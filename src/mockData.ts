@@ -11,7 +11,8 @@ import {
   ForumPost, 
   SupportContact, 
   ExperienceStory,
-  Comment
+  Comment,
+  Donation
 } from './types';
 
 export const INITIAL_ARTICLES: Article[] = [
@@ -381,6 +382,45 @@ export const INITIAL_COMMENTS: Comment[] = [
     date: '2026-07-09',
     likes: 7,
     reported: false
+  }
+];
+
+export const INITIAL_DONATIONS: Donation[] = [
+  {
+    id: 'don-1',
+    donorName: 'Jiří Š. (studium Synthesis)',
+    amount: 5000,
+    message: 'Podpora spravedlivého rodinného práva a technologického rozvoje platformy pod záštitou studia Synthesis.',
+    date: '2026-07-13',
+    isPublic: true,
+    isVerified: true
+  },
+  {
+    id: 'don-2',
+    donorName: 'Tomáš M.',
+    amount: 500,
+    message: 'Skvělá interaktivní kalkulačka střídavé péče. Výrazně mi to zjednodušilo argumentaci u opatrovnického soudu.',
+    date: '2026-07-12',
+    isPublic: true,
+    isVerified: true
+  },
+  {
+    id: 'don-3',
+    donorName: 'Anonymní dárce',
+    amount: 1000,
+    message: 'Díky moc za perfektní vzory podání k soudu ke stažení zdarma. Velmi užitečná práce pro všechny táty.',
+    date: '2026-07-10',
+    isPublic: true,
+    isVerified: true
+  },
+  {
+    id: 'don-4',
+    donorName: 'Kateřina L. (mediátorka)',
+    amount: 800,
+    message: 'Tento web doporučuji rodičům na mediacích jako skvělý zdroj vědecky podložených informací o prospěšnosti střídavé péče.',
+    date: '2026-07-08',
+    isPublic: true,
+    isVerified: true
   }
 ];
 

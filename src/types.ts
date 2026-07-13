@@ -115,3 +115,14 @@ export interface ExperienceStory {
   approved: boolean;
   reported: boolean;
 }
+
+export interface Donation {
+  id: string;
+  donorName: string;
+  amount: number;
+  message?: string;
+  date: string;
+  isPublic: boolean;
+  isVerified: boolean;
+}
+

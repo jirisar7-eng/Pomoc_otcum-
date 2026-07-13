@@ -21,7 +21,7 @@ import {
   HelpCircle,
   CheckCircle
 } from 'lucide-react';
-import { Article, ExperienceStory, ForumPost, Comment, User } from '../types';
+import { Article, ExperienceStory, ForumPost, Comment, User, Donation } from '../types';
 
 interface AdminPanelProps {
   currentUser: User | null;
@@ -29,10 +29,12 @@ interface AdminPanelProps {
   stories: ExperienceStory[];
   posts: ForumPost[];
   comments: Comment[];
+  donations: Donation[];
   setArticles: React.Dispatch<React.SetStateAction<Article[]>>;
   setStories: React.Dispatch<React.SetStateAction<ExperienceStory[]>>;
   setPosts: React.Dispatch<React.SetStateAction<ForumPost[]>>;
   setComments: React.Dispatch<React.SetStateAction<Comment[]>>;
+  setDonations: React.Dispatch<React.SetStateAction<Donation[]>>;
 }
 
 export default function AdminPanel({
@@ -41,13 +43,15 @@ export default function AdminPanel({
   stories,
   posts,
   comments,
+  donations = [],
   setArticles,
   setStories,
   setPosts,
-  setComments
+  setComments,
+  setDonations
 }: AdminPanelProps) {
   // Navigation within Admin Panel
-  const [adminTab, setAdminTab] = useState<'articles' | 'moderation' | 'flagged'>('articles');
+  const [adminTab, setAdminTab] = useState<'articles' | 'moderation' | 'flagged' | 'donations'>('articles');
 
   // Form states for adding/editing articles
   const [articleFormOpen, setArticleFormOpen] = useState(false);
@@ -87,6 +91,10 @@ export default function AdminPanel({
   const flaggedComments = useMemo(() => {
     return comments.filter(c => c.reported);
   }, [comments]);
+
+  const pendingDonations = useMemo(() => {
+    return donations.filter(d => !d.isVerified);
+  }, [donations]);
 
   // Article Actions
   const handleOpenNewArticle = () => {
@@ -208,6 +216,17 @@ export default function AdminPanel({
     }
   };
 
+  const handleApproveDonation = (donationId: string) => {
+    setDonations(prev => prev.map(d => d.id === donationId ? { ...d, isVerified: true } : d));
+    alert('Příspěvek byl úspěšně spárován a schválen na zeď podporovatelů.');
+  };
+
+  const handleDeleteDonation = (donationId: string) => {
+    if (confirm('Opravdu chcete tento dar a vzkaz trvale smazat?')) {
+      setDonations(prev => prev.filter(d => d.id !== donationId));
+    }
+  };
+
   return (
     <div className="space-y-6 animate-fade-in" id="admin-panel-container">
       
@@ -234,7 +253,8 @@ export default function AdminPanel({
         {[
           { id: 'articles', label: 'Správa článků', count: articles.length },
           { id: 'moderation', label: 'Schvalování příběhů', count: pendingStories.length },
-          { id: 'flagged', label: 'Nahlášený obsah', count: flaggedPosts.length + flaggedComments.length }
+          { id: 'flagged', label: 'Nahlášený obsah', count: flaggedPosts.length + flaggedComments.length },
+          { id: 'donations', label: 'Správa darů', count: pendingDonations.length }
         ].map((tab) => (
           <button
             id={`admin-subtab-select-${tab.id}`}
@@ -603,6 +623,121 @@ export default function AdminPanel({
               )}
 
             </div>
+          </div>
+        )}
+
+        {/* SUBTAB 4: DONATIONS MANAGEMENT */}
+        {adminTab === 'donations' && (
+          <div className="space-y-6 animate-fadeIn" id="admin-donations-workspace">
+            <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-2xs">
+              <h3 className="font-bold text-xs text-slate-700 uppercase tracking-wider mb-2">
+                Čekající dary na spárování a schválení ({pendingDonations.length})
+              </h3>
+              <p className="text-[11px] text-slate-500 leading-relaxed">
+                Zde vidíte příspěvky, které uživatelé zapsali s žádostí o zápis na zeď podporovatelů. Po obdržení platby na bankovní účet klikněte na "Schválit", čímž se dar a vzkaz okamžitě zobrazí na veřejné zdi podporovatelů.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4">
+              {pendingDonations.length === 0 ? (
+                <div className="bg-white p-12 rounded-2xl border border-slate-100 text-center text-slate-400 shadow-2xs italic text-xs">
+                  Žádné čekající příspěvky. Všechny zapsané dary byly úspěšně zpracovány a schváleny.
+                </div>
+              ) : (
+                pendingDonations.map(donation => (
+                  <div key={donation.id} className="bg-white p-5 rounded-2xl border border-teal-100 bg-teal-50/5 shadow-2xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4" id={`admin-donation-row-${donation.id}`}>
+                    <div className="space-y-1.5 max-w-2xl">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[9px] bg-teal-100 text-teal-800 border border-teal-200 font-bold px-2 py-0.5 rounded">
+                          ČEKAJÍCÍ PLATBA
+                        </span>
+                        <span className="text-[10px] text-slate-400 font-mono">Zapsáno: {donation.date}</span>
+                      </div>
+                      <h4 className="font-bold text-slate-800 text-sm">{donation.donorName}</h4>
+                      <span className="inline-block text-xs font-bold text-teal-800 bg-teal-50 border border-teal-100 px-2.5 py-0.5 rounded-lg mt-1 font-mono">
+                        Očekávaná částka: {donation.amount} Kč
+                      </span>
+                      {donation.message && (
+                        <p className="text-slate-600 text-xs italic bg-slate-50 p-2.5 rounded-lg border border-slate-100 mt-2">
+                          "{donation.message}"
+                        </p>
+                      )}
+                      <div className="text-[10px] text-slate-400 mt-1 font-mono">
+                        Zobrazit na zdi: <strong className={donation.isPublic ? "text-emerald-600" : "text-rose-600"}>{donation.isPublic ? "ANO" : "NE (Jen anonymní statistika)"}</strong>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2 shrink-0 w-full md:w-auto">
+                      <button
+                        onClick={() => handleDeleteDonation(donation.id)}
+                        className="flex-1 md:flex-initial px-3.5 py-2 border border-slate-200 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                        Smazat zápis
+                      </button>
+                      <button
+                        onClick={() => handleApproveDonation(donation.id)}
+                        className="flex-1 md:flex-initial px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                      >
+                        <Check className="w-3.5 h-3.5 text-teal-200" />
+                        Potvrdit přijetí & Schválit
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Verified / Approved Donations List */}
+            {donations.filter(d => d.isVerified).length > 0 && (
+              <div className="space-y-4">
+                <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-2xs">
+                  <h3 className="font-bold text-xs text-slate-700 uppercase tracking-wider">
+                    Historie schválených a doručených darů ({donations.filter(d => d.isVerified).length})
+                  </h3>
+                </div>
+                <div className="bg-white rounded-2xl border border-slate-100 shadow-2xs overflow-hidden">
+                  <table className="w-full text-left text-xs border-collapse">
+                     <thead>
+                       <tr className="bg-slate-50 text-slate-500 font-mono text-[9px] uppercase tracking-wider border-b border-slate-100">
+                         <th className="p-3">Dárce</th>
+                         <th className="p-3">Částka</th>
+                         <th className="p-3">Datum</th>
+                         <th className="p-3">Zobrazení</th>
+                         <th className="p-3">Zpráva</th>
+                         <th className="p-3 text-right">Akce</th>
+                       </tr>
+                     </thead>
+                     <tbody className="divide-y divide-slate-100">
+                       {donations.filter(d => d.isVerified).map(donation => (
+                         <tr key={donation.id} className="hover:bg-slate-50/50 transition-colors">
+                           <td className="p-3 font-semibold text-slate-800">{donation.donorName}</td>
+                           <td className="p-3 font-mono font-bold text-teal-700">{donation.amount} Kč</td>
+                           <td className="p-3 font-mono text-slate-500">{donation.date}</td>
+                           <td className="p-3">
+                             <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${donation.isPublic ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-600'}`}>
+                               {donation.isPublic ? 'Veřejný' : 'Skrytý'}
+                             </span>
+                           </td>
+                           <td className="p-3 text-slate-500 italic max-w-xs truncate" title={donation.message}>
+                             {donation.message || '-'}
+                           </td>
+                           <td className="p-3 text-right">
+                             <button
+                               onClick={() => handleDeleteDonation(donation.id)}
+                               className="p-1 hover:text-rose-600 text-slate-400 rounded transition-colors cursor-pointer"
+                               title="Smazat dar"
+                             >
+                               <Trash2 className="w-4 h-4" />
+                             </button>
+                           </td>
+                         </tr>
+                       ))}
+                     </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
           </div>
         )}
 

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Calendar, 
   HelpCircle, 
@@ -32,8 +32,16 @@ import {
   Info,
   TrendingUp,
   Plus,
-  Trash2
+  Trash2,
+  Save,
+  Cloud,
+  Baby,
+  GraduationCap,
+  Clock,
+  MapPin
 } from 'lucide-react';
+import { saveDocument } from '../lib/firebase';
+import { User } from '../types';
 
 interface ScheduleType {
   id: string;
@@ -95,31 +103,115 @@ const SCHEDULES: ScheduleType[] = [
   }
 ];
 
-export default function PeceODiteSection() {
+export default function PeceODiteSection({ currentUser, onOpenAuth }: { currentUser?: User | null; onOpenAuth?: () => void }) {
   const [activeSubTab, setActiveSubTab] = useState<'schedules' | 'studies' | 'methodologies'>('schedules');
   const [selectedStudy, setSelectedStudy] = useState<'fabricius' | 'warshak'>('fabricius');
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   // Advanced Child Care Regime Simulator State
-  const [fatherName, setFatherName] = useState<string>('Aktivní otec');
-  const [motherName, setMotherName] = useState<string>('Matka');
+  const [fatherName, setFatherName] = useState<string>(() => localStorage.getItem('synthesis_care_sim_father') || 'Aktivní otec');
+  const [motherName, setMotherName] = useState<string>(() => localStorage.getItem('synthesis_care_sim_mother') || 'Matka');
 
   interface SimulatedChild {
     id: string;
     name: string;
     pattern: ('A' | 'B')[];
     color: string;
+    ageGroup: 'infant' | 'toddler' | 'preschool' | 'school' | 'teen';
+    schoolType: 'skola' | 'skolka' | 'doma';
+    schoolDistanceDad: number;
+    schoolDistanceMom: number;
+    schoolTimeDad: number;
+    schoolTimeMom: number;
+    handoverType: 'school' | 'neutral' | 'father_residence' | 'mother_residence';
+    handoverTime: string;
+    handoverResponsible: 'both' | 'father' | 'mother';
+    hobbiesCount: number;
+    healthNotes: string;
+    summerWeeksDad: number;
+    summerWeeksMom: number;
+    christmasEveStyle: 'alternating' | 'father' | 'mother' | 'split';
   }
 
-  // Starts with one child (Mladší syn) as default
-  const [simulatedChildren, setSimulatedChildren] = useState<SimulatedChild[]>([
-    {
-      id: 'child-1',
-      name: 'Mladší syn',
-      pattern: ['A', 'A', 'A', 'A', 'A', 'A', 'A', 'B', 'B', 'B', 'B', 'B', 'B', 'B'],
-      color: 'bg-teal-600'
+  const ensureDefaultFields = (child: any): SimulatedChild => {
+    return {
+      id: child.id,
+      name: child.name,
+      pattern: child.pattern,
+      color: child.color || 'bg-teal-600',
+      ageGroup: child.ageGroup || 'school',
+      schoolType: child.schoolType || 'skola',
+      schoolDistanceDad: child.schoolDistanceDad !== undefined ? child.schoolDistanceDad : 5,
+      schoolDistanceMom: child.schoolDistanceMom !== undefined ? child.schoolDistanceMom : 5,
+      schoolTimeDad: child.schoolTimeDad !== undefined ? child.schoolTimeDad : 10,
+      schoolTimeMom: child.schoolTimeMom !== undefined ? child.schoolTimeMom : 10,
+      handoverType: child.handoverType || 'school',
+      handoverTime: child.handoverTime || 'Neděle 18:00',
+      handoverResponsible: child.handoverResponsible || 'both',
+      hobbiesCount: child.hobbiesCount !== undefined ? child.hobbiesCount : 1,
+      healthNotes: child.healthNotes || 'Standardní',
+      summerWeeksDad: child.summerWeeksDad !== undefined ? child.summerWeeksDad : 4,
+      summerWeeksMom: child.summerWeeksMom !== undefined ? child.summerWeeksMom : 4,
+      christmasEveStyle: child.christmasEveStyle || 'alternating'
+    };
+  };
+
+  // Starts with two children (Štěpánek & Jiřík) as default to showcase sibling cohesion
+  const [simulatedChildren, setSimulatedChildren] = useState<SimulatedChild[]>(() => {
+    const local = localStorage.getItem('synthesis_care_sim_children');
+    if (local) {
+      try {
+        const parsed = JSON.parse(local);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed.map(c => ensureDefaultFields(c));
+        }
+      } catch (e) {
+        console.error("Error parsing stored children state:", e);
+      }
     }
-  ]);
+    return [
+      {
+        id: 'child-1',
+        name: 'Štěpánek (mladší)',
+        pattern: ['A', 'A', 'A', 'A', 'A', 'A', 'A', 'B', 'B', 'B', 'B', 'B', 'B', 'B'],
+        color: 'bg-teal-600',
+        ageGroup: 'toddler',
+        schoolType: 'skolka',
+        schoolDistanceDad: 4,
+        schoolDistanceMom: 12,
+        schoolTimeDad: 10,
+        schoolTimeMom: 25,
+        handoverType: 'school',
+        handoverTime: 'Pondělí 8:00 přímo do školky',
+        handoverResponsible: 'both',
+        hobbiesCount: 1,
+        healthNotes: 'Bez speciálních potřeb',
+        summerWeeksDad: 4,
+        summerWeeksMom: 4,
+        christmasEveStyle: 'alternating'
+      },
+      {
+        id: 'child-2',
+        name: 'Jiřík (starší)',
+        pattern: ['A', 'A', 'A', 'A', 'A', 'A', 'A', 'B', 'B', 'B', 'B', 'B', 'B', 'B'],
+        color: 'bg-indigo-600',
+        ageGroup: 'school',
+        schoolType: 'skola',
+        schoolDistanceDad: 5,
+        schoolDistanceMom: 15,
+        schoolTimeDad: 12,
+        schoolTimeMom: 30,
+        handoverType: 'school',
+        handoverTime: 'Pondělí 8:00 přímo do školy',
+        handoverResponsible: 'both',
+        hobbiesCount: 2,
+        healthNotes: 'Lehká pylová alergie',
+        summerWeeksDad: 4,
+        summerWeeksMom: 4,
+        christmasEveStyle: 'alternating'
+      }
+    ];
+  });
 
   const [activePreset, setActivePreset] = useState<string>('sync');
   const [isPrintMode, setIsPrintMode] = useState<boolean>(false);
@@ -184,6 +276,73 @@ export default function PeceODiteSection() {
       });
       setActivePreset(presetId);
     }
+  };
+
+  const [expandedChildId, setExpandedChildId] = useState<string | null>(null);
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+
+  // Sync to localStorage
+  useEffect(() => {
+    localStorage.setItem('synthesis_care_sim_children', JSON.stringify(simulatedChildren));
+  }, [simulatedChildren]);
+
+  useEffect(() => {
+    localStorage.setItem('synthesis_care_sim_father', fatherName);
+  }, [fatherName]);
+
+  useEffect(() => {
+    localStorage.setItem('synthesis_care_sim_mother', motherName);
+  }, [motherName]);
+
+  // Load from Cloud if available
+  useEffect(() => {
+    if (currentUser && (currentUser as any).savedCarePlan) {
+      const plan = (currentUser as any).savedCarePlan;
+      if (plan.simulatedChildren && Array.isArray(plan.simulatedChildren)) {
+        setSimulatedChildren(plan.simulatedChildren.map((c: any) => ensureDefaultFields(c)));
+      }
+      if (plan.fatherName) setFatherName(plan.fatherName);
+      if (plan.motherName) setMotherName(plan.motherName);
+    }
+  }, [currentUser]);
+
+  const handleSaveToCloud = async () => {
+    if (!currentUser) {
+      if (onOpenAuth) {
+        onOpenAuth();
+      }
+      return;
+    }
+    setSaveStatus('saving');
+    try {
+      await saveDocument('users', currentUser.id, {
+        savedCarePlan: {
+          simulatedChildren,
+          fatherName,
+          motherName,
+          updatedAt: new Date().toISOString()
+        }
+      });
+      setSaveStatus('saved');
+      setTimeout(() => setSaveStatus('idle'), 3000);
+    } catch (e) {
+      console.error("Error saving plan to cloud:", e);
+      setSaveStatus('error');
+      setTimeout(() => setSaveStatus('idle'), 3000);
+    }
+  };
+
+  const updateChildField = (childId: string, field: keyof SimulatedChild, value: any) => {
+    setSimulatedChildren(prev => prev.map(child => {
+      if (child.id === childId) {
+        return {
+          ...child,
+          [field]: value
+        };
+      }
+      return child;
+    }));
+    setActivePreset('custom');
   };
 
   const toggleDay = (childId: string, index: number) => {
@@ -323,6 +482,41 @@ ${simulatedChildren.map(child => {
   const stability = getStabilityEval(transitions);
   return `- ${child.name}: ${transitions}x přesunů za 14 dnů (${stability.label})`;
 }).join('\n')}
+
+IV. Pokročilé individuální parametry dětí (Soudní logistika)
+${simulatedChildren.map(child => `
+Dítě: ${child.name}
+- Věková kategorie: ${
+  child.ageGroup === 'infant' ? 'Kojenec (do 1 roku)' :
+  child.ageGroup === 'toddler' ? 'Batole (1–3 roky)' :
+  child.ageGroup === 'preschool' ? 'Předškolák (3–6 let)' :
+  child.ageGroup === 'school' ? 'Školák (6–12 let)' :
+  'Teenager (12+ let)'
+}
+- Docházka: ${child.schoolType === 'skola' ? 'Základní škola' : child.schoolType === 'skolka' ? 'Mateřská škola / jesle' : 'Zatím nechodí (doma)'}
+- Vzdálenost do školy od otce: ${child.schoolDistanceDad} km, od matky: ${child.schoolDistanceMom} km
+- Místo předávání: ${
+  child.handoverType === 'school' ? 'Předávání přes školu/školku (Doporučený standard ČR)' :
+  child.handoverType === 'neutral' ? 'Neutrální veřejné místo' :
+  child.handoverType === 'father_residence' ? 'Bydliště otce' :
+  'Bydliště matky'
+}
+- Obvyklý čas předávání: ${child.handoverTime}
+- Letní prázdniny u otce: ${child.summerWeeksDad} týdnů, u matky: ${child.summerWeeksMom} týdnů
+- Vánoční střídání: ${
+  child.christmasEveStyle === 'alternating' ? 'Střídavě po roce (Lichý/Sudý)' :
+  child.christmasEveStyle === 'split' ? 'Rozdělený Štědrý den' :
+  child.christmasEveStyle === 'father' ? 'Vždy u otce' :
+  'Vždy u matky'
+}
+- Zdravotní potřeby: ${child.healthNotes || 'Standardní'}
+- Počet kroužků: ${child.hobbiesCount} týdně
+- Logistická zátěž předávání: ${
+  child.handoverResponsible === 'both' ? 'Spravedlivě oběma (půl na půl)' :
+  child.handoverResponsible === 'father' ? 'Zajišťuje převážně otec' :
+  'Zajišťuje převážně matka'
+}
+`).join('\n')}
 
 Místo a datum odevzdání:
 V [Město] dne ${new Date().toLocaleDateString('cs-CZ')}
@@ -478,16 +672,47 @@ Tento globální vědecký konsenzus stanovuje:
                 </div>
                 <p className="text-xs text-slate-500">Namodelujte si časový plán střídavé péče s ohledem na počet dětí a obhajte soudržnost sourozenců u soudu.</p>
               </div>
-              <button
-                onClick={() => setIsPrintMode(!isPrintMode)}
-                className={`px-4 py-2 font-bold text-xs rounded-xl transition-all flex items-center gap-2 cursor-pointer ${
-                  isPrintMode 
-                    ? 'bg-amber-100 text-amber-800 hover:bg-amber-200' 
-                    : 'bg-teal-600 text-white hover:bg-teal-700 shadow-3xs'
-                }`}
-              >
-                {isPrintMode ? 'Zpět do plánovače' : 'Vygenerovat verzi pro soud'}
-              </button>
+              <div className="flex flex-wrap items-center gap-2">
+                {currentUser ? (
+                  <button
+                    onClick={handleSaveToCloud}
+                    disabled={saveStatus === 'saving'}
+                    className={`px-3.5 py-2 font-bold text-xs rounded-xl transition-all flex items-center gap-2 cursor-pointer border ${
+                      saveStatus === 'saved'
+                        ? 'bg-emerald-50 border-emerald-200 text-emerald-800 font-extrabold shadow-3xs'
+                        : saveStatus === 'error'
+                        ? 'bg-rose-50 border-rose-200 text-rose-800 font-extrabold'
+                        : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+                    }`}
+                  >
+                    {saveStatus === 'saving' ? (
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin text-teal-600" />
+                    ) : (
+                      <Cloud className={`w-3.5 h-3.5 ${saveStatus === 'saved' ? 'text-emerald-600' : 'text-teal-600'}`} />
+                    )}
+                    {saveStatus === 'saving' ? 'Ukládám...' : saveStatus === 'saved' ? 'Uloženo v cloudu ✓' : saveStatus === 'error' ? 'Chyba ukládání ❌' : 'Uložit do cloudu'}
+                  </button>
+                ) : (
+                  <button
+                    onClick={onOpenAuth}
+                    className="px-3.5 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-600 font-bold text-xs rounded-xl transition-all flex items-center gap-2 cursor-pointer"
+                    title="Přihlaste se pro uložení rozvrhu do cloudu"
+                  >
+                    <Cloud className="w-3.5 h-3.5 text-slate-400" />
+                    Uložit do cloudu
+                  </button>
+                )}
+                <button
+                  onClick={() => setIsPrintMode(!isPrintMode)}
+                  className={`px-4 py-2 font-bold text-xs rounded-xl transition-all flex items-center gap-2 cursor-pointer ${
+                    isPrintMode 
+                      ? 'bg-amber-100 text-amber-800 hover:bg-amber-200' 
+                      : 'bg-teal-600 text-white hover:bg-teal-700 shadow-3xs'
+                  }`}
+                >
+                  {isPrintMode ? 'Zpět do plánovače' : 'Vygenerovat verzi pro soud'}
+                </button>
+              </div>
             </div>
 
             {isPrintMode ? (
@@ -758,7 +983,21 @@ Tento globální vědecký konsenzus stanovuje:
                                 id: newId,
                                 name: newChildName,
                                 pattern: ['A', 'A', 'A', 'A', 'A', 'A', 'A', 'B', 'B', 'B', 'B', 'B', 'B', 'B'],
-                                color: chosenColor
+                                color: chosenColor,
+                                ageGroup: 'school',
+                                schoolType: 'skola',
+                                schoolDistanceDad: 5,
+                                schoolDistanceMom: 5,
+                                schoolTimeDad: 10,
+                                schoolTimeMom: 10,
+                                handoverType: 'school',
+                                handoverTime: 'Neděle 18:00',
+                                handoverResponsible: 'both',
+                                hobbiesCount: 1,
+                                healthNotes: 'Standardní',
+                                summerWeeksDad: 4,
+                                summerWeeksMom: 4,
+                                christmasEveStyle: 'alternating'
                               }
                             ]);
                             setActivePreset('custom');
@@ -790,6 +1029,14 @@ Tento globální vědecký konsenzus stanovuje:
                               />
                             </div>
                             <div className="flex items-center gap-2 text-[10px] text-slate-400 font-mono">
+                              <button
+                                onClick={() => setExpandedChildId(expandedChildId === child.id ? null : child.id)}
+                                className="text-teal-600 hover:text-teal-800 font-bold flex items-center gap-1 cursor-pointer mr-2"
+                                title="Upravit pokročilé individuální parametry dítěte"
+                              >
+                                <Sliders className="w-3.5 h-3.5" />
+                                {expandedChildId === child.id ? 'Skrýt detaily' : 'Pokročilé detaily'}
+                              </button>
                               <span>Poměr: {dadDays} d. u táty ({Math.round(dadDays/14*100)}%)</span>
                               {simulatedChildren.length > 1 && (
                                 <button
@@ -818,7 +1065,7 @@ Tento globální vědecký konsenzus stanovuje:
                                       : 'bg-white border-slate-200 hover:bg-slate-50 text-slate-400'
                                   }`}
                                 >
-                                  <span className="text-[7px] text-slate-400 font-mono">D${idx+1} {daysOfWeek[idx % 7]}</span>
+                                  <span className="text-[7px] text-slate-400 font-mono">D{idx+1} {daysOfWeek[idx % 7]}</span>
                                   <span className={`text-[9px] font-bold ${isA ? 'text-teal-700' : 'text-slate-400'}`}>
                                     {isA ? 'Táta' : 'Máma'}
                                   </span>
@@ -826,6 +1073,190 @@ Tento globální vědecký konsenzus stanovuje:
                               );
                             })}
                           </div>
+
+                          {/* Advanced child parameters form when expanded */}
+                          {expandedChildId === child.id && (
+                            <div className="bg-white border border-slate-200/60 rounded-xl p-4 mt-3 space-y-4 animate-fadeIn text-xs shadow-3xs">
+                              <div className="flex items-center gap-2 border-b border-slate-100 pb-2">
+                                <Sliders className="w-4 h-4 text-teal-600 animate-pulse" />
+                                <span className="font-bold text-slate-800">Pokročilé parametry péče o: {child.name}</span>
+                              </div>
+
+                              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                {/* Column 1: Age & Health */}
+                                <div className="space-y-3">
+                                  <div>
+                                    <label className="block text-[10px] text-slate-500 uppercase font-bold mb-1">Věková kategorie dětství:</label>
+                                    <select 
+                                      value={child.ageGroup} 
+                                      onChange={(e) => updateChildField(child.id, 'ageGroup', e.target.value as any)}
+                                      className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs focus:ring-1 focus:ring-teal-500 focus:outline-none font-medium text-slate-700"
+                                    >
+                                      <option value="infant">Kojenec (do 1 roku)</option>
+                                      <option value="toddler">Batole (1–3 roky)</option>
+                                      <option value="preschool">Předškolák (3–6 let)</option>
+                                      <option value="school">Školák (6–12 let)</option>
+                                      <option value="teen">Teenager (12+ let)</option>
+                                    </select>
+                                  </div>
+
+                                  <div>
+                                    <label className="block text-[10px] text-slate-500 uppercase font-bold mb-1">Specifický zdravotní stav / potřeby:</label>
+                                    <input 
+                                      type="text" 
+                                      value={child.healthNotes || 'Standardní'}
+                                      onChange={(e) => updateChildField(child.id, 'healthNotes', e.target.value)}
+                                      placeholder="např. Standardní, ADHD, potravinová alergie"
+                                      className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs focus:ring-1 focus:ring-teal-500 focus:outline-none"
+                                    />
+                                  </div>
+                                </div>
+
+                                {/* Column 2: School & Distances */}
+                                <div className="space-y-3">
+                                  <div>
+                                    <label className="block text-[10px] text-slate-500 uppercase font-bold mb-1">Školní docházka dětí:</label>
+                                    <select 
+                                      value={child.schoolType} 
+                                      onChange={(e) => updateChildField(child.id, 'schoolType', e.target.value as any)}
+                                      className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs focus:ring-1 focus:ring-teal-500 focus:outline-none font-medium text-slate-700"
+                                    >
+                                      <option value="skola">Základní škola</option>
+                                      <option value="skolka">Mateřská školka / jesle</option>
+                                      <option value="doma">Doma (zatím nechodí)</option>
+                                    </select>
+                                  </div>
+
+                                  {child.schoolType !== 'doma' && (
+                                    <div className="grid grid-cols-2 gap-2">
+                                      <div>
+                                        <label className="block text-[9px] text-slate-400 font-bold mb-0.5">Vzdálenost k tátovi (km):</label>
+                                        <input 
+                                          type="number" 
+                                          value={child.schoolDistanceDad}
+                                          onChange={(e) => updateChildField(child.id, 'schoolDistanceDad', Number(e.target.value))}
+                                          className="w-full bg-slate-50 border border-slate-200 rounded-lg p-1.5 text-xs focus:ring-1 focus:ring-teal-500 focus:outline-none"
+                                        />
+                                      </div>
+                                      <div>
+                                        <label className="block text-[9px] text-slate-400 font-bold mb-0.5">Vzdálenost k mámě (km):</label>
+                                        <input 
+                                          type="number" 
+                                          value={child.schoolDistanceMom}
+                                          onChange={(e) => updateChildField(child.id, 'schoolDistanceMom', Number(e.target.value))}
+                                          className="w-full bg-slate-50 border border-slate-200 rounded-lg p-1.5 text-xs focus:ring-1 focus:ring-teal-500 focus:outline-none"
+                                        />
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+
+                                {/* Column 3: Handovers */}
+                                <div className="space-y-3">
+                                  <div>
+                                    <label className="block text-[10px] text-slate-500 uppercase font-bold mb-1">Místo předávání (soudní jistota):</label>
+                                    <select 
+                                      value={child.handoverType} 
+                                      onChange={(e) => updateChildField(child.id, 'handoverType', e.target.value as any)}
+                                      className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs focus:ring-1 focus:ring-teal-500 focus:outline-none font-medium text-slate-700"
+                                    >
+                                      <option value="school">Přes školu/školku (Doporučený standard ČR)</option>
+                                      <option value="neutral">Neutrální veřejné místo</option>
+                                      <option value="father_residence">Bydliště otce</option>
+                                      <option value="mother_residence">Bydliště matky</option>
+                                    </select>
+                                  </div>
+
+                                  <div>
+                                    <label className="block text-[10px] text-slate-500 uppercase font-bold mb-1">Obvyklý den &amp; čas předávání:</label>
+                                    <input 
+                                      type="text" 
+                                      value={child.handoverTime}
+                                      onChange={(e) => updateChildField(child.id, 'handoverTime', e.target.value)}
+                                      placeholder="např. Pondělí 8:00 (vstup do školy)"
+                                      className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs focus:ring-1 focus:ring-teal-500 focus:outline-none"
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-slate-100 pt-3">
+                                <div className="grid grid-cols-2 gap-2">
+                                  <div>
+                                    <label className="block text-[10px] text-slate-500 uppercase font-bold mb-1">Prázdniny u táty (týdny):</label>
+                                    <input 
+                                      type="number" 
+                                      value={child.summerWeeksDad}
+                                      onChange={(e) => updateChildField(child.id, 'summerWeeksDad', Number(e.target.value))}
+                                      className="w-full bg-slate-50 border border-slate-200 rounded-lg p-1.5 text-xs focus:ring-1 focus:ring-teal-500"
+                                      min={0}
+                                      max={8}
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="block text-[10px] text-slate-500 uppercase font-bold mb-1">Vánoční svátky střídání:</label>
+                                    <select 
+                                      value={child.christmasEveStyle} 
+                                      onChange={(e) => updateChildField(child.id, 'christmasEveStyle', e.target.value as any)}
+                                      className="w-full bg-slate-50 border border-slate-200 rounded-lg p-1.5 text-xs focus:ring-1 focus:ring-teal-500 focus:outline-none text-slate-700"
+                                    >
+                                      <option value="alternating">Střídavě po roce (Lichý/Sudý)</option>
+                                      <option value="split">Rozdělený svátek (24. u jednoho, 25. přesun)</option>
+                                      <option value="father">Vždy u otce</option>
+                                      <option value="mother">Vždy u matky</option>
+                                    </select>
+                                  </div>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-2">
+                                  <div>
+                                    <label className="block text-[10px] text-slate-500 uppercase font-bold mb-1">Počet kroužků týdně:</label>
+                                    <input 
+                                      type="number" 
+                                      value={child.hobbiesCount}
+                                      onChange={(e) => updateChildField(child.id, 'hobbiesCount', Number(e.target.value))}
+                                      className="w-full bg-slate-50 border border-slate-200 rounded-lg p-1.5 text-xs focus:ring-1 focus:ring-teal-500"
+                                      min={0}
+                                      max={10}
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="block text-[10px] text-slate-500 uppercase font-bold mb-1">Logistická zátěž předávání:</label>
+                                    <select 
+                                      value={child.handoverResponsible} 
+                                      onChange={(e) => updateChildField(child.id, 'handoverResponsible', e.target.value as any)}
+                                      className="w-full bg-slate-50 border border-slate-200 rounded-lg p-1.5 text-xs focus:ring-1 focus:ring-teal-500 focus:outline-none text-slate-700"
+                                    >
+                                      <option value="both">Spravedlivě oběma (půl na půl)</option>
+                                      <option value="father">Zajišťuje převážně otec</option>
+                                      <option value="mother">Zajišťuje převážně matka</option>
+                                    </select>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Developmental & Psychological Analysis Banner */}
+                              <div className="bg-teal-50/40 border border-teal-100 p-3 rounded-lg text-[11px] text-slate-700 leading-relaxed flex items-start gap-2">
+                                <Info className="w-4 h-4 text-teal-600 shrink-0 mt-0.5" />
+                                <div>
+                                  <span className="font-bold text-teal-950 block">Soudní doporučení pro věk: {
+                                    child.ageGroup === 'infant' ? 'Kojenec (do 1 roku)' :
+                                    child.ageGroup === 'toddler' ? 'Batole (1–3 roky)' :
+                                    child.ageGroup === 'preschool' ? 'Předškolák (3–6 let)' :
+                                    child.ageGroup === 'school' ? 'Školák (6–12 let)' :
+                                    'Teenager (12+ let)'
+                                  }</span>
+                                  <p className="mt-0.5 text-slate-600">
+                                    {child.ageGroup === 'infant' && "U kojenců do 1 roku výzkum a judikatura Ústavního soudu doporučují časté, kratší kontakty s oběma rodiči s postupným zapojováním přespávání. Klíčová je stabilita citových vazeb. Věda prokazuje, že zapojení noční péče otce buduje bezpečnější pouto do budoucna (Fabricius, 2016)."}
+                                    {child.ageGroup === 'toddler' && "U batolat (1-3 roky) je střídavá péče skvělá v kratších intervalech (např. režim 2-2-3 nebo 3-4-4-3). Pravidelné noční rituály a péče otce upevňují bezpečné pouto k oběma rodičům bez negativních vlivů na matku."}
+                                    {child.ageGroup === 'preschool' && "U předškoláků (3-6 let) je střídavá péče vynikající volbou v symetrických blocích. Děti mají rozvinutou řeč, logistiku přechodů snášejí velmi dobře a kontakt s oběma rodiči podporuje zdravou socializaci a emoční rozvoj."}
+                                    {child.ageGroup === 'school' && "U dětí školního věku (6-12 let) je standardní týden-týden střídání (předávání nejlépe v pondělí přímo přes školu/družinu) ideální. Zajišťuje klid na celotýdenní školní cyklus a kroužky. Děti mají vysokou stabilitu."}
+                                    {child.ageGroup === 'teen' && "U teenagerů (nad 12 let) má názor dítěte zásadní váhu podle § 867 Občanského zákoníku. Režim by měl být flexibilní a plně respektovat školní, sportovní a sociální život dospívajícího."}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       );
                     })}

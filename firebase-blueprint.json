@@ -1,0 +1,88 @@
+{
+  "collections": {
+    "users": {
+      "description": "Portál členové (tatovesta registered users and roles)",
+      "schema": {
+        "id": "string",
+        "email": "string",
+        "name": "string",
+        "role": "string",
+        "avatar": "string",
+        "createdAt": "string"
+      }
+    },
+    "articles": {
+      "description": "Články a návody (laws, courts, psychology, news)",
+      "schema": {
+        "id": "string",
+        "title": "string",
+        "summary": "string",
+        "content": "string",
+        "category": "string",
+        "date": "string",
+        "author": "string",
+        "likes": "number",
+        "commentsCount": "number",
+        "readTime": "string",
+        "tags": "array"
+      }
+    },
+    "stories": {
+      "description": "Zkušenosti ostatních rodičů (stories from parents)",
+      "schema": {
+        "id": "string",
+        "title": "string",
+        "content": "string",
+        "authorName": "string",
+        "date": "string",
+        "likes": "number",
+        "approved": "boolean",
+        "reported": "boolean"
+      }
+    },
+    "posts": {
+      "description": "Diskusní fórum témata (forum posts)",
+      "schema": {
+        "id": "string",
+        "categoryId": "string",
+        "title": "string",
+        "content": "string",
+        "userId": "string",
+        "userName": "string",
+        "userAvatar": "string",
+        "date": "string",
+        "likes": "number",
+        "commentsCount": "number",
+        "tags": "array",
+        "reported": "boolean"
+      }
+    },
+    "comments": {
+      "description": "Komentáře k článkům a fórům (comments)",
+      "schema": {
+        "id": "string",
+        "contentId": "string",
+        "contentType": "string",
+        "userId": "string",
+        "userName": "string",
+        "userAvatar": "string",
+        "content": "string",
+        "date": "string",
+        "likes": "number",
+        "reported": "boolean"
+      }
+    },
+    "donations": {
+      "description": "Dary a vzkazy podporovatelů webu (donations & support messages)",
+      "schema": {
+        "id": "string",
+        "donorName": "string",
+        "amount": "number",
+        "message": "string",
+        "date": "string",
+        "isPublic": "boolean",
+        "isVerified": "boolean"
+      }
+    }
+  }
+}

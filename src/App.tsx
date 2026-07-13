@@ -7,15 +7,23 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Sparkles, Scale, Heart, Shield } from 'lucide-react';
 
-import { User, Article, ExperienceStory, ForumPost, Comment } from './types';
+import { User, Article, ExperienceStory, ForumPost, Comment, Donation } from './types';
 import { 
   getStoredState, 
   setStoredState, 
   INITIAL_ARTICLES, 
   INITIAL_STORIES, 
   INITIAL_FORUM_POSTS, 
-  INITIAL_COMMENTS 
+  INITIAL_COMMENTS,
+  INITIAL_DONATIONS
 } from './mockData';
+import { 
+  subscribeToAuth, 
+  getCollectionData, 
+  saveDocument, 
+  deleteDocument,
+  logoutUser 
+} from './lib/firebase';
 
 // Component imports
 import Navigation from './components/Navigation';
@@ -40,6 +48,7 @@ import PeceODiteSection from './components/PeceODiteSection';
 import KeStazeniSection from './components/KeStazeniSection';
 import KontaktSection from './components/KontaktSection';
 import CrisisSection from './components/CrisisSection';
+import SupportSection from './components/SupportSection';
 
 export default function App() {
   // Global Authentication & Navigation States
@@ -53,10 +62,10 @@ export default function App() {
   const [authModalOpen, setAuthModalOpen] = useState<boolean>(false);
 
   // Lifed States for full Back-Office Synchronizations
-  const [articles, setArticles] = useState<Article[]>(() => 
+  const [articles, setLocalArticles] = useState<Article[]>(() => 
     getStoredState<Article[]>('articles', INITIAL_ARTICLES)
   );
-  const [stories, setStories] = useState<ExperienceStory[]>(() => {
+  const [stories, setLocalStories] = useState<ExperienceStory[]>(() => {
     const loaded = getStoredState<ExperienceStory[]>('stories', INITIAL_STORIES);
     const seen = new Set<string>();
     return loaded.filter(item => {
@@ -66,12 +75,112 @@ export default function App() {
       return true;
     });
   });
-  const [posts, setPosts] = useState<ForumPost[]>(() => 
+  const [posts, setLocalPosts] = useState<ForumPost[]>(() => 
     getStoredState<ForumPost[]>('posts', INITIAL_FORUM_POSTS)
   );
-  const [comments, setComments] = useState<Comment[]>(() => 
+  const [comments, setLocalComments] = useState<Comment[]>(() => 
     getStoredState<Comment[]>('comments', INITIAL_COMMENTS)
   );
+  const [donations, setLocalDonations] = useState<Donation[]>(() => 
+    getStoredState<Donation[]>('donations', INITIAL_DONATIONS)
+  );
+
+  // Track if Firebase collections have been successfully loaded
+  const [isFirebaseLoaded, setIsFirebaseLoaded] = useState<boolean>(false);
+
+  // Helper to create synchronized state setters
+  const createSyncedSetter = <T extends { id: string }>(
+    collectionName: string,
+    localSetter: React.Dispatch<React.SetStateAction<T[]>>,
+    canWriteCheck: () => boolean
+  ) => {
+    return (valueOrFunc: React.SetStateAction<T[]>) => {
+      localSetter((prev) => {
+        const next: T[] = typeof valueOrFunc === 'function'
+          ? (valueOrFunc as Function)(prev)
+          : valueOrFunc;
+
+        if (isFirebaseLoaded && canWriteCheck()) {
+          // 1. Sync additions and updates
+          next.forEach(item => {
+            const prevItem = prev.find(p => p.id === item.id);
+            if (!prevItem || JSON.stringify(prevItem) !== JSON.stringify(item)) {
+              saveDocument(collectionName, item.id, item).catch(e =>
+                console.error(`Error syncing ${collectionName} item ${item.id}:`, e)
+              );
+            }
+          });
+
+          // 2. Sync deletions
+          prev.forEach(prevItem => {
+            if (!next.some(n => n.id === prevItem.id)) {
+              deleteDocument(collectionName, prevItem.id).catch(e =>
+                console.error(`Error deleting ${collectionName} item ${prevItem.id}:`, e)
+              );
+            }
+          });
+        }
+
+        return next;
+      });
+    };
+  };
+
+  const setArticles = createSyncedSetter<Article>('articles', setLocalArticles, () => currentUser?.role === 'admin');
+  const setStories = createSyncedSetter<ExperienceStory>('stories', setLocalStories, () => true);
+  const setPosts = createSyncedSetter<ForumPost>('posts', setLocalPosts, () => !!currentUser);
+  const setComments = createSyncedSetter<Comment>('comments', setLocalComments, () => !!currentUser);
+  const setDonations = createSyncedSetter<Donation>('donations', setLocalDonations, () => true);
+
+  // 1. Subscribe to Firebase Authentication changes in real-time
+  useEffect(() => {
+    const unsubscribe = subscribeToAuth((user) => {
+      setCurrentUser(user);
+      if (user && user.role === 'admin' && activeTab === 'home') {
+        setActiveTab('admin');
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // 2. Fetch data from Firestore on initial mount
+  useEffect(() => {
+    async function loadFirestoreData() {
+      try {
+        console.log("Loading initial database collections from Firestore...");
+        
+        const dbArticles = await getCollectionData<Article>('articles', INITIAL_ARTICLES);
+        setLocalArticles(dbArticles);
+
+        const dbStories = await getCollectionData<ExperienceStory>('stories', INITIAL_STORIES);
+        const seenStories = new Set<string>();
+        const uniqueStories = dbStories.filter(item => {
+          if (!item || !item.id) return false;
+          if (seenStories.has(item.id)) return false;
+          seenStories.add(item.id);
+          return true;
+        });
+        setLocalStories(uniqueStories);
+
+        const dbPosts = await getCollectionData<ForumPost>('posts', INITIAL_FORUM_POSTS);
+        setLocalPosts(dbPosts);
+
+        const dbComments = await getCollectionData<Comment>('comments', INITIAL_COMMENTS);
+        setLocalComments(dbComments);
+
+        const dbDonations = await getCollectionData<Donation>('donations', INITIAL_DONATIONS);
+        setLocalDonations(dbDonations);
+
+        setIsFirebaseLoaded(true);
+        console.log("Firestore database synchronized successfully!");
+      } catch (err) {
+        console.error("Failed to load initial collections from Firestore:", err);
+        // Fallback: mark as loaded anyway so edits can persist
+        setIsFirebaseLoaded(true);
+      }
+    }
+    loadFirestoreData();
+  }, []);
 
   // Synchronize States to LocalStorage
   useEffect(() => {
@@ -98,6 +207,10 @@ export default function App() {
     setStoredState('comments', comments);
   }, [comments]);
 
+  useEffect(() => {
+    setStoredState('donations', donations);
+  }, [donations]);
+
   // Auth Callbacks
   const handleLogin = (user: User) => {
     setCurrentUser(user);
@@ -108,6 +221,7 @@ export default function App() {
   };
 
   const handleLogout = () => {
+    logoutUser().catch(e => console.error("Error logging out from Firebase:", e));
     setCurrentUser(null);
     if (activeTab === 'admin') {
       setActiveTab('home');
@@ -202,7 +316,7 @@ export default function App() {
             )}
 
             {activeTab === 'pece-o-dite' && (
-              <PeceODiteSection />
+              <PeceODiteSection currentUser={currentUser} onOpenAuth={() => setAuthModalOpen(true)} />
             )}
 
             {activeTab === 'advice' && (
@@ -242,6 +356,15 @@ export default function App() {
               <CrisisSection />
             )}
 
+            {activeTab === 'support' && (
+              <SupportSection
+                currentUser={currentUser}
+                onOpenAuth={() => setAuthModalOpen(true)}
+                donations={donations}
+                setDonations={setDonations}
+              />
+            )}
+
             {activeTab === 'news' && (
               <NewsSection
                 searchQuery={searchQuery}
@@ -257,10 +380,12 @@ export default function App() {
                 stories={stories}
                 posts={posts}
                 comments={comments}
+                donations={donations}
                 setArticles={setArticles}
                 setStories={setStories}
                 setPosts={setPosts}
                 setComments={setComments}
+                setDonations={setDonations}
               />
             )}
           </motion.div>
@@ -291,6 +416,9 @@ export default function App() {
                 <button onClick={() => setActiveTab('ke-stazeni')} className="text-left hover:text-teal-400 transition-colors cursor-pointer">Vzory podání</button>
                 <button onClick={() => setActiveTab('vyzivne')} className="text-left hover:text-teal-400 transition-colors cursor-pointer">Výpočet výživného</button>
                 <button onClick={() => setActiveTab('pece-o-dite')} className="text-left hover:text-teal-400 transition-colors cursor-pointer">Péče o dítě</button>
+                <button onClick={() => setActiveTab('support')} className="text-left text-teal-400 hover:text-teal-300 font-bold transition-colors cursor-pointer flex items-center gap-1 col-span-2 mt-1">
+                  <Heart className="w-3.5 h-3.5 text-teal-400 animate-pulse" /> Podpořit chod webu
+                </button>
               </div>
             </div>
 
@@ -306,7 +434,7 @@ export default function App() {
 
           <div className="border-t border-slate-800 mt-8 pt-6 flex flex-col md:flex-row items-center justify-between text-[11px] text-slate-500 font-mono">
             <div>
-              © 2026 Táta má právo. Vyvinuto s nejvyšším ohledem na blaho dětí.
+              © 2026 Táta má právo. Vyvinuto s nejvyšším ohledem na blaho dětí. Vytvořil Jiří Š. pod záštitou studia Synthesis.
             </div>
             <div className="flex gap-4 mt-2 md:mt-0">
               <span className="flex items-center gap-1 text-slate-400">

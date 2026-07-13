@@ -61,6 +61,7 @@ export default function Navigation({
     { id: 'crisis', label: 'Krizová pomoc', icon: LifeBuoy },
     { id: 'forum', label: 'Diskuze', icon: MessageCircle },
     { id: 'contacts', label: 'Kontakt', icon: PhoneCall },
+    { id: 'support', label: 'Podpořit web', icon: Heart },
   ];
 
   const handleTabClick = (tabId: string) => {
@@ -145,6 +146,19 @@ export default function Navigation({
                 </button>
               )}
             </div>
+
+            {/* Srdíčkové tlačítko Podpořit */}
+            <button
+              onClick={() => handleTabClick('support')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border font-bold text-[11px] transition-all cursor-pointer ${
+                activeTab === 'support'
+                  ? 'bg-teal-50 border-teal-200 text-teal-800'
+                  : 'bg-teal-50/40 hover:bg-teal-50 border-teal-100/50 text-teal-700 hover:border-teal-200 shadow-3xs'
+              }`}
+            >
+              <Heart className={`w-3.5 h-3.5 text-teal-600 ${activeTab === 'support' ? '' : 'animate-pulse'}`} />
+              Podpořit web
+            </button>
 
             {/* Authentication Buttons */}
             {currentUser ? (

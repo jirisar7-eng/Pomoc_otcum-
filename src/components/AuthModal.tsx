@@ -5,8 +5,9 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Mail, Lock, User as UserIcon, Shield, Sparkles } from 'lucide-react';
+import { X, Mail, Lock, User as UserIcon, Shield, Sparkles, LogIn } from 'lucide-react';
 import { User, UserRole } from '../types';
+import { loginWithGoogle, registerWithEmail, loginWithEmail } from '../lib/firebase';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -22,10 +23,11 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
   const [role, setRole] = useState<UserRole>('user');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
@@ -39,22 +41,61 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
       return;
     }
 
-    // Simulated login/register process
-    setSuccess(true);
-    setTimeout(() => {
-      const mockUser: User = {
-        id: isRegister ? 'usr-' + Math.random().toString(36).substr(2, 9) : (email.includes('admin') ? 'usr-admin' : 'usr-custom'),
-        email: email,
-        name: isRegister ? name : (email.includes('admin') ? 'Administrátor OS' : name || 'Aktivní Rodič'),
-        role: email.includes('admin') ? 'admin' : role,
-        avatar: `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(name || email)}`,
-        createdAt: new Date().toISOString()
-      };
+    setLoading(true);
+    try {
+      let loggedInUser: User;
+      if (isRegister) {
+        loggedInUser = await registerWithEmail(email, password, name);
+      } else {
+        loggedInUser = await loginWithEmail(email, password);
+      }
       
-      onLogin(mockUser);
+      setSuccess(true);
+      setTimeout(() => {
+        onLogin(loggedInUser);
+        setSuccess(false);
+        setLoading(false);
+        onClose();
+      }, 1000);
+    } catch (err: any) {
       setSuccess(false);
-      onClose();
-    }, 1200);
+      setLoading(false);
+      console.error("Auth error:", err);
+      // Translate common Firebase Auth errors to human-friendly Czech
+      if (err.code === 'auth/email-already-in-use') {
+        setError('Tento e-mail již používá jiný účet.');
+      } else if (err.code === 'auth/invalid-email') {
+        setError('Neplatný formát e-mailové adresy.');
+      } else if (err.code === 'auth/weak-password') {
+        setError('Heslo je příliš slabé. Použijte silnější heslo.');
+      } else if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
+        setError('Nesprávný e-mail nebo heslo.');
+      } else {
+        setError(err.message || 'Při ověřování došlo k chybě. Zkuste to prosím znovu.');
+      }
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    setError('');
+    setLoading(true);
+    try {
+      const loggedInUser = await loginWithGoogle();
+      setSuccess(true);
+      setTimeout(() => {
+        onLogin(loggedInUser);
+        setSuccess(false);
+        setLoading(false);
+        onClose();
+      }, 1000);
+    } catch (err: any) {
+      setSuccess(false);
+      setLoading(false);
+      console.error("Google Auth error:", err);
+      if (err.code !== 'auth/popup-blocked-by-user') {
+        setError('Přihlášení přes Google se nezdařilo. Zkuste to znovu.');
+      }
+    }
   };
 
   const setDemoUser = (type: 'user' | 'admin') => {
@@ -117,42 +158,66 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
                   </motion.div>
                 </div>
                 <h4 className="text-lg font-bold text-slate-800 font-display">Ověřování proběhlo úspěšně</h4>
-                <p className="text-slate-500 text-sm mt-1">Vítejte zpět v ekosystému Synthesis Hub.</p>
+                <p className="text-slate-500 text-sm mt-1">Vítejte v ekosystému Synthesis Hub.</p>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-4" id="auth-form">
+              <div className="space-y-4">
                 {error && (
                   <div className="bg-rose-50 text-rose-600 p-3 rounded-xl text-xs border border-rose-100" id="auth-error">
                     {error}
                   </div>
                 )}
 
-                {/* Quick Demo Accout buttons */}
-                <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                  <span className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold block mb-2 text-center">
-                    Rychlé demo účty pro testování RBAC:
-                  </span>
-                  <div className="grid grid-cols-2 gap-2">
-                    <button
-                      id="demo-user-btn"
-                      type="button"
-                      onClick={() => setDemoUser('user')}
-                      className="py-1.5 px-3 text-xs bg-white hover:bg-teal-50 border border-slate-200 hover:border-teal-300 text-slate-700 rounded-lg font-medium transition-all text-center flex items-center justify-center gap-1.5"
-                    >
-                      <UserIcon className="w-3.5 h-3.5 text-teal-600" />
-                      Role Rodič
-                    </button>
-                    <button
-                      id="demo-admin-btn"
-                      type="button"
-                      onClick={() => setDemoUser('admin')}
-                      className="py-1.5 px-3 text-xs bg-white hover:bg-indigo-50 border border-slate-200 hover:border-indigo-300 text-slate-700 rounded-lg font-medium transition-all text-center flex items-center justify-center gap-1.5"
-                    >
-                      <Shield className="w-3.5 h-3.5 text-indigo-600" />
-                      Role Administrátor
-                    </button>
-                  </div>
+                {/* Google Secure Login Button */}
+                <button
+                  id="google-login-btn"
+                  type="button"
+                  disabled={loading}
+                  onClick={handleGoogleLogin}
+                  className="w-full py-2.5 px-4 border border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs rounded-xl shadow-3xs transition-all flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-50"
+                >
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" width="16" height="16">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.85z" />
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.85c.87-2.6 3.3-4.53 6.16-4.53z" />
+                  </svg>
+                  Bezpečné přihlášení přes Google
+                </button>
+
+                <div className="relative flex py-2 items-center">
+                  <div className="flex-grow border-t border-slate-150"></div>
+                  <span className="flex-shrink mx-4 text-slate-400 text-[10px] uppercase font-bold tracking-wider">Nebo e-mailem</span>
+                  <div className="flex-grow border-t border-slate-150"></div>
                 </div>
+
+                <form onSubmit={handleSubmit} className="space-y-4" id="auth-form">
+                  {/* Quick Demo Account buttons */}
+                  <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                    <span className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold block mb-2 text-center">
+                      Rychlé demo účty pro testování:
+                    </span>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        id="demo-user-btn"
+                        type="button"
+                        onClick={() => setDemoUser('user')}
+                        className="py-1.5 px-3 text-xs bg-white hover:bg-teal-50 border border-slate-200 hover:border-teal-300 text-slate-700 rounded-lg font-medium transition-all text-center flex items-center justify-center gap-1.5"
+                      >
+                        <UserIcon className="w-3.5 h-3.5 text-teal-600" />
+                        Role Rodič
+                      </button>
+                      <button
+                        id="demo-admin-btn"
+                        type="button"
+                        onClick={() => setDemoUser('admin')}
+                        className="py-1.5 px-3 text-xs bg-white hover:bg-indigo-50 border border-slate-200 hover:border-indigo-300 text-slate-700 rounded-lg font-medium transition-all text-center flex items-center justify-center gap-1.5"
+                      >
+                        <Shield className="w-3.5 h-3.5 text-indigo-600" />
+                        Role Administrátor
+                      </button>
+                    </div>
+                  </div>
 
                 {isRegister && (
                   <div>
@@ -254,6 +319,7 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
                   </button>
                 </div>
               </form>
+            </div>
             )}
           </div>
         </motion.div>
