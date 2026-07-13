@@ -17,6 +17,7 @@ import {
   Users2,
   AlertTriangle
 } from 'lucide-react';
+import fatherAndChildHero from '../assets/images/father_and_child_hero_1783886957826.jpg';
 
 interface HeroSectionProps {
   onNavigate: (tabId: string) => void;
@@ -92,7 +93,7 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn }: Hero
           <div className="lg:col-span-5 relative">
             <div className="absolute inset-0 bg-gradient-to-tr from-teal-600/10 to-slate-800/10 rounded-2xl -rotate-1 scale-[1.02] -z-10 blur-xs"></div>
             <img
-              src="/src/assets/images/father_and_child_hero_1783886957826.jpg"
+              src={fatherAndChildHero}
               alt="Otec se svým malým synem"
               className="w-full h-64 md:h-80 object-cover rounded-2xl shadow-md border border-slate-100"
               referrerPolicy="no-referrer"
