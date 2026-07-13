@@ -1,0 +1,90 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Lora:ital,wght@0,400..700;1,400..700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Playfair Display", Georgia, serif;
+  --font-serif: "Lora", Georgia, serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  /* Natural Tones warm earthy gray/brown overrides for slate scale */
+  --color-slate-50: #FAF9F6;       /* Warm background creamy color */
+  --color-slate-100: #EBE7E0;      /* Gentle border color */
+  --color-slate-200: #E2DDD4;      /* Slightly darker warm gray border */
+  --color-slate-300: #D0C7B9;      /* Medium border or secondary grey text */
+  --color-slate-400: #B0A494;      /* Warm gray text */
+  --color-slate-500: #8C857E;      /* Muted brown/gray text */
+  --color-slate-600: #7D6B5D;      /* Secondary wood-toned gray text */
+  --color-slate-700: #5E5852;      /* Medium dark gray/brown text */
+  --color-slate-800: #4A443F;      /* Primary dark text color */
+  --color-slate-850: #3D3833;      /* Deepest heading charcoal color */
+  --color-slate-900: #332E2A;      /* Dark footer or panel background */
+  --color-slate-950: #25211E;      /* Extra deep charcoal background */
+
+  /* Sage Green overrides for teal scale */
+  --color-teal-50: #E6EBDD;        /* Light sage background tint */
+  --color-teal-100: #D2DEC4;       /* Soft light sage tint */
+  --color-teal-200: #B8C8A5;       /* Muted sage */
+  --color-teal-300: #9CB285;       /* Medium sage */
+  --color-teal-400: #879D70;       /* Bright sage */
+  --color-teal-500: #7D8F69;       /* Primary Sage Green accent color */
+  --color-teal-600: #6A7B58;       /* Primary Sage Green hover state */
+  --color-teal-700: #576548;       /* Darker sage green */
+  --color-teal-800: #454F39;       /* Deep forest sage green */
+  --color-teal-900: #333B2A;       /* Darkest sage forest shade */
+
+  /* Warm Wood/Earthy Golden overrides for indigo scale */
+  --color-indigo-50: #F5E6D3;      /* Soft wood accent pale rose-gold-cream */
+  --color-indigo-100: #EBD1B4;     /* Cream wood accent tint */
+  --color-indigo-200: #DEB992;     /* Earthy sand */
+  --color-indigo-300: #D4A373;     /* Earthy wood warm secondary */
+  --color-indigo-500: #C38D56;     /* Darker earthy sand */
+  --color-indigo-600: #A67C52;     /* Deep wood brown action color */
+  --color-indigo-700: #8B653F;     /* Rich earth brown */
+  --color-indigo-800: #6E4E2F;     /* Deep bark */
+  --color-indigo-900: #513921;     /* Dark bark */
+  --color-indigo-950: #392817;     /* Deep dark soil */
+
+  /* Soft warm amber warning overrides */
+  --color-amber-50: #FBF6EF;
+  --color-amber-100: #F5E5D0;
+  --color-amber-500: #D99B53;
+  --color-amber-700: #A16F34;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-slate-50);
+  color: var(--color-slate-800);
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+.font-serif {
+  font-family: var(--font-serif);
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+/* Custom Scrollbar for better UI feel */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-slate-200);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-teal-300);
+}

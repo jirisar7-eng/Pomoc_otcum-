@@ -1,0 +1,8 @@
+{
+  "name": "Remix: Táta má právo",
+  "description": "Informační portál pro spravedlivé opatrovnické řízení, střídavou péči a blaho dětí v systému Synthesis OS.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
