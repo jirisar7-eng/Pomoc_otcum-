@@ -39,7 +39,7 @@ const firebaseConfig = {
   storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || firebaseConfigJson.storageBucket,
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || firebaseConfigJson.messagingSenderId,
   appId: import.meta.env.VITE_FIREBASE_APP_ID || firebaseConfigJson.appId,
-  firestoreDatabaseId: import.meta.env.VITE_FIREBASE_DATABASE_ID || firebaseConfigJson.firestoreDatabaseId,
+  firestoreDatabaseId: import.meta.env.VITE_FIREBASE_DATABASE_ID || (firebaseConfigJson as any).firestoreDatabaseId,
   oAuthClientId: firebaseConfigJson.oAuthClientId
 };
 
@@ -54,10 +54,29 @@ export const auth = getAuth(app);
 
 // Authentication Helpers
 export const googleProvider = new GoogleAuthProvider();
+googleProvider.addScope('https://www.googleapis.com/auth/calendar.events');
+googleProvider.addScope('https://www.googleapis.com/auth/gmail.send');
+
+// In-memory cache for Google OAuth access token
+let cachedAccessToken: string | null = null;
+
+export function getCachedAccessToken(): string | null {
+  return cachedAccessToken;
+}
+
+export function setCachedAccessToken(token: string | null): void {
+  cachedAccessToken = token;
+}
 
 export async function loginWithGoogle(): Promise<User> {
   const result = await signInWithPopup(auth, googleProvider);
   const fbUser = result.user;
+  
+  // Cache the access token in memory
+  const credential = GoogleAuthProvider.credentialFromResult(result);
+  if (credential?.accessToken) {
+    cachedAccessToken = credential.accessToken;
+  }
   
   // Check if profile already exists, otherwise create it
   const userRef = doc(db, 'users', fbUser.uid);
@@ -81,6 +100,20 @@ export async function loginWithGoogle(): Promise<User> {
   // Persist / update profile in Firestore
   await setDoc(userRef, userData, { merge: true });
   return userData;
+}
+
+/**
+ * Explicitly connect / authorize Google Workspace (Calendar + Gmail)
+ * triggers a popup to get the OAuth token, without changing the logged-in user profile
+ */
+export async function authorizeGoogleWorkspace(): Promise<string> {
+  const result = await signInWithPopup(auth, googleProvider);
+  const credential = GoogleAuthProvider.credentialFromResult(result);
+  if (!credential?.accessToken) {
+    throw new Error('Nepodařilo se získat přístupový token Google.');
+  }
+  cachedAccessToken = credential.accessToken;
+  return cachedAccessToken;
 }
 
 export async function registerWithEmail(email: string, pass: string, name: string): Promise<User> {
@@ -135,6 +168,7 @@ export async function loginWithEmail(email: string, pass: string): Promise<User>
 
 export async function logoutUser(): Promise<void> {
   await signOut(auth);
+  cachedAccessToken = null;
 }
 
 // Subscribe to Auth changes

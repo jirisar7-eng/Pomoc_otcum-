@@ -29,7 +29,8 @@ import {
   Heart,
   CalendarDays,
   FileText,
-  HeartHandshake
+  HeartHandshake,
+  Shield
 } from 'lucide-react';
 import { 
   User as AppUser, 
@@ -40,7 +41,8 @@ import {
   CalendarEventCategory,
   DiaryEntryType
 } from '../types';
-import { db, auth } from '../lib/firebase';
+import { db, auth, getCachedAccessToken, authorizeGoogleWorkspace } from '../lib/firebase';
+import { createGoogleCalendarEvent, sendGmailNotification } from '../lib/googleWorkspace';
 import { 
   collection, 
   doc, 
@@ -134,6 +136,18 @@ export default function CoParentHub({ currentUser, onOpenAuth }: CoParentHubProp
   const [diaryImportant, setDiaryImportant] = useState<boolean>(false);
 
   const [newMessageText, setNewMessageText] = useState<string>('');
+  const [googleToken, setGoogleToken] = useState<string | null>(getCachedAccessToken());
+
+  useEffect(() => {
+    // Keep the local component state in sync with the global cached Google token
+    const interval = setInterval(() => {
+      const tok = getCachedAccessToken();
+      if (tok !== googleToken) {
+        setGoogleToken(tok);
+      }
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [googleToken]);
   
   // Chat scroll container reference
   const chatEndRef = useRef<HTMLDivElement>(null);
@@ -369,6 +383,27 @@ export default function CoParentHub({ currentUser, onOpenAuth }: CoParentHubProp
 
     setActionLoading(true);
     const newEventId = `evt_${Date.now()}`;
+    let isGmailSynced = eventGmailSync;
+
+    // Check if Google Authentication / Access Token is available if user wants to sync
+    let currentToken = getCachedAccessToken();
+    if (eventGmailSync && !currentToken) {
+      const wantConnect = window.confirm(
+        'K synchronizaci s Gmailem a Google Kalendářem je nutné se bezpečně propojit s vaším Google účtem.\n\nChcete se nyní propojit?'
+      );
+      if (wantConnect) {
+        try {
+          currentToken = await authorizeGoogleWorkspace();
+        } catch (authErr: any) {
+          console.error('Google authorization failed:', authErr);
+          alert('Propojení s Google účtem bylo zrušeno nebo selhalo. Událost se uloží bez synchronizace.');
+          isGmailSynced = false;
+        }
+      } else {
+        isGmailSynced = false;
+      }
+    }
+
     const newEvent: CoparentCalendarEvent = {
       id: newEventId,
       connectionId: connection.id,
@@ -378,9 +413,65 @@ export default function CoParentHub({ currentUser, onOpenAuth }: CoParentHubProp
       endDate: eventEnd,
       category: eventCategory,
       creatorId: currentUser.id,
-      gmailSynced: eventGmailSync,
+      gmailSynced: isGmailSynced,
       createdAt: new Date().toISOString()
     };
+
+    // Google Workspace Integration Call
+    if (isGmailSynced && currentToken) {
+      try {
+        // 1. Create event in primary Google Calendar
+        await createGoogleCalendarEvent(currentToken, {
+          title: newEvent.title,
+          description: `${newEvent.description || ''}\n\n(Synchronizováno ze systému Synthesis OS - Rodičovský Hub pro děti: ${connection.children.join(', ')})`,
+          startDate: newEvent.startDate,
+          endDate: newEvent.endDate,
+        });
+
+        // 2. Look up co-parent's email and notify them via Gmail
+        const otherParentId = connection.parent1Id === currentUser.id ? connection.parent2Id : connection.parent1Id;
+        if (otherParentId) {
+          const otherUserRef = doc(db, 'users', otherParentId);
+          const otherUserSnap = await getDoc(otherUserRef);
+          if (otherUserSnap.exists()) {
+            const otherUser = otherUserSnap.data();
+            if (otherUser.email) {
+              const emailSubject = `Nová rodičovská událost: ${newEvent.title}`;
+              const emailBody = `
+                <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff;">
+                  <h2 style="color: #0d9488; margin-top: 0; font-family: sans-serif;">Rodičovský Hub — Synthesis OS</h2>
+                  <p>Ahoj ${otherUser.name || 'rodiči'},</p>
+                  <p><strong>${currentUser.name}</strong> přidal novou událost do vašeho společného kalendáře pro děti <strong>${connection.children.join(', ')}</strong>:</p>
+                  
+                  <div style="background-color: #f8fafc; padding: 15px; border-left: 4px solid #0d9488; border-radius: 4px; margin: 20px 0;">
+                    <h3 style="margin-top: 0; color: #1e293b; font-size: 16px;">${newEvent.title}</h3>
+                    <p style="margin: 5px 0; font-size: 14px; color: #475569;"><strong>Kategorie:</strong> ${
+                      newEvent.category === 'handover' ? 'Předání dětí' :
+                      newEvent.category === 'school' ? 'Škola / Kroužky' :
+                      newEvent.category === 'health' ? 'Lékař / Zdraví' :
+                      newEvent.category === 'leisure' ? 'Volný čas / Výlety' : 'Ostatní'
+                    }</p>
+                    <p style="margin: 5px 0; font-size: 14px; color: #475569;"><strong>Začátek:</strong> ${new Date(newEvent.startDate).toLocaleString('cs-CZ')}</p>
+                    <p style="margin: 5px 0; font-size: 14px; color: #475569;"><strong>Konec:</strong> ${new Date(newEvent.endDate).toLocaleString('cs-CZ')}</p>
+                    ${newEvent.description ? `<p style="margin: 10px 0 0 0; font-size: 14px; color: #334155;"><strong>Poznámka:</strong> <br/>${newEvent.description.replace(/\n/g, '<br/>')}</p>` : ''}
+                  </div>
+                  
+                  <p style="font-size: 12px; color: #64748b; margin-top: 30px; border-top: 1px solid #f1f5f9; padding-top: 10px;">
+                    Tento e-mail byl bezpečně odeslán prostřednictvím portálu Synthesis Hub na základě vašeho nastavení synchronizace s Google API.
+                  </p>
+                </div>
+              `;
+              
+              await sendGmailNotification(currentToken, otherUser.email, emailSubject, emailBody);
+              console.log('Gmail notification sent successfully to co-parent:', otherUser.email);
+            }
+          }
+        }
+      } catch (googleApiErr: any) {
+        console.error('Failed to sync to Google APIs:', googleApiErr);
+        alert(`Událost byla uložena v systému, ale nepodařilo se ji synchronizovat s Google API: ${googleApiErr.message || googleApiErr}`);
+      }
+    }
 
     try {
       await setDoc(doc(db, 'coparent_calendar', newEventId), newEvent);
@@ -796,6 +887,53 @@ export default function CoParentHub({ currentUser, onOpenAuth }: CoParentHubProp
         {/* --- TAB A: CALENDAR --- */}
         {hubTab === 'calendar' && (
           <div className="space-y-6" id="view-calendar">
+            {/* Google Workspace Connection Status Banner */}
+            <div className="bg-white rounded-2xl border border-slate-100 p-4 shadow-3xs flex flex-col sm:flex-row sm:items-center justify-between gap-3" id="google-connection-banner">
+              <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${googleToken ? 'bg-teal-50 text-teal-600' : 'bg-amber-50 text-amber-600'}`}>
+                  <Shield className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                    <span>Synchronizace Google Workspace</span>
+                    {googleToken ? (
+                      <span className="text-[9px] bg-teal-100 text-teal-800 px-1.5 py-0.5 rounded-full font-mono font-bold uppercase">AKTIVNÍ</span>
+                    ) : (
+                      <span className="text-[9px] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded-full font-mono font-bold uppercase">NEPROPOJENO</span>
+                    )}
+                  </h4>
+                  <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
+                    {googleToken 
+                      ? 'Propojení aktivní. Nové události se automaticky synchronizují do Google Kalendáře a druhému rodiči bude odeslána Gmail notifikace.' 
+                      : 'Připojte svůj Google účet k automatické synchronizaci společných událostí do Kalendáře a zasílání přímých notifikací partnerovi přes Gmail.'}
+                  </p>
+                </div>
+              </div>
+              
+              {!googleToken ? (
+                <button
+                  type="button"
+                  onClick={async () => {
+                    try {
+                      const t = await authorizeGoogleWorkspace();
+                      setGoogleToken(t);
+                    } catch (err: any) {
+                      alert('Propojení selhalo: ' + err.message);
+                    }
+                  }}
+                  className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap self-start sm:self-auto shadow-sm"
+                  id="btn-google-connect-banner"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-teal-300 animate-pulse" />
+                  Propojit Google
+                </button>
+              ) : (
+                <span className="text-[10px] font-mono font-bold text-teal-600 bg-teal-50/50 border border-teal-200/40 px-3 py-1.5 rounded-xl whitespace-nowrap self-start sm:self-auto" id="google-connected-badge">
+                  ● PROPOJENO S GOOGLE
+                </span>
+              )}
+            </div>
+
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <h2 className="text-lg font-bold text-slate-800 font-display flex items-center gap-2">
