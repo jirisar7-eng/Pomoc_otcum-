@@ -93,40 +93,28 @@ export default function SupportSection({
 
   const impact = getSupportImpact(activeAmount);
 
-  // Generate Paylibo (Czech QR payment) compatible image link
-  // Account number: 2901928373 (demo Synthesis transparent account) / bank code: 2010 (Fio)
-  const bankAccount = "2901928373";
-  const bankCode = "2010";
+  // Revolut account details for Jiří Šár
+  const recipientName = "Jiří Šár";
+  const iban = "LT203250027954666874";
+  const formattedIban = "LT20 3250 0279 5466 6874";
+  const bic = "REVOLT21";
+  const bankName = "Revolut Bank UAB";
+  const bankAddress = "Konstitucijos ave. 21B, 08130, Vilnius, Lithuania";
+  const correspondentBic = "BARCGB22";
   const variableSymbol = "2026" + (currentUser ? currentUser.id.substring(0, 4).replace(/\D/g, '0') : '99');
   
-  // Dynamic, offline-first Czech IBAN calculator
-  const getCzechIban = (accountNumber: string, bCode: string): string => {
-    const paddedAccount = accountNumber.padStart(10, '0');
-    const bban = `${bCode}000000${paddedAccount}`;
-    const valueToModulo = `${bban}123500`;
-    let remainder = 0;
-    for (let i = 0; i < valueToModulo.length; i++) {
-      remainder = (remainder * 10 + parseInt(valueToModulo[i], 10)) % 97;
-    }
-    const checkDigits = (98 - remainder).toString().padStart(2, '0');
-    return `CZ${checkDigits}${bban}`;
-  };
-
-  const iban = getCzechIban(bankAccount, bankCode);
-
-  // Create QR Code URL using the Paylibo API (Czech standard QR payment)
+  // Create QR Code URL using standard SPAYD (Short Payment Descriptor) which is fully supported by Czech banking apps
   const qrMessageStr = `Dar Synthesis Hub - ${isAnonymous ? 'Anonym' : donorName.normalize("NFD").replace(/[\u0300-\u036f]/g, "").substring(0, 16)}`;
-  const payliboUrl = `https://api.paylibo.com/paylibo/generator/czech/image?accountNumber=${bankAccount}&bankCode=${bankCode}&amount=${activeAmount}&currency=CZK&vs=${variableSymbol}&message=${encodeURIComponent(qrMessageStr)}`;
-
-  // Construct highly resilient offline-fallback using SPAYD standard via high-availability QR Server API
+  
   const cleanMsgForSpayd = `Dar Synthesis Hub - ${isAnonymous ? 'Anonym' : donorName}`
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-zA-Z0-9 -]/g, "")
     .substring(0, 50);
 
-  const spdString = `SPD*1.0*ACC:${iban}*AM:${activeAmount.toFixed(2)}*CC:CZK*VS:${variableSymbol}*MSG:${cleanMsgForSpayd}`;
-  const fallbackQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(spdString)}`;
+  // SPAYD standard fully supports international IBAN (ACC:...) and BIC (BIC:...) for European / Revolut transactions
+  const spdString = `SPD*1.0*ACC:${iban}*BIC:${bic}*AM:${activeAmount.toFixed(2)}*CC:CZK*VS:${variableSymbol}*MSG:${cleanMsgForSpayd}`;
+  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(spdString)}`;
 
   const handleSubmitDonationForm = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -367,15 +355,18 @@ export default function SupportSection({
                 Chcete-li ocenit Jiřího osobní nasazení a autorskou práci na platformě pod záštitou studia <strong className="text-slate-800">Synthesis</strong>, můžete ho pozvat na virtuální kávu a podpořit ho přímo přes bezpečný odkaz.
               </p>
 
-              <a 
-                href="https://share.google/DMHHzFF8P6lyqrJm0" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="w-full py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-3xs transition-all flex items-center justify-center gap-1.5 cursor-pointer hover:shadow-sm"
-              >
-                <span>Podpořit Jiřího (Buy me a coffee)</span>
-                <ExternalLink className="w-3.5 h-3.5" />
-              </a>
+              <div className="space-y-1">
+                <button 
+                  disabled
+                  className="w-full py-2.5 bg-slate-100 border border-slate-200 text-slate-400 font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-not-allowed"
+                >
+                  <span>Podpořit Jiřího (Buy me a coffee)</span>
+                  <Coffee className="w-3.5 h-3.5 text-slate-300" />
+                </button>
+                <div className="text-[9px] text-amber-600 font-semibold text-center">
+                  ⚠️ Odkaz bude aktivován ihned po schválení partnerského účtu
+                </div>
+              </div>
             </div>
           </div>
           
@@ -396,14 +387,10 @@ export default function SupportSection({
             {/* QR Image Visualizer */}
             <div className="my-5 bg-white p-4 rounded-xl max-w-[200px] mx-auto border border-slate-800 shadow-3xs relative group">
               <img
-                src={useFallbackQr ? fallbackQrUrl : payliboUrl}
+                src={qrCodeUrl}
                 alt="QR platba"
                 className="w-full h-auto"
                 referrerPolicy="no-referrer"
-                onError={() => {
-                  console.warn("Primary Paylibo QR API failed. Swapping to high-availability fallback SPAYD generator.");
-                  setUseFallbackQr(true);
-                }}
               />
               <div className="absolute inset-0 bg-slate-900/10 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
                 <span className="bg-slate-900/80 text-[8px] px-2 py-1 rounded text-white font-bold font-mono">Částka: {activeAmount} Kč</span>
@@ -411,33 +398,49 @@ export default function SupportSection({
             </div>
 
             {/* Manual Bank details */}
-            <div className="border-t border-slate-800 pt-3 space-y-2 text-[11px] font-mono">
-              <div className="flex justify-between items-center py-1 border-b border-slate-800/50">
-                <span className="text-slate-400">Číslo účtu:</span>
-                <span className="text-white font-bold">{bankAccount} / {bankCode}</span>
+            <div className="border-t border-slate-800 pt-3 space-y-1.5 text-[10px] font-mono">
+              <div className="flex justify-between items-start py-1 border-b border-slate-800/40 gap-4">
+                <span className="text-slate-400 shrink-0">Příjemce:</span>
+                <span className="text-white font-bold text-right">{recipientName}</span>
               </div>
-              <div className="flex justify-between items-center py-1 border-b border-slate-800/50">
-                <span className="text-slate-400">IBAN:</span>
-                <span className="text-white font-bold text-[10px]">{iban}</span>
+              <div className="flex justify-between items-start py-1 border-b border-slate-800/40 gap-4">
+                <span className="text-slate-400 shrink-0">IBAN:</span>
+                <span className="text-white font-bold text-right tracking-tight">{formattedIban}</span>
               </div>
-              <div className="flex justify-between items-center py-1 border-b border-slate-800/50">
-                <span className="text-slate-400">Částka k odeslání:</span>
+              <div className="flex justify-between items-start py-1 border-b border-slate-800/40 gap-4">
+                <span className="text-slate-400 shrink-0">BIC / SWIFT:</span>
+                <span className="text-white font-bold text-right">{bic}</span>
+              </div>
+              <div className="flex justify-between items-start py-1 border-b border-slate-800/40 gap-4">
+                <span className="text-slate-400 shrink-0">Banka:</span>
+                <span className="text-white font-bold text-right">{bankName}</span>
+              </div>
+              <div className="flex justify-between items-start py-1 border-b border-slate-800/40 gap-4">
+                <span className="text-slate-400 shrink-0">Adresa banky:</span>
+                <span className="text-slate-300 text-[9px] text-right leading-tight">{bankAddress}</span>
+              </div>
+              <div className="flex justify-between items-start py-1 border-b border-slate-800/40 gap-4">
+                <span className="text-slate-400 shrink-0">Korespondent BIC:</span>
+                <span className="text-white font-bold text-right">{correspondentBic}</span>
+              </div>
+              <div className="flex justify-between items-center py-1 border-b border-slate-800/40 gap-4">
+                <span className="text-slate-400 shrink-0">Částka k odeslání:</span>
                 <span className="text-teal-400 font-bold text-xs">{activeAmount} CZK</span>
               </div>
-              <div className="flex justify-between items-center py-1 border-b border-slate-800/50">
-                <span className="text-slate-400">Variabilní symbol:</span>
+              <div className="flex justify-between items-center py-1 border-b border-slate-800/40 gap-4">
+                <span className="text-slate-400 shrink-0">Variabilní symbol:</span>
                 <span className="text-white font-bold">{variableSymbol}</span>
               </div>
-              <div className="flex justify-between items-center py-1">
-                <span className="text-slate-400">Zpráva pro příjemce:</span>
-                <span className="text-white font-bold text-[9px] truncate max-w-[150px]" title={qrMessageStr}>{qrMessageStr}</span>
+              <div className="flex justify-between items-start py-1 gap-4">
+                <span className="text-slate-400 shrink-0">Zpráva pro příjemce:</span>
+                <span className="text-white font-bold text-[9px] text-right truncate max-w-[170px]" title={qrMessageStr}>{qrMessageStr}</span>
               </div>
             </div>
 
             <div className="mt-3 bg-teal-950/40 border border-teal-800/30 p-2.5 rounded-lg text-[9px] text-teal-300 leading-relaxed flex items-start gap-1.5">
               <Info className="w-3.5 h-3.5 shrink-0 mt-0.5 text-teal-400" />
               <span>
-                <strong>Záruka transparentnosti:</strong> Všechny finanční příspěvky jsou použity výhradně na servery a tvorbu bezplatného obsahu. Jiří Š. ani studio Synthesis nečerpají z darů žádné osobní honoráře.
+                <strong>Záruka transparentnosti:</strong> Všechny finanční příspěvky jsou použity výhradně na servery a provoz bezplatného obsahu. Jiří Š. ani studio Synthesis nečerpají z darů žádné osobní honoráře.
               </span>
             </div>
           </div>

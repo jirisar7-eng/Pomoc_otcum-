@@ -55,9 +55,7 @@ export default function App() {
   const [currentUser, setCurrentUser] = useState<User | null>(() => 
     getStoredState<User | null>('current_user', null)
   );
-  const [activeTab, setActiveTab] = useState<string>(() => 
-    getStoredState<string>('active_tab', 'home')
-  );
+  const [activeTab, setActiveTab] = useState<string>('home');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [authModalOpen, setAuthModalOpen] = useState<boolean>(false);
 
@@ -189,6 +187,20 @@ export default function App() {
 
   useEffect(() => {
     setStoredState('active_tab', activeTab);
+    
+    // Smooth scroll to the content area or page top on tab selection
+    if (activeTab === 'home') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      const contentElement = document.getElementById('synthesis-main-content');
+      if (contentElement) {
+        setTimeout(() => {
+          contentElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
   }, [activeTab]);
 
   useEffect(() => {
@@ -248,7 +260,7 @@ export default function App() {
       />
 
       {/* Main Content Workspace viewport */}
-      <main className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+      <main id="synthesis-main-content" className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 flex-grow">
         {searchQuery && (
           <div className="bg-teal-50 border border-teal-100 rounded-2xl p-4 mb-6 flex items-center justify-between shadow-3xs" id="global-search-query-indicator">
             <div className="flex items-center gap-2.5">
