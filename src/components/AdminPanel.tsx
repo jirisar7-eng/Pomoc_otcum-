@@ -19,9 +19,21 @@ import {
   Send,
   PlusCircle,
   HelpCircle,
-  CheckCircle
+  CheckCircle,
+  Database,
+  Copy,
+  RefreshCw,
+  Play,
+  Sparkles
 } from 'lucide-react';
 import { Article, ExperienceStory, ForumPost, Comment, User, Donation } from '../types';
+import { 
+  getSupabaseUrl, 
+  getSupabaseAnonKey, 
+  isSupabaseConfigured, 
+  resetSupabaseInstance, 
+  SupabaseService 
+} from '../lib/supabase';
 
 interface AdminPanelProps {
   currentUser: User | null;
@@ -51,7 +63,22 @@ export default function AdminPanel({
   setDonations
 }: AdminPanelProps) {
   // Navigation within Admin Panel
-  const [adminTab, setAdminTab] = useState<'articles' | 'moderation' | 'flagged' | 'donations'>('articles');
+  const [adminTab, setAdminTab] = useState<'articles' | 'moderation' | 'flagged' | 'donations' | 'supabase'>('articles');
+
+  // Supabase Integration States
+  const [supUrl, setSupUrl] = useState(getSupabaseUrl());
+  const [supKey, setSupKey] = useState(getSupabaseAnonKey());
+  const [migrationLogs, setMigrationLogs] = useState<string[]>([]);
+  const [migrationPercent, setMigrationPercent] = useState(0);
+  const [isMigrating, setIsMigrating] = useState(false);
+  const [migrationError, setMigrationError] = useState('');
+  const [isSupabaseActive, setIsSupabaseActive] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('synthesis_hub_use_supabase') === 'true';
+    }
+    return false;
+  });
+  const [sqlCopied, setSqlCopied] = useState(false);
 
   // Form states for adding/editing articles
   const [articleFormOpen, setArticleFormOpen] = useState(false);
@@ -254,7 +281,8 @@ export default function AdminPanel({
           { id: 'articles', label: 'Správa článků', count: articles.length },
           { id: 'moderation', label: 'Schvalování příběhů', count: pendingStories.length },
           { id: 'flagged', label: 'Nahlášený obsah', count: flaggedPosts.length + flaggedComments.length },
-          { id: 'donations', label: 'Správa darů', count: pendingDonations.length }
+          { id: 'donations', label: 'Správa darů', count: pendingDonations.length },
+          { id: 'supabase', label: 'Supabase Integrace', count: isSupabaseConfigured() ? 'PŘIPOJENO' : 'NASTAVIT' }
         ].map((tab) => (
           <button
             id={`admin-subtab-select-${tab.id}`}
@@ -741,6 +769,440 @@ export default function AdminPanel({
           </div>
         )}
 
+        {/* SUBTAB 5: SUPABASE DATABASE INTEGRATION AND MIGRATOR */}
+        {adminTab === 'supabase' && (
+          <div className="space-y-6 text-left" id="admin-supabase-workspace">
+            
+            {/* General Info */}
+            <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-2xs">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <Database className="w-5 h-5 text-indigo-600 animate-pulse" />
+                    <h3 className="font-bold text-sm text-slate-800 uppercase tracking-wider font-display">
+                      Propojení s Supabase PostgreSQL Cloud
+                    </h3>
+                  </div>
+                  <p className="text-xs text-slate-500 leading-relaxed max-w-3xl">
+                    Synthesis OS Hub je od základu navržen pro API-First autonomní správu. Napojením vaší databáze <strong>Supabase (brqqinbxpluzrkrvpfqs)</strong> získáte stabilní PostgreSQL cloudové úložiště, veškerá data budou spravována bezpečně a v budoucnu k nim bude mít přístup i vaše lokální AI.
+                  </p>
+                </div>
+                
+                {/* Current Status Badge */}
+                <div className="shrink-0">
+                  <span className={`px-3 py-1.5 rounded-xl text-xs font-bold tracking-wider uppercase border flex items-center gap-1.5 ${
+                    isSupabaseActive && isSupabaseConfigured()
+                      ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
+                      : isSupabaseConfigured()
+                        ? 'bg-amber-50 border-amber-200 text-amber-600'
+                        : 'bg-slate-100 border-slate-200 text-slate-500'
+                  }`}>
+                    <span className={`w-2 h-2 rounded-full ${
+                      isSupabaseActive && isSupabaseConfigured()
+                        ? 'bg-emerald-500 animate-ping'
+                        : isSupabaseConfigured()
+                          ? 'bg-amber-500'
+                          : 'bg-slate-400'
+                    }`}></span>
+                    {isSupabaseActive && isSupabaseConfigured()
+                      ? 'Supabase Aktivní'
+                      : isSupabaseConfigured()
+                        ? 'Připojeno / Neaktivní'
+                        : 'Čeká na konfiguraci'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Connection switch button */}
+              <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 mt-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="space-y-0.5">
+                  <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider block">
+                    Aktivní databázový kanál
+                  </span>
+                  <p className="text-xs font-semibold text-slate-700">
+                    {isSupabaseActive 
+                      ? 'Portál nyní čte a zapisuje data v reálném čase do Supabase Cloud PostgreSQL.'
+                      : 'Portál nyní běží v režimu offline mezipaměti (LocalStorage / Firebase).'
+                     }
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    if (!isSupabaseConfigured()) {
+                      alert('Před aktivací Supabase databáze musíte vyplnit Supabase URL a platný Anon Key!');
+                      return;
+                    }
+                    const nextState = !isSupabaseActive;
+                    setIsSupabaseActive(nextState);
+                    if (typeof window !== 'undefined') {
+                      localStorage.setItem('synthesis_hub_use_supabase', String(nextState));
+                      alert(nextState 
+                        ? 'Aktivní databázový kanál byl změněn na Supabase Cloud PostgreSQL! Portál se nyní restartuje pro načtení cloudových dat.' 
+                        : 'Aktivní databázový kanál byl změněn zpět na lokální mezipaměť (LocalStorage / Firebase).'
+                      );
+                      window.location.reload();
+                    }
+                  }}
+                  className={`px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-3xs cursor-pointer ${
+                    isSupabaseActive
+                      ? 'bg-rose-600 hover:bg-rose-700 text-white'
+                      : 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                  }`}
+                >
+                  {isSupabaseActive ? 'Deaktivovat Supabase a přepnout na Local' : 'Aktivovat Supabase PostgreSQL'}
+                </button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 text-left font-sans">
+              
+              {/* Column Left: Connection form */}
+              <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-2xs space-y-4">
+                <h4 className="font-bold text-xs text-slate-800 uppercase tracking-wider border-b border-slate-50 pb-2">
+                  Konfigurace připojení k Supabase
+                </h4>
+
+                <form onSubmit={(e) => {
+                  e.preventDefault();
+                  if (typeof window !== 'undefined') {
+                    localStorage.setItem('synthesis_hub_supabase_url_override', supUrl.trim());
+                    localStorage.setItem('synthesis_hub_supabase_key_override', supKey.trim());
+                    resetSupabaseInstance();
+                    alert('Konfigurace Supabase byla uložena v prohlížeči! Nyní můžete spustit test, migraci nebo rovnou zapnout databázi.');
+                    window.location.reload();
+                  }
+                }} className="space-y-4">
+                  
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-semibold text-slate-600">Supabase API URL</label>
+                    <input
+                      type="text"
+                      value={supUrl}
+                      onChange={(e) => setSupUrl(e.target.value)}
+                      placeholder="https://brqqinbxpluzrkrvpfqs.supabase.co"
+                      className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none font-mono text-indigo-950"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-semibold text-slate-600">Supabase Public Anon Key</label>
+                    <input
+                      type="password"
+                      value={supKey}
+                      onChange={(e) => setSupKey(e.target.value)}
+                      placeholder="Vložte platný public anon_key..."
+                      className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none font-mono text-slate-600"
+                    />
+                    <span className="text-[10px] text-slate-400 block leading-relaxed">
+                      Tento klíč je bezpečný pro použití v klientském kódu. Můžete ho najít v Supabase Dashboardu pod: <strong>Project Settings &rarr; API &rarr; anon public</strong>.
+                    </span>
+                  </div>
+
+                  <div className="flex gap-2.5 justify-end border-t border-slate-50 pt-3">
+                    <button
+                      type="submit"
+                      className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-2xs cursor-pointer flex items-center gap-1.5"
+                    >
+                      <RefreshCw className="w-3.5 h-3.5" />
+                      Uložit & Použít klíče
+                    </button>
+                  </div>
+
+                </form>
+
+                {/* Test & Migration Engine */}
+                <div className="bg-indigo-50/40 p-4 rounded-xl border border-indigo-100/40 space-y-3">
+                  <div className="flex items-center gap-1.5">
+                     <Sparkles className="w-4 h-4 text-indigo-600" />
+                    <h5 className="text-xs font-bold text-slate-800">Jednokliková synchronizace (Seeder)</h5>
+                  </div>
+                  <p className="text-[11px] text-slate-500 leading-relaxed">
+                    Před aktivací doporučujeme přenést veškerá existující data (články, fórum, komentáře, schválené příběhy a dary) do Supabase, aby byl váš portál okamžitě plnohodnotný.
+                  </p>
+
+                  {isMigrating ? (
+                    <div className="space-y-2 pt-2">
+                      <div className="flex justify-between text-[10px] font-mono text-slate-500">
+                        <span>Průběh migrace:</span>
+                        <span className="font-bold">{migrationPercent}%</span>
+                      </div>
+                      <div className="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
+                        <div className="bg-indigo-600 h-full transition-all duration-300" style={{ width: `${migrationPercent}%` }}></div>
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={async () => {
+                        if (!isSupabaseConfigured()) {
+                          alert('Před spuštěním migrace musíte nejprve nastavit Supabase URL a Anon Key.');
+                          return;
+                        }
+                        
+                        setIsMigrating(true);
+                        setMigrationError('');
+                        setMigrationPercent(0);
+                        setMigrationLogs([
+                          `[${new Date().toLocaleTimeString()}] Inicializace migračního protokolu...`,
+                          `[${new Date().toLocaleTimeString()}] Spojování s PostgreSQL instancí: ${getSupabaseUrl()}`
+                        ]);
+
+                        const addLog = (msg: string) => {
+                          setMigrationLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] ${msg}`]);
+                         };
+
+                        try {
+                          const result = await SupabaseService.migrateData(
+                            articles,
+                            stories,
+                            posts,
+                            comments,
+                            donations,
+                            (msg, percent) => {
+                              addLog(msg);
+                              setMigrationPercent(percent);
+                            }
+                          );
+
+                          if (result.success) {
+                            addLog(`Úspěch! Celkem ${result.count} záznamů bylo úspěšně přeneseno do Supabase.`);
+                            alert(`Migrace dokončena! Do Supabase bylo nahráno ${result.count} záznamů.`);
+                          } else {
+                            setMigrationError(result.error || 'Neznámá chyba při synchronizaci dat.');
+                            addLog(`CHYBA: ${result.error}`);
+                          }
+                        } catch (e: any) {
+                          setMigrationError(e.message || String(e));
+                          addLog(`KRITICKÁ CHYBA: ${e.message || String(e)}`);
+                        } finally {
+                          setIsMigrating(false);
+                        }
+                      }}
+                      className="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-3xs"
+                    >
+                      <Play className="w-3.5 h-3.5 text-indigo-200 fill-indigo-200" />
+                      Nahrát a synchronizovat data do Supabase
+                    </button>
+                  )}
+
+                  {migrationError && (
+                    <div className="bg-rose-50 border border-rose-100 p-2.5 rounded-lg text-rose-600 text-[10px] leading-relaxed font-mono">
+                      <strong>CHYBA SYNC:</strong> {migrationError}
+                    </div>
+                  )}
+
+                  {migrationLogs.length > 0 && (
+                    <div className="bg-slate-950 text-slate-300 p-3 rounded-lg text-[9px] font-mono leading-normal h-40 overflow-y-auto space-y-1 mt-2 text-left">
+                      {migrationLogs.map((log, index) => (
+                        <div key={index} className={log.includes('CHYBA') ? 'text-rose-400' : log.includes('Úspěch') ? 'text-emerald-400' : ''}>
+                          {log}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+              </div>
+
+              {/* Column Right: SQL Schema paste helper */}
+              <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-2xs flex flex-col justify-between space-y-4">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between border-b border-slate-50 pb-2">
+                    <h4 className="font-bold text-xs text-slate-800 uppercase tracking-wider">
+                      SQL Schémata k instalaci (PostgreSQL)
+                    </h4>
+                    <button
+                      onClick={() => {
+                        const sqlSchemaText = `-- Synthesis OS Hub - Supabase SQL Schema setup script
+-- Vložte do SQL Editoru v administraci Supabase a spusťte!
+
+-- 1. Tabulka odborných článků a aktualit
+CREATE TABLE IF NOT EXISTS public.articles (
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  summary TEXT NOT NULL,
+  content TEXT NOT NULL,
+  category TEXT NOT NULL,
+  date TEXT NOT NULL,
+  author TEXT NOT NULL,
+  likes INTEGER DEFAULT 0,
+  comments_count INTEGER DEFAULT 0,
+  read_time TEXT NOT NULL,
+  tags TEXT[] DEFAULT '{}'::TEXT[],
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 2. Tabulka příběhů / osobních zkušeností rodičů
+CREATE TABLE IF NOT EXISTS public.experience_stories (
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  content TEXT NOT NULL,
+  author_name TEXT NOT NULL,
+  date TEXT NOT NULL,
+  likes INTEGER DEFAULT 0,
+  approved BOOLEAN DEFAULT false,
+  reported BOOLEAN DEFAULT false,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 3. Tabulka diskuzních témat fóra
+CREATE TABLE IF NOT EXISTS public.forum_posts (
+  id TEXT PRIMARY KEY,
+  category_id TEXT NOT NULL,
+  title TEXT NOT NULL,
+  content TEXT NOT NULL,
+  user_id TEXT NOT NULL,
+  user_name TEXT NOT NULL,
+  user_avatar TEXT,
+  date TEXT NOT NULL,
+  likes INTEGER DEFAULT 0,
+  comments_count INTEGER DEFAULT 0,
+  tags TEXT[] DEFAULT '{}'::TEXT[],
+  reported BOOLEAN DEFAULT false,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 4. Tabulka komentářů
+CREATE TABLE IF NOT EXISTS public.comments (
+  id TEXT PRIMARY KEY,
+  content_id TEXT NOT NULL,
+  content_type TEXT NOT NULL,
+  user_id TEXT NOT NULL,
+  user_name TEXT NOT NULL,
+  user_avatar TEXT,
+  content TEXT NOT NULL,
+  date TEXT NOT NULL,
+  likes INTEGER DEFAULT 0,
+  reported BOOLEAN DEFAULT false,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 5. Tabulka darů a podporovatelů
+CREATE TABLE IF NOT EXISTS public.donations (
+  id TEXT PRIMARY KEY,
+  donor_name TEXT NOT NULL,
+  amount INTEGER NOT NULL,
+  message TEXT,
+  date TEXT NOT NULL,
+  is_public BOOLEAN DEFAULT true,
+  is_verified BOOLEAN DEFAULT false,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Povolení RLS (Row Level Security) na tabulkách
+ALTER TABLE public.articles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.experience_stories ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.forum_posts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.comments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.donations ENABLE ROW LEVEL SECURITY;
+
+-- Vytvoření základních bezpečnostních politik pro anonymní přístup
+CREATE POLICY "Public Read Articles" ON public.articles FOR SELECT USING (true);
+CREATE POLICY "Public Read Stories" ON public.experience_stories FOR SELECT USING (approved = true);
+CREATE POLICY "Public Read Posts" ON public.forum_posts FOR SELECT USING (true);
+CREATE POLICY "Public Read Comments" ON public.comments FOR SELECT USING (true);
+CREATE POLICY "Public Read Donations" ON public.donations FOR SELECT USING (true);
+
+-- Admin & Authenticated write policies (V této fázi jsou povoleny operace se správnými klíči)
+CREATE POLICY "Allow All operations" ON public.articles FOR ALL USING (true);
+CREATE POLICY "Allow All operations" ON public.experience_stories FOR ALL USING (true);
+CREATE POLICY "Allow All operations" ON public.forum_posts FOR ALL USING (true);
+CREATE POLICY "Allow All operations" ON public.comments FOR ALL USING (true);
+CREATE POLICY "Allow All operations" ON public.donations FOR ALL USING (true);`;
+                        navigator.clipboard.writeText(sqlSchemaText);
+                        setSqlCopied(true);
+                        setTimeout(() => setSqlCopied(false), 2000);
+                      }}
+                      className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 rounded-lg text-[10px] font-bold transition-all flex items-center gap-1 cursor-pointer border border-slate-200"
+                    >
+                      <Copy className="w-3.5 h-3.5" />
+                      {sqlCopied ? 'Zkopírováno!' : 'Kopírovat SQL schémata'}
+                    </button>
+                  </div>
+                  <p className="text-[11px] text-slate-500 leading-relaxed">
+                    Přejdete do <strong>SQL Editoru</strong> ve vaší administraci Supabase, klikněte na <strong>"New query"</strong>, vložte vygenerovaný kód a klikněte na <strong>"Run"</strong>. Tím vytvoříte všechny tabulky a nastavíte zabezpečení RLS:
+                  </p>
+                </div>
+
+                <div className="bg-slate-950 text-emerald-400 p-4 rounded-xl text-[9px] font-mono leading-normal h-80 overflow-y-auto">
+                  <pre className="whitespace-pre">{`-- 1. Tabulka článků
+CREATE TABLE public.articles (
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  summary TEXT NOT NULL,
+  content TEXT NOT NULL,
+  category TEXT NOT NULL,
+  date TEXT NOT NULL,
+  author TEXT NOT NULL,
+  likes INTEGER DEFAULT 0,
+  comments_count INTEGER DEFAULT 0,
+  read_time TEXT NOT NULL,
+  tags TEXT[] DEFAULT '{}'::TEXT[],
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 2. Tabulka příběhů rodičů
+CREATE TABLE public.experience_stories (
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  content TEXT NOT NULL,
+  author_name TEXT NOT NULL,
+  date TEXT NOT NULL,
+  likes INTEGER DEFAULT 0,
+  approved BOOLEAN DEFAULT false,
+  reported BOOLEAN DEFAULT false,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 3. Tabulka témat fóra
+CREATE TABLE public.forum_posts (
+  id TEXT PRIMARY KEY,
+  category_id TEXT NOT NULL,
+  title TEXT NOT NULL,
+  content TEXT NOT NULL,
+  user_id TEXT NOT NULL,
+  user_name TEXT NOT NULL,
+  user_avatar TEXT,
+  date TEXT NOT NULL,
+  likes INTEGER DEFAULT 0,
+  comments_count INTEGER DEFAULT 0,
+  tags TEXT[] DEFAULT '{}'::TEXT[],
+  reported BOOLEAN DEFAULT false,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 4. Tabulka komentářů
+CREATE TABLE public.comments (
+  id TEXT PRIMARY KEY,
+  content_id TEXT NOT NULL,
+  content_type TEXT NOT NULL,
+  user_id TEXT NOT NULL,
+  user_name TEXT NOT NULL,
+  user_avatar TEXT,
+  content TEXT NOT NULL,
+  date TEXT NOT NULL,
+  likes INTEGER DEFAULT 0,
+  reported BOOLEAN DEFAULT false,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 5. Tabulka darů
+CREATE TABLE public.donations (
+  id TEXT PRIMARY KEY,
+  donor_name TEXT NOT NULL,
+  amount INTEGER NOT NULL,
+  message TEXT,
+  date TEXT NOT NULL,
+  is_public BOOLEAN DEFAULT true,
+  is_verified BOOLEAN DEFAULT false,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);`}</pre>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        )}
       </div>
 
     </div>

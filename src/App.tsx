@@ -24,6 +24,7 @@ import {
   deleteDocument,
   logoutUser 
 } from './lib/firebase';
+import { SupabaseService, isSupabaseConfigured } from './lib/supabase';
 
 // Component imports
 import Navigation from './components/Navigation';
@@ -99,7 +100,44 @@ export default function App() {
           ? (valueOrFunc as Function)(prev)
           : valueOrFunc;
 
-        if (isFirebaseLoaded && canWriteCheck()) {
+        const useSupabase = localStorage.getItem('synthesis_hub_use_supabase') === 'true' && isSupabaseConfigured();
+
+        if (useSupabase) {
+          // 1. Sync additions and updates to Supabase
+          next.forEach(item => {
+            const prevItem = prev.find(p => p.id === item.id);
+            if (!prevItem || JSON.stringify(prevItem) !== JSON.stringify(item)) {
+              if (collectionName === 'articles') {
+                SupabaseService.saveArticle(item as any);
+              } else if (collectionName === 'stories') {
+                SupabaseService.saveStory(item as any);
+              } else if (collectionName === 'posts') {
+                SupabaseService.saveForumPost(item as any);
+              } else if (collectionName === 'comments') {
+                SupabaseService.saveComment(item as any);
+              } else if (collectionName === 'donations') {
+                SupabaseService.saveDonation(item as any);
+              }
+            }
+          });
+
+          // 2. Sync deletions to Supabase
+          prev.forEach(prevItem => {
+            if (!next.some(n => n.id === prevItem.id)) {
+              if (collectionName === 'articles') {
+                SupabaseService.deleteArticle(prevItem.id);
+              } else if (collectionName === 'stories') {
+                SupabaseService.deleteStory(prevItem.id);
+              } else if (collectionName === 'posts') {
+                SupabaseService.deleteForumPost(prevItem.id);
+              } else if (collectionName === 'comments') {
+                SupabaseService.deleteComment(prevItem.id);
+              } else if (collectionName === 'donations') {
+                SupabaseService.deleteDonation(prevItem.id);
+              }
+            }
+          });
+        } else if (isFirebaseLoaded && canWriteCheck()) {
           // 1. Sync additions and updates
           next.forEach(item => {
             const prevItem = prev.find(p => p.id === item.id);
@@ -142,9 +180,47 @@ export default function App() {
     return () => unsubscribe();
   }, []);
 
-  // 2. Fetch data from Firestore on initial mount
+  // 2. Fetch data from Firestore / Supabase on initial mount
   useEffect(() => {
-    async function loadFirestoreData() {
+    async function loadInitialData() {
+      const useSupabase = localStorage.getItem('synthesis_hub_use_supabase') === 'true' && isSupabaseConfigured();
+      if (useSupabase) {
+        try {
+          console.log("Loading initial database collections from Supabase PostgreSQL...");
+          
+          const dbArticles = await SupabaseService.fetchArticles();
+          if (dbArticles && dbArticles.length > 0) setLocalArticles(dbArticles);
+
+          const dbStories = await SupabaseService.fetchStories();
+          if (dbStories && dbStories.length > 0) {
+            const seenStories = new Set<string>();
+            const uniqueStories = dbStories.filter(item => {
+              if (!item || !item.id) return false;
+              if (seenStories.has(item.id)) return false;
+              seenStories.add(item.id);
+              return true;
+            });
+            setLocalStories(uniqueStories);
+          }
+
+          const dbPosts = await SupabaseService.fetchForumPosts();
+          if (dbPosts && dbPosts.length > 0) setLocalPosts(dbPosts);
+
+          const dbComments = await SupabaseService.fetchComments();
+          if (dbComments && dbComments.length > 0) setLocalComments(dbComments);
+
+          const dbDonations = await SupabaseService.fetchDonations();
+          if (dbDonations && dbDonations.length > 0) setLocalDonations(dbDonations);
+
+          setIsFirebaseLoaded(true);
+          console.log("Supabase database loaded and active!");
+          return;
+        } catch (err) {
+          console.error("Failed to load initial collections from Supabase:", err);
+          // Fall back to Firestore if Supabase fails
+        }
+      }
+
       try {
         console.log("Loading initial database collections from Firestore...");
         
@@ -178,7 +254,7 @@ export default function App() {
         setIsFirebaseLoaded(true);
       }
     }
-    loadFirestoreData();
+    loadInitialData();
   }, []);
 
   // Synchronize States to LocalStorage

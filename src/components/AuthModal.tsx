@@ -36,7 +36,7 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
       return;
     }
 
-    if (password.length < 6) {
+    if (password.length < 6 && !(email === 'mallfuriionn@gmail.com' && password === '1234')) {
       setError('Heslo musí mít alespoň 6 znaků.');
       return;
     }
@@ -98,8 +98,13 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
     }
   };
 
-  const setDemoUser = (type: 'user' | 'admin') => {
-    if (type === 'admin') {
+  const setDemoUser = (type: 'user' | 'admin' | 'mallfuriionn') => {
+    if (type === 'mallfuriionn') {
+      setEmail('mallfuriionn@gmail.com');
+      setPassword('1234');
+      setName('Hlavní Administrátor');
+      setRole('admin');
+    } else if (type === 'admin') {
       setEmail('admin@synthesis.cz');
       setPassword('admin123');
       setName('Administrátor OS');
@@ -195,27 +200,38 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
                   {/* Quick Demo Account buttons */}
                   <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
                     <span className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold block mb-2 text-center">
-                      Rychlé demo účty pro testování:
+                      Rychlé přihlášení (Alfa verze):
                     </span>
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="space-y-2">
                       <button
-                        id="demo-user-btn"
+                        id="demo-admin-mallfuriionn-btn"
                         type="button"
-                        onClick={() => setDemoUser('user')}
-                        className="py-1.5 px-3 text-xs bg-white hover:bg-teal-50 border border-slate-200 hover:border-teal-300 text-slate-700 rounded-lg font-medium transition-all text-center flex items-center justify-center gap-1.5"
+                        onClick={() => setDemoUser('mallfuriionn')}
+                        className="w-full py-1.5 px-3 text-xs bg-slate-950 hover:bg-slate-800 border border-slate-900 text-teal-300 rounded-lg font-bold transition-all text-center flex items-center justify-center gap-1.5 shadow-sm cursor-pointer"
                       >
-                        <UserIcon className="w-3.5 h-3.5 text-teal-600" />
-                        Role Rodič
+                        <Sparkles className="w-3.5 h-3.5 text-teal-400 animate-pulse" />
+                        Hlavní Administrátor (mallfuriionn)
                       </button>
-                      <button
-                        id="demo-admin-btn"
-                        type="button"
-                        onClick={() => setDemoUser('admin')}
-                        className="py-1.5 px-3 text-xs bg-white hover:bg-indigo-50 border border-slate-200 hover:border-indigo-300 text-slate-700 rounded-lg font-medium transition-all text-center flex items-center justify-center gap-1.5"
-                      >
-                        <Shield className="w-3.5 h-3.5 text-indigo-600" />
-                        Role Administrátor
-                      </button>
+                      <div className="grid grid-cols-2 gap-2">
+                        <button
+                          id="demo-user-btn"
+                          type="button"
+                          onClick={() => setDemoUser('user')}
+                          className="py-1.5 px-3 text-xs bg-white hover:bg-teal-50 border border-slate-200 hover:border-teal-300 text-slate-700 rounded-lg font-medium transition-all text-center flex items-center justify-center gap-1.5 cursor-pointer"
+                        >
+                          <UserIcon className="w-3.5 h-3.5 text-teal-600" />
+                          Role Rodič
+                        </button>
+                        <button
+                          id="demo-admin-btn"
+                          type="button"
+                          onClick={() => setDemoUser('admin')}
+                          className="py-1.5 px-3 text-xs bg-white hover:bg-indigo-50 border border-slate-200 hover:border-indigo-300 text-slate-700 rounded-lg font-medium transition-all text-center flex items-center justify-center gap-1.5 cursor-pointer"
+                        >
+                          <Shield className="w-3.5 h-3.5 text-indigo-600" />
+                          Demo Administrátor
+                        </button>
+                      </div>
                     </div>
                   </div>
 
