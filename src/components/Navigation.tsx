@@ -23,7 +23,8 @@ import {
   MessageCircle, 
   PhoneCall, 
   Bell,
-  LifeBuoy
+  LifeBuoy,
+  HeartHandshake
 } from 'lucide-react';
 import { User } from '../types';
 
@@ -58,6 +59,7 @@ export default function Navigation({
     { id: 'soudni-rizeni', label: 'Soudní řízení', icon: Gavel },
     { id: 'vyzivne', label: 'Výživné', icon: Coins },
     { id: 'pece-o-dite', label: 'Péče o dítě', icon: Heart },
+    { id: 'coparent-hub', label: 'Rodičovský Hub', icon: HeartHandshake },
     { id: 'crisis', label: 'Krizová pomoc', icon: LifeBuoy },
     { id: 'forum', label: 'Diskuze', icon: MessageCircle },
     { id: 'contacts', label: 'Kontakt', icon: PhoneCall },

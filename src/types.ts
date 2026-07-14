@@ -126,3 +126,56 @@ export interface Donation {
   isVerified: boolean;
 }
 
+// Co-parenting Hub interfaces
+export interface CoparentConnection {
+  id: string;
+  inviteCode: string;
+  parent1Id: string;
+  parent1Name: string;
+  parent2Id?: string;
+  parent2Name?: string;
+  children: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type CalendarEventCategory = 'handover' | 'school' | 'health' | 'leisure' | 'other';
+
+export interface CoparentCalendarEvent {
+  id: string;
+  connectionId: string;
+  title: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+  category: CalendarEventCategory;
+  creatorId: string;
+  gmailSynced: boolean;
+  createdAt: string;
+}
+
+export type DiaryEntryType = 'note' | 'reminder' | 'request' | 'health_log' | 'school_log';
+
+export interface CoparentDiaryEntry {
+  id: string;
+  connectionId: string;
+  title: string;
+  content: string;
+  type: DiaryEntryType;
+  date: string;
+  creatorId: string;
+  creatorName: string;
+  isImportant: boolean;
+  status?: 'pending' | 'agreed' | 'declined';
+  createdAt: string;
+}
+
+export interface CoparentChatMessage {
+  id: string;
+  connectionId: string;
+  senderId: string;
+  senderName: string;
+  text: string;
+  createdAt: string;
+}
+

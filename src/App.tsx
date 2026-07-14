@@ -49,6 +49,7 @@ import KeStazeniSection from './components/KeStazeniSection';
 import KontaktSection from './components/KontaktSection';
 import CrisisSection from './components/CrisisSection';
 import SupportSection from './components/SupportSection';
+import CoParentHub from './components/CoParentHub';
 
 export default function App() {
   // Global Authentication & Navigation States
@@ -382,6 +383,13 @@ export default function App() {
                 searchQuery={searchQuery}
                 currentUser={currentUser}
                 externalArticles={articles}
+              />
+            )}
+
+            {activeTab === 'coparent-hub' && (
+              <CoParentHub
+                currentUser={currentUser}
+                onOpenAuth={() => setAuthModalOpen(true)}
               />
             )}
 

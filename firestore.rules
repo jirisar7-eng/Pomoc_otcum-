@@ -22,6 +22,14 @@ service cloud.firestore {
       );
     }
 
+    function isConnectionParent(connectionId) {
+      return isSignedIn() && (
+        get(/databases/$(database)/documents/coparent_connections/$(connectionId)).data.parent1Id == request.auth.uid ||
+        ('parent2Id' in get(/databases/$(database)/documents/coparent_connections/$(connectionId)).data &&
+         get(/databases/$(database)/documents/coparent_connections/$(connectionId)).data.parent2Id == request.auth.uid)
+      );
+    }
+
     // Users (members) profiles
     match /users/{userId} {
       allow read: if true;
@@ -60,6 +68,49 @@ service cloud.firestore {
       allow read: if true;
       allow create: if true;
       allow update, delete: if isAdmin();
+    }
+
+    // Co-parent Connections (Shared family pairs)
+    match /coparent_connections/{connectionId} {
+      allow create: if isSignedIn();
+      allow read, update, delete: if isSignedIn() && (
+        resource.data.parent1Id == request.auth.uid ||
+        ('parent2Id' in resource.data && resource.data.parent2Id == request.auth.uid) ||
+        isAdmin()
+      );
+    }
+
+    // Co-parent Shared Calendar
+    match /coparent_calendar/{eventId} {
+      allow create: if isSignedIn() && 
+        request.resource.data.creatorId == request.auth.uid &&
+        isConnectionParent(request.resource.data.connectionId);
+      allow read, update, delete: if isSignedIn() && (
+        isConnectionParent(resource.data.connectionId) ||
+        isAdmin()
+      );
+    }
+
+    // Co-parent Shared Child Diary
+    match /coparent_diary/{diaryId} {
+      allow create: if isSignedIn() && 
+        request.resource.data.creatorId == request.auth.uid &&
+        isConnectionParent(request.resource.data.connectionId);
+      allow read, update, delete: if isSignedIn() && (
+        isConnectionParent(resource.data.connectionId) ||
+        isAdmin()
+      );
+    }
+
+    // Co-parent Secured Chat
+    match /coparent_chat/{messageId} {
+      allow create: if isSignedIn() && 
+        request.resource.data.senderId == request.auth.uid &&
+        isConnectionParent(request.resource.data.connectionId);
+      allow read, update, delete: if isSignedIn() && (
+        isConnectionParent(resource.data.connectionId) ||
+        isAdmin()
+      );
     }
   }
 }

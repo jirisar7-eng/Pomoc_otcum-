@@ -83,6 +83,62 @@
         "isPublic": "boolean",
         "isVerified": "boolean"
       }
+    },
+    "coparent_connections": {
+      "description": "Spojení mezi dvěma rodiči (co-parent partnerships / shared spaces)",
+      "schema": {
+        "id": "string",
+        "inviteCode": "string",
+        "parent1Id": "string",
+        "parent1Name": "string",
+        "parent2Id": "string",
+        "parent2Name": "string",
+        "children": "array",
+        "createdAt": "string",
+        "updatedAt": "string"
+      }
+    },
+    "coparent_calendar": {
+      "description": "Sdílený kalendář dětí (handovers, school events, doctor, holidays)",
+      "schema": {
+        "id": "string",
+        "connectionId": "string",
+        "title": "string",
+        "description": "string",
+        "startDate": "string",
+        "endDate": "string",
+        "category": "string",
+        "creatorId": "string",
+        "gmailSynced": "boolean",
+        "createdAt": "string"
+      }
+    },
+    "coparent_diary": {
+      "description": "Společný dětský deník a logy (notes, reminders, requirements, changes)",
+      "schema": {
+        "id": "string",
+        "connectionId": "string",
+        "title": "string",
+        "content": "string",
+        "type": "string",
+        "date": "string",
+        "creatorId": "string",
+        "creatorName": "string",
+        "isImportant": "boolean",
+        "status": "string",
+        "createdAt": "string"
+      }
+    },
+    "coparent_chat": {
+      "description": "Zabezpečený chat mezi rodiči",
+      "schema": {
+        "id": "string",
+        "connectionId": "string",
+        "senderId": "string",
+        "senderName": "string",
+        "text": "string",
+        "createdAt": "string"
+      }
     }
   }
 }
