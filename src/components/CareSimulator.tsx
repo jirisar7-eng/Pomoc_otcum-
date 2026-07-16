@@ -51,6 +51,8 @@ type CareDayType = 'father' | 'mother' | 'handover';
 interface CalendarSchedule {
   week1: CareDayType[]; // index 0-6 (Mon-Sun)
   week2: CareDayType[]; // index 0-6 (Mon-Sun)
+  week3: CareDayType[]; // index 0-6 (Mon-Sun)
+  week4: CareDayType[]; // index 0-6 (Mon-Sun)
 }
 
 export default function CareSimulator() {
@@ -78,11 +80,13 @@ export default function CareSimulator() {
     distanceKm: 38
   });
 
-  // S3: 14-day Calendar schedule State
+  // S3: 28-day Calendar schedule State
   // We initialize with a standard alternating 7-7 model
   const [schedule, setSchedule] = useState<CalendarSchedule>({
     week1: ['father', 'father', 'father', 'father', 'mother', 'mother', 'mother'],
-    week2: ['mother', 'mother', 'mother', 'mother', 'father', 'father', 'father']
+    week2: ['mother', 'mother', 'mother', 'mother', 'father', 'father', 'father'],
+    week3: ['father', 'father', 'father', 'father', 'mother', 'mother', 'mother'],
+    week4: ['mother', 'mother', 'mother', 'mother', 'father', 'father', 'father']
   });
 
   // For the custom comparisons (Left: Court Ruling vs Right: Proposal)
@@ -102,34 +106,46 @@ export default function CareSimulator() {
   // Clipboard copy state
   const [copied, setCopied] = useState(false);
 
+  // Interactive calendar editing options inside the 28-day monthly calendar
+  const [calendarEditMode, setCalendarEditMode] = useState<'select' | 'paint'>('select');
+  const [paintBrush, setPaintBrush] = useState<CareDayType>('father');
+
   // --- PRESETS FOR CALENDAR ---
   const applyPreset = (preset: 'alternate_7_7' | 'alternate_2_2_3' | 'extended_father' | 'classic_weekend') => {
     switch (preset) {
       case 'alternate_7_7':
         setSchedule({
           week1: ['father', 'father', 'father', 'father', 'father', 'father', 'father'],
-          week2: ['mother', 'mother', 'mother', 'mother', 'mother', 'mother', 'mother']
+          week2: ['mother', 'mother', 'mother', 'mother', 'mother', 'mother', 'mother'],
+          week3: ['father', 'father', 'father', 'father', 'father', 'father', 'father'],
+          week4: ['mother', 'mother', 'mother', 'mother', 'mother', 'mother', 'mother']
         });
         break;
       case 'alternate_2_2_3':
         // Mon-Tue Father, Wed-Thu Mother, Fri-Sun Father, then opposite
         setSchedule({
           week1: ['father', 'father', 'mother', 'mother', 'father', 'father', 'father'],
-          week2: ['mother', 'mother', 'father', 'father', 'mother', 'mother', 'mother']
+          week2: ['mother', 'mother', 'father', 'father', 'mother', 'mother', 'mother'],
+          week3: ['father', 'father', 'mother', 'mother', 'father', 'father', 'father'],
+          week4: ['mother', 'mother', 'father', 'father', 'mother', 'mother', 'mother']
         });
         break;
       case 'extended_father':
         // Wed-Thu Father, Fri-Sun Father alternate weeks
         setSchedule({
           week1: ['mother', 'mother', 'father', 'father', 'mother', 'mother', 'mother'],
-          week2: ['mother', 'mother', 'father', 'father', 'father', 'father', 'father']
+          week2: ['mother', 'mother', 'father', 'father', 'father', 'father', 'father'],
+          week3: ['mother', 'mother', 'father', 'father', 'mother', 'mother', 'mother'],
+          week4: ['mother', 'mother', 'father', 'father', 'father', 'father', 'father']
         });
         break;
       case 'classic_weekend':
         // Every other weekend Father, rest Mother
         setSchedule({
           week1: ['mother', 'mother', 'mother', 'mother', 'mother', 'mother', 'mother'],
-          week2: ['mother', 'mother', 'mother', 'mother', 'father', 'father', 'father']
+          week2: ['mother', 'mother', 'mother', 'mother', 'father', 'father', 'father'],
+          week3: ['mother', 'mother', 'mother', 'mother', 'mother', 'mother', 'mother'],
+          week4: ['mother', 'mother', 'mother', 'mother', 'father', 'father', 'father']
         });
         break;
     }
@@ -152,7 +168,7 @@ export default function CareSimulator() {
     setChildren(children.filter(c => c.id !== id));
   };
 
-  const toggleDayCare = (week: 'week1' | 'week2', index: number) => {
+  const toggleDayCare = (week: 'week1' | 'week2' | 'week3' | 'week4', index: number) => {
     const currentList = [...schedule[week]];
     const current = currentList[index];
     let next: CareDayType = 'father';
@@ -160,43 +176,53 @@ export default function CareSimulator() {
     else if (current === 'mother') next = 'handover';
     else next = 'father';
     
+    // Sync templates: week1 maps to week3, week2 maps to week4
+    let extraUpdate = {};
+    if (week === 'week1') {
+      extraUpdate = { week3: schedule.week3.map((item, idx) => idx === index ? next : item) };
+    } else if (week === 'week2') {
+      extraUpdate = { week4: schedule.week4.map((item, idx) => idx === index ? next : item) };
+    } else if (week === 'week3') {
+      extraUpdate = { week1: schedule.week1.map((item, idx) => idx === index ? next : item) };
+    } else if (week === 'week4') {
+      extraUpdate = { week2: schedule.week2.map((item, idx) => idx === index ? next : item) };
+    }
+
     setSchedule({
       ...schedule,
-      [week]: schedule[week].map((item, idx) => idx === index ? next : item)
+      [week]: schedule[week].map((item, idx) => idx === index ? next : item),
+      ...extraUpdate
     });
   };
 
   // --- ANALYSIS COMPUTATIONS ---
-  // A 14-day cycle is scaled to a standard month (28 days / approx 4 weeks, which is a perfect 2x multiplier)
   const calculateStats = () => {
-    const combinedDays = [...schedule.week1, ...schedule.week2];
+    const combinedDays = [...schedule.week1, ...schedule.week2, ...schedule.week3, ...schedule.week4];
     
-    const nightsFatherWeek1 = schedule.week1.filter(d => d === 'father').length;
-    const nightsFatherWeek2 = schedule.week2.filter(d => d === 'father').length;
-    const nightsFatherTotal14 = nightsFatherWeek1 + nightsFatherWeek2;
-    const nightsFatherMonth = nightsFatherTotal14 * 2; // scaled to 28-day month
+    const nightsFatherMonth = combinedDays.filter(d => d === 'father').length;
     const nightsMotherMonth = 28 - nightsFatherMonth;
 
     const percentageFather = Math.round((nightsFatherMonth / 28) * 100);
     const percentageMother = 100 - percentageFather;
 
     // A handover occurs when care changes from father to mother or mother to father
-    // We analyze the 14-day array transitions, plus the wrap-around from end of week 2 to start of week 1
-    let handovers14 = 0;
-    for (let i = 0; i < 14; i++) {
+    // We analyze the 28-day array transitions, plus the wrap-around from end of week 4 to start of week 1
+    let handoversMonth = 0;
+    for (let i = 0; i < 28; i++) {
       const current = combinedDays[i];
-      const next = combinedDays[(i + 1) % 14];
+      const next = combinedDays[(i + 1) % 28];
       if (
         (current === 'father' && next === 'mother') ||
         (current === 'mother' && next === 'father') ||
         current === 'handover' ||
         next === 'handover'
       ) {
-        handovers14++;
+        handoversMonth++;
       }
     }
-    // De-duplicate contiguous handovers/transitional states slightly to make it highly realistic
-    const handoversMonth = Math.max(2, Math.round(handovers14 * 1.8));
+    // Make sure handovers has a realistic baseline
+    if (handoversMonth === 0) handoversMonth = 0;
+    else handoversMonth = Math.max(2, handoversMonth);
 
     // Travel calculations based on locations distance
     const dist = locations.distanceKm;
@@ -208,55 +234,43 @@ export default function CareSimulator() {
 
     // Sibling cohesion calculation (UNIQUE CORE MATH MODEL)
     // We analyze how many hours siblings are at the SAME parent's house and not in school
-    // Let's assume daily hours:
     // Waking hours together when at the same parent:
-    // Weekdays: 15:30 to 20:30 = 5 hours per day
+    // Weekdays: 15:30 to 20:30 = 5.5 hours per day
     // Weekend: 9:00 to 21:00 = 12 hours per day
-    // If they are not at the same parent, Jiří is always at Father's (since relation is father_only)
-    // Štěpán (joint) is with Father on father's days, and with Mother on mother's days.
-    // Let's loop through the 14 days and calculate overlap hours
-    let totalOverlapHours14 = 0;
+    let totalOverlapHours28 = 0;
     
-    // We check overlap for all children
     const fatherOnlyChildren = children.filter(c => c.relation === 'father_only');
     const motherOnlyChildren = children.filter(c => c.relation === 'mother_only');
     const jointChildren = children.filter(c => c.relation === 'joint');
 
     const hasSeparatedSiblings = (fatherOnlyChildren.length > 0 || motherOnlyChildren.length > 0) && jointChildren.length > 0;
 
-    for (let i = 0; i < 14; i++) {
+    for (let i = 0; i < 28; i++) {
       const parentInCare = combinedDays[i]; // 'father' or 'mother' or 'handover'
       const isWeekend = (i % 7 === 5 || i % 7 === 6); // Sat or Sun
 
-      // Sibling overlap rules:
-      // If father_only child is always with Father, and joint child is with Father, they are together!
-      // If mother_only child is always with Mother, and joint child is with Mother, they are together!
-      // If we have a mix: we count overlap of the main two prepopulated siblings (Jiří and Štěpán)
       let togetherToday = false;
       if (parentInCare === 'father') {
-        // Joint children are with father, father_only children are with father. They are together!
         togetherToday = true;
       } else if (parentInCare === 'mother') {
-        // Joint children are with mother. Jiří (father_only) is at father's. They are separated!
         togetherToday = false;
       } else {
-        // transitional day, assume partial
         togetherToday = false;
       }
 
       if (togetherToday) {
-        totalOverlapHours14 += isWeekend ? 12 : 5.5;
+        totalOverlapHours28 += isWeekend ? 12 : 5.5;
       }
     }
 
-    const siblingHoursWeekly = Math.round((totalOverlapHours14 / 2) * 10) / 10;
+    const siblingHoursWeekly = Math.round((totalOverlapHours28 / 4) * 10) / 10;
 
     // Average block length of care in days
     let blockLengths: number[] = [];
     let currentBlock = 1;
-    for (let i = 0; i < 14; i++) {
+    for (let i = 0; i < 28; i++) {
       const current = combinedDays[i];
-      const next = combinedDays[(i + 1) % 14];
+      const next = combinedDays[(i + 1) % 28];
       if (current === next) {
         currentBlock++;
       } else {
@@ -274,7 +288,6 @@ export default function CareSimulator() {
     let tempSepF = 0;
     let tempSepM = 0;
 
-    // Loop double array to handle wrap around boundaries easily
     const doubleDays = [...combinedDays, ...combinedDays];
     for (let i = 0; i < doubleDays.length; i++) {
       if (doubleDays[i] !== 'father') {
@@ -291,9 +304,9 @@ export default function CareSimulator() {
         tempSepM = 0;
       }
     }
-    // Cap at 14 since cycle is 14 days
-    maxSeparationFather = Math.min(14, maxSeparationFather);
-    maxSeparationMother = Math.min(14, maxSeparationMother);
+    // Cap at 28 days
+    maxSeparationFather = Math.min(28, maxSeparationFather);
+    maxSeparationMother = Math.min(28, maxSeparationMother);
 
     // Psychological Stability Rating
     let stabilityRating: 'stable' | 'moderate' | 'excessive' = 'stable';
@@ -334,6 +347,21 @@ export default function CareSimulator() {
   const stats = calculateStats();
   const child1Name = children[0]?.name || 'Dítě 1';
   const child2Name = children[1]?.name || 'Dítě 2';
+
+  const getChildrenInCareForDay = (care: CareDayType) => {
+    if (children.length === 0) return 'Dítě';
+    if (care === 'father') {
+      const active = children.filter(c => c.relation === 'joint' || c.relation === 'father_only');
+      if (active.length === 0) return 'Žádné dítě';
+      return active.map(c => c.name).join(' + ');
+    } else if (care === 'mother') {
+      const active = children.filter(c => c.relation === 'joint' || c.relation === 'mother_only');
+      if (active.length === 0) return 'Žádné dítě';
+      return active.map(c => c.name).join(' + ');
+    } else {
+      return 'Předání';
+    }
+  };
 
   // --- ARGUMENTATION GENERATOR ---
   const generateArgumentation = () => {
@@ -854,11 +882,11 @@ Tento simulační výpočet objektivně prokazuje, že navržený harmonogram je
               <div className="p-3.5 bg-slate-50 border border-slate-100 rounded-xl flex flex-wrap gap-4 text-[10px] text-slate-500">
                 <span className="flex items-center gap-1">
                   <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 block" />
-                  <strong>Zelená ({fatherName})</strong>: {child1Name} a {child2Name} jsou u: {fatherName}. {child1Name} je u: {fatherName} trvale.
+                  <strong>Zelená ({fatherName})</strong>: Společné dny péče u otce. Všechny společné a u otce vyloučené děti jsou s ním.
                 </span>
                 <span className="flex items-center gap-1">
                   <span className="w-2.5 h-2.5 rounded-full bg-amber-400 block" />
-                  <strong>Žlutá ({motherName})</strong>: {child2Name} je u: {motherName}. {child1Name} zůstává u: {fatherName} (oddělení).
+                  <strong>Žlutá ({motherName})</strong>: Společné dny péče u matky. Děti s výhradní péčí otce zůstávají u otce.
                 </span>
                 <span className="flex items-center gap-1">
                   <span className="w-2.5 h-2.5 rounded-full bg-indigo-200 block" />
@@ -1219,19 +1247,416 @@ Tento simulační výpočet objektivně prokazuje, že navržený harmonogram je
 
       {/* NEW MASTERCLASS: MONTHLY 3D CALENDAR GRID DISPLAY (3D Kalendář) */}
       <div className="bg-white p-6 md:p-8 rounded-3xl border border-slate-100 shadow-xs space-y-6" id="3d-calendar-module">
-        <div className="border-b border-slate-100 pb-3">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-indigo-50 border border-indigo-100 rounded-full text-[10px] font-bold text-indigo-700 uppercase tracking-wider mb-2">
-            <Sparkles className="w-3.5 h-3.5 text-indigo-600 animate-pulse" />
-            3D Vizualizace Měsíce
+        
+        {/* Header section with instructions */}
+        <div className="border-b border-slate-100 pb-3 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-indigo-50 border border-indigo-100 rounded-full text-[10px] font-bold text-indigo-700 uppercase tracking-wider mb-2">
+              <Sparkles className="w-3.5 h-3.5 text-indigo-600 animate-pulse" />
+              Pokročilá interaktivní simulace
+            </div>
+            <h3 className="font-extrabold text-base text-slate-800 font-display">Simulovaný 28-denní kalendář (Celý měsíc)</h3>
+            <p className="text-xs text-slate-500">
+              Přizpůsobte si každý z 28 dní individuálně. Upravujte jména rodičů a dětí na místě, přidávejte dcery či syny a okamžitě sledujte dopad na časovou koordinaci.
+            </p>
           </div>
-          <h3 className="font-extrabold text-base text-slate-800 font-display">Simulovaný 28-denní kalendář (Celý měsíc)</h3>
-          <p className="text-xs text-slate-500">
-            Komplexní trojrozměrná axonometrická mřížka simulující střídání, předávání a hlavně <strong>společně trávený čas sourozenců</strong> ({child1Name} + {child2Name}). Kliknutím na libovolný den zobrazíte logistický detail.
-          </p>
+          
+          <div className="flex gap-2">
+            <button
+              onClick={() => {
+                setSchedule({
+                  week1: Array(7).fill('handover'),
+                  week2: Array(7).fill('handover'),
+                  week3: Array(7).fill('handover'),
+                  week4: Array(7).fill('handover')
+                });
+              }}
+              className="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-[10px] rounded-xl transition-all cursor-pointer border border-rose-100 flex items-center gap-1"
+              title="Vynuluje kalendář na dny předání"
+            >
+              <RotateCcw className="w-3 h-3" />
+              Vyčistit měsíc
+            </button>
+          </div>
+        </div>
+
+        {/* Dynamic Child and Parent Manager integrated directly into Calendar Module */}
+        <div className="p-5 bg-slate-50 border border-slate-200/50 rounded-2xl space-y-4">
+          <div className="flex items-center gap-2 border-b border-slate-200/60 pb-2">
+            <span className="text-sm">👥</span>
+            <h4 className="font-bold text-xs text-slate-800 uppercase tracking-wider">Rychlá správa rodiny, jmen & dětí</h4>
+          </div>
+          
+          {/* Parents Config Row */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-[10px] font-bold font-mono text-slate-400 uppercase mb-1">Jméno otce</label>
+              <div className="relative">
+                <span className="absolute left-3 top-2.5 text-xs">👨</span>
+                <input
+                  type="text"
+                  value={fatherName}
+                  onChange={(e) => setFatherName(e.target.value)}
+                  className="w-full text-xs font-bold text-slate-700 bg-white border border-slate-200 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 rounded-xl pl-8 pr-3 py-2"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-[10px] font-bold font-mono text-slate-400 uppercase mb-1">Jméno matky</label>
+              <div className="relative">
+                <span className="absolute left-3 top-2.5 text-xs">👩</span>
+                <input
+                  type="text"
+                  value={motherName}
+                  onChange={(e) => setMotherName(e.target.value)}
+                  className="w-full text-xs font-bold text-slate-700 bg-white border border-slate-200 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 rounded-xl pl-8 pr-3 py-2"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Children list and inputs */}
+          <div className="space-y-2">
+            <label className="block text-[10px] font-bold font-mono text-slate-400 uppercase">Děti v kalendáři ({children.length})</label>
+            {children.length === 0 ? (
+              <div className="text-center py-4 bg-white rounded-xl border border-dashed border-slate-200 text-xs text-slate-400">
+                Žádné děti v simulaci. Pro správný výpočet sibling hodin přidejte dítě níže.
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {children.map((child) => (
+                  <div key={child.id} className="p-3 bg-white border border-slate-200 rounded-xl flex items-center justify-between gap-2 hover:shadow-2xs transition-all">
+                    <div className="flex-1 flex flex-wrap items-center gap-2">
+                      <span className="text-sm">👶</span>
+                      <input
+                        type="text"
+                        value={child.name}
+                        onChange={(e) => {
+                          const newName = e.target.value;
+                          setChildren(children.map(c => c.id === child.id ? { ...c, name: newName } : c));
+                        }}
+                        className="text-xs font-bold text-slate-800 bg-slate-50 border border-slate-200 hover:border-teal-400 focus:border-teal-500 rounded-lg px-2 py-1 w-24 sm:w-28"
+                        title="Kliknutím upravte jméno"
+                        placeholder="Jméno"
+                      />
+                      <select
+                        value={child.relation}
+                        onChange={(e: any) => {
+                          const newRelation = e.target.value;
+                          setChildren(children.map(c => c.id === child.id ? { ...c, relation: newRelation } : c));
+                        }}
+                        className="text-[10px] bg-slate-50 border border-slate-200 rounded-lg px-1 py-1 text-slate-600 font-medium"
+                      >
+                        <option value="joint">Společná</option>
+                        <option value="father_only">U Otce</option>
+                        <option value="mother_only">U Matky</option>
+                      </select>
+                      <input
+                        type="number"
+                        value={child.birthYear}
+                        onChange={(e) => {
+                          const newYear = parseInt(e.target.value) || 2020;
+                          setChildren(children.map(c => c.id === child.id ? { ...c, birthYear: newYear } : c));
+                        }}
+                        className="text-[10px] text-center bg-slate-50 border border-slate-200 rounded-lg px-1 py-1 text-slate-600 w-14"
+                        title="Rok narození"
+                        placeholder="Rok"
+                      />
+                    </div>
+                    <button
+                      onClick={() => handleRemoveChild(child.id)}
+                      className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                      title="Smazat dítě"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Quick Child Adder Inline */}
+          <div className="bg-indigo-50/40 p-3.5 rounded-xl border border-indigo-100/50 space-y-2">
+            <span className="text-[10px] font-bold text-indigo-700 uppercase tracking-wider block">Přidat další dceru / syna</span>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <input
+                type="text"
+                value={newChildName}
+                onChange={(e) => setNewChildName(e.target.value)}
+                placeholder="např. Tomáš"
+                className="text-xs p-2 bg-white border border-slate-200 rounded-lg focus:outline-hidden focus:border-indigo-500"
+              />
+              <input
+                type="number"
+                value={newChildYear}
+                onChange={(e) => setNewChildYear(parseInt(e.target.value) || 2020)}
+                placeholder="Rok narození"
+                className="text-xs p-2 bg-white border border-slate-200 rounded-lg focus:outline-hidden focus:border-indigo-500"
+              />
+              <select
+                value={newChildRelation}
+                onChange={(e: any) => setNewChildRelation(e.target.value)}
+                className="text-xs p-2 bg-white border border-slate-200 rounded-lg focus:outline-hidden focus:border-indigo-500 text-slate-600"
+              >
+                <option value="joint">Společná péče</option>
+                <option value="father_only">Pouze u: {fatherName}</option>
+                <option value="mother_only">Pouze u: {motherName}</option>
+              </select>
+            </div>
+            <div className="flex justify-end pt-1">
+              <button
+                onClick={handleAddChild}
+                className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-[11px] rounded-lg cursor-pointer flex items-center gap-1 transition-colors shadow-xs"
+              >
+                <Plus className="w-3 h-3" />
+                Vytvořit a zařadit dítě
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* --- MONTHLY PRESETS / PROPOSALS OF DAYS (NÁVRHY DNÍ A ROZVRHŮ) --- */}
+        <div className="bg-gradient-to-r from-slate-50 to-indigo-50/40 p-5 rounded-2xl border border-indigo-100/60 space-y-4 animate-fadeIn">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-indigo-100/50 pb-2">
+            <div className="flex items-center gap-2">
+              <span className="p-1.5 bg-indigo-100 text-indigo-700 rounded-lg">
+                <Sliders className="w-4 h-4" />
+              </span>
+              <h4 className="font-bold text-xs text-slate-800 uppercase tracking-wider">
+                Vzorové modely a návrhy střídání (Návrhy dní)
+              </h4>
+            </div>
+            <span className="text-[10px] text-slate-500 font-bold bg-white/80 border border-indigo-50 px-2 py-0.5 rounded-md">
+              Aplikuje se okamžitě na 28-denní kalendář
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+            {[
+              {
+                id: 'alternate_7_7',
+                title: 'Symetrická 7+7',
+                tag: 'Klasická střídavka',
+                age: 'Školáci (6+ let)',
+                desc: 'Týden u táty, týden u mámy. Minimální stěhování a maximální kontinuita.',
+                schedule: {
+                  week1: ['father', 'father', 'father', 'father', 'father', 'father', 'father'],
+                  week2: ['mother', 'mother', 'mother', 'mother', 'mother', 'mother', 'mother'],
+                  week3: ['father', 'father', 'father', 'father', 'father', 'father', 'father'],
+                  week4: ['mother', 'mother', 'mother', 'mother', 'mother', 'mother', 'mother']
+                },
+                color: 'from-emerald-50/70 to-teal-50/50',
+                border: 'border-emerald-100/80',
+                badgeBg: 'bg-emerald-100 text-emerald-800',
+                icon: '📅'
+              },
+              {
+                id: 'alternate_2_2_3',
+                title: 'Soustředěná 2-2-3',
+                tag: 'Častá střídavka',
+                age: 'Předškoláci (3–6 let)',
+                desc: 'Častější kontakt bez dlouhého odloučení (2 dny táta, 2 dny máma, prodloužený víkend).',
+                schedule: {
+                  week1: ['father', 'father', 'mother', 'mother', 'father', 'father', 'father'],
+                  week2: ['mother', 'mother', 'father', 'father', 'mother', 'mother', 'mother'],
+                  week3: ['father', 'father', 'mother', 'mother', 'father', 'father', 'father'],
+                  week4: ['mother', 'mother', 'father', 'father', 'mother', 'mother', 'mother']
+                },
+                color: 'from-cyan-50/70 to-blue-50/50',
+                border: 'border-cyan-100/80',
+                badgeBg: 'bg-cyan-100 text-cyan-800',
+                icon: '🔄'
+              },
+              {
+                id: 'stable_2_2_5_5',
+                title: 'Rozvržená 2-2-5-5',
+                tag: 'Pevné všední dny',
+                age: 'Vhodné pro kroužky',
+                desc: 'Táta má vždy Po+Út, máma St+Čt, víkendy se střídají. Maximálně stabilní dny.',
+                schedule: {
+                  week1: ['father', 'father', 'mother', 'mother', 'father', 'father', 'father'],
+                  week2: ['father', 'father', 'mother', 'mother', 'mother', 'mother', 'mother'],
+                  week3: ['father', 'father', 'mother', 'mother', 'father', 'father', 'father'],
+                  week4: ['father', 'father', 'mother', 'mother', 'mother', 'mother', 'mother']
+                },
+                color: 'from-violet-50/70 to-indigo-50/50',
+                border: 'border-violet-100/80',
+                badgeBg: 'bg-violet-100 text-violet-800',
+                icon: '🎯'
+              },
+              {
+                id: 'extended_father',
+                title: 'Rozšířená péče (St–Ne)',
+                tag: 'Asymetrický styk',
+                age: 'Batolata / Kompromis',
+                desc: 'Otec má děti každou St+Čt odpoledne + každý druhý prodloužený víkend (St–Ne).',
+                schedule: {
+                  week1: ['mother', 'mother', 'father', 'father', 'mother', 'mother', 'mother'],
+                  week2: ['mother', 'mother', 'father', 'father', 'father', 'father', 'father'],
+                  week3: ['mother', 'mother', 'father', 'father', 'mother', 'mother', 'mother'],
+                  week4: ['mother', 'mother', 'father', 'father', 'father', 'father', 'father']
+                },
+                color: 'from-amber-50/70 to-orange-50/50',
+                border: 'border-amber-100/80',
+                badgeBg: 'bg-amber-100 text-amber-800',
+                icon: '👑'
+              },
+              {
+                id: 'classic_weekend',
+                title: 'Klasický styk',
+                tag: 'Každý druhý víkend',
+                age: 'Asymetrická péče',
+                desc: 'Klasický model otec každý druhý víkend (Pá–Ne). Překonaný asymetrický rozsah.',
+                schedule: {
+                  week1: ['mother', 'mother', 'mother', 'mother', 'mother', 'mother', 'mother'],
+                  week2: ['mother', 'mother', 'mother', 'mother', 'father', 'father', 'father'],
+                  week3: ['mother', 'mother', 'mother', 'mother', 'mother', 'mother', 'mother'],
+                  week4: ['mother', 'mother', 'mother', 'mother', 'father', 'father', 'father']
+                },
+                color: 'from-rose-50/60 to-slate-50',
+                border: 'border-rose-100/50',
+                badgeBg: 'bg-rose-100 text-rose-800',
+                icon: '⚠️'
+              }
+            ].map((p) => {
+              const isCurrent = 
+                JSON.stringify(schedule.week1) === JSON.stringify(p.schedule.week1) &&
+                JSON.stringify(schedule.week2) === JSON.stringify(p.schedule.week2) &&
+                JSON.stringify(schedule.week3) === JSON.stringify(p.schedule.week3) &&
+                JSON.stringify(schedule.week4) === JSON.stringify(p.schedule.week4);
+
+              return (
+                <button
+                  key={p.id}
+                  onClick={() => {
+                    setSchedule(p.schedule as any);
+                    setSelectedCalendarDay(null);
+                  }}
+                  className={`group relative text-left p-3.5 rounded-xl border transition-all cursor-pointer flex flex-col justify-between bg-gradient-to-br ${p.color} ${p.border} ${
+                    isCurrent 
+                      ? 'ring-2 ring-indigo-600/80 shadow-md border-indigo-300' 
+                      : 'hover:shadow-xs hover:border-slate-300'
+                  }`}
+                >
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-base">{p.icon}</span>
+                      {isCurrent ? (
+                        <span className="text-[9px] font-black uppercase font-mono bg-indigo-600 text-white px-1.5 py-0.5 rounded-md">
+                          Aktivní
+                        </span>
+                      ) : (
+                        <span className="text-[9px] font-bold text-slate-400 uppercase font-mono group-hover:text-indigo-600 transition-colors">
+                          Aplikovat ➜
+                        </span>
+                      )}
+                    </div>
+                    <div>
+                      <h5 className="font-extrabold text-[12px] text-slate-800 leading-tight">
+                        {p.title}
+                      </h5>
+                      <span className="text-[9px] font-bold font-mono text-slate-500 block">
+                        {p.tag}
+                      </span>
+                    </div>
+                    <p className="text-[10px] text-slate-600 leading-snug">
+                      {p.desc}
+                    </p>
+                  </div>
+
+                  <div className="mt-2.5 pt-1.5 border-t border-slate-200/50 flex items-center justify-between">
+                    <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-md ${p.badgeBg}`}>
+                      {p.age}
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Dynamic Controls Bar for Brush Editing / Paint mode */}
+        <div className="p-4 bg-slate-900 text-white rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-teal-400 font-mono">REŽIM EDITACE KALENDÁŘE:</span>
+              <span className={`px-2 py-0.2 rounded text-[10px] uppercase font-bold font-mono ${calendarEditMode === 'paint' ? 'bg-amber-500 text-slate-950' : 'bg-slate-800 text-slate-300'}`}>
+                {calendarEditMode === 'paint' ? '✏️ Kreslení (Rychlá změna)' : '🔍 Detaily (Kliknutím vyberete)'}
+              </span>
+            </div>
+            <p className="text-[11px] text-slate-400">
+              {calendarEditMode === 'paint' 
+                ? 'Kliknutím na políčko dne v mřížce okamžitě nanesete vybranou péči.' 
+                : 'Kliknutím na políčko dne zobrazíte jeho detailní logistiku a info o přítomnosti dětí.'}
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Toggle Modes */}
+            <div className="flex bg-slate-800 p-0.5 rounded-lg border border-slate-700">
+              <button
+                onClick={() => setCalendarEditMode('select')}
+                className={`px-2.5 py-1 text-[10px] font-bold rounded-md cursor-pointer transition-all ${
+                  calendarEditMode === 'select' ? 'bg-slate-700 text-white shadow-xs' : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                🔍 Výběr dnu
+              </button>
+              <button
+                onClick={() => setCalendarEditMode('paint')}
+                className={`px-2.5 py-1 text-[10px] font-bold rounded-md cursor-pointer transition-all ${
+                  calendarEditMode === 'paint' ? 'bg-slate-700 text-white shadow-xs' : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                ✏️ Malování péče
+              </button>
+            </div>
+
+            {/* Paint brushes selector (only visible in paint mode) */}
+            {calendarEditMode === 'paint' && (
+              <div className="flex items-center gap-1 bg-slate-800 p-0.5 rounded-lg border border-slate-700">
+                <button
+                  onClick={() => setPaintBrush('father')}
+                  className={`px-2 py-1 text-[10px] font-bold rounded-md flex items-center gap-1 cursor-pointer transition-all ${
+                    paintBrush === 'father' ? 'bg-emerald-600 text-white' : 'text-slate-400 hover:bg-slate-750'
+                  }`}
+                  title={`Nastavit péči u: ${fatherName}`}
+                >
+                  <span>👨</span> {fatherName}
+                </button>
+                <button
+                  onClick={() => setPaintBrush('mother')}
+                  className={`px-2 py-1 text-[10px] font-bold rounded-md flex items-center gap-1 cursor-pointer transition-all ${
+                    paintBrush === 'mother' ? 'bg-amber-500 text-slate-950' : 'text-slate-400 hover:bg-slate-750'
+                  }`}
+                  title={`Nastavit péči u: ${motherName}`}
+                >
+                  <span>👩</span> {motherName}
+                </button>
+                <button
+                  onClick={() => setPaintBrush('handover')}
+                  className={`px-2 py-1 text-[10px] font-bold rounded-md flex items-center gap-1 cursor-pointer transition-all ${
+                    paintBrush === 'handover' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:bg-slate-750'
+                  }`}
+                  title="Nastavit den jako předávací"
+                >
+                  <span>🔄</span> Předání
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Helper swipe note for small screens */}
+        <div className="flex md:hidden items-center justify-center gap-1.5 mb-2.5">
+          <span className="inline-flex items-center gap-1.5 text-[10px] font-extrabold text-indigo-700 bg-indigo-50 border border-indigo-100/60 px-3 py-1.5 rounded-full shadow-2xs">
+            <span>👈</span> Posunutím zobrazíte všechny dny (Pondělí až Neděle) <span>👉</span>
+          </span>
         </div>
 
         {/* 3D Isometric View wrapper */}
-        <div className="overflow-x-auto py-6 flex justify-center">
+        <div className="overflow-x-auto py-6 flex justify-start md:justify-center bg-slate-50/50 rounded-2xl border border-slate-100">
           <div className="min-w-[640px] px-4">
             <div className="grid grid-cols-7 gap-3 [perspective:1000px]">
               
@@ -1242,33 +1667,46 @@ Tento simulační výpočet objektivně prokazuje, že navržený harmonogram je
                 </div>
               ))}
 
-              {/* Generate 28 Days representing Month (2 cycles of Week 1 & Week 2) */}
+              {/* Generate 28 Days representing Month (4 individual customizable weeks) */}
               {Array.from({ length: 28 }).map((_, index) => {
                 const weekIndex = Math.floor(index / 7);
                 const dayOfWeekIdx = index % 7;
                 
-                // Determine schedule day mapping
-                // Cycle alternate: Week 1, Week 2, Week 1, Week 2
-                const isWeek1 = weekIndex === 0 || weekIndex === 2;
-                const activeWeekStr = isWeek1 ? 'week1' : 'week2';
+                const activeWeekStr: 'week1' | 'week2' | 'week3' | 'week4' = 
+                  weekIndex === 0 ? 'week1' :
+                  weekIndex === 1 ? 'week2' :
+                  weekIndex === 2 ? 'week3' : 'week4';
+                
                 const care = schedule[activeWeekStr][dayOfWeekIdx];
-
                 const isWeekend = dayOfWeekIdx === 5 || dayOfWeekIdx === 6;
 
-                // Sibling togetherness helper
-                // Jiří is always with Father. If Štěpán (joint) is with Father (care === 'father'), they are together!
-                const siblingsTogether = care === 'father';
+                // Children present today helper
+                const presentChildren = children.filter(c => 
+                  c.relation === 'joint' || 
+                  (care === 'father' && c.relation === 'father_only') ||
+                  (care === 'mother' && c.relation === 'mother_only')
+                );
 
+                const siblingsTogether = presentChildren.length > 1;
                 const isSelected = selectedCalendarDay === index;
 
                 return (
                   <motion.div
                     key={index}
                     whileHover={{ scale: 1.05, y: -4, rotateX: 5 }}
-                    onClick={() => setSelectedCalendarDay(index)}
-                    className={`relative aspect-square rounded-xl p-2 transition-all cursor-pointer border flex flex-col justify-between shadow-2xs [transform:rotateX(15deg)_rotateY(-5deg)] hover:shadow-md ${
+                    onClick={() => {
+                      if (calendarEditMode === 'paint') {
+                        setSchedule(prev => ({
+                          ...prev,
+                          [activeWeekStr]: prev[activeWeekStr].map((item, idx) => idx === dayOfWeekIdx ? paintBrush : item)
+                        }));
+                      } else {
+                        setSelectedCalendarDay(index);
+                      }
+                    }}
+                    className={`relative aspect-square rounded-xl p-2.5 transition-all cursor-pointer border flex flex-col justify-between shadow-3xs [transform:rotateX(12deg)_rotateY(-4deg)] hover:shadow-xs ${
                       isSelected 
-                        ? 'ring-4 ring-teal-500/50 border-teal-500' 
+                        ? 'ring-4 ring-indigo-500/60 border-indigo-500 bg-indigo-50/10' 
                         : care === 'father'
                           ? 'bg-emerald-500 border-emerald-600 text-white shadow-emerald-50/50'
                           : care === 'mother'
@@ -1276,29 +1714,27 @@ Tento simulační výpočet objektivně prokazuje, že navržený harmonogram je
                             : 'bg-indigo-50 border-indigo-200 text-indigo-700'
                     }`}
                   >
-                    {/* Day Number */}
+                    {/* Day Number and Togetherness Indicator */}
                     <div className="flex justify-between items-center">
-                      <span className="text-[10px] font-mono font-bold opacity-80">{index + 1}.</span>
+                      <span className="text-[10px] font-mono font-bold opacity-80">{index + 1}. d.</span>
                       {siblingsTogether && (
-                        <span className="text-[11px]" title="Sourozenci jsou spolu">👥</span>
+                        <span className="text-[11px]" title="Sourozenci jsou v tomto místě spolu">👥</span>
                       )}
                     </div>
 
-                    {/* Care indicator icon / tag */}
+                    {/* Children details */}
                     <div className="space-y-0.5">
                       <div className="text-[9px] font-black uppercase tracking-tight truncate">
-                        {care === 'father' ? `👨 ${child1Name} + ${child2Name}` : care === 'mother' ? `👩 ${child2Name}` : '🔄 Předání'}
+                        {care === 'father' ? '👨 ' + fatherName : care === 'mother' ? '👩 ' + motherName : '🔄 Předání'}
                       </div>
-                      <div className="text-[8px] opacity-70 leading-none">
-                        {care === 'father' && 'U Otce'}
-                        {care === 'mother' && 'U Matky'}
-                        {care === 'handover' && 'Transice'}
+                      <div className="text-[8px] font-mono opacity-80 leading-tight truncate">
+                        {care === 'handover' ? 'Transice' : getChildrenInCareForDay(care)}
                       </div>
                     </div>
 
                     {/* Sibling bond strength dot */}
                     {siblingsTogether && (
-                      <div className="absolute bottom-1 right-1 w-1.5 h-1.5 bg-blue-300 rounded-full animate-ping" />
+                      <div className="absolute bottom-1 right-1 w-1.5 h-1.5 bg-indigo-400 rounded-full animate-ping" />
                     )}
                   </motion.div>
                 );
@@ -1312,26 +1748,38 @@ Tento simulační výpočet objektivně prokazuje, že navržený harmonogram je
         {selectedCalendarDay !== null && (() => {
           const weekIndex = Math.floor(selectedCalendarDay / 7);
           const dayOfWeekIdx = selectedCalendarDay % 7;
-          const isWeek1 = weekIndex === 0 || weekIndex === 2;
-          const activeWeekStr = isWeek1 ? 'week1' : 'week2';
+          
+          const activeWeekStr: 'week1' | 'week2' | 'week3' | 'week4' = 
+            weekIndex === 0 ? 'week1' :
+            weekIndex === 1 ? 'week2' :
+            weekIndex === 2 ? 'week3' : 'week4';
+
           const care = schedule[activeWeekStr][dayOfWeekIdx];
-          const siblingsTogether = care === 'father';
+
+          const present = children.filter(c => 
+            c.relation === 'joint' || 
+            (care === 'father' && c.relation === 'father_only') ||
+            (care === 'mother' && c.relation === 'mother_only')
+          );
 
           const dayNames = ['Pondělí', 'Úterý', 'Středa', 'Čtvrtek', 'Pátek', 'Sobota', 'Neděle'];
 
           return (
-            <div className="p-5 bg-slate-50 border border-slate-100 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-fadeIn">
+            <div className="p-5 bg-indigo-50/30 border border-indigo-100 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-fadeIn">
               <div className="space-y-1">
-                <span className="text-[9px] font-mono font-bold text-slate-400 uppercase">Detail vybraného dne v simulaci:</span>
+                <span className="text-[9px] font-mono font-bold text-indigo-500 uppercase">Detail vybraného dne v měsíční simulaci:</span>
                 <h4 className="font-bold text-xs text-slate-800">
                   Den {selectedCalendarDay + 1}. ({dayNames[dayOfWeekIdx]} - {weekIndex + 1}. týden měsíce)
                 </h4>
                 <div className="flex flex-wrap gap-2 pt-1 text-[10px] font-medium text-slate-600">
-                  <span className="bg-white px-2 py-0.5 rounded-md border border-slate-100 flex items-center gap-1">
-                    Care: <strong>{care === 'father' ? '👨 Otec' : care === 'mother' ? '👩 Matka' : '🔄 Předání'}</strong>
+                  <span className="bg-white px-2.5 py-0.5 rounded-md border border-slate-200 flex items-center gap-1">
+                    Aktuální péče: <strong>{care === 'father' ? `👨 ${fatherName}` : care === 'mother' ? `👩 ${motherName}` : '🔄 Předání'}</strong>
                   </span>
-                  <span className="bg-white px-2 py-0.5 rounded-md border border-slate-100 flex items-center gap-1">
-                    Sourozenci spolu: <strong>{siblingsTogether ? '🟢 ANO (12 hodin)' : '🔴 NE (0 hodin)'}</strong>
+                  <span className="bg-white px-2.5 py-0.5 rounded-md border border-slate-200 flex items-center gap-1">
+                    Přítomné děti ({present.length}): <strong>{present.map(c => c.name).join(', ') || 'Žádné'}</strong>
+                  </span>
+                  <span className="bg-white px-2.5 py-0.5 rounded-md border border-slate-200 flex items-center gap-1">
+                    Společný čas sourozenců: <strong>{present.length > 1 ? '🟢 ANO' : '🔴 NE'}</strong>
                   </span>
                 </div>
               </div>
@@ -1341,20 +1789,19 @@ Tento simulační výpočet objektivně prokazuje, že navržený harmonogram je
                   onClick={() => setSelectedCalendarDay(null)}
                   className="px-3 py-1.5 border border-slate-200 text-slate-600 hover:bg-slate-100 font-bold text-xs rounded-xl cursor-pointer transition-colors"
                 >
-                  Zavřít detail
+                  Zavřít
                 </button>
                 <button
                   onClick={() => {
-                    const currentList = [...schedule[activeWeekStr]];
                     const next: CareDayType = care === 'father' ? 'mother' : care === 'mother' ? 'handover' : 'father';
                     setSchedule({
                       ...schedule,
                       [activeWeekStr]: schedule[activeWeekStr].map((item, idx) => idx === dayOfWeekIdx ? next : item)
                     });
                   }}
-                  className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl cursor-pointer transition-colors"
+                  className="px-3 py-1.5 bg-slate-850 hover:bg-slate-750 text-white font-bold text-xs rounded-xl cursor-pointer transition-colors"
                 >
-                  Změnit péči dne
+                  Změnit péči dne (Cyklovat)
                 </button>
               </div>
             </div>

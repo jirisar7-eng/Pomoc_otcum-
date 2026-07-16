@@ -429,7 +429,7 @@ export default function App() {
             )}
 
             {activeTab === 'pece-o-dite' && (
-              <PeceODiteSection currentUser={currentUser} onOpenAuth={() => setAuthModalOpen(true)} />
+              <PeceODiteSection currentUser={currentUser} onOpenAuth={() => setAuthModalOpen(true)} setActiveTab={setActiveTab} />
             )}
 
             {activeTab === 'care-simulator' && (
