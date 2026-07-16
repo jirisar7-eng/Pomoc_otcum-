@@ -55,6 +55,7 @@ import GlossaryDrawer from './components/GlossaryDrawer';
 import AiGuideSection from './components/AiGuideSection';
 import UserPortal from './components/UserPortal';
 import SitemapTimeline from './components/SitemapTimeline';
+import CareSimulator from './components/CareSimulator';
 
 export default function App() {
   // Global Authentication & Navigation States
@@ -429,6 +430,10 @@ export default function App() {
 
             {activeTab === 'pece-o-dite' && (
               <PeceODiteSection currentUser={currentUser} onOpenAuth={() => setAuthModalOpen(true)} />
+            )}
+
+            {activeTab === 'care-simulator' && (
+              <CareSimulator />
             )}
 
             {activeTab === 'advice' && (

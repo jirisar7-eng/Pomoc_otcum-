@@ -22,7 +22,8 @@ import {
   Hourglass, 
   Cpu, 
   Eye, 
-  Network
+  Network,
+  Sliders
 } from 'lucide-react';
 
 interface SitemapTimelineProps {
@@ -190,6 +191,7 @@ export default function SitemapTimeline({ setActiveTab, onOpenGlossary, currentU
       color: 'border-purple-100 bg-purple-50/20 text-purple-900',
       badgeColor: 'bg-purple-100 text-purple-800',
       items: [
+        { name: 'Simulátor péče & sourozenců', tab: 'care-simulator', desc: 'Unikátní simulace střídavé péče, cestování a sourozenecké soudržnosti.', icon: <Sliders className="w-3.5 h-3.5 text-teal-600" />, highlight: true },
         { name: 'Spolurodičovský Hub (CoParent)', tab: 'coparent-hub', desc: 'Sdílený kalendář pro plynulé střídání, správa nákladů a zpráv.', icon: <Network className="w-3.5 h-3.5" /> },
         { name: 'Sémantický AI Průvodce řízením', tab: 'ai-guide', desc: 'Vygenerujte si strategii na míru na základě vašeho specifického případu.', icon: <Cpu className="w-3.5 h-3.5 text-purple-600" /> },
         { name: 'Osobní profil / Portál tance', tab: 'user-portal', desc: 'Správa vašich uložených vzorů, konceptů podání a vlastní historie.', icon: <Compass className="w-3.5 h-3.5" /> },
