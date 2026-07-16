@@ -1137,7 +1137,7 @@ Tento simulační výpočet objektivně prokazuje, že navržený harmonogram je
               {stats.siblingHoursWeekly === 0 ? (
                 <div className="p-3 bg-rose-500/10 text-rose-300 rounded-xl border border-rose-500/20 text-[11px] leading-relaxed">
                   <span className="font-bold block mb-0.5">⚠️ Kritické varování (Soudržnost: 0%):</span>
-                  Při současném modelu se Jiří a Štěpán nepotkají u jednoho rodiče ani jednu hodinu týdně. Hrozí úplné odcizení sourozenců.
+                  Při současném modelu se {child1Name} a {child2Name} nepotkají u jednoho rodiče ani jednu hodinu týdně. Hrozí úplné odcizení sourozenců.
                 </div>
               ) : stats.siblingHoursWeekly < 15 ? (
                 <div className="p-3 bg-amber-500/10 text-amber-300 rounded-xl border border-amber-500/20 text-[11px] leading-relaxed">
@@ -1226,7 +1226,7 @@ Tento simulační výpočet objektivně prokazuje, že navržený harmonogram je
           </div>
           <h3 className="font-extrabold text-base text-slate-800 font-display">Simulovaný 28-denní kalendář (Celý měsíc)</h3>
           <p className="text-xs text-slate-500">
-            Komplexní trojrozměrná axonometrická mřížka simulující střídání, předávání a hlavně <strong>společně trávený čas sourozenců</strong> (Jiřík + Štěpánek). Kliknutím na libovolný den zobrazíte logistický detail.
+            Komplexní trojrozměrná axonometrická mřížka simulující střídání, předávání a hlavně <strong>společně trávený čas sourozenců</strong> ({child1Name} + {child2Name}). Kliknutím na libovolný den zobrazíte logistický detail.
           </p>
         </div>
 
@@ -1287,7 +1287,7 @@ Tento simulační výpočet objektivně prokazuje, že navržený harmonogram je
                     {/* Care indicator icon / tag */}
                     <div className="space-y-0.5">
                       <div className="text-[9px] font-black uppercase tracking-tight truncate">
-                        {care === 'father' ? '👨 Jiří + Štěpán' : care === 'mother' ? '👩 Štěpán' : '🔄 Předání'}
+                        {care === 'father' ? `👨 ${child1Name} + ${child2Name}` : care === 'mother' ? `👩 ${child2Name}` : '🔄 Předání'}
                       </div>
                       <div className="text-[8px] opacity-70 leading-none">
                         {care === 'father' && 'U Otce'}
