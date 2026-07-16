@@ -24,7 +24,8 @@ import {
   PhoneCall, 
   Bell,
   LifeBuoy,
-  HeartHandshake
+  HeartHandshake,
+  BookOpen
 } from 'lucide-react';
 import { User } from '../types';
 
@@ -149,6 +150,15 @@ export default function Navigation({
               )}
             </div>
 
+            {/* Slovník pojmů tlačítko */}
+            <button
+              onClick={() => window.dispatchEvent(new CustomEvent('open-glossary', { detail: '' }))}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 font-bold text-[11px] rounded-xl transition-all cursor-pointer shadow-3xs"
+            >
+              <BookOpen className="w-3.5 h-3.5 text-teal-600" />
+              Slovník pojmů
+            </button>
+
             {/* Srdíčkové tlačítko Podpořit */}
             <button
               onClick={() => handleTabClick('support')}
@@ -261,6 +271,19 @@ export default function Navigation({
                 Administrace systému
               </button>
             )}
+          </div>
+
+          <div className="border-t border-slate-100 pt-3 flex flex-col gap-2">
+            <button
+              onClick={() => {
+                window.dispatchEvent(new CustomEvent('open-glossary', { detail: '' }));
+                setMobileMenuOpen(false);
+              }}
+              className="w-full flex items-center justify-center gap-2 py-2 bg-teal-50 hover:bg-teal-100/80 border border-teal-100 text-teal-800 font-bold text-xs rounded-xl transition-colors cursor-pointer"
+            >
+              <BookOpen className="w-4 h-4 text-teal-600" />
+              Odborný slovník pojmů
+            </button>
           </div>
 
           <div className="border-t border-slate-100 pt-3">

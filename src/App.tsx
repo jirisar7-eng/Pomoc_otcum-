@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Sparkles, Scale, Heart, Shield } from 'lucide-react';
+import { Sparkles, Scale, Heart, Shield, BookOpen } from 'lucide-react';
 
 import { User, Article, ExperienceStory, ForumPost, Comment, Donation } from './types';
 import { 
@@ -51,6 +51,7 @@ import KontaktSection from './components/KontaktSection';
 import CrisisSection from './components/CrisisSection';
 import SupportSection from './components/SupportSection';
 import CoParentHub from './components/CoParentHub';
+import GlossaryDrawer from './components/GlossaryDrawer';
 
 export default function App() {
   // Global Authentication & Navigation States
@@ -60,6 +61,10 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<string>('home');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [authModalOpen, setAuthModalOpen] = useState<boolean>(false);
+
+  // Glossary / Dictionary States
+  const [glossaryOpen, setGlossaryOpen] = useState<boolean>(false);
+  const [selectedGlossaryTerm, setSelectedGlossaryTerm] = useState<string | null>(null);
 
   // Lifed States for full Back-Office Synchronizations
   const [articles, setLocalArticles] = useState<Article[]>(() => 
@@ -255,6 +260,17 @@ export default function App() {
       }
     }
     loadInitialData();
+  }, []);
+
+  // Listen for the custom global 'open-glossary' event to show the dictionary
+  useEffect(() => {
+    const handleOpenGlossary = (e: Event) => {
+      const termId = (e as CustomEvent).detail;
+      setSelectedGlossaryTerm(termId || null);
+      setGlossaryOpen(true);
+    };
+    window.addEventListener('open-glossary', handleOpenGlossary);
+    return () => window.removeEventListener('open-glossary', handleOpenGlossary);
   }, []);
 
   // Synchronize States to LocalStorage
@@ -548,6 +564,27 @@ export default function App() {
 
       {/* Synthesis AI Assistant floating widget */}
       <AiAssistant />
+
+      {/* Floating Glossary Widget on the bottom left */}
+      <div className="fixed bottom-6 left-6 z-40 flex flex-col items-start font-sans" id="glossary-floating-widget">
+        <button
+          onClick={() => setGlossaryOpen(true)}
+          className="w-12 h-12 rounded-full bg-teal-600 hover:bg-teal-700 text-white flex items-center justify-center shadow-lg hover:shadow-teal-600/20 cursor-pointer group transition-all"
+          title="Otevřít odborný slovník pojmů"
+        >
+          <BookOpen className="w-5 h-5 group-hover:scale-110 transition-transform" />
+          <span className="absolute left-14 bg-slate-850 text-white font-bold text-[10px] py-1 px-2.5 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity uppercase tracking-wider border border-slate-700/50">
+            Slovník pojmů
+          </span>
+        </button>
+      </div>
+
+      {/* Glossary Drawer overlay */}
+      <GlossaryDrawer
+        isOpen={glossaryOpen}
+        onClose={() => setGlossaryOpen(false)}
+        initialTermId={selectedGlossaryTerm}
+      />
 
       {/* Security Authentication overlay modal */}
       <AuthModal

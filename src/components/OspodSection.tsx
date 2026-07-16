@@ -5,6 +5,7 @@
 
 import React, { useState } from 'react';
 import { ShieldCheck, ChevronDown, ChevronUp, Copy, Check, FileCheck, ClipboardList, Info } from 'lucide-react';
+import GlossaryTerm from './GlossaryTerm';
 
 interface Rule {
   title: string;
@@ -118,7 +119,7 @@ ID Datové schránky: [ID schránky]`;
           </div>
         </div>
         <p className="text-slate-500 text-sm leading-relaxed max-w-3xl mt-3">
-          Orgán sociálně-právní ochrany dětí (OSPOD) je soudem ustanoven jako kolizní opatrovník vašeho dítěte. Jeho posudek a doporučení mají pro rozhodnutí soudce obrovskou váhu. Připravte se na komunikaci s nimi tak, abyste působili jako zralý, stabilní a spolupracující rodič.
+          <GlossaryTerm termId="ospod">Orgán sociálně-právní ochrany dětí (OSPOD)</GlossaryTerm> je soudem ustanoven jako kolizní opatrovník vašeho dítěte. Jeho posudek a doporučení mají pro rozhodnutí soudce obrovskou váhu. Připravte se na komunikaci s nimi tak, abyste působili jako zralý, stabilní a spolupracující rodič.
         </p>
       </div>
 

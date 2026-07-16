@@ -45,6 +45,7 @@ import { motion } from 'motion/react';
 import { saveDocument } from '../lib/firebase';
 import { User } from '../types';
 import { TRANSLATED_STUDIES } from '../data/translatedStudies';
+import GlossaryTerm from './GlossaryTerm';
 
 interface ScheduleType {
   id: string;
@@ -1468,7 +1469,7 @@ Tento globální vědecký konsenzus stanovuje:
                 Vědecké studie vyvracejí opatrovnické mýty o nejmenších dětech
               </h3>
               <p className="text-xs text-slate-300 leading-relaxed max-w-4xl">
-                Opatrovnické soudy a sociální pracovnice OSPOD v České republice často žijí v zajetí dávno vyvrácených mateřských stereotypů ze 20. století (tzv. teorie monotropie - předpoklad, že dítě pod 3 roky potřebuje k zdravému vývoji výhradně matku a s otcem nesmí přespávat). Moderní světová vývojová psychologie a rozsáhlá empirická data však mluví naprosto jednoznačně: <strong>střídavá péče a přespávání u obou rodičů je nejlepším zájmem dítěte již od narození</strong>.
+                Opatrovnické soudy a sociální pracovnice <GlossaryTerm termId="ospod">OSPOD</GlossaryTerm> v České republice často žijí v zajetí dávno vyvrácených mateřských stereotypů ze 20. století (tzv. <GlossaryTerm termId="monotropy">teorie monotropie</GlossaryTerm> - předpoklad, že dítě pod 3 roky potřebuje k zdravému vývoji výhradně matku a s otcem nesmí přespávat). Moderní světová vývojová psychologie a rozsáhlá empirická data však mluví naprosto jednoznačně: <strong>střídavá péče a přespávání u obou rodičů je nejlepším zájmem dítěte již od narození</strong>.
               </p>
             </div>
           </div>
@@ -1553,7 +1554,7 @@ Tento globální vědecký konsenzus stanovuje:
                     <div className="bg-slate-50 border border-slate-100/50 p-3.5 rounded-xl space-y-1">
                       <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider font-mono">Klíčová zjištěná proměnná</span>
                       <p className="text-slate-700 leading-relaxed font-semibold">
-                        Zkoumaly se standardizované vědecké škály otcovské a mateřské vřelosti (Parental Caring, Mattering, Paternal Blame) a celková blízkost a důvěra ve vztahu (PBI).
+                        Zkoumaly se standardizované vědecké škály otcovské a mateřské vřelosti (Parental Caring, Mattering, Paternal Blame) a celková blízkost a důvěra ve vztahu (<GlossaryTerm termId="pbi">PBI</GlossaryTerm>).
                       </p>
                     </div>
                   </div>
@@ -1566,7 +1567,7 @@ Tento globální vědecký konsenzus stanovuje:
                       <div className="flex items-start gap-2 text-xs">
                         <Check className="w-4 h-4 text-teal-600 shrink-0 mt-0.5" />
                         <div>
-                          <strong className="text-slate-800 block text-xs">Efekt přímé závislosti (Dose-Response)</strong>
+                          <strong className="text-slate-800 block text-xs">Efekt přímé závislosti (<GlossaryTerm termId="dose-response">Dose-Response Effect</GlossaryTerm>)</strong>
                           <span className="text-slate-600 leading-relaxed">
                             Každá noc strávená u otce navíc v raném věku (kojenci do 1 roku i batolata do 2 let) lineárně zvyšuje kvalitu a hloubku vztahu s otcem v dospělosti. Maximální kvality a optimálního bezpečí bylo dosaženo při rovnocenném počtu nocí u obou rodičů (6 až 7 nocí ve 14denním cyklu u otce).
                           </span>
@@ -1578,7 +1579,7 @@ Tento globální vědecký konsenzus stanovuje:
                         <div>
                           <strong className="text-slate-800 block text-xs">Nulová újma na vztahu s matkou</strong>
                           <span className="text-slate-600 leading-relaxed">
-                            Výzkum prokazatelně vyvrátil obavu, že přespávání u otce poškozuje vztah dětí k matkám. Děti, které trávily noci u obou rodičů, vykazovaly stabilní a bezpečné citové vazby s oběma rodiči současně.
+                            Výzkum prokazatelně vyvrátil obavu, že přespávání u otce poškozuje vztah dětí k matkám. Děti, které trávily noci u obou rodičů, vykazovaly stabilní a bezpečné <GlossaryTerm termId="attachment">citové vazby</GlossaryTerm> s oběma rodiči současně.
                           </span>
                         </div>
                       </div>
@@ -1674,7 +1675,7 @@ Tento globální vědecký konsenzus stanovuje:
                         <div>
                           <strong className="text-slate-800 block text-xs">Střídavá péče od narození</strong>
                           <span className="text-slate-600 leading-relaxed">
-                            Empirická data plně podporují střídavou péči (podíl času v rozmezí 35% až 50% pro každého rodiče) jako nejlepší možnou normu pro zdravý rozvoj dítěte u dětí všech věkových skupin, včetně dětí mladších 4 let.
+                            Empirická data plně podporují <GlossaryTerm termId="shared-parenting">střídavou péči</GlossaryTerm> (podíl času v rozmezí 35% až 50% pro každého rodiče) jako nejlepší možnou normu pro zdravý rozvoj dítěte u dětí všech věkových skupin, včetně dětí mladších 4 let.
                           </span>
                         </div>
                       </div>
@@ -1694,7 +1695,7 @@ Tento globální vědecký konsenzus stanovuje:
                         <div>
                           <strong className="text-slate-800 block text-xs">Zdravý vývoj paralelních vazeb</strong>
                           <span className="text-slate-600 leading-relaxed">
-                            Kojenci a batolata si vytvářejí paralelní citové vazby k matce i k otci současně. Představa, že dítě má pouze jednoho "primárního" rodiče (obvykle matku), byla vědecky překonána. Omezení kontaktu s otcem na pouhé hodiny bez přespávání tuto vazbu nevratně poškozuje.
+                            Kojenci a batolata si vytvářejí paralelní <GlossaryTerm termId="attachment">citové vazby</GlossaryTerm> k matce i k otci současně. Představa, že dítě má pouze jednoho "primárního" rodiče (obvykle matku), byla vědecky překonána. Omezení kontaktu s otcem na pouhé hodiny bez přespávání tuto vazbu nevratně poškozuje.
                           </span>
                         </div>
                       </div>
