@@ -38,10 +38,13 @@ import {
   Baby,
   GraduationCap,
   Clock,
-  MapPin
+  MapPin,
+  X
 } from 'lucide-react';
+import { motion } from 'motion/react';
 import { saveDocument } from '../lib/firebase';
 import { User } from '../types';
+import { TRANSLATED_STUDIES } from '../data/translatedStudies';
 
 interface ScheduleType {
   id: string;
@@ -106,6 +109,7 @@ const SCHEDULES: ScheduleType[] = [
 export default function PeceODiteSection({ currentUser, onOpenAuth }: { currentUser?: User | null; onOpenAuth?: () => void }) {
   const [activeSubTab, setActiveSubTab] = useState<'schedules' | 'studies' | 'methodologies'>('schedules');
   const [selectedStudy, setSelectedStudy] = useState<'fabricius' | 'warshak'>('fabricius');
+  const [expandedStudyText, setExpandedStudyText] = useState<boolean>(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   // Advanced Child Care Regime Simulator State
@@ -1477,7 +1481,7 @@ Tento globální vědecký konsenzus stanovuje:
               <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider font-mono block">Vyberte vědeckou studii:</span>
               
               <button
-                onClick={() => setSelectedStudy('fabricius')}
+                onClick={() => { setSelectedStudy('fabricius'); setExpandedStudyText(false); }}
                 className={`w-full text-left p-4 rounded-xl border transition-all flex items-start gap-3 cursor-pointer ${
                   selectedStudy === 'fabricius'
                     ? 'bg-teal-50/70 border-teal-200 text-teal-900 shadow-3xs'
@@ -1495,7 +1499,7 @@ Tento globální vědecký konsenzus stanovuje:
               </button>
 
               <button
-                onClick={() => setSelectedStudy('warshak')}
+                onClick={() => { setSelectedStudy('warshak'); setExpandedStudyText(false); }}
                 className={`w-full text-left p-4 rounded-xl border transition-all flex items-start gap-3 cursor-pointer ${
                   selectedStudy === 'warshak'
                     ? 'bg-teal-50/70 border-teal-200 text-teal-900 shadow-3xs'
@@ -1732,6 +1736,126 @@ Tento globální vědecký konsenzus stanovuje:
                   </div>
 
                 </div>
+              )}
+
+              {/* Expanded Translation Section */}
+              <div className="pt-4 border-t border-slate-100">
+                <button
+                  onClick={() => setExpandedStudyText(!expandedStudyText)}
+                  className="w-full py-3 px-4 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-xs cursor-pointer transition-all hover:scale-[1.01] active:scale-[0.99]"
+                >
+                  {expandedStudyText ? (
+                    <>
+                      <X className="w-4 h-4 shrink-0" />
+                      Skrýt plné znění a překlad studie
+                    </>
+                  ) : (
+                    <>
+                      <BookOpen className="w-4 h-4 shrink-0" />
+                      Číst plný český překlad studie v češtině (Plné znění)
+                    </>
+                  )}
+                </button>
+              </div>
+
+              {expandedStudyText && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="mt-6 bg-[#FCFCFB] border border-[#F3EFE9] rounded-2xl p-6 md:p-8 space-y-6 text-slate-800 leading-relaxed overflow-hidden shadow-2xs font-serif select-text text-left"
+                >
+                  {/* Interactive academic paper header */}
+                  <div className="border-b border-slate-200 pb-4 space-y-2 font-sans">
+                    <span className="text-[10px] bg-teal-100 text-teal-800 font-bold uppercase tracking-wider font-mono px-2.5 py-0.5 rounded-full inline-block">
+                      Překlad akademického originálu • Plné znění
+                    </span>
+                    <h2 className="text-xl md:text-2xl font-bold font-display text-slate-900 tracking-tight leading-snug">
+                      {TRANSLATED_STUDIES[selectedStudy].title}
+                    </h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-500 font-mono pt-2">
+                      <div><strong>Autoři:</strong> {TRANSLATED_STUDIES[selectedStudy].authors}</div>
+                      <div><strong>Časopis:</strong> {TRANSLATED_STUDIES[selectedStudy].journal}</div>
+                      <div><strong>Rok:</strong> {TRANSLATED_STUDIES[selectedStudy].year}</div>
+                      <div><strong>Citace:</strong> {TRANSLATED_STUDIES[selectedStudy].citation}</div>
+                    </div>
+                  </div>
+
+                  {/* Abstract Card */}
+                  <div className="bg-[#FAF9F5] border-l-4 border-teal-500 p-5 rounded-r-xl space-y-2 font-sans">
+                    <h4 className="font-bold text-slate-900 text-xs uppercase tracking-wider font-mono">Abstrakt / Souhrn</h4>
+                    <p className="text-slate-700 text-xs leading-relaxed italic">
+                      {TRANSLATED_STUDIES[selectedStudy].abstract}
+                    </p>
+                  </div>
+
+                  {/* Introduction */}
+                  <div className="space-y-2">
+                    <h4 className="font-bold text-slate-900 text-xs uppercase tracking-wider font-mono font-sans">Úvod a teoretická východiska</h4>
+                    <p className="text-xs text-slate-700 leading-relaxed font-serif">
+                      {TRANSLATED_STUDIES[selectedStudy].introduction}
+                    </p>
+                  </div>
+
+                  {/* Methodology */}
+                  <div className="space-y-2">
+                    <h4 className="font-bold text-slate-900 text-xs uppercase tracking-wider font-mono font-sans">Vědecká metodologie a zkoumaný vzorek</h4>
+                    <p className="text-xs text-slate-700 leading-relaxed font-serif">
+                      {TRANSLATED_STUDIES[selectedStudy].methodology}
+                    </p>
+                  </div>
+
+                  {/* Detailed Findings List */}
+                  <div className="space-y-3 bg-[#FAF9F5]/40 border border-slate-100 rounded-xl p-5 font-sans">
+                    <h4 className="font-bold text-slate-900 text-xs uppercase tracking-wider font-mono">Hlavní vědecké nálezy a výsledky:</h4>
+                    <div className="space-y-3 text-xs text-slate-700 leading-relaxed">
+                      {TRANSLATED_STUDIES[selectedStudy].keyFindings.map((finding, idx) => (
+                        <div key={idx} className="flex gap-2">
+                          <span className="text-teal-600 font-bold shrink-0">{idx + 1}.</span>
+                          <p>{finding}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Scientific Discussion */}
+                  <div className="space-y-2">
+                    <h4 className="font-bold text-slate-900 text-xs uppercase tracking-wider font-mono font-sans">Odborná vědecká diskuse</h4>
+                    <p className="text-xs text-slate-700 leading-relaxed font-serif">
+                      {TRANSLATED_STUDIES[selectedStudy].scientificDiscussion}
+                    </p>
+                  </div>
+
+                  {/* Policy & Practice */}
+                  <div className="space-y-2">
+                    <h4 className="font-bold text-slate-900 text-xs uppercase tracking-wider font-mono font-sans">Dopady na rodinnou politiku a soudní praxi</h4>
+                    <p className="text-xs text-slate-700 leading-relaxed font-serif">
+                      {TRANSLATED_STUDIES[selectedStudy].policyImplications}
+                    </p>
+                  </div>
+
+                  {/* Final Conclusion Block */}
+                  <div className="bg-[#FAF9F5] border border-[#EBE7E0] p-6 rounded-xl space-y-2 font-sans text-center">
+                    <h4 className="font-bold text-slate-900 text-xs uppercase tracking-wider font-mono">Závěr a shrnutí studie</h4>
+                    <p className="text-slate-800 text-xs leading-relaxed font-serif italic max-w-2xl mx-auto">
+                      {TRANSLATED_STUDIES[selectedStudy].conclusions}
+                    </p>
+                  </div>
+
+                  {/* Section by Section Full Breakdown */}
+                  <div className="space-y-4 pt-4 border-t border-slate-200">
+                    <h4 className="font-bold text-slate-900 text-xs uppercase tracking-wider font-mono font-sans">Detailní struktura a kapitoly studie:</h4>
+                    <div className="space-y-4">
+                      {TRANSLATED_STUDIES[selectedStudy].sections.map((section, idx) => (
+                        <div key={idx} className="space-y-1.5">
+                          <h5 className="font-bold text-slate-900 text-xs font-sans">{section.title}</h5>
+                          <p className="text-xs text-slate-700 leading-relaxed font-serif">{section.content}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                </motion.div>
               )}
 
             </div>
