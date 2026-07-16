@@ -44,11 +44,26 @@ const firebaseConfig = {
   oAuthClientId: firebaseConfigJson.oAuthClientId
 };
 
+// Sanitize firestoreDatabaseId: a valid Firestore database ID must consist only of lowercase letters, numbers, and hyphens (up to 63 chars), or be '(default)'.
+// It must NOT be a URL, and must NOT contain slashes, colons, or dots.
+let firestoreDbId = firebaseConfig.firestoreDatabaseId;
+if (firestoreDbId) {
+  const isCleanId = /^[a-z0-9-]+$/i.test(firestoreDbId);
+  if (!isCleanId || firestoreDbId.toLowerCase() === 'default' || firestoreDbId.toLowerCase() === '(default)') {
+    if (firestoreDbId.includes('/') || firestoreDbId.includes(':') || firestoreDbId.includes('.')) {
+      console.warn(`[Firebase Initialization] Invalid firestoreDatabaseId detected ("${firestoreDbId}"). Forcing fallback to "(default)".`);
+    }
+    firestoreDbId = '(default)';
+  }
+} else {
+  firestoreDbId = '(default)';
+}
+
 // Initialize Firebase App
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
 // Initialize Firestore with Database ID from the config (critical!)
-export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId || '(default)');
+export const db = getFirestore(app, firestoreDbId || '(default)');
 
 // Enable offline persistent storage
 if (typeof window !== 'undefined') {
