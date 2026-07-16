@@ -52,6 +52,7 @@ import CrisisSection from './components/CrisisSection';
 import SupportSection from './components/SupportSection';
 import CoParentHub from './components/CoParentHub';
 import GlossaryDrawer from './components/GlossaryDrawer';
+import AiGuideSection from './components/AiGuideSection';
 
 export default function App() {
   // Global Authentication & Navigation States
@@ -406,6 +407,10 @@ export default function App() {
 
             {activeTab === 'ke-stazeni' && (
               <KeStazeniSection />
+            )}
+
+            {activeTab === 'ai-guide' && (
+              <AiGuideSection />
             )}
 
             {activeTab === 'ospod' && (

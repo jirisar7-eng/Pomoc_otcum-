@@ -56,6 +56,7 @@ export default function Navigation({
     { id: 'news', label: 'Články', icon: Bell },
     { id: 'judikatura', label: 'Judikatura', icon: Scale },
     { id: 'ke-stazeni', label: 'Vzory podání', icon: FileSpreadsheet },
+    { id: 'ai-guide', label: 'AI Průvodce', icon: Sparkles },
     { id: 'ospod', label: 'OSPOD', icon: ShieldCheck },
     { id: 'soudni-rizeni', label: 'Soudní řízení', icon: Gavel },
     { id: 'vyzivne', label: 'Výživné', icon: Coins },

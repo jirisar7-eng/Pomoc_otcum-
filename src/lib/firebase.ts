@@ -88,7 +88,16 @@ export async function loginWithGoogle(): Promise<User> {
   
   // Check if profile already exists, otherwise create it
   const userRef = doc(db, 'users', fbUser.uid);
-  const userSnap = await getDoc(userRef);
+  
+  let existingData: any = null;
+  try {
+    const userSnap = await getDoc(userRef);
+    if (userSnap.exists()) {
+      existingData = userSnap.data();
+    }
+  } catch (err: any) {
+    console.warn("Firestore offline or unavailable during Google login. Using fallback.", err);
+  }
   
   let role: UserRole = 'user';
   // If email is administrator, default to admin
@@ -100,9 +109,9 @@ export async function loginWithGoogle(): Promise<User> {
     id: fbUser.uid,
     email: fbUser.email || '',
     name: fbUser.displayName || (fbUser.email === 'mallfuriionn@gmail.com' ? 'Administrátor (mallfuriionn)' : 'Uživatel'),
-    role: userSnap.exists() ? (userSnap.data().role as UserRole) : role,
+    role: existingData ? (existingData.role as UserRole) : role,
     avatar: fbUser.photoURL || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(fbUser.displayName || fbUser.uid)}`,
-    createdAt: userSnap.exists() ? userSnap.data().createdAt : new Date().toISOString()
+    createdAt: existingData ? existingData.createdAt : new Date().toISOString()
   };
 
   // If we loaded it but want to ensure mallfuriionn has admin privileges always:
@@ -111,7 +120,17 @@ export async function loginWithGoogle(): Promise<User> {
   }
 
   // Persist / update profile in Firestore
-  await setDoc(userRef, userData, { merge: true });
+  try {
+    await setDoc(userRef, userData, { merge: true });
+  } catch (err: any) {
+    console.warn("Could not save user profile to Firestore (likely offline):", err);
+  }
+
+  // Also cache locally to bypass issues
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('synthesis_hub_local_user', JSON.stringify(userData));
+  }
+
   return userData;
 }
 
@@ -153,7 +172,16 @@ export async function registerWithEmail(email: string, pass: string, name: strin
     createdAt: new Date().toISOString()
   };
 
-  await setDoc(doc(db, 'users', fbUser.uid), userData);
+  try {
+    await setDoc(doc(db, 'users', fbUser.uid), userData);
+  } catch (err) {
+    console.warn("Could not save registered user profile to Firestore (likely offline):", err);
+  }
+  
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('synthesis_hub_local_user', JSON.stringify(userData));
+  }
+
   return userData;
 }
 
@@ -170,7 +198,16 @@ export async function loginWithEmail(email: string, pass: string): Promise<User>
     const fbUser = result.user;
 
     const userRef = doc(db, 'users', fbUser.uid);
-    const userSnap = await getDoc(userRef);
+    let userSnap = null;
+    let existingData: any = null;
+    try {
+      userSnap = await getDoc(userRef);
+      if (userSnap.exists()) {
+        existingData = userSnap.data();
+      }
+    } catch (firestoreErr: any) {
+      console.warn("Could not load user profile from Firestore during login (likely offline):", firestoreErr);
+    }
 
     let role: UserRole = 'user';
     if (finalEmail === 'admin@synthesis.cz' || finalEmail === 'mallfuriionn@gmail.com' || finalEmail.includes('admin@')) {
@@ -183,7 +220,7 @@ export async function loginWithEmail(email: string, pass: string): Promise<User>
       name: fbUser.displayName || (finalEmail === 'mallfuriionn@gmail.com' ? 'Administrátor (mallfuriionn)' : 'Aktivní Rodič'),
       role: role,
       avatar: `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(finalEmail)}`,
-      createdAt: userSnap.exists() ? userSnap.data().createdAt : new Date().toISOString()
+      createdAt: existingData ? existingData.createdAt : new Date().toISOString()
     };
     
     // Always enforce admin role for mallfuriionn
@@ -191,7 +228,11 @@ export async function loginWithEmail(email: string, pass: string): Promise<User>
       userData.role = 'admin';
     }
 
-    await setDoc(userRef, userData, { merge: true });
+    try {
+      await setDoc(userRef, userData, { merge: true });
+    } catch (firestoreErr: any) {
+      console.warn("Could not save user profile to Firestore during login (likely offline):", firestoreErr);
+    }
     
     // Also cache locally to bypass Vercel domains issue on hot refresh
     if (typeof window !== 'undefined') {

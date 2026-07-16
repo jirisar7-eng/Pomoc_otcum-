@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { DocumentTemplate } from '../types';
 import { INITIAL_DOCUMENTS } from '../mockData';
+import AiGuideModal from './AiGuideModal';
 
 interface DocumentsSectionProps {
   searchQuery: string;
@@ -30,6 +31,7 @@ export default function DocumentsSection({ searchQuery: globalSearchQuery }: Doc
   const [formData, setFormData] = useState<Record<string, string>>({});
   const [copied, setCopied] = useState(false);
   const [downloaded, setDownloaded] = useState(false);
+  const [guideOpen, setGuideOpen] = useState(false);
 
   // Initialize form with placeholder values when document changes
   React.useEffect(() => {
@@ -188,6 +190,25 @@ export default function DocumentsSection({ searchQuery: globalSearchQuery }: Doc
         <p className="text-slate-500 text-sm leading-relaxed max-w-3xl mt-3">
           Vyberte si ze schválených vzorů podání. Vyplňte formulář vlevo a vpravo uvidíte živý náhled hotového dokumentu k soudu. Můžete jej přímo zkopírovat nebo stáhnout jako textový soubor připravený pro Word či tisk.
         </p>
+
+        <div className="mt-5 pt-5 border-t border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-start gap-2.5">
+            <Sparkles className="w-5 h-5 text-teal-600 shrink-0 mt-0.5 animate-pulse" />
+            <div>
+              <h4 className="font-bold text-xs text-slate-800 font-display">Chcete stažený dokument dokonale přizpůsobit pomocí AI?</h4>
+              <p className="text-[11px] text-slate-500 leading-relaxed mt-0.5">
+                Využijte nástroje jako <strong>NotebookLM</strong> jako svůj právní mozek. Ukážeme vám, jak psát neprůstřelná zadání (prompty) a vyhnout se nebezpečným chybám.
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => setGuideOpen(true)}
+            className="shrink-0 px-4 py-2 bg-slate-900 hover:bg-black text-white rounded-xl text-xs font-bold transition-all shadow-3xs hover:shadow-md cursor-pointer flex items-center gap-1.5"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-teal-300" />
+            Jak na to s AI (NotebookLM)
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -328,6 +349,11 @@ export default function DocumentsSection({ searchQuery: globalSearchQuery }: Doc
         </div>
 
       </div>
+
+      <AiGuideModal
+        isOpen={guideOpen}
+        onClose={() => setGuideOpen(false)}
+      />
 
     </div>
   );
