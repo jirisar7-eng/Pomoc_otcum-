@@ -59,9 +59,11 @@ export default function CareSimulator() {
   
   // S1: Family state
   const [children, setChildren] = useState<Child[]>([
-    { id: '1', name: 'Jiří', birthYear: 2017, relation: 'father_only' },
-    { id: '2', name: 'Štěpán', birthYear: 2025, relation: 'joint' }
+    { id: '1', name: 'Dítě 1', birthYear: 2017, relation: 'father_only' },
+    { id: '2', name: 'Dítě 2', birthYear: 2025, relation: 'joint' }
   ]);
+  const [fatherName, setFatherName] = useState('Táta');
+  const [motherName, setMotherName] = useState('Máma');
   const [newChildName, setNewChildName] = useState('');
   const [newChildYear, setNewChildYear] = useState<number>(2020);
   const [newChildRelation, setNewChildRelation] = useState<'joint' | 'father_only' | 'mother_only'>('joint');
@@ -330,19 +332,22 @@ export default function CareSimulator() {
   };
 
   const stats = calculateStats();
+  const child1Name = children[0]?.name || 'Dítě 1';
+  const child2Name = children[1]?.name || 'Dítě 2';
 
   // --- ARGUMENTATION GENERATOR ---
   const generateArgumentation = () => {
     const isEven = stats.percentageFather === 50;
-    const careRatio = `${stats.percentageFather}% otec / ${stats.percentageMother}% matka`;
+    const careRatio = `${stats.percentageFather}% ${fatherName.toLowerCase()} / ${stats.percentageMother}% ${motherName.toLowerCase()}`;
+    const childNames = children.map(c => c.name).join(' a ') || 'děti';
     
     let siblingText = '';
     if (stats.siblingHoursWeekly === 0) {
       siblingText = `Zvolený model vyžaduje okamžitou pozornost, protože sourozenci spolu tráví 0 hodin týdně. To může vážně poškodit jejich vzájemné pouto.`;
     } else if (stats.siblingHoursWeekly < 15) {
-      siblingText = `Navržený model zajišťuje, že sourozenci spolu tráví alespovň ${stats.siblingHoursWeekly} hodin týdně společného volného času, což pomáhá udržovat jejich sourozeneckou soudržnost.`;
+      siblingText = `Navržený model zajišťuje, že sourozenci spolu tráví alespoň ${stats.siblingHoursWeekly} hodin týdně společného volného času, což pomáhá udržovat jejich sourozeneckou soudržnost.`;
     } else {
-      siblingText = `Navržený model je vynikající pro sourozeneckou soudržnost, jelikož sourozenci (Jiří a Štěpán) spolu tráví přibližně ${stats.siblingHoursWeekly} hodin týdně aktivního společného času mimo školu.`;
+      siblingText = `Navržený model je vynikající pro sourozeneckou soudržnost, jelikož sourozenci (${childNames}) spolu tráví přibližně ${stats.siblingHoursWeekly} hodin týdně aktivního společného času mimo školu.`;
     }
 
     let stabilityText = '';
@@ -359,7 +364,7 @@ export default function CareSimulator() {
 Navrhovaný model péče o nezletilé děti splňuje veškerá kritéria pro zdravý vývoj osobnosti, stabilitu a zachování klíčových rodinných vazeb:
 
 1. Podíl na péči a stabilita režimu:
-Péče je rozdělena v poměru ${careRatio} (tj. ${stats.nightsFatherMonth} nocí u otce a ${stats.nightsMotherMonth} nocí u matky za standardní měsíc). ${stabilityText}
+Péče je rozdělena v poměru ${careRatio} (tj. ${stats.nightsFatherMonth} nocí u: ${fatherName} a ${stats.nightsMotherMonth} nocí u: ${motherName} za standardní měsíc). ${stabilityText}
 
 2. Sourozenecká soudržnost (Klíčový zájem dětí):
 ${siblingText} Právo sourozenců vyrůstat společně a sdílet každodenní zážitky je Ústavním soudem ČR dlouhodobě deklarováno jako jeden z hlavních pilířů zájmu dítěte.
@@ -449,16 +454,28 @@ Tento simulační výpočet objektivně prokazuje, že navržený harmonogram je
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="p-4 bg-slate-50 border border-slate-100 rounded-xl flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-lg font-bold">👨</div>
-                  <div>
-                    <strong className="text-xs text-slate-700 block">Otec (Jiří)</strong>
-                    <span className="text-[10px] text-slate-400 font-mono">Synthesis OS Iniciátor</span>
+                  <div className="flex-1">
+                    <label className="block text-[9px] uppercase font-mono text-slate-400">Jméno otce</label>
+                    <input
+                      type="text"
+                      value={fatherName}
+                      onChange={(e) => setFatherName(e.target.value)}
+                      className="w-full text-xs font-bold text-slate-700 bg-transparent border-b border-dashed border-slate-200 focus:border-indigo-500 focus:outline-hidden px-1 py-0.5"
+                    />
+                    <span className="text-[9px] text-slate-400 font-mono block mt-1">Synthesis OS Iniciátor</span>
                   </div>
                 </div>
                 <div className="p-4 bg-slate-50 border border-slate-100 rounded-xl flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-rose-100 text-rose-700 flex items-center justify-center text-lg font-bold">👩</div>
-                  <div>
-                    <strong className="text-xs text-slate-700 block">Matka</strong>
-                    <span className="text-[10px] text-slate-400 font-mono">Opatrovník / Spolurodič</span>
+                  <div className="flex-1">
+                    <label className="block text-[9px] uppercase font-mono text-slate-400">Jméno matky</label>
+                    <input
+                      type="text"
+                      value={motherName}
+                      onChange={(e) => setMotherName(e.target.value)}
+                      className="w-full text-xs font-bold text-slate-700 bg-transparent border-b border-dashed border-slate-200 focus:border-rose-500 focus:outline-hidden px-1 py-0.5"
+                    />
+                    <span className="text-[9px] text-slate-400 font-mono block mt-1">Spolurodič</span>
                   </div>
                 </div>
               </div>
@@ -474,15 +491,24 @@ Tento simulační výpočet objektivně prokazuje, že navržený harmonogram je
                         <span className="text-xl">👶</span>
                         <div>
                           <div className="flex items-center gap-1.5">
-                            <strong className="text-xs text-slate-800">{child.name}</strong>
+                            <input
+                              type="text"
+                              value={child.name}
+                              onChange={(e) => {
+                                const newName = e.target.value;
+                                setChildren(children.map(c => c.id === child.id ? { ...c, name: newName } : c));
+                              }}
+                              className="text-xs font-bold text-slate-800 bg-transparent border-b border-dashed border-slate-200 hover:border-teal-400 focus:border-teal-500 focus:outline-hidden px-1 py-0.5 rounded w-28 sm:w-36"
+                              title="Kliknutím přejmenujete"
+                            />
                             <span className="text-[10px] bg-slate-100 text-slate-500 font-mono px-1.5 py-0.2 rounded-md">
                               nar. {child.birthYear} (cca {2026 - child.birthYear} let)
                             </span>
                           </div>
                           <span className="text-[10px] text-slate-400 font-medium">
-                            {child.relation === 'joint' && 'Společné dítě obou rodičů'}
-                            {child.relation === 'father_only' && 'Vyloučená péče: Dítě pouze u otce'}
-                            {child.relation === 'mother_only' && 'Vyloučená péče: Dítě pouze u matky'}
+                            {child.relation === 'joint' && `Společné dítě obou rodičů (${fatherName} + ${motherName})`}
+                            {child.relation === 'father_only' && `Vyloučená péče: Pouze u: ${fatherName}`}
+                            {child.relation === 'mother_only' && `Vyloučená péče: Pouze u: ${motherName}`}
                           </span>
                         </div>
                       </div>
@@ -530,9 +556,9 @@ Tento simulační výpočet objektivně prokazuje, že navržený harmonogram je
                       onChange={(e: any) => setNewChildRelation(e.target.value)}
                       className="w-full text-xs p-2 bg-white border border-slate-200 rounded-xl focus:border-teal-500 focus:outline-hidden"
                     >
-                      <option value="joint">Společné dítě</option>
-                      <option value="father_only">Pouze otce (Jiřího)</option>
-                      <option value="mother_only">Pouze matky</option>
+                      <option value="joint">Společné dítě ({fatherName} + {motherName})</option>
+                      <option value="father_only">Pouze u: {fatherName}</option>
+                      <option value="mother_only">Pouze u: {motherName}</option>
                     </select>
                   </div>
                 </div>
@@ -580,7 +606,7 @@ Tento simulační výpočet objektivně prokazuje, že navržený harmonogram je
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase">Adresa Otce (Jiří)</label>
+                  <label className="block text-[10px] font-bold text-slate-500 uppercase">Adresa - {fatherName}</label>
                   <input
                     type="text"
                     value={locations.fatherAddress}
@@ -589,7 +615,7 @@ Tento simulační výpočet objektivně prokazuje, že navržený harmonogram je
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase">Adresa Matky</label>
+                  <label className="block text-[10px] font-bold text-slate-500 uppercase">Adresa - {motherName}</label>
                   <input
                     type="text"
                     value={locations.motherAddress}
@@ -598,7 +624,7 @@ Tento simulační výpočet objektivně prokazuje, že navržený harmonogram je
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase">Škola (Dítě 1 Jiří)</label>
+                  <label className="block text-[10px] font-bold text-slate-500 uppercase">Škola ({child1Name})</label>
                   <input
                     type="text"
                     value={locations.schoolAddress}
@@ -607,7 +633,7 @@ Tento simulační výpočet objektivně prokazuje, že navržený harmonogram je
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase">Školka (Dítě 2 Štěpán)</label>
+                  <label className="block text-[10px] font-bold text-slate-500 uppercase">Školka ({child2Name})</label>
                   <input
                     type="text"
                     value={locations.kindergartenAddress}
@@ -666,16 +692,16 @@ Tento simulační výpočet objektivně prokazuje, že navržený harmonogram je
                 <div className="relative flex justify-between items-center w-full max-w-md z-10 text-center">
                   <div className="space-y-1">
                     <span className="text-lg">🏠</span>
-                    <span className="text-[9px] font-mono text-slate-300 block font-semibold">OTEC</span>
-                    <span className="text-[8px] text-teal-400 bg-teal-500/10 px-1 py-0.2 rounded font-mono">Brno</span>
+                    <span className="text-[9px] font-mono text-slate-300 block font-semibold">{fatherName.toUpperCase()}</span>
+                    <span className="text-[8px] text-teal-400 bg-teal-500/10 px-1 py-0.2 rounded font-mono">{locations.fatherAddress.split(',')[1]?.trim() || locations.fatherAddress.split(' ')[0] || 'Místo A'}</span>
                   </div>
                   <div className="px-3 py-1 bg-slate-900 border border-slate-800 rounded-full text-[9px] font-mono text-slate-400">
                     Cca {locations.distanceKm} km dálnice D1
                   </div>
                   <div className="space-y-1">
                     <span className="text-lg">🏡</span>
-                    <span className="text-[9px] font-mono text-slate-300 block font-semibold">MATKA</span>
-                    <span className="text-[8px] text-indigo-400 bg-indigo-500/10 px-1 py-0.2 rounded font-mono">Vyškov</span>
+                    <span className="text-[9px] font-mono text-slate-300 block font-semibold">{motherName.toUpperCase()}</span>
+                    <span className="text-[8px] text-indigo-400 bg-indigo-500/10 px-1 py-0.2 rounded font-mono">{locations.motherAddress.split(',')[1]?.trim() || locations.motherAddress.split(' ')[0] || 'Místo B'}</span>
                   </div>
                 </div>
               </div>
@@ -730,8 +756,8 @@ Tento simulační výpočet objektivně prokazuje, že navržený harmonogram je
                   {[
                     { id: 'alternate_7_7', label: 'Střídavá 7-7' },
                     { id: 'alternate_2_2_3', label: 'Střídavá 2-2-3' },
-                    { id: 'extended_father', label: 'Rozšířený styk otce' },
-                    { id: 'classic_weekend', label: 'Klasický styk otce' }
+                    { id: 'extended_father', label: `Rozšířený styk: ${fatherName}` },
+                    { id: 'classic_weekend', label: `Klasický styk: ${fatherName}` }
                   ].map((p) => (
                     <button
                       key={p.id}
@@ -775,8 +801,8 @@ Tento simulační výpočet objektivně prokazuje, že navržený harmonogram je
                               {care === 'handover' && '🔄'}
                             </span>
                             <span className="text-[8px] font-bold uppercase tracking-tight block">
-                              {care === 'father' && 'Otec'}
-                              {care === 'mother' && 'Matka'}
+                              {care === 'father' && fatherName}
+                              {care === 'mother' && motherName}
                               {care === 'handover' && 'Předání'}
                             </span>
                           </button>
@@ -811,8 +837,8 @@ Tento simulační výpočet objektivně prokazuje, že navržený harmonogram je
                               {care === 'handover' && '🔄'}
                             </span>
                             <span className="text-[8px] font-bold uppercase tracking-tight block">
-                              {care === 'father' && 'Otec'}
-                              {care === 'mother' && 'Matka'}
+                              {care === 'father' && fatherName}
+                              {care === 'mother' && motherName}
                               {care === 'handover' && 'Předání'}
                             </span>
                           </button>
@@ -828,11 +854,11 @@ Tento simulační výpočet objektivně prokazuje, že navržený harmonogram je
               <div className="p-3.5 bg-slate-50 border border-slate-100 rounded-xl flex flex-wrap gap-4 text-[10px] text-slate-500">
                 <span className="flex items-center gap-1">
                   <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 block" />
-                  <strong>Zelená (Otec)</strong>: Jiří a Štěpán (společné) jsou u otce. Jiří je u otce trvale.
+                  <strong>Zelená ({fatherName})</strong>: {child1Name} a {child2Name} jsou u: {fatherName}. {child1Name} je u: {fatherName} trvale.
                 </span>
                 <span className="flex items-center gap-1">
                   <span className="w-2.5 h-2.5 rounded-full bg-amber-400 block" />
-                  <strong>Žlutá (Matka)</strong>: Štěpán je u matky. Jiří zůstává u otce (oddělení).
+                  <strong>Žlutá ({motherName})</strong>: {child2Name} je u: {motherName}. {child1Name} zůstává u: {fatherName} (oddělení).
                 </span>
                 <span className="flex items-center gap-1">
                   <span className="w-2.5 h-2.5 rounded-full bg-indigo-200 block" />
@@ -986,15 +1012,15 @@ Tento simulační výpočet objektivně prokazuje, že navržený harmonogram je
                       {/* Father Care Nights */}
                       <div className="space-y-1.5 pt-2 border-t border-slate-50">
                         <div className="flex justify-between font-medium">
-                          <span className="text-slate-700">Počet nocí s tátou Jiříkem (měsíčně)</span>
-                          <span className="font-bold text-slate-800">Otec: {stats.nightsFatherMonth} nocí / Matka: {stats.nightsMotherMonth} nocí</span>
+                          <span className="text-slate-700">Počet nocí s: {fatherName} (měsíčně)</span>
+                          <span className="font-bold text-slate-800">{fatherName}: {stats.nightsFatherMonth} nocí / {motherName}: {stats.nightsMotherMonth} nocí</span>
                         </div>
                         <div className="w-full bg-slate-100 h-4 rounded-lg overflow-hidden flex font-mono text-[9px] font-bold text-white text-center">
                           <div className="bg-emerald-500 flex items-center justify-center transition-all" style={{ width: `${stats.percentageFather}%` }}>
-                            {stats.percentageFather}% Otec ({stats.nightsFatherMonth} nocí)
+                            {stats.percentageFather}% {fatherName} ({stats.nightsFatherMonth} nocí)
                           </div>
                           <div className="bg-amber-400 text-slate-800 flex items-center justify-center transition-all" style={{ width: `${stats.percentageMother}%` }}>
-                            {stats.percentageMother}% Matka ({stats.nightsMotherMonth} nocí)
+                            {stats.percentageMother}% {motherName} ({stats.nightsMotherMonth} nocí)
                           </div>
                         </div>
                       </div>
@@ -1018,7 +1044,7 @@ Tento simulační výpočet objektivně prokazuje, že navržený harmonogram je
                             <td className="p-3 text-emerald-600 font-bold text-right">✓ Zvýšení o {stats.siblingHoursWeekly} h</td>
                           </tr>
                           <tr>
-                            <td className="p-3 font-semibold text-slate-700">Noci u otce (Štěpán)</td>
+                            <td className="p-3 font-semibold text-slate-700">Noci u: {fatherName} ({child2Name})</td>
                             <td className="p-3 text-slate-500">4 noci / měsíc</td>
                             <td className="p-3 text-teal-600 font-bold">{stats.nightsFatherMonth} nocí / měsíc</td>
                             <td className="p-3 text-teal-600 font-bold text-right">+{stats.nightsFatherMonth - 4} nocí</td>
