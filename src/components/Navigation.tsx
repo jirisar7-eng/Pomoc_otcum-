@@ -78,7 +78,16 @@ export default function Navigation({
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-white border-b border-slate-100 shadow-xs">
+    <>
+      {/* Official Launch Top Banner */}
+      <div className="bg-gradient-to-r from-teal-600 via-indigo-600 to-slate-900 text-white text-[11px] font-mono py-2.5 px-4 text-center flex flex-wrap items-center justify-center gap-x-2 gap-y-1 font-semibold border-b border-teal-500/10">
+        <Sparkles className="w-3.5 h-3.5 text-teal-300 animate-pulse shrink-0" />
+        <span>Oficiální spuštění alfa verze <strong>0.0.1.1</strong> portálu Táta má právo! 🚀</span>
+        <span className="hidden md:inline text-teal-200">•</span>
+        <span className="hidden md:inline text-[10px] text-teal-100 font-sans">Uživatelská demo data byla bezpečně pročištěna a portál je připraven pro ostrý provoz.</span>
+      </div>
+
+      <header className="sticky top-0 z-40 bg-white border-b border-slate-100 shadow-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between min-h-[72px] py-2">
           
@@ -334,5 +343,6 @@ export default function Navigation({
         </div>
       )}
     </header>
+    </>
   );
 }
