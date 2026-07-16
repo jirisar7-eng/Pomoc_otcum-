@@ -53,6 +53,7 @@ import SupportSection from './components/SupportSection';
 import CoParentHub from './components/CoParentHub';
 import GlossaryDrawer from './components/GlossaryDrawer';
 import AiGuideSection from './components/AiGuideSection';
+import UserPortal from './components/UserPortal';
 
 export default function App() {
   // Global Authentication & Navigation States
@@ -485,6 +486,13 @@ export default function App() {
 
             {activeTab === 'coparent-hub' && (
               <CoParentHub
+                currentUser={currentUser}
+                onOpenAuth={() => setAuthModalOpen(true)}
+              />
+            )}
+
+            {activeTab === 'user-portal' && (
+              <UserPortal
                 currentUser={currentUser}
                 onOpenAuth={() => setAuthModalOpen(true)}
               />

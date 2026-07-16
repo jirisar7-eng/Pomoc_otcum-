@@ -25,7 +25,8 @@ import {
   Bell,
   LifeBuoy,
   HeartHandshake,
-  BookOpen
+  BookOpen,
+  LayoutDashboard
 } from 'lucide-react';
 import { User } from '../types';
 
@@ -52,6 +53,7 @@ export default function Navigation({
 
   const menuItems = [
     { id: 'home', label: 'Domů', icon: Home },
+    { id: 'user-portal', label: 'Můj Portál', icon: LayoutDashboard },
     { id: 'stories', label: 'Můj příběh', icon: History },
     { id: 'news', label: 'Články', icon: Bell },
     { id: 'judikatura', label: 'Judikatura', icon: Scale },

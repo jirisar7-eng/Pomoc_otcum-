@@ -179,3 +179,66 @@ export interface CoparentChatMessage {
   createdAt: string;
 }
 
+// User Portal Data Models
+export type TimelineNodeType = 'proposal' | 'mother_response' | 'ospod' | 'court_hearing' | 'judgment' | 'appeal' | 'other';
+
+export interface TimelineNode {
+  id: string;
+  caseId: string;
+  type: TimelineNodeType;
+  title: string;
+  date: string;
+  notes: string;
+  evidenceIds: string[]; // Associated Evidence IDs
+  deadlineDate?: string;
+  deadlineCompleted?: boolean;
+}
+
+export type EvidenceType = 'pdf' | 'photo' | 'audio' | 'video' | 'screenshot' | 'email';
+
+export interface EvidenceFile {
+  id: string;
+  name: string;
+  type: EvidenceType;
+  notes: string;
+  date: string;
+  tags: string[];
+  fileSize?: string;
+  url?: string;
+}
+
+export interface CaseInfo {
+  id: string;
+  childName: string;
+  status: string;
+  courtName: string;
+  notes: string;
+  createdAt: string;
+}
+
+export interface NotificationItem {
+  id: string;
+  title: string;
+  content: string;
+  date: string;
+  read: boolean;
+  type: 'info' | 'alert' | 'message';
+}
+
+export interface PrivateMessage {
+  id: string;
+  senderName: string;
+  text: string;
+  date: string;
+  read: boolean;
+}
+
+export interface AuditLog {
+  id: string;
+  action: string;
+  userName: string;
+  date: string;
+  details: string;
+}
+
+
