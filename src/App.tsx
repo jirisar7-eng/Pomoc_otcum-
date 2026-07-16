@@ -54,6 +54,7 @@ import CoParentHub from './components/CoParentHub';
 import GlossaryDrawer from './components/GlossaryDrawer';
 import AiGuideSection from './components/AiGuideSection';
 import UserPortal from './components/UserPortal';
+import SitemapTimeline from './components/SitemapTimeline';
 
 export default function App() {
   // Global Authentication & Navigation States
@@ -498,6 +499,17 @@ export default function App() {
               />
             )}
 
+            {activeTab === 'sitemap' && (
+              <SitemapTimeline
+                setActiveTab={(tab) => {
+                  setActiveTab(tab);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                onOpenGlossary={() => setGlossaryOpen(true)}
+                currentUser={currentUser}
+              />
+            )}
+
             {activeTab === 'admin' && (
               <AdminPanel
                 currentUser={currentUser}
@@ -541,7 +553,10 @@ export default function App() {
                 <button onClick={() => setActiveTab('ke-stazeni')} className="text-left hover:text-teal-400 transition-colors cursor-pointer">Vzory podání</button>
                 <button onClick={() => setActiveTab('vyzivne')} className="text-left hover:text-teal-400 transition-colors cursor-pointer">Výpočet výživného</button>
                 <button onClick={() => setActiveTab('pece-o-dite')} className="text-left hover:text-teal-400 transition-colors cursor-pointer">Péče o dítě</button>
-                <button onClick={() => setActiveTab('support')} className="text-left text-teal-400 hover:text-teal-300 font-bold transition-colors cursor-pointer flex items-center gap-1 col-span-2 mt-1">
+                <button onClick={() => { setActiveTab('sitemap'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="text-left hover:text-teal-400 font-bold text-teal-400 transition-colors cursor-pointer flex items-center gap-1 mt-1">
+                  📂 Mapa stránek & Vývoj
+                </button>
+                <button onClick={() => setActiveTab('support')} className="text-left text-teal-400 hover:text-teal-300 font-bold transition-colors cursor-pointer flex items-center gap-1 mt-1">
                   <Heart className="w-3.5 h-3.5 text-teal-400 animate-pulse" /> Podpořit chod webu
                 </button>
               </div>
@@ -561,7 +576,13 @@ export default function App() {
             <div>
               © 2026 Táta má právo. Vyvinuto s nejvyšším ohledem na blaho dětí. Vytvořil Jiří Š. pod záštitou studia Synthesis.
             </div>
-            <div className="flex gap-4 mt-2 md:mt-0">
+            <div className="flex flex-wrap gap-4 mt-2 md:mt-0 items-center">
+              <button
+                onClick={() => { setActiveTab('sitemap'); window.scrollTo({top: 0, behavior: 'smooth'}); }}
+                className="text-teal-400 hover:text-teal-300 font-bold hover:underline transition-colors cursor-pointer flex items-center gap-1 mr-2"
+              >
+                📂 Mapa stránek & Vývoj projektu
+              </button>
               <span className="flex items-center gap-1 text-slate-400">
                 <Shield className="w-3.5 h-3.5" />
                 RBAC aktivní
