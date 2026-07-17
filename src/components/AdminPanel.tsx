@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { 
   Shield, FileText, Plus, Trash2, Check, X, Edit3, MessageSquare, 
@@ -14,7 +14,8 @@ import {
   Sliders, Settings, Activity, FileCode, Share2, Download, ArrowUp, ArrowDown
 } from 'lucide-react';
 import { Article, ExperienceStory, ForumPost, Comment, User, Donation } from '../types';
-import { getSupabaseUrl, getSupabaseAnonKey, isSupabaseConfigured } from '../lib/supabase';
+import { getSupabaseUrl, getSupabaseAnonKey, isSupabaseConfigured, getSupabase } from '../lib/supabase';
+import { saveDocument, deleteDocument, getCollectionData } from '../lib/firebase';
 import { AIAdminActions } from '../lib/ai-admin/actions';
 import { AIAdminClient } from '../lib/ai-admin/client';
 
@@ -54,6 +55,243 @@ export default function AdminPanel({
   const [isSupabaseActive] = useState(() => {
     return typeof window !== 'undefined' ? localStorage.getItem('synthesis_hub_use_supabase') === 'true' : false;
   });
+
+  // --- STATE FOR USER MANAGEMENT ---
+  const [usersList, setUsersList] = useState<User[]>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('synthesis_hub_registered_users');
+      if (saved) return JSON.parse(saved);
+    }
+    return [
+      {
+        id: 'user-mallfuriionn',
+        name: 'Ondřej Novák (mallfuriionn)',
+        email: 'mallfuriionn@gmail.com',
+        role: 'admin',
+        avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=mallfuriionn',
+        createdAt: '2026-02-10T14:30:00.000Z'
+      },
+      {
+        id: 'user-admin',
+        name: 'Administrátor OS',
+        email: 'admin@synthesis.cz',
+        role: 'admin',
+        avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=admin',
+        createdAt: '2026-02-12T09:15:00.000Z'
+      },
+      {
+        id: 'user-petr',
+        name: 'Petr Novák',
+        email: 'petr.novak@email.cz',
+        role: 'user',
+        avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=PetrNovak',
+        createdAt: '2026-05-18T11:22:00.000Z'
+      },
+      {
+        id: 'user-pavel',
+        name: 'PhDr. Pavel Černý',
+        email: 'pavel.cerny@akcerny.cz',
+        role: 'user',
+        avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=PavelCerny',
+        createdAt: '2026-06-01T16:45:00.000Z'
+      },
+      {
+        id: 'user-jan',
+        name: 'Mgr. Jan Novotný',
+        email: 'ak.jan.novotny@pravnik.cz',
+        role: 'user',
+        avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=JanNovotny',
+        createdAt: '2026-06-15T08:10:00.000Z'
+      }
+    ];
+  });
+
+  const [searchUserQuery, setSearchUserQuery] = useState('');
+  const [isAddingUser, setIsAddingUser] = useState(false);
+  const [userSyncStatus, setUserSyncStatus] = useState<'synced' | 'saving' | 'error'>('synced');
+  const [newUserForm, setNewUserForm] = useState({
+    name: '',
+    email: '',
+    role: 'user' as const,
+    subRole: 'Registrovaný'
+  });
+
+  // --- DATABASE & CLOUD STATUS STATES ---
+  const [firebaseStatus, setFirebaseStatus] = useState<'active' | 'loading' | 'offline' | 'error'>('loading');
+  const [supabaseStatus, setSupabaseStatus] = useState<'active' | 'loading' | 'offline' | 'error'>('loading');
+  const [pingLatency, setPingLatency] = useState<number | null>(null);
+  const [dbTableCounts, setDbTableCounts] = useState({
+    articles: 0,
+    stories: 0,
+    posts: 0,
+    comments: 0,
+    donations: 0,
+    users: 0
+  });
+
+  // Synchronize users to localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('synthesis_hub_registered_users', JSON.stringify(usersList));
+    }
+  }, [usersList]);
+
+  // Load and check databases
+  useEffect(() => {
+    async function initAdminStats() {
+      // 1. Fetch users from Firestore
+      try {
+        const dbUsers = await getCollectionData<User>('users', []);
+        if (dbUsers && dbUsers.length > 0) {
+          // Merge with local users, matching by id
+          setUsersList(prev => {
+            const merged = [...prev];
+            dbUsers.forEach(dbU => {
+              const idx = merged.findIndex(m => m.id === dbU.id);
+              if (idx !== -1) {
+                merged[idx] = dbU;
+              } else {
+                merged.push(dbU);
+              }
+            });
+            return merged;
+          });
+        }
+        setFirebaseStatus('active');
+      } catch (err) {
+        console.warn("Could not fetch user list from Firestore:", err);
+        setFirebaseStatus('offline');
+      }
+
+      // 2. Fetch counts and statuses
+      const startTime = Date.now();
+      let supActive = false;
+      const sb = getSupabase();
+      if (sb && isSupabaseConfigured()) {
+        try {
+          // Attempt simple table checks
+          const [artCheck, storyCheck, postCheck, commCheck, donCheck] = await Promise.all([
+            sb.from('articles').select('id', { count: 'exact', head: true }),
+            sb.from('experience_stories').select('id', { count: 'exact', head: true }),
+            sb.from('forum_posts').select('id', { count: 'exact', head: true }),
+            sb.from('comments').select('id', { count: 'exact', head: true }),
+            sb.from('donations').select('id', { count: 'exact', head: true })
+          ]);
+
+          setDbTableCounts(prev => ({
+            ...prev,
+            articles: artCheck.count !== null ? artCheck.count : articles.length,
+            stories: storyCheck.count !== null ? storyCheck.count : stories.length,
+            posts: postCheck.count !== null ? postCheck.count : posts.length,
+            comments: commCheck.count !== null ? commCheck.count : comments.length,
+            donations: donCheck.count !== null ? donCheck.count : donations.length
+          }));
+          setSupabaseStatus('active');
+          supActive = true;
+          setPingLatency(Date.now() - startTime);
+        } catch (e) {
+          console.error("Supabase live tables check failed:", e);
+          setSupabaseStatus('error');
+        }
+      } else {
+        setSupabaseStatus('offline');
+      }
+
+      // If Supabase not active or failed, use local list lengths for counts
+      if (!supActive) {
+        setDbTableCounts(prev => ({
+          ...prev,
+          articles: articles.length,
+          stories: stories.length,
+          posts: posts.length,
+          comments: comments.length,
+          donations: donations.length
+        }));
+      }
+
+      // Update total user count in state
+      setDbTableCounts(prev => ({
+        ...prev,
+        users: usersList.length
+      }));
+    }
+
+    initAdminStats();
+  }, [articles.length, stories.length, posts.length, comments.length, donations.length]);
+
+  const handleAddUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newUserForm.name || !newUserForm.email) return;
+
+    setUserSyncStatus('saving');
+    const newId = 'user-' + Date.now();
+    const newUserObj: User & { subRole?: string } = {
+      id: newId,
+      name: newUserForm.name,
+      email: newUserForm.email,
+      role: newUserForm.role,
+      avatar: `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(newUserForm.name)}`,
+      createdAt: new Date().toISOString()
+    };
+    if (newUserForm.subRole) {
+      (newUserObj as any).subRole = newUserForm.subRole;
+    }
+
+    try {
+      await saveDocument('users', newId, newUserObj);
+    } catch (err) {
+      console.warn("Could not save new user to Firestore directly:", err);
+    }
+
+    setUsersList(prev => [...prev, newUserObj]);
+    setNewUserForm({ name: '', email: '', role: 'user', subRole: 'Registrovaný' });
+    setIsAddingUser(false);
+    setUserSyncStatus('synced');
+  };
+
+  const handleDeleteUser = async (id: string) => {
+    if (id === 'user-mallfuriionn' || (currentUser && id === currentUser.id)) {
+      alert("Nemůžete smazat hlavního administrátora nebo sami sebe!");
+      return;
+    }
+    if (!confirm("Opravdu chcete smazat tohoto uživatele?")) return;
+
+    setUserSyncStatus('saving');
+    try {
+      await deleteDocument('users', id);
+    } catch (err) {
+      console.warn("Could not delete user from Firestore:", err);
+    }
+
+    setUsersList(prev => prev.filter(u => u.id !== id));
+    setUserSyncStatus('synced');
+  };
+
+  const handleUpdateUserRole = async (id: string, newRole: 'user' | 'admin', newSubRole?: string) => {
+    setUserSyncStatus('saving');
+    const updatedUsers = usersList.map(u => {
+      if (u.id === id) {
+        const updated = { ...u, role: newRole };
+        if (newSubRole) {
+          (updated as any).subRole = newSubRole;
+        }
+        return updated;
+      }
+      return u;
+    });
+
+    const targetUser = updatedUsers.find(u => u.id === id);
+    if (targetUser) {
+      try {
+        await saveDocument('users', id, targetUser);
+      } catch (err) {
+        console.warn("Could not update user role in Firestore:", err);
+      }
+    }
+
+    setUsersList(updatedUsers);
+    setUserSyncStatus('synced');
+  };
 
   // RBAC Permission Grid State
   const [rolePermissions, setRolePermissions] = useState<Record<string, string[]>>({
@@ -698,7 +936,8 @@ ${cases.map(c => `Název: ${c.title}\nStav: ${c.status}\nChronologie:\n` + (c.ch
               { id: 'simulator', label: 'Nastavení simulátoru', icon: Sliders },
               { id: 'appearance', label: 'Vzhled & Šablony', icon: Paintbrush },
               { id: 'stats', label: 'Návštěvnost & Statistiky', icon: BarChart2 },
-              { id: 'audit', label: 'Systémový audit & Zálohy', icon: Activity }
+              { id: 'audit', label: 'Systémový audit & Zálohy', icon: Activity },
+              { id: 'supabase', label: 'Databáze & Cloud', icon: Database }
             ].map((item) => {
               const Icon = item.icon;
               return (
@@ -1975,19 +2214,254 @@ ${cases.map(c => `Název: ${c.title}\nStav: ${c.status}\nChronologie:\n` + (c.ch
           {/* TAB 9: USERS & RBAC (Role a Práva) */}
           {activeMenu === 'users' && (
             <div className="space-y-6">
-              <div className="border-b border-slate-100 pb-3">
-                <h2 className="text-base font-bold text-slate-800 font-display flex items-center gap-2">
-                  <Users className="w-5 h-5 text-indigo-500" />
-                  Správa uživatelů & Role-Based Access Control (RBAC)
-                </h2>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  Přiřaďte detailní schvalovací práva jednotlivým rolím v ekosystému Synthesis OS.
-                </p>
+              <div className="border-b border-slate-100 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <h2 className="text-base font-bold text-slate-800 font-display flex items-center gap-2">
+                    <Users className="w-5 h-5 text-indigo-500" />
+                    Správa uživatelů & Role-Based Access Control (RBAC)
+                  </h2>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Kompletní správa uživatelských účtů a detailních oprávnění pro moduly Synthesis OS.
+                  </p>
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-mono font-bold ${
+                    userSyncStatus === 'synced' ? 'bg-teal-50 text-teal-700 border border-teal-100' :
+                    userSyncStatus === 'saving' ? 'bg-amber-50 text-amber-700 border border-amber-100' :
+                    'bg-rose-50 text-rose-700 border border-rose-100'
+                  }`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${
+                      userSyncStatus === 'synced' ? 'bg-teal-500' :
+                      userSyncStatus === 'saving' ? 'bg-amber-500 animate-pulse' :
+                      'bg-rose-500'
+                    }`} />
+                    {userSyncStatus === 'synced' ? 'Synchronizováno (Cloud/Local)' :
+                     userSyncStatus === 'saving' ? 'Ukládám do DB...' :
+                     'Chyba synchronizace'}
+                  </span>
+                </div>
+              </div>
+
+              {/* STATS COUNTERS */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-2xs">
+                  <span className="text-[10px] uppercase font-mono font-bold text-slate-400 block">Celkem registrováno</span>
+                  <strong className="text-xl font-extrabold text-slate-800 block mt-1">{usersList.length} tátů</strong>
+                </div>
+                <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-2xs">
+                  <span className="text-[10px] uppercase font-mono font-bold text-slate-400 block">Administrátoři</span>
+                  <strong className="text-xl font-extrabold text-indigo-600 block mt-1">{usersList.filter(u => u.role === 'admin').length} účtů</strong>
+                </div>
+                <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-2xs">
+                  <span className="text-[10px] uppercase font-mono font-bold text-slate-400 block">Služby & Specialisté</span>
+                  <strong className="text-xl font-extrabold text-teal-600 block mt-1">
+                    {usersList.filter(u => (u as any).subRole && ['Psycholog', 'Právní poradce', 'Editor', 'Moderátor'].includes((u as any).subRole)).length} specialistů
+                  </strong>
+                </div>
+                <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-2xs">
+                  <span className="text-[10px] uppercase font-mono font-bold text-slate-400 block">Zablokovaní</span>
+                  <strong className="text-xl font-extrabold text-rose-600 block mt-1">{usersList.filter(u => (u as any).subRole === 'Zablokovaný').length} tátů</strong>
+                </div>
+              </div>
+
+              {/* SEARCH & ACTIONS */}
+              <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-2xs space-y-4">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+                  <div className="relative flex-1 max-w-md">
+                    <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                    <input
+                      type="text"
+                      placeholder="Hledat uživatele podle jména nebo e-mailu..."
+                      value={searchUserQuery}
+                      onChange={(e) => setSearchUserQuery(e.target.value)}
+                      className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200/80 rounded-xl text-xs text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500/30"
+                    />
+                  </div>
+                  
+                  <button
+                    onClick={() => setIsAddingUser(!isAddingUser)}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all cursor-pointer shadow-sm"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Nový uživatel (AI Admin / Partner)
+                  </button>
+                </div>
+
+                {/* ADD USER FORM (EXPANDABLE) */}
+                {isAddingUser && (
+                  <form onSubmit={handleAddUser} className="bg-slate-50/50 p-4 rounded-xl border border-slate-100 space-y-4 animate-fadeIn">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase block">Jméno a příjmení</label>
+                        <input
+                          type="text"
+                          required
+                          placeholder="Např. PhDr. Milan Kovář"
+                          value={newUserForm.name}
+                          onChange={(e) => setNewUserForm({ ...newUserForm, name: e.target.value })}
+                          className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-700 focus:outline-none"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase block">E-mailová adresa</label>
+                        <input
+                          type="email"
+                          required
+                          placeholder="milan.kovar@synthesis.cz"
+                          value={newUserForm.email}
+                          onChange={(e) => setNewUserForm({ ...newUserForm, email: e.target.value })}
+                          className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-700 focus:outline-none"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase block">Základní oprávnění</label>
+                        <select
+                          value={newUserForm.role}
+                          onChange={(e) => setNewUserForm({ ...newUserForm, role: e.target.value as any })}
+                          className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-700 focus:outline-none"
+                        >
+                          <option value="user">Běžný uživatel (User)</option>
+                          <option value="admin">Administrátor (Admin)</option>
+                        </select>
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase block">Role v portálu (Portal Role)</label>
+                        <select
+                          value={newUserForm.subRole}
+                          onChange={(e) => setNewUserForm({ ...newUserForm, subRole: e.target.value })}
+                          className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-700 focus:outline-none"
+                        >
+                          <option value="Registrovaný">👤 Registrovaný</option>
+                          <option value="OvenyUzivatel">⭐ Ověřený uživatel</option>
+                          <option value="Moderator">🛡️ Moderátor fóra</option>
+                          <option value="Editor">✍️ Editor obsahu</option>
+                          <option value="Psycholog">🧠 Psycholog / Specialista</option>
+                          <option value="PravniPoradce">⚖️ Právní poradce</option>
+                          <option value="Admin">⚙️ Administrátor</option>
+                          <option value="SuperAdmin">👑 SuperAdmin</option>
+                          <option value="Zablokovaný">🚫 Zablokovaný</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div className="flex justify-end gap-2 text-xs">
+                      <button
+                        type="button"
+                        onClick={() => setIsAddingUser(false)}
+                        className="px-3 py-1.5 border border-slate-200 rounded-lg text-slate-500 hover:bg-slate-50"
+                      >
+                        Zrušit
+                      </button>
+                      <button
+                        type="submit"
+                        className="px-4 py-1.5 bg-teal-600 text-white font-bold rounded-lg hover:bg-teal-700 shadow-xs"
+                      >
+                        Uložit do registru
+                      </button>
+                    </div>
+                  </form>
+                )}
+
+                {/* USERS TABLE */}
+                <div className="overflow-x-auto border border-slate-100 rounded-xl">
+                  <table className="w-full text-left text-xs border-collapse min-w-[700px]">
+                    <thead>
+                      <tr className="bg-slate-50 text-slate-400 font-mono text-[9px] uppercase tracking-wider border-b border-slate-100">
+                        <th className="p-3">Uživatel</th>
+                        <th className="p-3">E-mail</th>
+                        <th className="p-3">Základní role</th>
+                        <th className="p-3">Role v portálu</th>
+                        <th className="p-3">Datum registrace</th>
+                        <th className="p-3 text-right">Akce</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
+                      {usersList
+                        .filter(u => 
+                          u.name.toLowerCase().includes(searchUserQuery.toLowerCase()) || 
+                          u.email.toLowerCase().includes(searchUserQuery.toLowerCase())
+                        )
+                        .map((user) => {
+                          const currentSubRole = (user as any).subRole || (user.role === 'admin' ? 'Admin' : 'Registrovaný');
+                          return (
+                            <tr key={user.id} className="hover:bg-slate-50/50">
+                              <td className="p-3 flex items-center gap-3">
+                                <img
+                                  src={user.avatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(user.name)}`}
+                                  alt={user.name}
+                                  referrerPolicy="no-referrer"
+                                  className="w-7 h-7 rounded-full bg-slate-100 border border-slate-200 shrink-0"
+                                />
+                                <div>
+                                  <span className="font-semibold text-slate-800 block leading-tight">{user.name}</span>
+                                  {currentUser && user.id === currentUser.id && (
+                                    <span className="text-[9px] bg-slate-100 text-slate-500 border border-slate-200/50 px-1 py-0.2 rounded font-mono font-bold mt-0.5 inline-block">Můj profil</span>
+                                  )}
+                                </div>
+                              </td>
+                              <td className="p-3 text-slate-500 font-mono text-[11px]">{user.email}</td>
+                              <td className="p-3">
+                                <select
+                                  value={user.role}
+                                  onChange={(e) => handleUpdateUserRole(user.id, e.target.value as any, currentSubRole)}
+                                  className="px-2 py-1 bg-slate-50 border border-slate-200 rounded text-xs focus:outline-none"
+                                >
+                                  <option value="user">User</option>
+                                  <option value="admin">Admin</option>
+                                </select>
+                              </td>
+                              <td className="p-3">
+                                <select
+                                  value={currentSubRole}
+                                  onChange={(e) => {
+                                    const nextSubRole = e.target.value;
+                                    const nextCoreRole = (['SuperAdmin', 'Admin'].includes(nextSubRole)) ? 'admin' : 'user';
+                                    handleUpdateUserRole(user.id, nextCoreRole, nextSubRole);
+                                  }}
+                                  className="px-2 py-1 bg-slate-50 border border-slate-200 rounded text-xs focus:outline-none font-sans"
+                                >
+                                  <option value="SuperAdmin">👑 SuperAdmin</option>
+                                  <option value="Admin">⚙️ Admin</option>
+                                  <option value="Editor">✍️ Editor</option>
+                                  <option value="PravniPoradce">⚖️ Právní poradce</option>
+                                  <option value="Psycholog">🧠 Psycholog</option>
+                                  <option value="Moderator">🛡️ Moderátor</option>
+                                  <option value="OvenyUzivatel">⭐ Ověřený</option>
+                                  <option value="Registrovaný">👤 Registrovaný</option>
+                                  <option value="Zablokovaný">🚫 Zablokovaný</option>
+                                </select>
+                              </td>
+                              <td className="p-3 text-slate-400 font-mono text-[10px]">
+                                {user.createdAt ? new Date(user.createdAt).toLocaleDateString('cs-CZ') : 'Neznámé'}
+                              </td>
+                              <td className="p-3 text-right">
+                                <button
+                                  onClick={() => handleDeleteUser(user.id)}
+                                  disabled={user.id === 'user-mallfuriionn' || (currentUser && user.id === currentUser.id)}
+                                  className={`p-1.5 rounded-lg border transition-all ${
+                                    user.id === 'user-mallfuriionn' || (currentUser && user.id === currentUser.id)
+                                      ? 'text-slate-300 border-slate-100 bg-slate-50 cursor-not-allowed'
+                                      : 'text-rose-500 hover:bg-rose-50 border-rose-100/30 cursor-pointer'
+                                  }`}
+                                  title="Odstranit uživatele z OS"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                    </tbody>
+                  </table>
+                </div>
               </div>
 
               {/* Grid of roles and permissions */}
               <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-2xs space-y-4">
-                <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider">Matrice oprávnění rolí (Oprávnění k modulům)</h3>
+                <div className="border-b border-slate-50 pb-2 flex items-center justify-between">
+                  <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider">Matrice oprávnění rolí (Oprávnění k modulům)</h3>
+                  <span className="text-[10px] text-slate-400 font-mono font-bold uppercase">Synthesis OS Core Permissions</span>
+                </div>
                 
                 <div className="overflow-x-auto border border-slate-100 rounded-xl">
                   <table className="w-full text-left text-xs border-collapse min-w-[600px]">
@@ -2385,38 +2859,190 @@ ${cases.map(c => `Název: ${c.title}\nStav: ${c.status}\nChronologie:\n` + (c.ch
             </div>
           )}
 
-          {/* TAB 14: SUPABASE CONTROL */}
+          {/* TAB 14: DATABASE & CLOUD CONTROL */}
           {activeMenu === 'supabase' && (
-            <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-2xs space-y-6">
-              <div className="border-b border-slate-50 pb-3">
-                <h3 className="font-bold text-xs text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                  <Database className="w-5 h-5 text-indigo-600" />
-                  Supabase PostgreSQL Integrace
-                </h3>
-                <p className="text-xs text-slate-400 mt-1">
-                  Správa nativních vazeb pro stálá cloudová data.
+            <div className="space-y-6">
+              <div className="border-b border-slate-100 pb-3">
+                <h2 className="text-base font-bold text-slate-800 font-display flex items-center gap-2">
+                  <Database className="w-5 h-5 text-indigo-500" />
+                  Databáze & Cloud Management (Firebase / Supabase)
+                </h2>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Monitorujte a spravujte stav cloudové infrastruktury Synthesis OS, datová úložiště a integrační body.
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-                <div className="p-4 bg-slate-50 rounded-xl space-y-1">
-                  <strong className="text-slate-500 font-mono block">SUPABASE API URL</strong>
-                  <span className="font-mono text-[11px] break-all">{supUrl || 'Nenastaveno'}</span>
+              {/* TWO CLOUDS CARDS COMPARISON */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                {/* FIREBASE / FIRESTORE CONTROL */}
+                <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-2xs space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-bold text-xs text-slate-700 uppercase tracking-wider flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
+                      Firebase (Firestore & Auth)
+                    </h3>
+                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-mono font-bold ${
+                      firebaseStatus === 'active' ? 'bg-teal-50 text-teal-700 border border-teal-100' :
+                      firebaseStatus === 'loading' ? 'bg-slate-50 text-slate-500' :
+                      'bg-rose-50 text-rose-700 border border-rose-100'
+                    }`}>
+                      {firebaseStatus === 'active' ? '🟢 AKTIVNÍ' :
+                       firebaseStatus === 'loading' ? '⏳ NAČÍTÁNÍ...' :
+                       '🔴 ODPOJENO'}
+                    </span>
+                  </div>
+
+                  <div className="space-y-3 text-xs">
+                    <div className="p-3.5 bg-slate-50 rounded-xl space-y-2">
+                      <div className="flex justify-between border-b border-slate-100/50 pb-1.5">
+                        <span className="text-slate-400 font-mono text-[10px]">PROJEKT ID</span>
+                        <span className="font-mono text-slate-700 font-bold">synthesis-os-db</span>
+                      </div>
+                      <div className="flex justify-between border-b border-slate-100/50 pb-1.5">
+                        <span className="text-slate-400 font-mono text-[10px]">FIRESTORE DB ID</span>
+                        <span className="font-mono text-slate-700 font-bold">(default)</span>
+                      </div>
+                      <div className="flex justify-between pb-0.5">
+                        <span className="text-slate-400 font-mono text-[10px]">REŽIM STORAGE</span>
+                        <span className="font-mono text-slate-700 font-bold">Hybrid (Auth + NoSQL)</span>
+                      </div>
+                    </div>
+
+                    <div className="p-3 bg-indigo-50/50 border border-indigo-100/30 rounded-xl space-y-1">
+                      <strong className="text-slate-800 font-bold block text-[11px]">Firestore kolekce (Users):</strong>
+                      <p className="text-slate-500 text-[11px] leading-relaxed">
+                        Spravuje profily registrovaných uživatelů, ověření účtů, speciální role a bezpečnostní vazby RBAC.
+                      </p>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        setFirebaseStatus('loading');
+                        try {
+                          const users = await getCollectionData<User>('users', []);
+                          setFirebaseStatus('active');
+                          alert(`Firebase test úspěšný! Načteno ${users.length} uživatelských profilů.`);
+                        } catch (e) {
+                          setFirebaseStatus('error');
+                          alert("Firebase test selhal. Zkontrolujte prosím konfiguraci projektu.");
+                        }
+                      }}
+                      className="w-full py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200/80 rounded-xl font-bold text-slate-700 text-xs transition-all cursor-pointer"
+                    >
+                      Otestovat Firestore spojení (Ping)
+                    </button>
+                  </div>
                 </div>
-                <div className="p-4 bg-slate-50 rounded-xl space-y-1">
-                  <strong className="text-slate-500 font-mono block">ANONYMNÍ KLÍČ</strong>
-                  <span className="font-mono text-[11px] break-all">
-                    {supKey ? '••••••••••••••••••••' : 'Nenastaveno'}
-                  </span>
+
+                {/* SUPABASE CONTROL */}
+                <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-2xs space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-bold text-xs text-slate-700 uppercase tracking-wider flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+                      Supabase (PostgreSQL)
+                    </h3>
+                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-mono font-bold ${
+                      supabaseStatus === 'active' ? 'bg-teal-50 text-teal-700 border border-teal-100' :
+                      supabaseStatus === 'loading' ? 'bg-slate-50 text-slate-500' :
+                      'bg-rose-50 text-rose-700 border border-rose-100'
+                    }`}>
+                      {supabaseStatus === 'active' ? `🟢 AKTIVNÍ (${pingLatency ? `${pingLatency}ms` : 'OK'})` :
+                       supabaseStatus === 'loading' ? '⏳ NAČÍTÁNÍ...' :
+                       '🟡 FALLBACK / LOKÁLNÍ'}
+                    </span>
+                  </div>
+
+                  <div className="space-y-3 text-xs">
+                    <div className="p-3.5 bg-slate-50 rounded-xl space-y-2">
+                      <div className="flex justify-between border-b border-slate-100/50 pb-1.5">
+                        <span className="text-slate-400 font-mono text-[10px]">DATABÁZE URL</span>
+                        <span className="font-mono text-slate-700 font-bold break-all max-w-[150px] truncate" title={supUrl || 'Nenastaveno'}>
+                          {supUrl || 'Nenastaveno'}
+                        </span>
+                      </div>
+                      <div className="flex justify-between border-b border-slate-100/50 pb-1.5">
+                        <span className="text-slate-400 font-mono text-[10px]">ANON KLÍČ</span>
+                        <span className="font-mono text-slate-700 font-bold">
+                          {supKey ? '••••••••••••••••••••' : 'Nenastaveno'}
+                        </span>
+                      </div>
+                      <div className="flex justify-between pb-0.5">
+                        <span className="text-slate-400 font-mono text-[10px]">RLS PROTECTION</span>
+                        <span className="font-mono text-emerald-600 font-extrabold uppercase">ZAPNUTO (RLS)</span>
+                      </div>
+                    </div>
+
+                    <div className="p-3 bg-emerald-50/50 border border-emerald-100/30 rounded-xl space-y-1">
+                      <strong className="text-slate-800 font-bold block text-[11px]">Relační PostgreSQL motor:</strong>
+                      <p className="text-slate-500 text-[11px] leading-relaxed">
+                        Ukládá články, příběhy, komunitní fórum, komentáře a finanční dary tátů.
+                      </p>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        setSupabaseStatus('loading');
+                        const startTime = Date.now();
+                        const sb = getSupabase();
+                        if (sb && isSupabaseConfigured()) {
+                          try {
+                            const { error } = await sb.from('articles').select('id', { count: 'exact', head: true });
+                            if (error) throw error;
+                            setSupabaseStatus('active');
+                            setPingLatency(Date.now() - startTime);
+                            alert(`Supabase test úspěšný! Odezva ${Date.now() - startTime}ms.`);
+                          } catch (e) {
+                            setSupabaseStatus('error');
+                            alert("Supabase test selhal. Zkontrolujte připojení k PostgreSQL.");
+                          }
+                        } else {
+                          setSupabaseStatus('offline');
+                          alert("Supabase není nakonfigurováno.");
+                        }
+                      }}
+                      className="w-full py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200/80 rounded-xl font-bold text-slate-700 text-xs transition-all cursor-pointer"
+                    >
+                      Otestovat Supabase spojení (Ping)
+                    </button>
+                  </div>
+                </div>
+
+              </div>
+
+              {/* DYNAMIC RECORD COUNTERS PANEL */}
+              <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-2xs space-y-4">
+                <div className="border-b border-slate-50 pb-2 flex justify-between items-center">
+                  <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider">Aktuální počty datových záznamů</h3>
+                  <span className="text-[9px] bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-full font-mono font-bold uppercase">Stav tabulek</span>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+                  {[
+                    { label: 'Uživatelé', count: dbTableCounts.users, color: 'text-indigo-600 bg-indigo-50/50 border-indigo-100/50' },
+                    { label: 'Články', count: dbTableCounts.articles, color: 'text-teal-600 bg-teal-50/50 border-teal-100/50' },
+                    { label: 'Příběhy', count: dbTableCounts.stories, color: 'text-rose-600 bg-rose-50/50 border-rose-100/50' },
+                    { label: 'Příspěvky', count: dbTableCounts.posts, color: 'text-amber-600 bg-amber-50/50 border-amber-100/50' },
+                    { label: 'Komentáře', count: dbTableCounts.comments, color: 'text-purple-600 bg-purple-50/50 border-purple-100/50' },
+                    { label: 'Dary', count: dbTableCounts.donations, color: 'text-emerald-600 bg-emerald-50/50 border-emerald-100/50' }
+                  ].map((tbl, i) => (
+                    <div key={i} className={`p-4 border rounded-xl text-center space-y-1 ${tbl.color}`}>
+                      <span className="text-[10px] font-bold block uppercase tracking-wider text-slate-400">{tbl.label}</span>
+                      <strong className="text-lg font-extrabold block">{tbl.count}</strong>
+                    </div>
+                  ))}
                 </div>
               </div>
 
+              {/* AUTOMATION WARNING BOX */}
               <div className="p-4 bg-teal-50 border border-teal-100 text-teal-950 rounded-2xl flex items-start gap-3">
                 <CheckCircle className="w-5 h-5 text-teal-600 shrink-0 mt-0.5" />
                 <div className="text-xs">
-                  <strong className="font-bold block">Status synchronizace: {isSupabaseActive ? 'AKTIVNÍ' : 'LOKÁLNÍ STORAGE'}</strong>
+                  <strong className="font-bold block">Architektura autonomního řízení (Synthesis OS API-First)</strong>
                   <p className="mt-1 leading-relaxed">
-                    Uživatelská data a auditní stopy se ukládají v reálném čase do relační PostgreSQL databáze Supabase s bezpečnými pravidly Row-Level Security (RLS).
+                    Tato databázová vrstva je navržena tak, aby podporovala budoucí autonomní správu (AI Admin). Změny provedené v administraci se automaticky propagují na zabezpečené API endpointy, což umožňuje lokálním AI agentům efektivně auditovat a čistit data bez manuálních zásahů.
                   </p>
                 </div>
               </div>
