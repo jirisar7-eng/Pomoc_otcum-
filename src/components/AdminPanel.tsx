@@ -59,8 +59,12 @@ export default function AdminPanel({
   // --- STATE FOR USER MANAGEMENT ---
   const [usersList, setUsersList] = useState<User[]>(() => {
     if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('synthesis_hub_registered_users');
-      if (saved) return JSON.parse(saved);
+      try {
+        const saved = localStorage.getItem('synthesis_hub_registered_users');
+        if (saved) return JSON.parse(saved);
+      } catch (e) {
+        console.warn("Error parsing synthesis_hub_registered_users:", e);
+      }
     }
     return [
       {
@@ -308,13 +312,13 @@ export default function AdminPanel({
 
   // Dashboard Movable Widgets State
   const [dashboardWidgets, setDashboardWidgets] = useState([
-    { id: 'traffic', title: 'Dnešní návštěvnost', value: '1 248 uživatelů', change: '+14% oproti včerejšku', color: 'from-teal-500 to-emerald-600', icon: Eye },
-    { id: 'new_users', title: 'Noví registrovaní', value: '24 otců dnes', change: '+8% tento týden', color: 'from-indigo-500 to-indigo-600', icon: Users },
-    { id: 'pending_articles', title: 'Čekající články', value: '3 k právní kontrole', change: 'Redakční fronta aktivní', color: 'from-amber-500 to-orange-600', icon: FileText },
-    { id: 'pending_comments', title: 'Čekající komentáře', value: '4 k moderaci', change: 'AI ochrana běží', color: 'from-rose-500 to-red-600', icon: MessageSquare },
-    { id: 'new_docs', title: 'Nové vzory podání', value: '12 stažení dnes', change: 'Celkem 180 vzorů', color: 'from-purple-500 to-purple-600', icon: Folder },
-    { id: 'cases', title: 'Případy v databázi', value: '8 podrobných studií', change: 'Anonymizováno', color: 'from-sky-500 to-blue-600', icon: Briefcase },
-    { id: 'server', title: 'Stav Synthesis OS', value: '99.98% Online', change: 'Docker container v3000', color: 'from-emerald-600 to-teal-600', icon: Activity }
+    { id: 'traffic', title: 'Dnešní návštěvnost', value: '0 uživatelů', change: 'Čeká na první návštěvníky', color: 'from-teal-500 to-emerald-600', icon: Eye },
+    { id: 'new_users', title: 'Noví registrovaní', value: '0 registrovaných', change: 'Aktivní uživatelské profily', color: 'from-indigo-500 to-indigo-600', icon: Users },
+    { id: 'pending_articles', title: 'Čekající články', value: '0 k publikaci', change: 'Redakční fronta aktivní', color: 'from-amber-500 to-orange-600', icon: FileText },
+    { id: 'pending_comments', title: 'Čekající komentáře', value: '0 k moderaci', change: 'AI ochrana běží', color: 'from-rose-500 to-red-600', icon: MessageSquare },
+    { id: 'new_docs', title: 'Nové vzory podání', value: '0 stažení dnes', change: 'Šablony připraveny', color: 'from-purple-500 to-purple-600', icon: Folder },
+    { id: 'cases', title: 'Případy v databázi', value: '0 kazuistik', change: 'Anonymizováno', color: 'from-sky-500 to-blue-600', icon: Briefcase },
+    { id: 'server', title: 'Stav Synthesis OS', value: '100% Online', change: 'Docker container v3000', color: 'from-emerald-600 to-teal-600', icon: Activity }
   ]);
 
   // Content block presets for the article editor
@@ -335,12 +339,7 @@ export default function AdminPanel({
   });
 
   // Kanban Board columns for Editorial Queue
-  const [contentQueue, setContentQueue] = useState([
-    { id: 'c1', title: 'Zákon o rodině: Revize 2026', author: 'Ondřej', phase: 'legal', desc: 'Čeká na posouzení právního poradce.' },
-    { id: 'c2', title: 'Jak vyvrátit monotropii u soudu', author: 'Jiří', phase: 'proof', desc: 'Jazyková korektura hotova, doplňují se citace.' },
-    { id: 'c3', title: 'Příručka pro jednání s OSPOD', author: 'Marie', phase: 'draft', desc: 'První hrubý koncept osy rozhovoru.' },
-    { id: 'c4', title: 'Vzor odvolání proti výživnému', author: 'Ondřej', phase: 'approved', desc: 'Schváleno supervizorem, naplánováno publikování.' }
-  ]);
+  const [contentQueue, setContentQueue] = useState<{ id: string; title: string; author: string; phase: string; desc: string }[]>([]);
 
   // Judikatura rulings state
   const [rulings, setRulings] = useState([
@@ -428,15 +427,18 @@ export default function AdminPanel({
 
   // System Audits Logs State
   const [auditLogs, setAuditLogs] = useState([
-    { date: '16. 7. 2026, 06:12', user: 'admin@synthesis.cz', ip: '192.168.1.104', category: 'Zveřejnění článku', desc: 'Publikován nový článek "Jak správně vyvrátit monotropii" s přiložením studií.', browser: 'Chrome / Linux', hash: 'sha256:d8b2e1' },
-    { date: '15. 7. 2026, 18:30', user: 'Ondřej (Právní poradce)', ip: '192.168.1.112', category: 'Schválení vzoru', desc: 'Upraven a schválen vzor podání pro střídavou péči s důrazem na soudržnost.', browser: 'Safari / macOS', hash: 'sha256:0a39fb' },
-    { date: '15. 7. 2026, 11:22', user: 'AI Admin System', ip: 'localhost', category: 'Automatický audit', desc: 'Záloha lokálního úložiště šifrovaného obsahu a kontrola odkazů.', browser: 'Node / Docker', hash: 'sha256:9f4001' }
+    { 
+      date: new Date().toLocaleString('cs-CZ'), 
+      user: 'System OS', 
+      ip: '127.0.0.1', 
+      category: 'Inicializace', 
+      desc: 'Systém Synthesis OS byl úspěšně spuštěn v produkčním režimu.', 
+      browser: 'Docker Container / Production', 
+      hash: 'sha256:000000' 
+    }
   ]);
 
-  const [backups, setBackups] = useState([
-    { id: 'b-1', date: '16. 7. 2026, 04:00', size: '14.2 MB', creator: 'Automatický Cron' },
-    { id: 'b-2', date: '15. 7. 2026, 04:00', size: '14.1 MB', creator: 'Automatický Cron' }
-  ]);
+  const [backups, setBackups] = useState<{ id: string; date: string; size: string; creator: string }[]>([]);
   const [backupRunning, setBackupRunning] = useState(false);
 
   // --- ACTIONS ---
@@ -820,7 +822,10 @@ Nahraď všechna rodná jména dětí, rodičů, adresy, rodná čísla a kontak
     setJusticeScoreDetails(null);
     try {
       const systemInstruction = `Jsi "Synthesis Justice Score Evaluator" - analytický modul pro ohodnocení celkové připravenosti soudního sporu a šance na prosazení nejlepšího zájmu dětí (střídavá péče, sourozenecká vazba).
-Musíš zanalyzovat seznam doložených důkazů a stav případu a vygenerovat JSON s těmito klíči:
+Musíš zanalyzovat seznam doložených důkazů a stav případu a vygenerovat JSON s těmito klíči.
+DŮLEŽITÉ: Odpověz VÝHRADNĚ čistým validním JSON objektem. Neodpovídej žádným úvodním pozdravem (např. "Dobrý den"), žádným povídáním okolo ani žádným textem mimo JSON formát.
+
+Klíče v JSONu:
 - "score": číslo od 0 do 100 (hodnocení připravenosti důkazní situace otce)
 - "strengthPoints": pole 3 silných stránek případu na základě důkazů (pole textů)
 - "weakPoints": pole 2 slabých stránek nebo rizik (pole textů)
@@ -834,11 +839,39 @@ Aktivní opatrovnický případ:
 ${cases.map(c => `Název: ${c.title}\nStav: ${c.status}\nChronologie:\n` + (c.chronology || []).map((ch: any) => `- ${ch.date}: ${ch.title}`).join('\n')).join('\n')}`;
 
       const text = await AIAdminClient.queryGemini(prompt, systemInstruction);
-      let data = JSON.parse(text || '{}');
-      if (typeof data.score === 'number') {
+      
+      let data: any = null;
+      try {
+        data = JSON.parse(text || '{}');
+      } catch (parseErr) {
+        // Fallback to extraction if conversational greeting or markdown is present
+        const firstBrace = text.indexOf('{');
+        const lastBrace = text.lastIndexOf('}');
+        if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+          try {
+            data = JSON.parse(text.slice(firstBrace, lastBrace + 1));
+          } catch (innerErr) {
+            // Check for ```json ... ``` markdown block
+            const mdJsonMatch = text.match(/```json\s*([\s\S]*?)\s*```/);
+            if (mdJsonMatch && mdJsonMatch[1]) {
+              try {
+                data = JSON.parse(mdJsonMatch[1].trim());
+              } catch (mdErr) {
+                throw parseErr;
+              }
+            } else {
+              throw parseErr;
+            }
+          }
+        } else {
+          throw parseErr;
+        }
+      }
+
+      if (data && typeof data.score === 'number') {
         setJusticeScoreDetails(data);
       } else {
-        throw new Error('Nevalidní odpověď');
+        throw new Error('Nevalidní struktura odpovědi');
       }
     } catch (err: any) {
       console.error('Recalculating score failed:', err);
@@ -994,6 +1027,36 @@ ${cases.map(c => `Název: ${c.title}\nStav: ${c.status}\nChronologie:\n` + (c.ch
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                 {dashboardWidgets.map((w, idx) => {
                   const Icon = w.icon;
+                  
+                  // Dynamické výpočty pro ostré nasazení bez statických dat
+                  let displayValue = w.value;
+                  let displayChange = w.change;
+
+                  if (w.id === 'traffic') {
+                    displayValue = '0 uživatelů';
+                    displayChange = 'Čeká na první návštěvy';
+                  } else if (w.id === 'new_users') {
+                    displayValue = `${usersList.length} registrovaných`;
+                    displayChange = 'Aktivní uživatelské profily';
+                  } else if (w.id === 'pending_articles') {
+                    const pendingCount = contentQueue.filter(item => item.phase !== 'approved').length;
+                    displayValue = `${pendingCount} k publikaci`;
+                    displayChange = `${articles.length} publikovaných článků`;
+                  } else if (w.id === 'pending_comments') {
+                    const reportedCount = comments.filter(c => c.reported).length;
+                    displayValue = `${reportedCount} k moderaci`;
+                    displayChange = `${comments.length} celkem komentářů`;
+                  } else if (w.id === 'new_docs') {
+                    displayValue = '0 stažení dnes';
+                    displayChange = 'Produkční šablony připraveny';
+                  } else if (w.id === 'cases') {
+                    displayValue = `${stories.length} kazuistik`;
+                    displayChange = 'Anonymizované příběhy';
+                  } else if (w.id === 'server') {
+                    displayValue = '100% Online';
+                    displayChange = 'Docker container v3000';
+                  }
+
                   return (
                     <div 
                       key={w.id} 
@@ -1025,8 +1088,8 @@ ${cases.map(c => `Název: ${c.title}\nStav: ${c.status}\nChronologie:\n` + (c.ch
                         </div>
                         <div>
                           <span className="text-[10px] uppercase font-mono text-slate-400 font-bold block">{w.title}</span>
-                          <strong className="text-base font-extrabold text-slate-800 font-display block mt-0.5">{w.value}</strong>
-                          <span className="text-[10px] text-slate-500 font-medium block mt-1">{w.change}</span>
+                          <strong className="text-base font-extrabold text-slate-800 font-display block mt-0.5">{displayValue}</strong>
+                          <span className="text-[10px] text-slate-500 font-medium block mt-1">{displayChange}</span>
                         </div>
                       </div>
                     </div>

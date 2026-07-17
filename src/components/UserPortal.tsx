@@ -117,45 +117,85 @@ export default function UserPortal({ currentUser, onOpenAuth }: UserPortalProps)
 
   // Persistence States synced with localStorage
   const [caseInfo, setCaseInfo] = useState<CaseInfo>(() => {
-    const saved = localStorage.getItem('sh_portal_case_info');
-    return saved ? JSON.parse(saved) : DEFAULT_CASE;
+    try {
+      const saved = localStorage.getItem('sh_portal_case_info');
+      return saved ? JSON.parse(saved) : DEFAULT_CASE;
+    } catch (e) {
+      console.warn("Failed to parse sh_portal_case_info from localStorage:", e);
+      return DEFAULT_CASE;
+    }
   });
 
   const [evidenceList, setEvidenceList] = useState<EvidenceFile[]>(() => {
-    const saved = localStorage.getItem('sh_portal_evidence');
-    return saved ? JSON.parse(saved) : DEFAULT_EVIDENCE;
+    try {
+      const saved = localStorage.getItem('sh_portal_evidence');
+      return saved ? JSON.parse(saved) : DEFAULT_EVIDENCE;
+    } catch (e) {
+      console.warn("Failed to parse sh_portal_evidence from localStorage:", e);
+      return DEFAULT_EVIDENCE;
+    }
   });
 
   const [timelineNodes, setTimelineNodes] = useState<TimelineNode[]>(() => {
-    const saved = localStorage.getItem('sh_portal_timeline');
-    return saved ? JSON.parse(saved) : DEFAULT_TIMELINE;
+    try {
+      const saved = localStorage.getItem('sh_portal_timeline');
+      return saved ? JSON.parse(saved) : DEFAULT_TIMELINE;
+    } catch (e) {
+      console.warn("Failed to parse sh_portal_timeline from localStorage:", e);
+      return DEFAULT_TIMELINE;
+    }
   });
 
   const [notifications, setNotifications] = useState<NotificationItem[]>(() => {
-    const saved = localStorage.getItem('sh_portal_notifications');
-    return saved ? JSON.parse(saved) : DEFAULT_NOTIFICATIONS;
+    try {
+      const saved = localStorage.getItem('sh_portal_notifications');
+      return saved ? JSON.parse(saved) : DEFAULT_NOTIFICATIONS;
+    } catch (e) {
+      console.warn("Failed to parse sh_portal_notifications from localStorage:", e);
+      return DEFAULT_NOTIFICATIONS;
+    }
   });
 
   const [messages, setMessages] = useState<PrivateMessage[]>(() => {
-    const saved = localStorage.getItem('sh_portal_messages');
-    return saved ? JSON.parse(saved) : DEFAULT_MESSAGES;
+    try {
+      const saved = localStorage.getItem('sh_portal_messages');
+      return saved ? JSON.parse(saved) : DEFAULT_MESSAGES;
+    } catch (e) {
+      console.warn("Failed to parse sh_portal_messages from localStorage:", e);
+      return DEFAULT_MESSAGES;
+    }
   });
 
   // Checklist of court readiness
   const [checklist, setChecklist] = useState<ChecklistItem[]>(() => {
-    const saved = localStorage.getItem('sh_portal_checklist');
-    return saved ? JSON.parse(saved) : DEFAULT_CHECKLIST;
+    try {
+      const saved = localStorage.getItem('sh_portal_checklist');
+      return saved ? JSON.parse(saved) : DEFAULT_CHECKLIST;
+    } catch (e) {
+      console.warn("Failed to parse sh_portal_checklist from localStorage:", e);
+      return DEFAULT_CHECKLIST;
+    }
   });
 
   // Favorite / Saved Articles and Judgment rules
   const [savedArticles, setSavedArticles] = useState<{ id: string; title: string; category: string }[]>(() => {
-    const saved = localStorage.getItem('sh_portal_saved_articles');
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem('sh_portal_saved_articles');
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      console.warn("Failed to parse sh_portal_saved_articles from localStorage:", e);
+      return [];
+    }
   });
 
   const [savedJudgments, setSavedJudgments] = useState<{ id: string; courtName: string; caseNumber: string; summary: string }[]>(() => {
-    const saved = localStorage.getItem('sh_portal_saved_judgments');
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem('sh_portal_saved_judgments');
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      console.warn("Failed to parse sh_portal_saved_judgments from localStorage:", e);
+      return [];
+    }
   });
 
   // AI Notebook Text area
@@ -178,8 +218,13 @@ export default function UserPortal({ currentUser, onOpenAuth }: UserPortalProps)
   const [calendarMonth, setCalendarMonth] = useState<number>(new Date().getMonth());
   const [calendarYear, setCalendarYear] = useState<number>(new Date().getFullYear());
   const [customReminders, setCustomReminders] = useState<{ id: string; title: string; date: string; type: string }[]>(() => {
-    const saved = localStorage.getItem('sh_portal_custom_reminders');
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem('sh_portal_custom_reminders');
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      console.warn("Failed to parse sh_portal_custom_reminders from localStorage:", e);
+      return [];
+    }
   });
   const [isAddingReminder, setIsAddingReminder] = useState<boolean>(false);
   const [newReminderTitle, setNewReminderTitle] = useState<string>('');
