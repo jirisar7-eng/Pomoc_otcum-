@@ -223,73 +223,15 @@ export const INITIAL_ADVICE: AdviceItem[] = [
 ];
 
 export const INITIAL_FORUM_CATEGORIES: ForumCategory[] = [
-  { id: 'cat-1', name: 'Střídavá péče', description: 'Praktické zkušenosti, harmonogramy střídání, logistika a psychologie dětí.', iconName: 'Scale', postCount: 24 },
-  { id: 'cat-2', name: 'Soudní řízení', description: 'Jak probíhá soud, délka řízení, znalecké posudky a odvolání.', iconName: 'FileText', postCount: 37 },
-  { id: 'cat-3', name: 'Komunikace a OSPOD', description: 'Jak mluvit se sociálními pracovníky, jak komunikovat s expartnerem bez konfliktů.', iconName: 'MessageSquare', postCount: 19 },
-  { id: 'cat-4', name: 'Výživné (Alimony)', description: 'Výpočet výživného, tabulky ministerstva spravedlnosti, vymáhání dlužného výživného.', iconName: 'Coins', postCount: 15 }
+  { id: 'cat-1', name: 'Střídavá péče', description: 'Praktické zkušenosti, harmonogramy střídání, logistika a psychologie dětí.', iconName: 'Scale', postCount: 0 },
+  { id: 'cat-2', name: 'Soudní řízení', description: 'Jak probíhá soud, délka řízení, znalecké posudky a odvolání.', iconName: 'FileText', postCount: 0 },
+  { id: 'cat-3', name: 'Komunikace a OSPOD', description: 'Jak mluvit se sociálními pracovníky, jak komunikovat s expartnerem bez konfliktů.', iconName: 'MessageSquare', postCount: 0 },
+  { id: 'cat-4', name: 'Výživné (Alimony)', description: 'Výpočet výživného, tabulky ministerstva spravedlnosti, vymáhání dlužného výživného.', iconName: 'Coins', postCount: 0 }
 ];
 
-export const INITIAL_FORUM_POSTS: ForumPost[] = [
-  {
-    id: 'post-1',
-    categoryId: 'cat-1',
-    title: 'Jak zvládají vaše děti střídání po týdnu? Zkušenosti a rady.',
-    content: `Ahoj všichni, uvažujeme s bývalou ženou o střídavé péči v režimu týden-týden pro našeho 6letého syna. Syn nastupuje do školy. Chci se zeptat, jak to zvládají vaše děti? Není týden příliš dlouho na odloučení? Jak řešíte předávání věcí, školních pomůcek apod.? Budu rád za jakékoliv praktické postřehy.`,
-    userId: 'usr-1',
-    userName: 'Jakub K.',
-    userAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=100',
-    date: '2026-07-08',
-    likes: 12,
-    commentsCount: 2,
-    tags: ['střídavá péče', 'škola', 'předávání'],
-    reported: false
-  },
-  {
-    id: 'post-2',
-    categoryId: 'cat-2',
-    title: 'Znalecký posudek z oboru dětské psychologie - co čekat?',
-    content: `Soud nám nařídil vypracování znaleckého posudku k určení vazby dětí k rodičům a naší výchovné způsobilosti. Máte s tím někdo zkušenost? Jak takové vyšetření u psychologa probíhá? Na co se ptají dětí (8 a 10 let)? Mám z toho docela obavy, abychom děti zbytečně nestresovali. Děkuji za odpovědi.`,
-    userId: 'usr-2',
-    userName: 'Simona M.',
-    userAvatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=100',
-    date: '2026-07-10',
-    likes: 8,
-    commentsCount: 1,
-    tags: ['znalecký posudek', 'psychologie', 'soud'],
-    reported: false
-  }
-];
+export const INITIAL_FORUM_POSTS: ForumPost[] = [];
 
-export const INITIAL_STORIES: ExperienceStory[] = [
-  {
-    id: 'story-1',
-    title: 'Od válečné stezky k respektu: Naše cesta ke střídavé péči',
-    content: `Po rozchodu to byl klasický boj. Výčitky, naschvály, strach, že přijdu o syna. Moje bývalá partnerka ho nechtěla pouštět na víc než dva dny v kuse. První měsíce byly plné právních dopisů a výhrůžek. Na doporučení mediátorky jsme se ale rozhodli zkusit jedno společné sezení bez právníků.
-
-Seděli jsme tam tři hodiny. První hodinu jsme jen křičeli, ale pak nám mediátorka položila otázku: "Co z vašeho chování teď nejvíc prospívá vašemu synovi?" Ticho, které nastalo, bylo léčivé. Uvědomili jsme si, že syna ničíme naším bojem.
-
-Dnes máme střídavou péči 2-2-3 dny, syn je nadšený, má u obou plnohodnotný domov a my s ex-partnerkou dokážeme společně slavit jeho narozeniny. Trpělivost, snaha pochopit strach druhého a odsunutí vlastního ega na druhou kolej je to jediné, co funguje.`,
-    authorName: 'T., táta 8letého syna',
-    date: '2026-06-20',
-    likes: 34,
-    approved: true,
-    reported: false
-  },
-  {
-    id: 'story-2',
-    title: 'Pochopila jsem, že táta je pro dceru stejně důležitý jako já',
-    content: `Jako máma jsem měla pocit, že nikdo nedokáže dceru uspat, nakrmit nebo utěšit lépe než já. Když partner navrhl střídavou péči, polila mě hrůza. Chtěla jsem bojovat o výhradní péči. Moje vlastní mamka mě ale zastavila a řekla: "Tvůj táta s tebou sice nežil, ale pamatuješ si, jak moc ti chyběl?"
-
-To mě donutilo k zamyšlení. Můj bývalý partner dceru miluje, nikdy jí neublížil a je skvělý táta. Proč bych jí ho měla brát jen kvůli mým zraněným citům?
-
-Začali jsme postupně – nejdřív prodloužené víkendy, pak půl týdne. Teď máme střídavku týden-týden. Dcera prospívá, ve škole exceluje a má úžasný vztah s oběma. Vidím, jak moc ji táta naučil věcí, které já neumím. Stálo mě to hodně pláče a sebezapření, ale byl to ten nejlepší krok v mém životě.`,
-    authorName: 'V., máma 9leté dcery',
-    date: '2026-07-05',
-    likes: 49,
-    approved: true,
-    reported: false
-  }
-];
+export const INITIAL_STORIES: ExperienceStory[] = [];
 
 export const INITIAL_CONTACTS: SupportContact[] = [
   {
@@ -346,83 +288,9 @@ export const INITIAL_CONTACTS: SupportContact[] = [
   }
 ];
 
-export const INITIAL_COMMENTS: Comment[] = [
-  {
-    id: 'comm-1',
-    contentId: 'art-1',
-    contentType: 'article',
-    userId: 'usr-1',
-    userName: 'Jakub K.',
-    userAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=100',
-    content: 'Tato novela je krok správným směrem. Soudy doteď často zbytečně prodlužovaly řízení, přitom včasná mediace by vyřešila polovinu sporů.',
-    date: '2026-06-16',
-    likes: 5,
-    reported: false
-  },
-  {
-    id: 'comm-2',
-    contentId: 'art-1',
-    contentType: 'article',
-    userId: 'usr-2',
-    userName: 'Simona M.',
-    userAvatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=100',
-    content: 'Souhlasím. Jen doufám, že OSPODy budou mít dostatečnou kapacitu tyto dohody aktivně podporovat a pomáhat rodičům s formulací.',
-    date: '2026-06-17',
-    likes: 3,
-    reported: false
-  },
-  {
-    id: 'comm-3',
-    contentId: 'post-1',
-    contentType: 'forum',
-    userId: 'usr-2',
-    userName: 'Simona M.',
-    userAvatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=100',
-    content: 'Ahoj Jakube, máme syna (7 let) ve střídavce týden-týden od školky a funguje to skvěle. Klíčem je mít obě domácnosti blízko u sebe a v dosahu stejné školy, aby syn neztrácel kamarády. Máme dvoje učebnice a dvoje základní věci, takže nosí v pátek jen batůžek s hračkou. Držím palce!',
-    date: '2026-07-09',
-    likes: 7,
-    reported: false
-  }
-];
+export const INITIAL_COMMENTS: Comment[] = [];
 
-export const INITIAL_DONATIONS: Donation[] = [
-  {
-    id: 'don-1',
-    donorName: 'Jiří Š. (studium Synthesis)',
-    amount: 5000,
-    message: 'Podpora spravedlivého rodinného práva a technologického rozvoje platformy pod záštitou studia Synthesis.',
-    date: '2026-07-13',
-    isPublic: true,
-    isVerified: true
-  },
-  {
-    id: 'don-2',
-    donorName: 'Tomáš M.',
-    amount: 500,
-    message: 'Skvělá interaktivní kalkulačka střídavé péče. Výrazně mi to zjednodušilo argumentaci u opatrovnického soudu.',
-    date: '2026-07-12',
-    isPublic: true,
-    isVerified: true
-  },
-  {
-    id: 'don-3',
-    donorName: 'Anonymní dárce',
-    amount: 1000,
-    message: 'Díky moc za perfektní vzory podání k soudu ke stažení zdarma. Velmi užitečná práce pro všechny táty.',
-    date: '2026-07-10',
-    isPublic: true,
-    isVerified: true
-  },
-  {
-    id: 'don-4',
-    donorName: 'Kateřina L. (mediátorka)',
-    amount: 800,
-    message: 'Tento web doporučuji rodičům na mediacích jako skvělý zdroj vědecky podložených informací o prospěšnosti střídavé péče.',
-    date: '2026-07-08',
-    isPublic: true,
-    isVerified: true
-  }
-];
+export const INITIAL_DONATIONS: Donation[] = [];
 
 // Helper to initialize and manage localStorage state safely
 export function getStoredState<T>(key: string, defaultValue: T): T {

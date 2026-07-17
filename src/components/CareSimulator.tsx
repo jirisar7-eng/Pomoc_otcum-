@@ -90,6 +90,9 @@ export default function CareSimulator() {
   });
 
   // For the custom comparisons (Left: Court Ruling vs Right: Proposal)
+  const [comparisonBaseline, setComparisonBaseline] = useState<'classic_weekend' | 'alternate_7_7' | 'alternate_2_2_3' | 'stable_2_2_5_5'>('classic_weekend');
+  const [showSimulatorPrint, setShowSimulatorPrint] = useState(false);
+
   const [comparisonModel, setComparisonModel] = useState({
     courtNightsFather: 4, // classic every other weekend
     courtHandovers: 8,
@@ -195,18 +198,15 @@ export default function CareSimulator() {
     });
   };
 
-  // --- ANALYSIS COMPUTATIONS ---
-  const calculateStats = () => {
-    const combinedDays = [...schedule.week1, ...schedule.week2, ...schedule.week3, ...schedule.week4];
-    
+  // --- REUSABLE GENERALIZED ANALYSIS COMPUTATIONS ---
+  const calculateStatsForDays = (combinedDays: CareDayType[]) => {
     const nightsFatherMonth = combinedDays.filter(d => d === 'father').length;
-    const nightsMotherMonth = 28 - nightsFatherMonth;
+    const nightsMotherMonth = combinedDays.filter(d => d === 'mother').length;
 
     const percentageFather = Math.round((nightsFatherMonth / 28) * 100);
-    const percentageMother = 100 - percentageFather;
+    const percentageMother = Math.round((nightsMotherMonth / 28) * 100);
 
     // A handover occurs when care changes from father to mother or mother to father
-    // We analyze the 28-day array transitions, plus the wrap-around from end of week 4 to start of week 1
     let handoversMonth = 0;
     for (let i = 0; i < 28; i++) {
       const current = combinedDays[i];
@@ -220,7 +220,6 @@ export default function CareSimulator() {
         handoversMonth++;
       }
     }
-    // Make sure handovers has a realistic baseline
     if (handoversMonth === 0) handoversMonth = 0;
     else handoversMonth = Math.max(2, handoversMonth);
 
@@ -233,10 +232,6 @@ export default function CareSimulator() {
     const monthlyTravelHours = Math.round(((carTimeMin * handoversMonth * 2) / 60) * 10) / 10;
 
     // Sibling cohesion calculation (UNIQUE CORE MATH MODEL)
-    // We analyze how many hours siblings are at the SAME parent's house and not in school
-    // Waking hours together when at the same parent:
-    // Weekdays: 15:30 to 20:30 = 5.5 hours per day
-    // Weekend: 9:00 to 21:00 = 12 hours per day
     let totalOverlapHours28 = 0;
     
     const fatherOnlyChildren = children.filter(c => c.relation === 'father_only');
@@ -304,7 +299,6 @@ export default function CareSimulator() {
         tempSepM = 0;
       }
     }
-    // Cap at 28 days
     maxSeparationFather = Math.min(28, maxSeparationFather);
     maxSeparationMother = Math.min(28, maxSeparationMother);
 
@@ -344,7 +338,46 @@ export default function CareSimulator() {
     };
   };
 
-  const stats = calculateStats();
+  // Active Schedule stats
+  const stats = calculateStatsForDays([...schedule.week1, ...schedule.week2, ...schedule.week3, ...schedule.week4]);
+
+  // Baseline Schedule generator based on user selection
+  const getBaselineDays = (): CareDayType[] => {
+    switch (comparisonBaseline) {
+      case 'classic_weekend':
+        return [
+          'mother', 'mother', 'mother', 'mother', 'mother', 'mother', 'mother',
+          'mother', 'mother', 'mother', 'mother', 'father', 'father', 'father',
+          'mother', 'mother', 'mother', 'mother', 'mother', 'mother', 'mother',
+          'mother', 'mother', 'mother', 'mother', 'father', 'father', 'father'
+        ];
+      case 'alternate_7_7':
+        return [
+          'father', 'father', 'father', 'father', 'father', 'father', 'father',
+          'mother', 'mother', 'mother', 'mother', 'mother', 'mother', 'mother',
+          'father', 'father', 'father', 'father', 'father', 'father', 'father',
+          'mother', 'mother', 'mother', 'mother', 'mother', 'mother', 'mother'
+        ];
+      case 'alternate_2_2_3':
+        return [
+          'father', 'father', 'mother', 'mother', 'father', 'father', 'father',
+          'mother', 'mother', 'father', 'father', 'mother', 'mother', 'mother',
+          'father', 'father', 'mother', 'mother', 'father', 'father', 'father',
+          'mother', 'mother', 'father', 'father', 'mother', 'mother', 'mother'
+        ];
+      case 'stable_2_2_5_5':
+        return [
+          'father', 'father', 'mother', 'mother', 'father', 'father', 'father',
+          'father', 'father', 'mother', 'mother', 'mother', 'mother', 'mother',
+          'father', 'father', 'mother', 'mother', 'father', 'father', 'father',
+          'father', 'father', 'mother', 'mother', 'mother', 'mother', 'mother'
+        ];
+      default:
+        return Array(28).fill('mother');
+    }
+  };
+
+  const baselineStats = calculateStatsForDays(getBaselineDays());
   const child1Name = children[0]?.name || 'Dítě 1';
   const child2Name = children[1]?.name || 'Dítě 2';
 
@@ -918,15 +951,30 @@ Tento simulační výpočet objektivně prokazuje, že navržený harmonogram je
             <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-2xs space-y-6 animate-fadeIn" id="simulator-step-4">
               
               {/* Header */}
-              <div className="border-b border-slate-50 pb-3 flex justify-between items-center">
+              <div className="border-b border-slate-50 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
                   <h2 className="text-base font-bold text-slate-800 font-display flex items-center gap-2">
                     <span className="p-1.5 bg-teal-50 text-teal-600 rounded-lg"><Activity className="w-4.5 h-4.5" /></span>
-                    Krok 4: Výsledná analýza střídání
+                    Krok 4: Výsledná analýza střídání & Porovnání
                   </h2>
                   <p className="text-xs text-slate-400 mt-1">
                     Komplexní vyhodnocení logistického, sociálního a psychologického dopadu vašeho navrženého plánu péče.
                   </p>
+                </div>
+
+                {/* Srovnávací Model Selector (Porovnání dvou modelů péče) */}
+                <div className="flex items-center gap-2 shrink-0">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider font-mono">Srovnávací model:</span>
+                  <select
+                    value={comparisonBaseline}
+                    onChange={(e: any) => setComparisonBaseline(e.target.value)}
+                    className="text-xs font-bold p-1.5 bg-slate-50 border border-slate-200 focus:border-teal-500 rounded-xl outline-none"
+                  >
+                    <option value="classic_weekend">Klasický styk (každý 2. víkend)</option>
+                    <option value="alternate_7_7">Symetrická střídavá (7-7)</option>
+                    <option value="alternate_2_2_3">Soustředěná střídavá (2-2-3)</option>
+                    <option value="stable_2_2_5_5">Rozvržená střídavá (2-2-5-5)</option>
+                  </select>
                 </div>
               </div>
 
@@ -947,7 +995,11 @@ Tento simulační výpočet objektivně prokazuje, že navržený harmonogram je
                 </div>
 
                 <p className="text-xs text-slate-200 leading-relaxed font-mono whitespace-pre-wrap select-all max-h-48 overflow-y-auto pr-1">
-                  {`Navržený model péče umožňuje sourozencům společně trávit přibližně ${stats.siblingHoursWeekly} hodin týdně. Oproti klasickému asymetrickému modelu dochází ke stabilizaci počtu předání na ${stats.handoversMonth} za měsíc a ke zkrácení celkového času na cestách dětí na ${stats.monthlyTravelHours} hodiny měsíčně. Delší souvislé bloky péče o délce ${stats.avgBlockLength} dne poskytují dětem zdravý a stabilní režim.`}
+                  {`Navržený model péče umožňuje sourozencům společně trávit přibližně ${stats.siblingHoursWeekly} hodin týdně. Oproti zvolenému srovnávacímu modelu (${
+                    comparisonBaseline === 'classic_weekend' ? 'Klasický styk' :
+                    comparisonBaseline === 'alternate_7_7' ? 'Střídavá 7-7' :
+                    comparisonBaseline === 'alternate_2_2_3' ? 'Střídavá 2-2-3' : 'Střídavá 2-2-5-5'
+                  }), kde sourozenci tráví spolu pouze ${baselineStats.siblingHoursWeekly} hodin týdně, dochází ke stabilizaci počtu předání na ${stats.handoversMonth} za měsíc a ke zkrácení celkového času dětí na cestách na ${stats.monthlyTravelHours} hodiny měsíčně. Delší souvislé bloky péče o průměrné délce ${stats.avgBlockLength} dne poskytují dětem zdravý a stabilní režim.`}
                 </p>
                 
                 <span className="text-[9px] text-slate-400 block italic">
@@ -956,141 +1008,240 @@ Tento simulační výpočet objektivně prokazuje, že navržený harmonogram je
               </div>
 
               {/* Comparison model panel */}
-              <div className="border border-slate-100 rounded-2xl overflow-hidden shadow-2xs">
+              <div className="border border-slate-200/60 rounded-3xl overflow-hidden shadow-xs">
                 
                 {/* Panel bar */}
-                <div className="bg-slate-50 border-b border-slate-100 p-3 flex justify-between items-center">
-                  <span className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1">
+                <div className="bg-slate-50 border-b border-slate-200/60 p-4 flex justify-between items-center">
+                  <span className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
                     <Scale className="w-4 h-4 text-slate-500" />
-                    Porovnání: Současný stav vs. Tvůj Návrh
+                    Detailní porovnání dvou modelů péče
                   </span>
-                  <div className="flex gap-1">
+                  <div className="flex bg-slate-200/60 p-0.5 rounded-lg border border-slate-200">
                     <button
                       onClick={() => setComparisonTab('charts')}
-                      className={`px-2 py-1 text-[10px] font-bold rounded-lg cursor-pointer ${
-                        comparisonTab === 'charts' ? 'bg-slate-900 text-white' : 'text-slate-500 hover:bg-slate-100'
+                      className={`px-3 py-1 text-[10px] font-bold rounded-md cursor-pointer transition-all ${
+                        comparisonTab === 'charts' ? 'bg-white text-slate-800 shadow-3xs' : 'text-slate-500 hover:text-slate-800'
                       }`}
                     >
-                      Grafické
+                      Grafické porovnání
                     </button>
                     <button
                       onClick={() => setComparisonTab('table')}
-                      className={`px-2 py-1 text-[10px] font-bold rounded-lg cursor-pointer ${
-                        comparisonTab === 'table' ? 'bg-slate-900 text-white' : 'text-slate-500 hover:bg-slate-100'
+                      className={`px-3 py-1 text-[10px] font-bold rounded-md cursor-pointer transition-all ${
+                        comparisonTab === 'table' ? 'bg-white text-slate-800 shadow-3xs' : 'text-slate-500 hover:text-slate-800'
                       }`}
                     >
-                      Číselné
+                      Tabulka metrik
                     </button>
                   </div>
                 </div>
 
                 {/* Content Comparison */}
-                <div className="p-5 space-y-4 bg-white">
+                <div className="p-5 space-y-6 bg-white">
                   
                   {comparisonTab === 'charts' ? (
-                    <div className="space-y-4 text-xs">
-                      {/* Sibling Cohesion Graph Bar */}
-                      <div className="space-y-1.5">
-                        <div className="flex justify-between font-medium">
-                          <span className="text-slate-700">Sourozenecká soudržnost (Spolu hodin týdně)</span>
-                          <span className="font-bold text-slate-800">Tvůj návrh: {stats.siblingHoursWeekly} h / Soudní rozsudek: {comparisonModel.courtSiblingHours} h</span>
+                    <div className="space-y-6 text-xs">
+                      {/* Sibling Cohesion Graph Bar (GRAF ČASU SOUROZENCŮ SPOLU) */}
+                      <div className="space-y-2 p-4 bg-indigo-50/20 border border-indigo-100/30 rounded-2xl">
+                        <div className="flex justify-between font-bold text-slate-800">
+                          <span className="flex items-center gap-1.5">👥 Graf času sourozenců spolu (Soudržnost v h/týden)</span>
+                          <span className="text-teal-600 font-mono">Vyšší číslo = Lepší sourozenecké vazby</span>
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
+                        <p className="text-[11px] text-slate-400 pb-2 border-b border-slate-100">
+                          Tento graf ukazuje společné bdělé hodiny dětí mimo školní docházku. Dlouhodobé odloučení sourozenců poškozuje jejich vzájemný vztah.
+                        </p>
+                        <div className="space-y-3 pt-2">
+                          {/* Baseline Model */}
                           <div className="space-y-1">
-                            <span className="text-[9px] text-slate-400 block font-mono">Soudní rozsudek:</span>
-                            <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                              <div className="bg-rose-500 h-full" style={{ width: '0%' }} />
+                            <div className="flex justify-between text-[11px]">
+                              <span className="text-slate-500 font-medium">Srovnávací model ({
+                                comparisonBaseline === 'classic_weekend' ? 'Klasický styk' :
+                                comparisonBaseline === 'alternate_7_7' ? 'Střídavá 7-7' :
+                                comparisonBaseline === 'alternate_2_2_3' ? 'Střídavá 2-2-3' : 'Střídavá 2-2-5-5'
+                              }):</span>
+                              <strong className="text-slate-600 font-mono">{baselineStats.siblingHoursWeekly} h / týdně spolu</strong>
                             </div>
-                            <span className="text-[9px] font-bold text-rose-500">0 hod/týden (Úplné rozdělení)</span>
+                            <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                              <div className="bg-rose-400 h-full transition-all" style={{ width: `${Math.max(4, Math.min(100, (baselineStats.siblingHoursWeekly / 40) * 100))}%` }} />
+                            </div>
                           </div>
+                          {/* Custom Model */}
                           <div className="space-y-1">
-                            <span className="text-[9px] text-slate-400 block font-mono">Váš návrh:</span>
-                            <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                              <div className="bg-emerald-500 h-full" style={{ width: `${Math.min(100, (stats.siblingHoursWeekly / 40) * 100)}%` }} />
+                            <div className="flex justify-between text-[11px]">
+                              <span className="text-slate-800 font-extrabold">Váš navržený plán péče (Z kalendáře):</span>
+                              <strong className="text-teal-600 font-extrabold font-mono">{stats.siblingHoursWeekly} h / týdně spolu</strong>
                             </div>
-                            <span className="text-[9px] font-bold text-emerald-600">{stats.siblingHoursWeekly} hod/týden</span>
+                            <div className="w-full bg-slate-100 h-3 rounded-full overflow-hidden shadow-inner">
+                              <div className="bg-teal-500 h-full transition-all" style={{ width: `${Math.max(4, Math.min(100, (stats.siblingHoursWeekly / 40) * 100))}%` }} />
+                            </div>
                           </div>
                         </div>
                       </div>
 
-                      {/* Travel Hours Graph Bar */}
-                      <div className="space-y-1.5 pt-2 border-t border-slate-50">
-                        <div className="flex justify-between font-medium">
-                          <span className="text-slate-700">Měsíční cestování dětí (hodiny na cestě)</span>
-                          <span className="font-bold text-slate-800">Méně je lépe (Tvůj návrh: {stats.monthlyTravelHours} h)</span>
+                      {/* Parent Time Graph Bar (GRAF ČASU DÍTĚTE S KAŽDÝM RODIČEM) */}
+                      <div className="space-y-2 p-4 bg-slate-50/40 border border-slate-200/50 rounded-2xl">
+                        <div className="flex justify-between font-bold text-slate-800">
+                          <span className="flex items-center gap-1.5">⚖️ Graf času dětí s každým rodičem (Poměr nocí)</span>
+                          <span className="text-slate-500">Měsíční rozsah (28 nocí)</span>
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="space-y-1">
-                            <span className="text-[9px] text-slate-400 block font-mono">Soudní rozsudek (roztříštěný styk):</span>
-                            <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                              <div className="bg-amber-500 h-full" style={{ width: '80%' }} />
+                        <p className="text-[11px] text-slate-400 pb-2 border-b border-slate-100">
+                          Srovnání spravedlivého zapojení obou rodičů do výchovy dítěte. Ústavní soud upřednostňuje vyrovnanou péči obou rodičů.
+                        </p>
+                        
+                        <div className="space-y-4 pt-2">
+                          {/* Baseline Model */}
+                          <div className="space-y-1.5">
+                            <span className="text-[11px] text-slate-500 font-medium block">Srovnávací model ({
+                              comparisonBaseline === 'classic_weekend' ? 'Klasický styk' :
+                              comparisonBaseline === 'alternate_7_7' ? 'Střídavá 7-7' :
+                              comparisonBaseline === 'alternate_2_2_3' ? 'Střídavá 2-2-3' : 'Střídavá 2-2-5-5'
+                            }):</span>
+                            <div className="w-full bg-slate-100 h-4 rounded-lg overflow-hidden flex font-mono text-[9px] font-bold text-white text-center">
+                              <div className="bg-emerald-500/80 flex items-center justify-center transition-all" style={{ width: `${baselineStats.percentageFather}%` }}>
+                                {baselineStats.percentageFather > 15 ? `${baselineStats.percentageFather}% ${fatherName}` : '👨'}
+                              </div>
+                              <div className="bg-amber-400/80 text-slate-800 flex items-center justify-center transition-all" style={{ width: `${baselineStats.percentageMother}%` }}>
+                                {baselineStats.percentageMother > 15 ? `${baselineStats.percentageMother}% ${motherName}` : '👩'}
+                              </div>
                             </div>
-                            <span className="text-[9px] font-bold text-amber-600">Cca 16.5 hodin / měsíc</span>
+                            <span className="text-[10px] text-slate-400 block text-center font-mono">
+                              Otec: {baselineStats.nightsFatherMonth} nocí | Matka: {baselineStats.nightsMotherMonth} nocí
+                            </span>
                           </div>
-                          <div className="space-y-1">
-                            <span className="text-[9px] text-slate-400 block font-mono">Tvůj návrh střídání:</span>
-                            <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                              <div className="bg-teal-500 h-full" style={{ width: `${Math.min(100, (stats.monthlyTravelHours / 20) * 100)}%` }} />
+
+                          {/* Custom Model */}
+                          <div className="space-y-1.5">
+                            <span className="text-[11px] text-slate-800 font-extrabold block">Váš navržený plán péče (Z kalendáře):</span>
+                            <div className="w-full bg-slate-100 h-5 rounded-lg overflow-hidden flex font-mono text-[10px] font-bold text-white text-center shadow-xs">
+                              <div className="bg-emerald-500 flex items-center justify-center transition-all" style={{ width: `${stats.percentageFather}%` }}>
+                                {stats.percentageFather > 15 ? `${stats.percentageFather}% ${fatherName}` : '👨'}
+                              </div>
+                              <div className="bg-amber-400 text-slate-800 flex items-center justify-center transition-all" style={{ width: `${stats.percentageMother}%` }}>
+                                {stats.percentageMother > 15 ? `${stats.percentageMother}% ${motherName}` : '👩'}
+                              </div>
                             </div>
-                            <span className="text-[9px] font-bold text-teal-600">{stats.monthlyTravelHours} hodin / měsíc</span>
+                            <span className="text-[10px] text-slate-600 block text-center font-bold font-mono">
+                              Otec: {stats.nightsFatherMonth} nocí | Matka: {stats.nightsMotherMonth} nocí
+                            </span>
                           </div>
                         </div>
                       </div>
 
-                      {/* Father Care Nights */}
-                      <div className="space-y-1.5 pt-2 border-t border-slate-50">
-                        <div className="flex justify-between font-medium">
-                          <span className="text-slate-700">Počet nocí s: {fatherName} (měsíčně)</span>
-                          <span className="font-bold text-slate-800">{fatherName}: {stats.nightsFatherMonth} nocí / {motherName}: {stats.nightsMotherMonth} nocí</span>
+                      {/* Travel and Handovers metrics row */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                        {/* Handovers Comparison Card */}
+                        <div className="p-3.5 bg-slate-50 border border-slate-200/50 rounded-2xl space-y-1">
+                          <span className="text-[10px] uppercase font-mono font-bold text-slate-400">Počet předání dětí (Měsíčně)</span>
+                          <div className="flex items-baseline gap-2 pt-1">
+                            <strong className="text-xl font-black text-slate-800">{stats.handoversMonth}x</strong>
+                            <span className="text-[11px] text-slate-400">ve vašem plánu</span>
+                          </div>
+                          <p className="text-[10px] text-slate-500 leading-normal">
+                            Srovnávací model vyžaduje <strong>{baselineStats.handoversMonth}x</strong> předání. {
+                              stats.handoversMonth < baselineStats.handoversMonth 
+                                ? '✓ Váš plán snižuje četnost balení a přejíždění dětí.' 
+                                : 'Váš plán má vyšší nebo srovnatelnou četnost předání.'
+                            }
+                          </p>
                         </div>
-                        <div className="w-full bg-slate-100 h-4 rounded-lg overflow-hidden flex font-mono text-[9px] font-bold text-white text-center">
-                          <div className="bg-emerald-500 flex items-center justify-center transition-all" style={{ width: `${stats.percentageFather}%` }}>
-                            {stats.percentageFather}% {fatherName} ({stats.nightsFatherMonth} nocí)
+
+                        {/* Travel Time Comparison Card */}
+                        <div className="p-3.5 bg-slate-50 border border-slate-200/50 rounded-2xl space-y-1">
+                          <span className="text-[10px] uppercase font-mono font-bold text-slate-400">Čas dětí strávený na cestách</span>
+                          <div className="flex items-baseline gap-2 pt-1">
+                            <strong className="text-xl font-black text-indigo-600">{stats.monthlyTravelHours} hod</strong>
+                            <span className="text-[11px] text-slate-400">za měsíc</span>
                           </div>
-                          <div className="bg-amber-400 text-slate-800 flex items-center justify-center transition-all" style={{ width: `${stats.percentageMother}%` }}>
-                            {stats.percentageMother}% {motherName} ({stats.nightsMotherMonth} nocí)
-                          </div>
+                          <p className="text-[10px] text-slate-500 leading-normal">
+                            Srovnávací model zatíží děti <strong>{baselineStats.monthlyTravelHours} hod</strong> na cestách. Vzdálenost je {locations.distanceKm} km.
+                          </p>
                         </div>
                       </div>
+
                     </div>
                   ) : (
-                    <div className="overflow-hidden border border-slate-100 rounded-xl">
+                    <div className="overflow-hidden border border-slate-200/60 rounded-2xl">
                       <table className="w-full text-left text-xs border-collapse font-sans">
                         <thead>
-                          <tr className="bg-slate-50 text-slate-400 text-[10px] uppercase font-mono tracking-wider border-b border-slate-100">
-                            <th className="p-3">Sledovaná metrika</th>
-                            <th className="p-3">Soudní rozsudek</th>
-                            <th className="p-3">Váš návrh</th>
-                            <th className="p-3 text-right">Změna / Dopad</th>
+                          <tr className="bg-slate-50 text-slate-500 text-[10px] uppercase font-mono tracking-wider border-b border-slate-200/60">
+                            <th className="p-3.5 font-bold">Sledovaná metrika / Ukazatel</th>
+                            <th className="p-3.5 font-bold">Srovnávací model ({
+                              comparisonBaseline === 'classic_weekend' ? 'Klasický' : 'Střídavá'
+                            })</th>
+                            <th className="p-3.5 font-bold">Váš navržený plán</th>
+                            <th className="p-3.5 font-bold text-right">Změna / Praktický dopad</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100">
+                        <tbody className="divide-y divide-slate-150">
                           <tr>
-                            <td className="p-3 font-semibold text-slate-700">Sourozenci spolu</td>
-                            <td className="p-3 text-rose-500 font-bold">0 hod/týden</td>
-                            <td className="p-3 text-emerald-600 font-bold">{stats.siblingHoursWeekly} hod/týden</td>
-                            <td className="p-3 text-emerald-600 font-bold text-right">✓ Zvýšení o {stats.siblingHoursWeekly} h</td>
-                          </tr>
-                          <tr>
-                            <td className="p-3 font-semibold text-slate-700">Noci u: {fatherName} ({child2Name})</td>
-                            <td className="p-3 text-slate-500">4 noci / měsíc</td>
-                            <td className="p-3 text-teal-600 font-bold">{stats.nightsFatherMonth} nocí / měsíc</td>
-                            <td className="p-3 text-teal-600 font-bold text-right">+{stats.nightsFatherMonth - 4} nocí</td>
-                          </tr>
-                          <tr>
-                            <td className="p-3 font-semibold text-slate-700">Počet předání dětí</td>
-                            <td className="p-3 text-slate-500">8 předání</td>
-                            <td className="p-3 text-teal-600 font-bold">{stats.handoversMonth} předání</td>
-                            <td className="p-3 text-right text-slate-500">
-                              {stats.handoversMonth <= 8 ? '✓ Úspora předání' : 'Častější přesuny'}
+                            <td className="p-3.5">
+                              <span className="font-bold text-slate-800 block">Společný čas sourozenců spolu</span>
+                              <span className="text-[10px] text-slate-400">Bdělé hodiny v týdnu</span>
+                            </td>
+                            <td className="p-3.5 font-semibold text-slate-500">{baselineStats.siblingHoursWeekly} h / týdně</td>
+                            <td className="p-3.5 text-teal-600 font-extrabold">{stats.siblingHoursWeekly} h / týdně</td>
+                            <td className="p-3.5 text-emerald-600 font-bold text-right">
+                              {stats.siblingHoursWeekly > baselineStats.siblingHoursWeekly 
+                                ? `✓ Zlepšení o +${Math.round((stats.siblingHoursWeekly - baselineStats.siblingHoursWeekly) * 10) / 10} h/týden` 
+                                : stats.siblingHoursWeekly === baselineStats.siblingHoursWeekly 
+                                  ? 'Stejná hodnota' 
+                                  : 'Snížení společného času dětí'}
                             </td>
                           </tr>
                           <tr>
-                            <td className="p-3 font-semibold text-slate-700">Kilometry za měsíc</td>
-                            <td className="p-3 text-slate-500">608 km</td>
-                            <td className="p-3 text-teal-600 font-bold">{stats.monthlyKm} km</td>
-                            <td className="p-3 text-right font-mono text-[10px]">
-                              {stats.monthlyKm < 608 ? 'Snížení zátěže' : 'Více logistiky'}
+                            <td className="p-3.5">
+                              <span className="font-bold text-slate-800 block">Noci v péči otce ({fatherName})</span>
+                              <span className="text-[10px] text-slate-400">Za 28 dní</span>
+                            </td>
+                            <td className="p-3.5 font-semibold text-slate-500">{baselineStats.nightsFatherMonth} nocí</td>
+                            <td className="p-3.5 text-teal-600 font-bold">{stats.nightsFatherMonth} nocí</td>
+                            <td className="p-3.5 text-right text-slate-500 font-semibold font-mono">
+                              {stats.nightsFatherMonth !== baselineStats.nightsFatherMonth 
+                                ? `${stats.nightsFatherMonth > baselineStats.nightsFatherMonth ? '+' : ''}${stats.nightsFatherMonth - baselineStats.nightsFatherMonth} nocí` 
+                                : 'Beze změny'}
+                            </td>
+                          </tr>
+                          <tr>
+                            <td className="p-3.5">
+                              <span className="font-bold text-slate-800 block">Noci v péči matky ({motherName})</span>
+                              <span className="text-[10px] text-slate-400">Za 28 dní</span>
+                            </td>
+                            <td className="p-3.5 font-semibold text-slate-500">{baselineStats.nightsMotherMonth} nocí</td>
+                            <td className="p-3.5 text-teal-600 font-bold">{stats.nightsMotherMonth} nocí</td>
+                            <td className="p-3.5 text-right text-slate-500 font-semibold font-mono">
+                              {stats.nightsMotherMonth !== baselineStats.nightsMotherMonth 
+                                ? `${stats.nightsMotherMonth > baselineStats.nightsMotherMonth ? '+' : ''}${stats.nightsMotherMonth - baselineStats.nightsMotherMonth} nocí` 
+                                : 'Beze změny'}
+                            </td>
+                          </tr>
+                          <tr>
+                            <td className="p-3.5">
+                              <span className="font-bold text-slate-800 block">Měsíční počet předání</span>
+                              <span className="text-[10px] text-slate-400">Frekvence přesunů dětí</span>
+                            </td>
+                            <td className="p-3.5 font-semibold text-slate-500">{baselineStats.handoversMonth}x za měsíc</td>
+                            <td className="p-3.5 text-teal-600 font-bold">{stats.handoversMonth}x za měsíc</td>
+                            <td className="p-3.5 text-right font-bold text-emerald-600">
+                              {stats.handoversMonth < baselineStats.handoversMonth 
+                                ? `✓ Méně o -${baselineStats.handoversMonth - stats.handoversMonth} předání (klidnější režim)` 
+                                : stats.handoversMonth === baselineStats.handoversMonth 
+                                  ? 'Stejná zátěž' 
+                                  : 'Více logistických přesunů'}
+                            </td>
+                          </tr>
+                          <tr>
+                            <td className="p-3.5">
+                              <span className="font-bold text-slate-800 block">Čas dětí na cestách</span>
+                              <span className="text-[10px] text-slate-400">Měsíční logistika ({locations.distanceKm} km)</span>
+                            </td>
+                            <td className="p-3.5 font-semibold text-slate-500 font-mono">{baselineStats.monthlyTravelHours} h / měsíc</td>
+                            <td className="p-3.5 text-indigo-600 font-extrabold font-mono">{stats.monthlyTravelHours} h / měsíc</td>
+                            <td className="p-3.5 text-right font-bold">
+                              {stats.monthlyTravelHours < baselineStats.monthlyTravelHours 
+                                ? <span className="text-emerald-600">✓ Úspora -{Math.round((baselineStats.monthlyTravelHours - stats.monthlyTravelHours) * 10) / 10} h cestování</span>
+                                : stats.monthlyTravelHours === baselineStats.monthlyTravelHours 
+                                  ? <span className="text-slate-400">Stejný čas</span>
+                                  : <span className="text-amber-600">+{Math.round((stats.monthlyTravelHours - baselineStats.monthlyTravelHours) * 10) / 10} h více na cestě</span>}
                             </td>
                           </tr>
                         </tbody>
@@ -1112,20 +1263,15 @@ Tento simulační výpočet objektivně prokazuje, že navržený harmonogram je
                 <div className="flex gap-2">
                   <button
                     onClick={() => {
-                      window.print();
-                    }}
-                    className="px-4 py-2 border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs rounded-xl cursor-pointer flex items-center gap-1.5 transition-all"
-                  >
-                    <Printer className="w-4 h-4 text-slate-400" />
-                    Tisková PDF sestava
-                  </button>
-                  <button
-                    onClick={() => {
-                      alert("Tento model byl uložen do vašeho profilu 'Synthesis OS' a spárován se Supabase. AI asistent k němu má nyní přístup.");
+                      setShowSimulatorPrint(true);
+                      setTimeout(() => {
+                        window.print();
+                      }, 500);
                     }}
                     className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl cursor-pointer flex items-center gap-1.5 transition-all"
                   >
-                    Uložit model péče
+                    <Printer className="w-4 h-4 text-teal-400" />
+                    Exportovat přehlednou zprávu (PDF)
                   </button>
                 </div>
               </div>
@@ -1824,6 +1970,150 @@ Tento simulační výpočet objektivně prokazuje, že navržený harmonogram je
           </p>
         </div>
       </div>
+
+      {/* PRINTABLE OVERLAY REPORT (Zpráva ze simulátoru) */}
+      {showSimulatorPrint && (
+        <div className="fixed inset-0 bg-white z-[999] overflow-y-auto p-12 text-slate-800 select-none">
+          <div className="max-w-4xl mx-auto space-y-8">
+            
+            {/* Header / Brand */}
+            <div className="flex justify-between items-start border-b-2 border-slate-900 pb-4">
+              <div>
+                <span className="text-xs uppercase font-mono tracking-widest text-indigo-600 font-extrabold">Synthesis OS — Simulátor Péče</span>
+                <h1 className="text-2xl font-black text-slate-900 font-display mt-1">OFICIÁLNÍ ZPRÁVA SIMULACE PÉČE O DĚTI</h1>
+                <p className="text-xs text-slate-500 mt-1">Generováno dne: {new Date().toLocaleDateString('cs-CZ')}</p>
+              </div>
+              <div className="text-right">
+                <span className="px-3 py-1 bg-teal-500 text-white font-mono text-xs font-bold rounded-lg">ALFA 0.0.1.1</span>
+                <p className="text-[10px] text-slate-400 mt-1">Klientská verze</p>
+              </div>
+            </div>
+
+            {/* Back Button (Hidden during print) */}
+            <div className="flex justify-between items-center bg-slate-50 p-4 rounded-2xl print:hidden">
+              <span className="text-xs text-slate-500">Tento pohled je optimalizován pro tisk na papír A4 nebo export do PDF.</span>
+              <button
+                onClick={() => setShowSimulatorPrint(false)}
+                className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl cursor-pointer"
+              >
+                Zpět do aplikace
+              </button>
+            </div>
+
+            {/* Configuration Specs */}
+            <div className="grid grid-cols-2 gap-6 bg-slate-50 p-6 rounded-2xl border border-slate-200">
+              <div>
+                <h3 className="font-bold text-xs text-slate-400 uppercase tracking-wider font-mono">Členové rodiny & Nastavení</h3>
+                <div className="mt-3 space-y-2 text-xs">
+                  <p>👨 <strong>Otec:</strong> {fatherName}</p>
+                  <p>👩 <strong>Matka:</strong> {motherName}</p>
+                  <p>📍 <strong>Bydliště otce:</strong> {locations.fatherCity}</p>
+                  <p>📍 <strong>Bydliště matky:</strong> {locations.motherCity}</p>
+                  <p>🚗 <strong>Vzdálenost:</strong> {locations.distanceKm} km</p>
+                </div>
+              </div>
+              <div>
+                <h3 className="font-bold text-xs text-slate-400 uppercase tracking-wider font-mono">Děti v péči</h3>
+                <div className="mt-3 space-y-2 text-xs">
+                  {children.map((c) => (
+                    <p key={c.id}>👶 <strong>{c.name}</strong> (nar. {c.birthYear}) — Režim: {
+                      c.relation === 'joint' ? 'Společná / Symetrická' :
+                      c.relation === 'father_only' ? `Výhradní u ${fatherName}` : `Výhradní u ${motherName}`
+                    }</p>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Core Metrics Tables side-by-side */}
+            <div className="space-y-4">
+              <h3 className="font-black text-sm text-slate-900 uppercase tracking-wider font-display">SROVNÁVACÍ ANALÝZA DVOU MODELŮ</h3>
+              <div className="overflow-hidden border border-slate-300 rounded-xl">
+                <table className="w-full text-left text-xs border-collapse font-sans">
+                  <thead>
+                    <tr className="bg-slate-100 text-slate-600 uppercase font-mono tracking-wider text-[10px] border-b border-slate-300">
+                      <th className="p-3 font-bold">Analytický Ukazatel</th>
+                      <th className="p-3 font-bold">Srovnávací model ({
+                        comparisonBaseline === 'classic_weekend' ? 'Klasický styk' : 'Střídavá'
+                      })</th>
+                      <th className="p-3 font-bold">Navržený plán péče</th>
+                      <th className="p-3 font-bold text-right">Změna / Praktický dopad</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200">
+                    <tr>
+                      <td className="p-3 font-bold text-slate-800">Společný čas sourozenců</td>
+                      <td className="p-3 text-slate-600">{baselineStats.siblingHoursWeekly} h / týdně</td>
+                      <td className="p-3 text-teal-600 font-extrabold">{stats.siblingHoursWeekly} h / týdně</td>
+                      <td className="p-3 text-right font-bold text-slate-900">
+                        {stats.siblingHoursWeekly > baselineStats.siblingHoursWeekly 
+                          ? `Zlepšení o +${Math.round((stats.siblingHoursWeekly - baselineStats.siblingHoursWeekly) * 10) / 10} h/týden` 
+                          : 'Beze změny'}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="p-3 font-bold text-slate-800">Rozdělení nocí (Otec / Matka)</td>
+                      <td className="p-3 text-slate-600">{baselineStats.nightsFatherMonth} n / {baselineStats.nightsMotherMonth} n</td>
+                      <td className="p-3 text-teal-600 font-bold">{stats.nightsFatherMonth} n / {stats.nightsMotherMonth} n</td>
+                      <td className="p-3 text-right font-bold text-slate-900">
+                        Poměr: {stats.percentageFather}% / {stats.percentageMother}%
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="p-3 font-bold text-slate-800">Frekvence přesunů (Předání)</td>
+                      <td className="p-3 text-slate-600">{baselineStats.handoversMonth}x za měsíc</td>
+                      <td className="p-3 text-teal-600 font-bold">{stats.handoversMonth}x za měsíc</td>
+                      <td className="p-3 text-right font-bold text-slate-900">
+                        {stats.handoversMonth < baselineStats.handoversMonth ? 'Pokles zátěže' : 'Srovnatelná četnost'}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="p-3 font-bold text-slate-800">Cestování dětí (hod / měsíc)</td>
+                      <td className="p-3 text-slate-600 font-mono">{baselineStats.monthlyTravelHours} h</td>
+                      <td className="p-3 text-indigo-600 font-extrabold font-mono">{stats.monthlyTravelHours} h</td>
+                      <td className="p-3 text-right font-bold text-slate-900 font-mono">
+                        {stats.monthlyTravelHours < baselineStats.monthlyTravelHours 
+                          ? `Úspora -${Math.round((baselineStats.monthlyTravelHours - stats.monthlyTravelHours) * 10) / 10} h` 
+                          : 'Vyšší logistika'}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Generated Argumentation text */}
+            <div className="p-6 bg-slate-100 rounded-2xl border border-slate-300 space-y-2">
+              <h3 className="font-bold text-xs text-slate-600 uppercase tracking-wider font-mono">Objektivní odůvodnění plánu (Soudní argumentace)</h3>
+              <p className="text-xs text-slate-800 leading-relaxed font-mono whitespace-pre-wrap">
+                {`Navržený model péče umožňuje sourozencům společně trávit přibližně ${stats.siblingHoursWeekly} hodin týdně. Oproti zvolenému srovnávacímu modelu (${
+                  comparisonBaseline === 'classic_weekend' ? 'Klasický styk' :
+                  comparisonBaseline === 'alternate_7_7' ? 'Střídavá 7-7' :
+                  comparisonBaseline === 'alternate_2_2_3' ? 'Střídavá 2-2-3' : 'Střídavá 2-2-5-5'
+                }), kde sourozenci tráví spolu pouze ${baselineStats.siblingHoursWeekly} hodin týdně, dochází ke stabilizaci počtu předání na ${stats.handoversMonth} za měsíc a ke zkrácení celkového času dětí na cestách na ${stats.monthlyTravelHours} hodiny měsíčně. Delší souvislé bloky péče o průměrné délce ${stats.avgBlockLength} dne poskytují dětem zdravý a stabilní režim.`}
+              </p>
+            </div>
+
+            {/* Footer Signatures */}
+            <div className="grid grid-cols-2 gap-12 pt-12 border-t border-slate-200">
+              <div className="text-center">
+                <div className="border-b border-slate-400 h-16 w-48 mx-auto" />
+                <span className="text-[10px] text-slate-400 block mt-2">Podpis otce ({fatherName})</span>
+              </div>
+              <div className="text-center">
+                <div className="border-b border-slate-400 h-16 w-48 mx-auto" />
+                <span className="text-[10px] text-slate-400 block mt-2">Podpis matky ({motherName})</span>
+              </div>
+            </div>
+
+            {/* Disclaimer */}
+            <div className="text-[9px] text-slate-400 leading-normal text-center pt-8">
+              Tento tiskový dokument byl vygenerován autonomně v rámci systému Synthesis OS 0.0.1.1. Výpočty a grafy vycházejí z exaktního matematického vyhodnocení 28-denní mřížky plánu péče a slouží jako podklad pro soudní jednání nebo jednání s OSPOD.
+            </div>
+
+          </div>
+        </div>
+      )}
 
     </div>
   );

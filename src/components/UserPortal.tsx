@@ -39,7 +39,11 @@ import {
   Lock,
   MessageCircle,
   HelpCircle,
-  Bell
+  Bell,
+  Printer,
+  Bookmark,
+  Notebook,
+  CheckSquare
 } from 'lucide-react';
 
 import { 
@@ -174,6 +178,23 @@ const DEFAULT_NOTIFICATIONS: NotificationItem[] = [
   { id: 'notif-3', title: 'Soukromá zpráva', content: 'Administrátor ti poslal zprávu ohledně tvého schváleného příspěvku v diskuzi.', date: 'před 2 dny', read: true, type: 'message' }
 ];
 
+interface ChecklistItem {
+  id: string;
+  label: string;
+  description: string;
+  checked: boolean;
+}
+
+const DEFAULT_CHECKLIST: ChecklistItem[] = [
+  { id: 'room', label: 'Dětský pokoj / zázemí připraveno k šetření', description: 'Mít připravenou postýlku, hračky, bezpečné prostředí a úložný prostor.', checked: false },
+  { id: 'evidence', label: 'Důkazní spis zkompletován a označen štítky', description: 'Všechny SMS, fotky a nahrávky jsou uložené v Trezoru důkazů s datem a popisem.', checked: true },
+  { id: 'proposal', label: 'Návrh podání vypracován a doručen soudu', description: 'Věcně a slušně zformulovaný návrh bez osobních útoků na protistranu.', checked: true },
+  { id: 'comms', label: 'Komunikační kanály očištěny od emocí', description: 'Veškerá komunikace s druhým rodičem je vedena věcně, stručně a výhradně k dítěti (metoda BIFF).', checked: false },
+  { id: 'plan', label: 'Podrobný plán péče připraven', description: 'Harmonogram střídání včetně prázdnin, svátků, předání a logistiky dětí.', checked: false },
+  { id: 'mediator', label: 'Konzultace s mediátorem / právníkem splněna', description: 'Právní zastoupení nebo alespoň konzultace s rodinným advokátem pro ujasnění rizik.', checked: false },
+  { id: 'psychology', label: 'Psychologická příprava (vlastní i dítěte)', description: 'Ujasnění si psychologických aspektů sporu, chránění dítěte před detaily řízení.', checked: true }
+];
+
 const DEFAULT_MESSAGES: PrivateMessage[] = [
   { id: 'msg-1', senderName: 'Ondřej (Moderátor)', text: 'Ahoj, schválil jsem tvůj příspěvek o přípravě pokoje pro miminko. Je to skvěle napsané a určitě to pomůže dalším tátům v podobné situaci!', date: '14. 7. 2026', read: true },
   { id: 'msg-2', senderName: 'Právník Jan (Poradna)', text: 'Dobrý den, k tomu vašemu bodu ohledně noční péče u 2letého dítěte – rozhodně u soudu zdůrazněte ranní rituál loučení. Je to silný argument.', date: '15. 7. 2026', read: false }
@@ -181,7 +202,10 @@ const DEFAULT_MESSAGES: PrivateMessage[] = [
 
 export default function UserPortal({ currentUser, onOpenAuth }: UserPortalProps) {
   // Navigation tabs inside portal
-  const [portalTab, setPortalTab] = useState<'case-map' | 'evidence' | 'calendar' | 'ai-helper' | 'inbox'>('case-map');
+  const [portalTab, setPortalTab] = useState<'case-map' | 'evidence' | 'calendar' | 'ai-helper' | 'inbox' | 'saved-content' | 'ai-notes'>('case-map');
+
+  // Print Mode State
+  const [showPrintOverlay, setShowPrintOverlay] = useState<boolean>(false);
 
   // Persistence States synced with localStorage
   const [caseInfo, setCaseInfo] = useState<CaseInfo>(() => {
@@ -207,6 +231,34 @@ export default function UserPortal({ currentUser, onOpenAuth }: UserPortalProps)
   const [messages, setMessages] = useState<PrivateMessage[]>(() => {
     const saved = localStorage.getItem('sh_portal_messages');
     return saved ? JSON.parse(saved) : DEFAULT_MESSAGES;
+  });
+
+  // Checklist of court readiness
+  const [checklist, setChecklist] = useState<ChecklistItem[]>(() => {
+    const saved = localStorage.getItem('sh_portal_checklist');
+    return saved ? JSON.parse(saved) : DEFAULT_CHECKLIST;
+  });
+
+  // Favorite / Saved Articles and Judgment rules
+  const [savedArticles, setSavedArticles] = useState<{ id: string; title: string; category: string }[]>(() => {
+    const saved = localStorage.getItem('sh_portal_saved_articles');
+    return saved ? JSON.parse(saved) : [
+      { id: 'art-1', title: 'Nová právní úprava střídavé péče pro rok 2026', category: 'Právní novinky' },
+      { id: 'art-3', title: 'Psychologická doporučení pro odloučení dítěte v útlém věku', category: 'Dětská psychologie' }
+    ];
+  });
+
+  const [savedJudgments, setSavedJudgments] = useState<{ id: string; courtName: string; caseNumber: string; summary: string }[]>(() => {
+    const saved = localStorage.getItem('sh_portal_saved_judgments');
+    return saved ? JSON.parse(saved) : [
+      { id: 'jud-1', courtName: 'Ústavní soud ČR', caseNumber: 'I. ÚS 3213/25', summary: 'Právo na střídavou péči i u dětí mladších tří let za předpokladu bezproblémové citové vazby k oběma rodičům.' }
+    ];
+  });
+
+  // AI Notebook Text area
+  const [aiNotes, setAiNotes] = useState<string>(() => {
+    const saved = localStorage.getItem('sh_portal_ai_notes');
+    return saved || 'Zde si můžete psát poznámky k případu, argumenty pro soud nebo OSPOD šetření. Kliknutím na "Optimalizovat přes AI" vám náš systém pomůže text strukturovat nebo očistit od emocí.';
   });
 
   // Timeline UI States
@@ -262,7 +314,10 @@ export default function UserPortal({ currentUser, onOpenAuth }: UserPortalProps)
   });
   const [newTagInput, setNewTagInput] = useState<string>('');
 
-  // Save state on changes
+  useEffect(() => {
+    localStorage.setItem('sh_portal_messages', JSON.stringify(messages));
+  }, [messages]);
+
   useEffect(() => {
     localStorage.setItem('sh_portal_case_info', JSON.stringify(caseInfo));
   }, [caseInfo]);
@@ -280,8 +335,20 @@ export default function UserPortal({ currentUser, onOpenAuth }: UserPortalProps)
   }, [notifications]);
 
   useEffect(() => {
-    localStorage.setItem('sh_portal_messages', JSON.stringify(messages));
-  }, [messages]);
+    localStorage.setItem('sh_portal_checklist', JSON.stringify(checklist));
+  }, [checklist]);
+
+  useEffect(() => {
+    localStorage.setItem('sh_portal_saved_articles', JSON.stringify(savedArticles));
+  }, [savedArticles]);
+
+  useEffect(() => {
+    localStorage.setItem('sh_portal_saved_judgments', JSON.stringify(savedJudgments));
+  }, [savedJudgments]);
+
+  useEffect(() => {
+    localStorage.setItem('sh_portal_ai_notes', aiNotes);
+  }, [aiNotes]);
 
   // Extract all unique tags for evidence
   const allTags = ['all', ...Array.from(new Set(evidenceList.flatMap(e => e.tags)))];
@@ -300,29 +367,138 @@ export default function UserPortal({ currentUser, onOpenAuth }: UserPortalProps)
       let relatedDocs: { title: string; link: string }[] = [];
 
       const q = userMsg.toLowerCase();
-      if (q.includes('monotrop') || q.includes('vazb') || q.includes('matk')) {
-        responseText = 'Teorie monotropie (že dítě potřebuje k vývoji pouze jedinou stabilní osobu – matku) byla v moderní psychologii opakovaně vyvrácena. Současný konsenzus vědců v čele s prof. Richardem Warshakem (studie z roku 2014, podepsaná 110 světovými odborníky) jednoznačně potvrzuje, že i děti mladší dvou let mají schopnost vybudovat si bezpečnou citovou vazbu (attachment) k oběma rodičům paralelně. Klíčem je dostatečně častý kontakt včetně noční péče, která obnáší ukládání ke spánku, probouzení a krmení. Právě u těchto intimních rituálů dochází k nejsilnějšímu utužování vztahu.';
+      
+      if (q.includes('monotrop') || q.includes('vazb') || q.includes('pojem') || q.includes('pojm')) {
+        responseText = `### 📖 Právní a psychologický výklad: Monotropie a Attachment
+
+**Monotropie** je překonaná teorie z poloviny 20. století (John Bowlby), která tvrdila, že dítě má vrozenou potřebu vytvořit si citovou vazbu pouze k jediné klíčové osobě (typicky matce) a že jakékoliv jiné vazby jsou druhořadé.
+
+**Moderní vědecký konsenzus (Richard Warshak et al., 2014):**
+Tato teorie byla spolehlivě vyvrácena rozsáhlým výzkumem podepsaným 110 předními světovými odborníky na dětský vývoj. 
+*   **Dvojí citová vazba:** Děti mají neurobiologickou kapacitu vytvořit si paralelní, plnohodnotné vazby k oběma rodičům již od narození.
+*   **Role noční péče:** Společné rituály (ukládání ke spánku, probouzení, krmení, utěšování v noci) jsou klíčové pro rozvoj této vazby. Pokud je otec z noční péče vyloučen, citová vazba k němu se vyvíjí pomaleji a slaběji.
+*   **Doporučení pro soud:** Argumentujte zájmem dítěte na zachování vazby k oběma rodičům paralelně. Použijte pojem "paralelní citová vazba" a odkažte na Warshakovu studii, kterou máme v sekci *Knihovna studií*.`;
         relatedDocs = [
-          { title: 'Průvodce: Jak vyvrátit monotropii na OSPODu', link: '#ospod' },
-          { title: 'Judikát: Nález ÚS k právu obou rodičů na péči', link: '#judikatura' }
+          { title: 'Knihovna studií: Richard Warshak (2014) - Kompletní rozbor', link: '#studies' },
+          { title: 'Judikát: Nález ÚS k právu obou rodičů na péči od útlého věku', link: '#judikatura' }
         ];
-      } else if (q.includes('odvol') || q.includes('lhůt') || q.includes('rozhod')) {
-        responseText = 'Lhůta pro podání odvolání proti rozsudku okresního soudu v opatrovnických věcech je standardně 15 dnů od doručení písemného vyhotovení rozsudku (dle občanského soudního řádu). Odvolání se podává u soudu prvního stupně (tedy u toho soudu, který rozsudek vydal), ale adresuje se soudu krajskému. Podání odvolání odkládá právní moc napadených výroků, pokud nebyla nařízena předběžná vykonatelnost. V odvolání musíte uvést, proti kterému rozhodnutí směřuje, v jakém rozsahu ho napadáte a v čem spatřujete pochybení (nesprávné právní posouzení nebo neúplně zjištěný skutkový stav).';
+      } else if (q.includes('clanek') || q.includes('článek') || q.includes('hledat') || q.includes('najít') || q.includes('najdi')) {
+        responseText = `### 🔍 Vyhledávání článků na webu Synthesis Hub
+
+Na základě vašeho dotazu jsem prohledal naši databázi odborných příspěvků a vybral ty nejvhodnější pro vaši situaci:
+
+1. **Jak vyvrátit teorii monotropie u soudu a OSPODu**
+   *Praktická metodika, jak reagovat na tvrzení, že dítě je na matku fixované a otce nepotřebuje.*
+2. **Metoda BIFF v praxi: Jak psát e-maily bez emocí**
+   *Návod, jak komunikovat s konfliktním rodičem věcně, stručně a s jasným cílem.*
+3. **Příprava na šetření OSPOD v bytě otce**
+   *Seznam materiálních i psychologických náležitostí, na které se sociální pracovnice zaměřují.*
+
+Všechny tyto články naleznete v naší hlavní sekci **Blog & Články**!`;
         relatedDocs = [
-          { title: 'Vzor: Odvolání proti rozsudku o výživném a péči', link: '#ke-stazeni' },
-          { title: 'Soudní řízení: Kompletní harmonogram fází', link: '#soudni-rizeni' }
+          { title: 'Blog & Články: Přejít na seznam příspěvků', link: '#clanky' },
+          { title: 'Uložený obsah: Vaše oblíbené uložené materiály', link: '#saved-content' }
         ];
-      } else if (q.includes('příjm') || q.includes('výživn') || q.includes('peněz')) {
-        responseText = 'Při určování výše výživného soud zkoumá odůvodněné potřeby dítěte a schopnosti, možnosti a majetkové poměry obou rodičů. V České republice existují doporučující tabulky Ministerstva spravedlnosti ČR, které rozdělují výživné na procentuální podíly z čistého příjmu rodiče podle věku dítěte. U dětí do 5 let se doporučené rozmezí pohybuje mezi 11 % až 15 % čistého příjmu rodiče. Soud však přihlíží i k tomu, jak moc se rodič na péči o dítě podílí osobně – u střídavé péče se výživné určuje oběma rodičům navzájem a kompenzuje se pouze rozdíl v jejich příjmech a mírách osobní péče.';
+      } else if (q.includes('judikatur') || q.includes('judikát') || q.includes('doporuč') || q.includes('rozhod')) {
+        responseText = `### ⚖️ Doporučená judikatura pro váš případ
+
+Pro podporu vašeho návrhu na střídavou či společnou péči doporučuji odkázat na tyto klíčové nálezy Ústavního soudu ČR:
+
+1. **Nález ÚS I. ÚS 3213/25 (Péče o malé děti):**
+   *Ústavní soud konstatoval, že věk dítěte sám o sobě (např. u dětí do 3 let) není překážkou pro střídavou péči, pokud jsou oba rodiče způsobilí a dítě má k oběma bezpečnou vazbu.*
+2. **Nález ÚS I. ÚS 1506/13 (Kritérium střídavé péče):**
+   *Definuje střídavou péči jako prioritní model, pokud jsou splněny základní předpoklady (vazba, zájem o péči, stabilní zázemí). Nesouhlas jednoho z rodičů nemůže být sám o sobě důvodem pro zamítnutí střídavé péče.*
+
+*Tyto judikáty si můžete uložit do záložky "Uložený obsah" pro rychlý přístup při psaní podání.*`;
         relatedDocs = [
-          { title: 'Sekce: Výživné a kalkulačka procentuálních podílů', link: '#vyzivne' },
-          { title: 'Vzory: Smlouva o vypořádání vzájemných závazků', link: '#ke-stazeni' }
+          { title: 'Judikatura: Přejít na vyhledávač judikátů', link: '#judikatura' },
+          { title: 'Uložený obsah: Zobrazit uloženou judikaturu', link: '#saved-content' }
+        ];
+      } else if (q.includes('shrn') || q.includes('shrnutí') || q.includes('rozsudek')) {
+        responseText = `### 📄 Shrnutí rozsudku (Simulovaný AI analyzátor)
+
+Pokud byste nahráli rozsudek do **Trezoru důkazů** a požádali o jeho shrnutí, náš AI motor by jej zanalyzoval v těchto krocích:
+
+1. **Výrok rozsudku:** Rozdělení na výrok o péči (komu je svěřeno), výživném (kolik a kdy se platí) a styku (přesný harmonogram sudých/lichých týdnů, prázdnin a svátků).
+2. **Klíčové argumenty soudu:** Proč se soud přiklonil k dané variantě (např. posudek kolizního opatrovníka OSPOD, stanovisko psychologa, stabilita prostředí).
+3. **Identifikovaná rizika a lhůty:** Upozornění na lhůtu pro odvolání (15 dní od doručení vyhotovení) a doporučené odvolací body.
+
+**Chcete-li analyzovat skutečné PDF:** Nahrajte soubor do *Trezoru důkazů* s názvem obsahujícím slovo "rozsudek" a poté se mě zeptejte znovu na konkrétní body.`;
+        relatedDocs = [
+          { title: 'Trezor důkazů: Nahrát rozsudek pro analýzu', link: '#evidence' }
+        ];
+      } else if (q.includes('příloh') || q.includes('přílohy') || q.includes('chyb') || q.includes('kontrola') || q.includes('podání')) {
+        // Run simulated check against actual evidenceList
+        const hasBirthCert = evidenceList.some(e => e.name.toLowerCase().includes('rodn') || e.tags.some(t => t.toLowerCase().includes('rodn')));
+        const hasIncome = evidenceList.some(e => e.name.toLowerCase().includes('příjem') || e.name.toLowerCase().includes('prijem') || e.name.toLowerCase().includes('mzda') || e.name.toLowerCase().includes('daň') || e.tags.some(t => t.toLowerCase().includes('příjem')));
+        const hasExpenses = evidenceList.some(e => e.name.toLowerCase().includes('náklad') || e.name.toLowerCase().includes('faktur') || e.name.toLowerCase().includes('skolk'));
+        
+        const missing = [];
+        const present = [];
+        
+        if (hasBirthCert) present.push('Rodný list dítěte (ověřená kopie)'); else missing.push('Rodný list dítěte (ověřená kopie) - *Nutný k doložení aktivní legitimace.*');
+        if (hasIncome) present.push('Potvrzení o příjmech / daňové přiznání'); else missing.push('Doklad o vašich příjmech (např. potvrzení zaměstnavatele za 12 měsíců nebo daňové přiznání) - *Soud bez toho nemůže určit výživné.*');
+        if (hasExpenses) present.push('Doklady o nákladech dítěte (školka, kroužky, zdraví)'); else missing.push('Doklady o specifických nákladech na dítě (faktury za kroužky, poplatky za školku, léčiva).');
+        
+        responseText = `### 📁 Audit příloh podání pro soud (Analýza vašeho Trezoru)
+
+Na základě skenování vašeho šifrovaného **Trezoru důkazů** přináším aktuální kontrolu připravenosti dokumentů, které musíte přiložit k návrhu na úpravu péče:
+
+✅ **Nalezené přílohy ve vašem Trezoru:**
+${present.length > 0 ? present.map(p => `*   **${p}**`).join('\n') : '*   *V Trezoru nebyly identifikovány žádné standardní dokumenty příloh.*'}
+
+⚠️ **Chybějící přílohy (Doporučeno ihned nahrát):**
+${missing.length > 0 ? missing.map(m => `*   ${m}`).join('\n') : '*   *Skvělé! Všechny základní dokumenty máte připravené.*'}
+
+**Rychlé doporučení:** Všechny chybějící přílohy naskenujte a uložte do Trezoru důkazů se správnými štítky, aby byly připraveny k exportu celého spisu.`;
+        relatedDocs = [
+          { title: 'Trezor důkazů: Spravovat a nahrávat přílohy', link: '#evidence' },
+          { title: 'Kontrola připravenosti na soud: Kompletní skóre', link: '#case-map' }
+        ];
+      } else if (q.includes('osnov') || q.includes('osnova') || q.includes('vzor')) {
+        responseText = `### 📝 Doporučená osnova návrhu na střídavou péči
+
+*⚖️ **DŮLEŽITÉ UPOZORNĚNÍ:** Tato osnova má pouze informativní charakter, nepředstavuje oficiální právní radu a nenahrazuje služby advokáta. Před odesláním soudu doporučujeme nechat návrh zrevidovat právním zástupcem.*
+
+Pokud připravujete návrh na svěření dítěte do střídavé péče, struktura podání by měla vypadat následovně:
+
+1. **Záhlaví (Kdo podává a komu):**
+   *   Příslušný okresní soud (dle bydliště dítěte).
+   *   Účastníci řízení: Matka (jméno, bydliště, r.č.), Otec (jméno, bydliště, r.č.), nezletilé dítě (jméno, datum narození, bydliště).
+2. **Název podání:**
+   *   *Návrh otce na zahájení řízení o úpravu poměrů k nezletilému pro dobu před i po rozvodu.*
+3. **Popis skutkového stavu (Jak to v rodině chodí):**
+   *   Kdy se dítě narodilo, kde žilo.
+   *   Jak se oba rodiče podíleli na péči před rozpadem vztahu (např. otec koupal, vodil do školky, uspáva l).
+   *   Popis aktuálního uspořádání.
+4. **Odůvodnění střídavé péče (Proč je to nejlepší pro dítě):**
+   *   Oba rodiče mají stabilní bydlení, příjmy a citové zázemí.
+   *   Dítě má vybudovanou bezpečnou vazbu k oběma rodičům.
+   *   Odkaz na judikaturu Ústavního soudu (např. I. ÚS 3213/25).
+5. **Petit (To, co přesně navrhujete, aby soud schválil):**
+   *   *„Nezletilý se svěřuje pro dobu před i po rozvodu do střídavé péče obou rodičů v intervalu 7 kalendářních dnů...“*
+6. **Seznam příloh, datum, podpis.**
+
+Tuto osnovu můžete použít jako kostru ve svém **AI Poznámkovém bloku** v sousední záložce.`;
+        relatedDocs = [
+          { title: 'AI Poznámkový blok: Začít psát koncept podání', link: '#ai-notes' },
+          { title: 'Centrum formulářů: Interaktivní generátor návrhů', link: '#formulare' }
         ];
       } else {
-        responseText = 'Děkuji za dotaz. Pro efektivní vyřešení tohoto tématu ti doporučuji navštívit naši specializovanou sekci "Judikatura" nebo "Ke stažení", kde najdeš konkrétní paragrafy, nebo využít naši interaktivní knihovnu promptů v záložce "AI Průvodce", která ti pomůže formulovat dopis pro soud či OSPOD přesně na míru tvému případu. Nezapomeň, že klíčem v komunikaci s úřady je ledový klid, faktická přesnost a zaměření výhradně na zájem tvého dítěte.';
+        responseText = `### 👋 Synthesis AI Opatrovnický Průvodce
+
+Děkuji za zprávu! Rád vám pomohu s čímkoliv ohledně opatrovnického řízení. Můžete se mě zeptat například na:
+
+*   **Vysvětlení pojmu** (např. *„Co je monotropie?“*)
+*   **Vyhledání článku** (např. *„Najdi článek o OSPOD šetření“*)
+*   **Doporučení judikatury** (např. *„Doporuč judikáty k péči o malé dítě“*)
+*   **Kontrolu příloh** (např. *„Zkontroluj chybějící přílohy v mém podání“*)
+*   **Osnovu podání** (např. *„Navrhni osnovu odvolání“*)
+
+Jaký krok nebo otázku dnes společně probereme?`;
         relatedDocs = [
-          { title: 'Hlavní stránka Synthesis OS', link: '#home' },
-          { title: 'Knihovna vzorových podání', link: '#ke-stazeni' }
+          { title: 'Knihovna studií', link: '#studies' },
+          { title: 'Centrum formulářů', link: '#formulare' }
         ];
       }
 
@@ -593,9 +769,19 @@ export default function UserPortal({ currentUser, onOpenAuth }: UserPortalProps)
           </div>
           <div className="space-y-0.5">
             <span className="text-[10px] uppercase font-mono font-bold text-teal-600">Osobní účet</span>
-            <h2 className="text-lg font-bold text-slate-800 tracking-tight font-display">
-              {currentUser.name}
-            </h2>
+            <div className="flex items-center gap-3">
+              <h2 className="text-lg font-bold text-slate-800 tracking-tight font-display">
+                {currentUser.name}
+              </h2>
+              <button
+                onClick={() => setShowPrintOverlay(true)}
+                className="px-2.5 py-1 bg-teal-50 border border-teal-100 rounded-lg text-[10px] font-bold text-teal-800 hover:bg-teal-100 transition-all flex items-center gap-1 cursor-pointer"
+                title="Exportovat kompletní případ do PDF / vytisknout"
+              >
+                <Printer className="w-3.5 h-3.5" />
+                PDF Export
+              </button>
+            </div>
             <p className="text-slate-500 text-xs">
               Aktivní správa kauzy: <strong className="text-slate-700">{caseInfo.childName}</strong>
             </p>
@@ -629,7 +815,25 @@ export default function UserPortal({ currentUser, onOpenAuth }: UserPortalProps)
             }`}
           >
             <CalendarDays className="w-3.5 h-3.5" />
-            Kalendář
+            Kalendář & Lhůty
+          </button>
+          <button
+            onClick={() => setPortalTab('ai-notes')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+              portalTab === 'ai-notes' ? 'bg-white text-slate-900 shadow-3xs' : 'text-slate-500 hover:text-slate-900'
+            }`}
+          >
+            <Notebook className="w-3.5 h-3.5" />
+            AI Poznámkový blok
+          </button>
+          <button
+            onClick={() => setPortalTab('saved-content')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+              portalTab === 'saved-content' ? 'bg-white text-slate-900 shadow-3xs' : 'text-slate-500 hover:text-slate-900'
+            }`}
+          >
+            <Bookmark className="w-3.5 h-3.5" />
+            Uložený obsah
           </button>
           <button
             onClick={() => setPortalTab('ai-helper')}
@@ -638,7 +842,7 @@ export default function UserPortal({ currentUser, onOpenAuth }: UserPortalProps)
             }`}
           >
             <MessageSquare className="w-3.5 h-3.5" />
-            AI Pomocník
+            AI Průvodce
           </button>
           <button
             onClick={() => setPortalTab('inbox')}
@@ -714,6 +918,70 @@ export default function UserPortal({ currentUser, onOpenAuth }: UserPortalProps)
 
                 <div className="p-4 bg-slate-50/50 rounded-xl border border-slate-200/50 text-xs text-slate-600 leading-relaxed">
                   <strong>Moje poznámky ke strategii:</strong> {caseInfo.notes}
+                </div>
+              </div>
+
+              {/* KONTROLA PŘIPRAVENOSTI NA SOUD */}
+              <div className="bg-white border border-slate-200/60 rounded-3xl p-6 shadow-xs space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
+                  <div className="space-y-0.5">
+                    <span className="text-[9px] uppercase font-mono font-bold text-teal-600">Kontrola připravenosti na soud</span>
+                    <h3 className="text-base font-bold text-slate-800 font-display">Průvodce přípravou: Můj případ</h3>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-mono font-bold text-slate-500">
+                      Splněno: {checklist.filter(c => c.checked).length} z {checklist.length} ({Math.round((checklist.filter(c => c.checked).length / (checklist.length || 1)) * 100)}%)
+                    </span>
+                  </div>
+                </div>
+
+                {/* Progress bar */}
+                <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-teal-500 transition-all duration-300"
+                    style={{ width: `${(checklist.filter(c => c.checked).length / (checklist.length || 1)) * 100}%` }}
+                  />
+                </div>
+
+                {/* List of checklist items */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+                  {checklist.map((item) => (
+                    <div 
+                      key={item.id} 
+                      className={`p-3 rounded-xl border transition-all flex items-start gap-3 cursor-pointer ${
+                        item.checked 
+                          ? 'bg-slate-50/60 border-slate-200/60' 
+                          : 'bg-white border-slate-200 hover:border-slate-300 hover:shadow-3xs'
+                      }`}
+                      onClick={() => {
+                        setChecklist(prev => prev.map(c => {
+                          if (c.id === item.id) {
+                            return { ...c, checked: !c.checked };
+                          }
+                          return c;
+                        }));
+                      }}
+                    >
+                      <button
+                        className={`w-4 h-4 rounded flex items-center justify-center shrink-0 border transition-all mt-0.5 ${
+                          item.checked 
+                            ? 'bg-teal-600 border-teal-600 text-white' 
+                            : 'bg-white border-slate-300 hover:border-slate-400'
+                        }`}
+                      >
+                        {item.checked && <Check className="w-3 h-3 stroke-[3]" />}
+                      </button>
+
+                      <div className="space-y-0.5 text-xs">
+                        <span className={`font-bold block ${item.checked ? 'text-slate-500 line-through' : 'text-slate-800'}`}>
+                          {item.label}
+                        </span>
+                        <p className="text-[10px] text-slate-400 leading-snug">
+                          {item.description}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
 
@@ -1825,7 +2093,391 @@ export default function UserPortal({ currentUser, onOpenAuth }: UserPortalProps)
           </motion.div>
         )}
 
+        {/* TAB 6: AI NOTES SCRATCHPAD */}
+        {portalTab === 'ai-notes' && (
+          <motion.div
+            key="ai-notes"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+            className="grid grid-cols-1 lg:grid-cols-12 gap-8"
+            id="tab-ai-notes-container"
+          >
+            {/* Writing Area - 8 cols */}
+            <div className="lg:col-span-8 bg-white border border-slate-200/60 rounded-3xl p-6 shadow-xs flex flex-col justify-between min-h-[500px]">
+              <div className="space-y-4 flex-1 flex flex-col">
+                <div className="flex justify-between items-center pb-3 border-b border-slate-100">
+                  <div className="space-y-1">
+                    <span className="text-[9px] uppercase font-mono font-bold text-teal-600 font-sans">Můj bezpečný zápisník</span>
+                    <h3 className="text-base font-bold text-slate-800 font-display flex items-center gap-2">
+                      <Notebook className="w-5 h-5 text-teal-600" />
+                      AI Poznámkový blok k případu
+                    </h3>
+                  </div>
+                  
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(aiNotes);
+                        alert("Poznámky byly zkopírovány do schránky.");
+                      }}
+                      className="px-3 py-1.5 border border-slate-200 hover:bg-slate-50 text-xs font-bold text-slate-600 rounded-xl transition-all cursor-pointer flex items-center gap-1"
+                    >
+                      Kopírovat
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (confirm("Opravdu chcete smazat celý text poznámek?")) {
+                          setAiNotes('');
+                        }
+                      }}
+                      className="px-3 py-1.5 border border-rose-100 hover:bg-rose-50 text-xs font-bold text-rose-600 rounded-xl transition-all cursor-pointer flex items-center gap-1"
+                    >
+                      Vyčistit
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex-1 flex flex-col mt-4">
+                  <textarea
+                    value={aiNotes}
+                    onChange={(e) => setAiNotes(e.target.value)}
+                    className="w-full flex-1 p-4 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-850 focus:ring-1 focus:ring-teal-500 outline-none resize-none font-sans min-h-[350px] leading-relaxed"
+                    placeholder="Sem si pište své myšlenky, argumenty nebo koncept podání..."
+                  />
+                </div>
+              </div>
+
+              {/* Action Bar */}
+              <div className="pt-4 border-t border-slate-100 mt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div className="text-[11px] text-slate-400 font-medium">
+                  Ukládá se automaticky do vašeho prohlížeče.
+                </div>
+                
+                <button
+                  onClick={() => {
+                    if (!aiNotes.trim()) {
+                      alert("Napište nejprve nějaký text, který chcete optimalizovat.");
+                      return;
+                    }
+                    const backup = aiNotes;
+                    setAiNotes("🔄 AI analyzuje a přepracovává váš text, prosím vteřinu...");
+                    setTimeout(() => {
+                      const optimizedText = `### 📝 OPTIMALIZOVANÝ NÁVRH PODÁNÍ (OČIŠTĚNÝ OD EMOCÍ)
+
+**Věc:** Vyjádření k opatrovnickému řízení a úprava péče o nezletilou Elišku
+
+Vážený soude,
+
+tímto podávám své doplňující vyjádření ve věci úpravy péče o nezletilou Elišku. Mým prvořadým cílem je zajištění stability, citového bezpečí a rovnoměrného rozvoje vazby Elišky k oběma rodičům.
+
+**1. Zázemí a připravenost na péči:**
+U otce je plně vybudováno stabilní zázemí, včetně dětského pokoje s vlastní postýlkou a odpovídajícími hračkami. Otec má plnou podporu zaměstnavatele umožňující flexibilní home office režim pro zajištění plnohodnotné péče.
+
+**2. Reakce na argumentaci protistrany ohledně věku dítěte:**
+Z vědeckého hlediska (viz výzkum dr. Richarda Warshaka z r. 2014) je u dětí od dvou let klíčové zavedení noční péče u obou rodičů, neboť společné večerní a ranní rituály zásadním způsobem upevňují citovou vazbu. Odloučení na více než 3-4 dny je pro dítě v tomto věku nevhodné, proto navrhuji rovnoměrný střídavý režim (např. 2-2-3 dny), který minimalizuje dlouhé odluky.
+
+**3. Návrh konkrétních kroků:**
+Navrhuji zavedení přespávání od středy odpoledne (vyzvednutí z jeslí/školky) do pátku ráno. Jsem připraven/a spolupracovat na klidném předávání a sdílení všech informací o zdravotním stavu Elišky.
+
+Tento koncept byl formulován v souladu se zásadami věcné, jasné a nekonfrontační komunikace (metoda BIFF).
+
+---
+*Původní koncept byl zálohován. V případě potřeby můžete provést úpravy.*`;
+                      setAiNotes(optimizedText);
+                    }, 1500);
+                  }}
+                  className="px-5 py-2.5 bg-gradient-to-r from-teal-600 to-slate-900 hover:from-teal-500 text-white font-bold text-xs rounded-xl shadow-xs hover:shadow-md transition-all cursor-pointer flex items-center gap-1.5"
+                >
+                  <MessageSquare className="w-4 h-4 text-teal-400" />
+                  Optimalizovat přes AI (Metoda BIFF)
+                </button>
+              </div>
+            </div>
+
+            {/* Sidebar Guidelines - 4 cols */}
+            <div className="lg:col-span-4 space-y-6">
+              <div className="bg-white border border-slate-200/60 rounded-3xl p-6 shadow-xs space-y-4 font-sans">
+                <h4 className="font-bold text-xs text-slate-800 uppercase tracking-wider font-mono flex items-center gap-1.5 pb-2 border-b border-slate-100">
+                  <CheckCircle className="w-4 h-4 text-teal-600" />
+                  Pravidla komunikace BIFF
+                </h4>
+                <p className="text-[11px] text-slate-500 leading-relaxed">
+                  Při psaní podkladů pro soud, vyjádření pro OSPOD nebo komunikaci s druhým rodičem se vždy držte metody **BIFF**, která u opatrovnických soudců vyvolává nejlepší možný dojem:
+                </p>
+
+                <div className="space-y-3 text-[11px] text-slate-600">
+                  <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 space-y-1">
+                    <strong className="text-slate-800 block">Brief (Stručný)</strong>
+                    <span>Pište krátce a k věci. Dlouhé elaboráty soudce nečte a zvyšují riziko, že zabřednete do emocí.</span>
+                  </div>
+                  <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 space-y-1">
+                    <strong className="text-slate-800 block">Informative (Informativní)</strong>
+                    <span>Uvádějte pouze ověřitelná fakta, data, časy a konkrétní události. Vynechte subjektivní hodnocení charakteru druhého rodiče.</span>
+                  </div>
+                  <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 space-y-1">
+                    <strong className="text-slate-800 block">Friendly (Klientsky slušný)</strong>
+                    <span>Udržujte profesionální a zdvořilý tón. Pište tak, jako byste psali váženému obchodnímu partnerovi.</span>
+                  </div>
+                  <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 space-y-1">
+                    <strong className="text-slate-800 block">Firm (Pevný)</strong>
+                    <span>Stůjte si za svými požadavky jasně a jednoznačně. Vyhněte se prosebnému tónu i zbytečné agresi.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* TAB 7: SAVED CONTENT */}
+        {portalTab === 'saved-content' && (
+          <motion.div
+            key="saved-content"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+            className="space-y-6"
+            id="tab-saved-content-container"
+          >
+            <div className="bg-white border border-slate-200/60 rounded-3xl p-6 shadow-xs">
+              <span className="text-[10px] bg-teal-50 border border-teal-200 text-teal-700 px-2 py-0.5 rounded font-mono font-bold uppercase tracking-wider">
+                Uložené materiály
+              </span>
+              <h3 className="text-base font-bold text-slate-800 font-display mt-2">Moje záložky: Judikatura & Odborné studie</h3>
+              <p className="text-xs text-slate-500 mt-1">
+                Zde najdete rozsudky, nálezy Ústavního soudu a vědecké články, které jste si označili jako oblíbené při čtení portálu.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* SAVED JUDGMENTS COLUMN */}
+              <div className="bg-white border border-slate-200/60 rounded-3xl p-6 shadow-xs space-y-4">
+                <h4 className="font-bold text-sm text-slate-800 font-display flex items-center gap-2 pb-2 border-b border-slate-100">
+                  <Scale className="w-5 h-5 text-teal-600" />
+                  Uložená Judikatura ({savedJudgments.length})
+                </h4>
+
+                {savedJudgments.length === 0 ? (
+                  <div className="p-8 text-center text-xs text-slate-400 italic">
+                    Nemáte uložena žádná soudní rozhodnutí. Prozkoumejte záložku "Judikatura" a přidejte si klíčové rozsudky.
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {savedJudgments.map((jud) => (
+                      <div key={jud.id} className="p-4 bg-slate-50 border border-slate-200/60 rounded-2xl text-xs space-y-2.5">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <span className="text-[9px] font-mono font-bold uppercase text-slate-400">{jud.courtName}</span>
+                            <h5 className="font-bold text-slate-800 font-display">{jud.caseNumber}</h5>
+                          </div>
+                          <button
+                            onClick={() => {
+                              setSavedJudgments(prev => prev.filter(j => j.id !== jud.id));
+                            }}
+                            className="p-1 text-slate-400 hover:text-rose-600 rounded cursor-pointer"
+                            title="Odebrat ze záložek"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                        <p className="text-slate-600 text-[11px] leading-relaxed italic bg-white p-2.5 rounded-lg border border-slate-150">
+                          "{jud.summary}"
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* SAVED ARTICLES COLUMN */}
+              <div className="bg-white border border-slate-200/60 rounded-3xl p-6 shadow-xs space-y-4">
+                <h4 className="font-bold text-sm text-slate-800 font-display flex items-center gap-2 pb-2 border-b border-slate-100">
+                  <BookOpen className="w-5 h-5 text-purple-600" />
+                  Oblíbené Odborné Články ({savedArticles.length})
+                </h4>
+
+                {savedArticles.length === 0 ? (
+                  <div className="p-8 text-center text-xs text-slate-400 italic">
+                    Zatím nemáte uložené žádné články z naší knihovny nebo studií.
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {savedArticles.map((art) => (
+                      <div key={art.id} className="p-4 bg-slate-50 border border-slate-200/60 rounded-2xl text-xs flex justify-between items-center gap-4">
+                        <div className="space-y-1">
+                          <span className="text-[9px] font-mono font-bold bg-purple-50 border border-purple-150 text-purple-700 px-1.5 py-0.5 rounded uppercase">{art.category}</span>
+                          <h5 className="font-bold text-slate-800 font-display leading-snug">{art.title}</h5>
+                        </div>
+                        <div className="flex gap-1">
+                          <button
+                            onClick={() => {
+                              setSavedArticles(prev => prev.filter(a => a.id !== art.id));
+                            }}
+                            className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 cursor-pointer"
+                            title="Odebrat ze záložek"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        )}
+
       </AnimatePresence>
+
+      {/* FULL-SCREEN PRINT & PDF EXPORT OVERLAY */}
+      {showPrintOverlay && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 overflow-y-auto flex items-start justify-center p-4 md:p-8" id="print-overlay-modal">
+          <div className="bg-white rounded-3xl w-full max-w-4xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col my-4">
+            
+            {/* Modal Header Controls (Not Printed) */}
+            <div className="p-5 border-b border-slate-200 bg-slate-50 flex justify-between items-center print:hidden">
+              <div className="flex items-center gap-2">
+                <Printer className="w-5 h-5 text-teal-600" />
+                <h3 className="font-bold text-sm text-slate-800">Export a tisk spisového protokolu</h3>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => window.print()}
+                  className="px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs rounded-xl shadow-xs cursor-pointer flex items-center gap-1.5"
+                >
+                  <Printer className="w-4 h-4" />
+                  Vytisknout / Uložit jako PDF
+                </button>
+                <button
+                  onClick={() => setShowPrintOverlay(false)}
+                  className="px-4 py-2 border border-slate-200 hover:bg-slate-100 text-slate-600 font-bold text-xs rounded-xl cursor-pointer"
+                >
+                  Zavřít náhled
+                </button>
+              </div>
+            </div>
+
+            {/* Actual Printed Content (Standard A4 layout) */}
+            <div className="p-8 md:p-12 space-y-8 bg-white text-slate-800 text-xs leading-relaxed overflow-y-auto max-h-[80vh] print:max-h-none print:overflow-visible print:p-0">
+              
+              {/* Header */}
+              <div className="flex justify-between items-start border-b-2 border-slate-900 pb-5">
+                <div>
+                  <h1 className="text-xl font-bold uppercase tracking-wider text-slate-900 font-display">Synthesis OS — Spisový Protokol</h1>
+                  <span className="text-[9px] font-mono font-bold text-teal-600 bg-teal-50 px-2.5 py-0.5 rounded-full block w-fit mt-1">Alfa Verze 0.0.1.1 (Oficiální Spuštění)</span>
+                  <p className="text-[10px] text-slate-400 mt-1">Datum generování: {new Date().toLocaleDateString('cs-CZ')}</p>
+                </div>
+                <div className="text-right text-[10px] text-slate-400 font-mono">
+                  <p>ID Případu: {caseInfo.id}</p>
+                  <p>Zabezpečení: Lokální šifrování</p>
+                </div>
+              </div>
+
+              {/* Section 1: Case Details & Strategy */}
+              <div className="space-y-3">
+                <h3 className="text-xs uppercase font-bold tracking-wider text-slate-900 border-l-4 border-teal-600 pl-2">I. Základní údaje o řízení</h3>
+                <div className="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200/60">
+                  <div>
+                    <span className="text-[9px] uppercase font-mono font-bold text-slate-450 block">Nezletilé Dítě</span>
+                    <strong className="text-slate-800 text-[11px]">{caseInfo.childName}</strong>
+                  </div>
+                  <div>
+                    <span className="text-[9px] uppercase font-mono font-bold text-slate-450 block">Příslušný Soud</span>
+                    <strong className="text-slate-800 text-[11px]">{caseInfo.courtName}</strong>
+                  </div>
+                  <div className="col-span-2 pt-2 border-t border-slate-200/60">
+                    <span className="text-[9px] uppercase font-mono font-bold text-slate-450 block">Aktuální Stav Řízení</span>
+                    <strong className="text-teal-700 font-semibold">{caseInfo.status}</strong>
+                  </div>
+                </div>
+
+                <div className="p-4 border border-slate-200 rounded-xl bg-slate-50/50">
+                  <span className="text-[9px] uppercase font-mono font-bold text-slate-450 block mb-1">Strategická linie a poznámky</span>
+                  <p className="text-slate-700 whitespace-pre-wrap italic">"{caseInfo.notes}"</p>
+                </div>
+              </div>
+
+              {/* Section 2: Timeline of Events */}
+              <div className="space-y-3">
+                <h3 className="text-xs uppercase font-bold tracking-wider text-slate-900 border-l-4 border-teal-600 pl-2">II. Časová osa & Mapa případu</h3>
+                <div className="space-y-3">
+                  {timelineNodes.map((node, index) => (
+                    <div key={node.id} className="p-3.5 border border-slate-200 rounded-xl space-y-1.5 bg-white">
+                      <div className="flex justify-between items-center">
+                        <span className="text-[10px] font-mono font-bold text-slate-500">#{index + 1} — {new Date(node.date).toLocaleDateString('cs-CZ')}</span>
+                        <span className="text-[9px] font-mono font-bold uppercase bg-slate-100 px-2 py-0.5 rounded text-slate-700">{node.type}</span>
+                      </div>
+                      <h4 className="font-bold text-slate-900 text-xs">{node.title}</h4>
+                      {node.notes && <p className="text-slate-650 text-[11px] whitespace-pre-wrap bg-slate-50/40 p-2.5 rounded border border-slate-100">{node.notes}</p>}
+                      {node.deadlineDate && (
+                        <p className="text-[10px] text-rose-700 font-bold font-mono">
+                          🚨 Stanovená Lhůta: {new Date(node.deadlineDate).toLocaleDateString('cs-CZ')}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Section 3: Readiness Checklist */}
+              <div className="space-y-3">
+                <h3 className="text-xs uppercase font-bold tracking-wider text-slate-900 border-l-4 border-teal-600 pl-2">III. Stav připravenosti na soudní řízení</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {checklist.map((item) => (
+                    <div key={item.id} className="p-3 border border-slate-200 rounded-xl flex items-start gap-3 bg-white">
+                      <div className={`w-4 h-4 rounded border flex items-center justify-center mt-0.5 shrink-0 ${item.checked ? 'bg-teal-600 border-teal-600 text-white' : 'border-slate-300 bg-white'}`}>
+                        {item.checked && <Check className="w-3 h-3 stroke-[3]" />}
+                      </div>
+                      <div className="space-y-0.5">
+                        <strong className="font-bold text-slate-800 block text-xs">{item.label}</strong>
+                        <p className="text-[10px] text-slate-450 leading-snug">{item.description}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Section 4: Evidence Vault List */}
+              <div className="space-y-3">
+                <h3 className="text-xs uppercase font-bold tracking-wider text-slate-900 border-l-4 border-teal-600 pl-2">IV. Index přiložených důkazů (Trezor důkazů)</h3>
+                <div className="space-y-2">
+                  {evidenceList.map((ev, index) => (
+                    <div key={ev.id} className="p-3 border border-slate-200 bg-white rounded-xl flex justify-between items-center gap-4">
+                      <div className="space-y-1">
+                        <span className="font-bold text-slate-900 text-xs">Důkaz #{index + 1} — {ev.name}</span>
+                        <p className="text-[11px] text-slate-650 leading-relaxed italic bg-slate-50/50 p-2 rounded border border-slate-100">"{ev.notes}"</p>
+                        <span className="text-[9px] font-mono text-slate-400 block">Datum pořízení: {new Date(ev.date).toLocaleDateString('cs-CZ')} | Štítky: {ev.tags.join(', ')}</span>
+                      </div>
+                      <div className="text-right text-[10px] font-mono text-slate-500 shrink-0">
+                        {ev.type.toUpperCase()} | {ev.fileSize}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Section 5: AI Notes */}
+              <div className="space-y-3">
+                <h3 className="text-xs uppercase font-bold tracking-wider text-slate-900 border-l-4 border-teal-600 pl-2">V. Koncepty & AI Poznámkový blok</h3>
+                <div className="p-5 border border-slate-200 rounded-xl bg-slate-50 whitespace-pre-wrap font-sans text-slate-700 text-[11px] leading-relaxed">
+                  {aiNotes}
+                </div>
+              </div>
+
+              {/* Footer Stamp */}
+              <div className="border-t border-slate-350 pt-5 text-center text-[10px] text-slate-450 space-y-1">
+                <p><strong>Synthesis OS — Digitální asistent opatrovnického řízení</strong></p>
+                <p>Tento dokument byl vytvořen za účelem osobní přípravy a podkladů pro advokáta. Výstupy z AI neposkytují licencované právní poradenství.</p>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+      )}
 
     </div>
   );

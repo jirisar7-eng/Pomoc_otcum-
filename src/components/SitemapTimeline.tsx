@@ -197,6 +197,19 @@ export default function SitemapTimeline({ setActiveTab, onOpenGlossary, currentU
         { name: 'Osobní profil / Portál tance', tab: 'user-portal', desc: 'Správa vašich uložených vzorů, konceptů podání a vlastní historie.', icon: <Compass className="w-3.5 h-3.5" /> },
         { name: 'Podpořit projekt (Dary)', tab: 'support', desc: 'Finanční dary na provoz serveru a tvorbu nových právních vzorů.', icon: <Heart className="w-3.5 h-3.5 text-rose-500" /> }
       ]
+    },
+    {
+      title: 'Odborná Akademie & Databáze',
+      description: 'Pokročilé právní nástroje a edukační podpora',
+      icon: <BookOpen className="w-5 h-5 text-emerald-500" />,
+      color: 'border-emerald-100 bg-emerald-50/20 text-emerald-900',
+      badgeColor: 'bg-emerald-100 text-emerald-800',
+      items: [
+        { name: 'Interaktivní Formuláře (Chytrý editor)', tab: 'centrum-formularu', desc: 'Sestavte si bezvadné podání nebo odvolání s naším průvodcem.', icon: <FileText className="w-3.5 h-3.5 text-indigo-600" />, highlight: true },
+        { name: 'Případová Databáze rozsudků', tab: 'pripadova-databaze', desc: 'Katalog precedentních rozsudků seřazených podle taktiky a věku dětí.', icon: <Scale className="w-3.5 h-3.5 text-teal-600" /> },
+        { name: 'Knihovna vědeckých studií', tab: 'knihovna-studii', desc: 'Kompletní argumentační zdroje z oborů psychologie, lékařství a sociologie.', icon: <BookOpen className="w-3.5 h-3.5 text-indigo-600" /> },
+        { name: 'Akademie tátů (Právní kvízy)', tab: 'vzdelavani', desc: 'Edukační kvízy a zátěžové scénáře pro přípravu na soudní stání.', icon: <Sliders className="w-3.5 h-3.5 text-emerald-600" /> }
+      ]
     }
   ];
 
@@ -244,7 +257,7 @@ export default function SitemapTimeline({ setActiveTab, onOpenGlossary, currentU
           </div>
         </div>
       </div>
-
+      
       {/* SECTION 1: MAPA STRÁNKY (SITEMAP) */}
       <div id="sitemap-section-block" className="space-y-6 scroll-mt-6">
         <div className="border-b border-slate-100 pb-3">
@@ -257,7 +270,7 @@ export default function SitemapTimeline({ setActiveTab, onOpenGlossary, currentU
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {sitemapSections.map((section, idx) => (
             <div key={idx} className="bg-white rounded-2xl border border-slate-100 shadow-2xs hover:shadow-xs transition-all p-5 flex flex-col justify-between">
               <div className="space-y-4">

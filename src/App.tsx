@@ -57,6 +57,12 @@ import UserPortal from './components/UserPortal';
 import SitemapTimeline from './components/SitemapTimeline';
 import CareSimulator from './components/CareSimulator';
 
+// High-fidelity expert educational and legal tools
+import KnihovnaStudies from './components/KnihovnaStudies';
+import VzdelavaniSection from './components/VzdelavaniSection';
+import PripadovaDatabaze from './components/PripadovaDatabaze';
+import CentrumFormularu from './components/CentrumFormularu';
+
 export default function App() {
   // Global Authentication & Navigation States
   const [currentUser, setCurrentUser] = useState<User | null>(() => 
@@ -410,6 +416,22 @@ export default function App() {
 
             {activeTab === 'ke-stazeni' && (
               <KeStazeniSection />
+            )}
+
+            {activeTab === 'knihovna-studii' && (
+              <KnihovnaStudies />
+            )}
+
+            {activeTab === 'vzdelavani' && (
+              <VzdelavaniSection />
+            )}
+
+            {activeTab === 'pripadova-databaze' && (
+              <PripadovaDatabaze />
+            )}
+
+            {activeTab === 'centrum-formularu' && (
+              <CentrumFormularu />
             )}
 
             {activeTab === 'ai-guide' && (
