@@ -29,7 +29,7 @@ import {
   Download,
   Info
 } from 'lucide-react';
-import { getStoredState, setStoredState } from '../mockData';
+import { getStoredState, setStoredState } from '../initialState';
 
 // --- Types ---
 interface IncidentLog {

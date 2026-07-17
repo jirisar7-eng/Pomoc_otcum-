@@ -19,7 +19,7 @@ import {
   Search 
 } from 'lucide-react';
 import { SupportContact } from '../types';
-import { INITIAL_CONTACTS } from '../mockData';
+import { INITIAL_CONTACTS } from '../initialState';
 
 interface ContactsSectionProps {
   searchQuery: string;

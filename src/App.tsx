@@ -16,7 +16,7 @@ import {
   INITIAL_FORUM_POSTS, 
   INITIAL_COMMENTS,
   INITIAL_DONATIONS
-} from './mockData';
+} from './initialState';
 import { 
   subscribeToAuth, 
   getCollectionData, 

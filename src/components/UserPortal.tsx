@@ -76,107 +76,18 @@ const NODE_TYPES: { type: TimelineNodeType; label: string; color: string; bg: st
 // Prefilled mock data for first-time use
 const DEFAULT_CASE: CaseInfo = {
   id: 'case-1',
-  childName: 'Eliška (2 roky)',
-  status: 'V řízení (před prvním opatrovnickým soudem)',
-  courtName: 'Okresní soud v Olomouci',
-  notes: 'Hlavním tématem je zavedení přespávání od středy do pátku. Matka argumentuje věkem 2 roky jako nevhodným pro odloučení.',
-  createdAt: '2026-02-10T08:00:00.000Z'
+  childName: '',
+  status: 'Příprava sporu',
+  courtName: 'Zatím nevybráno',
+  notes: 'Klikněte na "Upravit" pro nastavení informací o vašem opatrovnickém případu.',
+  createdAt: new Date().toISOString()
 };
 
-const DEFAULT_EVIDENCE: EvidenceFile[] = [
-  {
-    id: 'ev-1',
-    name: 'Vyúčtování plateb a poplatků školka.pdf',
-    type: 'pdf',
-    notes: 'Doklad o mém polovičním spolufinancování zájmových kroužků a soukromých jeslí Elišky.',
-    date: '2026-05-14',
-    tags: ['Finance', 'Školka'],
-    fileSize: '1.2 MB'
-  },
-  {
-    id: 'ev-2',
-    name: 'Screenshot SMS - zrušení styku na poslední chvíli.png',
-    type: 'screenshot',
-    notes: 'Matka píše v pátek v 15:50 (styk měl začít v 16:00), že malá má rýmu a nikam nejede. SMS s mým návrhem, že přijedu za ní s léky, zůstala bez odpovědi.',
-    date: '2026-06-05',
-    tags: ['Maření styku', 'SMS'],
-    fileSize: '450 KB'
-  },
-  {
-    id: 'ev-3',
-    name: 'Nahrávka předání Elišky - klidný průběh.mp3',
-    type: 'audio',
-    notes: 'Audio nahrávka z předání v parku. Dokazuje, že dcera se ke mně radostně rozběhla, objala mě a nebyl přítomen žádný pláč nebo strach, který matka popisuje ve vyjádření.',
-    date: '2026-06-12',
-    tags: ['Předání dětí', 'Nahrávka'],
-    fileSize: '4.8 MB'
-  },
-  {
-    id: 'ev-4',
-    name: 'Fotka - Eliška usíná u mě v posteli.jpg',
-    type: 'photo',
-    notes: 'Fotografie z odpoledního spánku během víkendové péče. Dokazuje, že u mě bez problémů usíná sama bez přítomnosti matky.',
-    date: '2026-06-20',
-    tags: ['Péče', 'Spánek'],
-    fileSize: '2.1 MB'
-  }
-];
+const DEFAULT_EVIDENCE: EvidenceFile[] = [];
 
-const DEFAULT_TIMELINE: TimelineNode[] = [
-  {
-    id: 'node-1',
-    caseId: 'case-1',
-    type: 'proposal',
-    title: 'Podání mého návrhu na střídavou péči',
-    date: '2026-02-15',
-    notes: 'Podán upravený návrh s důrazem na rovnoměrné rozdělení noční péče. Přiloženo čestné prohlášení zaměstnavatele o home office.',
-    evidenceIds: ['ev-1']
-  },
-  {
-    id: 'node-2',
-    caseId: 'case-1',
-    type: 'mother_response',
-    title: 'Vyjádření matky k návrhu',
-    date: '2026-03-22',
-    notes: 'Matka navrhuje výhradní péči a styk s otcem pouze každou druhou sobotu od 9:00 do 15:00 bez přespávání. Tvrdí, že otec nemá mateřské kompetence.',
-    evidenceIds: []
-  },
-  {
-    id: 'node-3',
-    caseId: 'case-1',
-    type: 'ospod',
-    title: 'Návštěva sociální pracovnice u mě doma',
-    date: '2026-04-10',
-    notes: 'Sociální pracovnice zkontrolovala dětský pokoj. Vše v naprostém pořádku (vlastní postýlka, hračky, bezpečnostní prvky). Protokol vyzněl neutrálně.',
-    evidenceIds: ['ev-4']
-  },
-  {
-    id: 'node-4',
-    caseId: 'case-1',
-    type: 'other',
-    title: 'Incident - bezdůvodné zmaření víkendového styku',
-    date: '2026-06-05',
-    notes: 'Matka neodevzdala dítě s výmluvou na lehké nachlazení. Policie ČR věc odmítla na místě sepsat, proveden pouze zápis do mého deníku.',
-    evidenceIds: ['ev-2']
-  },
-  {
-    id: 'node-5',
-    caseId: 'case-1',
-    type: 'court_hearing',
-    title: 'První ústní jednání u Okresního soudu',
-    date: '2026-07-28',
-    notes: 'Soudce nařídil předběžné opatření a doporučil nám absolvovat 3 sezení u mediátora. Odročeno na konec září.',
-    evidenceIds: ['ev-3'],
-    deadlineDate: '2026-07-28',
-    deadlineCompleted: false
-  }
-];
+const DEFAULT_TIMELINE: TimelineNode[] = [];
 
-const DEFAULT_NOTIFICATIONS: NotificationItem[] = [
-  { id: 'notif-1', title: 'Lhůta pro vyjádření', content: 'Zbývají 4 dny na odeslání doplňujícího vyjádření k soudu ohledně zprávy OSPOD.', date: 'před 2 hodinami', read: false, type: 'alert' },
-  { id: 'notif-2', title: 'Nové rozhodnutí NS ČR', content: 'Do sekce Judikatura byl přidán nový přelomový nález k věkové hranici střídavé péče.', date: 'včera', read: false, type: 'info' },
-  { id: 'notif-3', title: 'Soukromá zpráva', content: 'Administrátor ti poslal zprávu ohledně tvého schváleného příspěvku v diskuzi.', date: 'před 2 dny', read: true, type: 'message' }
-];
+const DEFAULT_NOTIFICATIONS: NotificationItem[] = [];
 
 interface ChecklistItem {
   id: string;
@@ -187,18 +98,15 @@ interface ChecklistItem {
 
 const DEFAULT_CHECKLIST: ChecklistItem[] = [
   { id: 'room', label: 'Dětský pokoj / zázemí připraveno k šetření', description: 'Mít připravenou postýlku, hračky, bezpečné prostředí a úložný prostor.', checked: false },
-  { id: 'evidence', label: 'Důkazní spis zkompletován a označen štítky', description: 'Všechny SMS, fotky a nahrávky jsou uložené v Trezoru důkazů s datem a popisem.', checked: true },
-  { id: 'proposal', label: 'Návrh podání vypracován a doručen soudu', description: 'Věcně a slušně zformulovaný návrh bez osobních útoků na protistranu.', checked: true },
+  { id: 'evidence', label: 'Důkazní spis zkompletován a označen štítky', description: 'Všechny SMS, fotky a nahrávky jsou uložené v Trezoru důkazů s datem a popisem.', checked: false },
+  { id: 'proposal', label: 'Návrh podání vypracován a doručen soudu', description: 'Věcně a slušně zformulovaný návrh bez osobních útoků na protistranu.', checked: false },
   { id: 'comms', label: 'Komunikační kanály očištěny od emocí', description: 'Veškerá komunikace s druhým rodičem je vedena věcně, stručně a výhradně k dítěti (metoda BIFF).', checked: false },
   { id: 'plan', label: 'Podrobný plán péče připraven', description: 'Harmonogram střídání včetně prázdnin, svátků, předání a logistiky dětí.', checked: false },
   { id: 'mediator', label: 'Konzultace s mediátorem / právníkem splněna', description: 'Právní zastoupení nebo alespoň konzultace s rodinným advokátem pro ujasnění rizik.', checked: false },
-  { id: 'psychology', label: 'Psychologická příprava (vlastní i dítěte)', description: 'Ujasnění si psychologických aspektů sporu, chránění dítěte před detaily řízení.', checked: true }
+  { id: 'psychology', label: 'Psychologická příprava (vlastní i dítěte)', description: 'Ujasnění si psychologických aspektů sporu, chránění dítěte před detaily řízení.', checked: false }
 ];
 
-const DEFAULT_MESSAGES: PrivateMessage[] = [
-  { id: 'msg-1', senderName: 'Ondřej (Moderátor)', text: 'Ahoj, schválil jsem tvůj příspěvek o přípravě pokoje pro miminko. Je to skvěle napsané a určitě to pomůže dalším tátům v podobné situaci!', date: '14. 7. 2026', read: true },
-  { id: 'msg-2', senderName: 'Právník Jan (Poradna)', text: 'Dobrý den, k tomu vašemu bodu ohledně noční péče u 2letého dítěte – rozhodně u soudu zdůrazněte ranní rituál loučení. Je to silný argument.', date: '15. 7. 2026', read: false }
-];
+const DEFAULT_MESSAGES: PrivateMessage[] = [];
 
 export default function UserPortal({ currentUser, onOpenAuth }: UserPortalProps) {
   // Navigation tabs inside portal
@@ -242,27 +150,22 @@ export default function UserPortal({ currentUser, onOpenAuth }: UserPortalProps)
   // Favorite / Saved Articles and Judgment rules
   const [savedArticles, setSavedArticles] = useState<{ id: string; title: string; category: string }[]>(() => {
     const saved = localStorage.getItem('sh_portal_saved_articles');
-    return saved ? JSON.parse(saved) : [
-      { id: 'art-1', title: 'Nová právní úprava střídavé péče pro rok 2026', category: 'Právní novinky' },
-      { id: 'art-3', title: 'Psychologická doporučení pro odloučení dítěte v útlém věku', category: 'Dětská psychologie' }
-    ];
+    return saved ? JSON.parse(saved) : [];
   });
 
   const [savedJudgments, setSavedJudgments] = useState<{ id: string; courtName: string; caseNumber: string; summary: string }[]>(() => {
     const saved = localStorage.getItem('sh_portal_saved_judgments');
-    return saved ? JSON.parse(saved) : [
-      { id: 'jud-1', courtName: 'Ústavní soud ČR', caseNumber: 'I. ÚS 3213/25', summary: 'Právo na střídavou péči i u dětí mladších tří let za předpokladu bezproblémové citové vazby k oběma rodičům.' }
-    ];
+    return saved ? JSON.parse(saved) : [];
   });
 
   // AI Notebook Text area
   const [aiNotes, setAiNotes] = useState<string>(() => {
     const saved = localStorage.getItem('sh_portal_ai_notes');
-    return saved || 'Zde si můžete psát poznámky k případu, argumenty pro soud nebo OSPOD šetření. Kliknutím na "Optimalizovat přes AI" vám náš systém pomůže text strukturovat nebo očistit od emocí.';
+    return saved || '';
   });
 
   // Timeline UI States
-  const [selectedNodeId, setSelectedNodeId] = useState<string | null>('node-5');
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [isEditingNode, setIsEditingNode] = useState<boolean>(false);
   const [isAddingNode, setIsAddingNode] = useState<boolean>(false);
 
@@ -272,12 +175,12 @@ export default function UserPortal({ currentUser, onOpenAuth }: UserPortalProps)
   const [isAddingEvidence, setIsAddingEvidence] = useState<boolean>(false);
 
   // Calendar UI States
-  const [calendarMonth, setCalendarMonth] = useState<number>(6); // July (0-indexed)
-  const [calendarYear, setCalendarYear] = useState<number>(2026);
-  const [customReminders, setCustomReminders] = useState<{ id: string; title: string; date: string; type: string }[]>([
-    { id: 'rem-1', title: 'OSPOD pohovor Eliška', date: '2026-07-22', type: 'ospod' },
-    { id: 'rem-2', title: 'Předání Elišky na víkend', date: '2026-07-17', type: 'other' }
-  ]);
+  const [calendarMonth, setCalendarMonth] = useState<number>(new Date().getMonth());
+  const [calendarYear, setCalendarYear] = useState<number>(new Date().getFullYear());
+  const [customReminders, setCustomReminders] = useState<{ id: string; title: string; date: string; type: string }[]>(() => {
+    const saved = localStorage.getItem('sh_portal_custom_reminders');
+    return saved ? JSON.parse(saved) : [];
+  });
   const [isAddingReminder, setIsAddingReminder] = useState<boolean>(false);
   const [newReminderTitle, setNewReminderTitle] = useState<string>('');
   const [newReminderDate, setNewReminderDate] = useState<string>('');
@@ -882,7 +785,7 @@ Jaký krok nebo otázku dnes společně probereme?`;
                 <div className="flex justify-between items-start gap-4">
                   <div className="space-y-1">
                     <span className="text-[9px] uppercase font-mono font-bold text-slate-400">Nastavení Kauzy</span>
-                    <h3 className="text-base font-bold text-slate-800 font-display">Eliška (2 roky) — Hlavní spor</h3>
+                    <h3 className="text-base font-bold text-slate-800 font-display">{caseInfo.childName || 'Můj případ'} — Hlavní spor</h3>
                   </div>
                   <button 
                     onClick={() => {

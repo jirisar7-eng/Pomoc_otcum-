@@ -22,7 +22,7 @@ import {
   RefreshCw
 } from 'lucide-react';
 import { ForumCategory, ForumPost, Comment, User } from '../types';
-import { INITIAL_FORUM_CATEGORIES, INITIAL_FORUM_POSTS, INITIAL_COMMENTS } from '../mockData';
+import { INITIAL_FORUM_CATEGORIES, INITIAL_FORUM_POSTS, INITIAL_COMMENTS } from '../initialState';
 
 interface ForumSectionProps {
   currentUser: User | null;

@@ -23,7 +23,7 @@ import {
   ThumbsUp
 } from 'lucide-react';
 import { Article, Comment, User } from '../types';
-import { INITIAL_ARTICLES, INITIAL_COMMENTS } from '../mockData';
+import { INITIAL_ARTICLES, INITIAL_COMMENTS } from '../initialState';
 import { formatRichText } from '../utils';
 
 interface NewsSectionProps {
@@ -329,8 +329,12 @@ export default function NewsSection({ searchQuery: globalSearchQuery, currentUse
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="news-articles-bento">
             {filteredArticles.length === 0 ? (
-              <div className="col-span-3 bg-white p-12 rounded-2xl border border-slate-100 text-center text-slate-400 shadow-2xs italic">
-                Žádné články neodpovídají vyhledávání.
+              <div className="col-span-3 bg-white p-12 rounded-2xl border border-slate-100 text-center text-slate-400 shadow-2xs">
+                <div className="w-16 h-16 bg-slate-50 border border-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-400">
+                  <BookOpen className="w-8 h-8" />
+                </div>
+                <p className="font-semibold text-slate-600 text-sm">Aktuality a články jsou v přípravě</p>
+                <p className="text-xs mt-1 text-slate-400">Doposud nejsou k dispozici žádná data. Statistiky se začnou vytvářet po spuštění alfa verze.</p>
               </div>
             ) : (
               filteredArticles.map((art) => (

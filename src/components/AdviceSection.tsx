@@ -19,7 +19,7 @@ import {
   RefreshCw
 } from 'lucide-react';
 import { AdviceItem, Comment, User } from '../types';
-import { INITIAL_ADVICE, INITIAL_COMMENTS } from '../mockData';
+import { INITIAL_ADVICE, INITIAL_COMMENTS } from '../initialState';
 import { formatRichText } from '../utils';
 
 interface AdviceSectionProps {
@@ -35,7 +35,7 @@ export default function AdviceSection({
   comments,
   setComments
 }: AdviceSectionProps) {
-  const [activeAdviceId, setActiveAdviceId] = useState<string>(INITIAL_ADVICE[0].id);
+  const [activeAdviceId, setActiveAdviceId] = useState<string>(() => INITIAL_ADVICE[0]?.id || '');
   const [completedItems, setCompletedItems] = useState<Record<string, boolean>>({});
   const [newCommentText, setNewCommentText] = useState('');
   const [guestName, setGuestName] = useState('');
@@ -364,8 +364,12 @@ export default function AdviceSection({
 
             </div>
           ) : (
-            <div className="bg-white rounded-2xl border border-slate-100 p-12 text-center text-slate-400 shadow-2xs">
-              Vyberte téma z levého panelu.
+            <div className="bg-white border border-slate-200/60 rounded-3xl p-12 text-center text-slate-400">
+              <div className="w-16 h-16 bg-slate-50 border border-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-400">
+                <Compass className="w-8 h-8" />
+              </div>
+              <p className="font-semibold text-slate-600 text-sm">Metodické návody a rady jsou v přípravě</p>
+              <p className="text-xs mt-1 text-slate-400">Doposud nejsou k dispozici žádná data. Statistiky se začnou vytvářet po spuštění alfa verze.</p>
             </div>
           )}
         </div>

@@ -18,7 +18,7 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import { DocumentTemplate } from '../types';
-import { INITIAL_DOCUMENTS } from '../mockData';
+import { INITIAL_DOCUMENTS } from '../initialState';
 import AiGuideModal from './AiGuideModal';
 
 interface DocumentsSectionProps {
@@ -27,7 +27,7 @@ interface DocumentsSectionProps {
 
 export default function DocumentsSection({ searchQuery: globalSearchQuery }: DocumentsSectionProps) {
   const [localSearch, setLocalSearch] = useState('');
-  const [selectedDoc, setSelectedDoc] = useState<DocumentTemplate | null>(INITIAL_DOCUMENTS[0]);
+  const [selectedDoc, setSelectedDoc] = useState<DocumentTemplate | null>(() => INITIAL_DOCUMENTS[0] || null);
   const [formData, setFormData] = useState<Record<string, string>>({});
   const [copied, setCopied] = useState(false);
   const [downloaded, setDownloaded] = useState(false);
@@ -341,9 +341,12 @@ export default function DocumentsSection({ searchQuery: globalSearchQuery }: Doc
 
             </div>
           ) : (
-            <div className="bg-white rounded-2xl border border-slate-100 p-12 text-center text-slate-400 shadow-2xs flex-1 flex flex-col items-center justify-center">
-              <FileText className="w-12 h-12 text-slate-300 mb-2" />
-              <p className="text-sm">Vyberte šablonu z levého menu pro spuštění generátoru.</p>
+            <div className="bg-white border border-slate-200/60 rounded-3xl p-12 text-center text-slate-400 flex-1 flex flex-col items-center justify-center">
+              <div className="w-16 h-16 bg-slate-50 border border-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-400">
+                <FileText className="w-8 h-8" />
+              </div>
+              <p className="font-semibold text-slate-600 text-sm">Právní vzory a generátor dokumentů v přípravě</p>
+              <p className="text-xs mt-1 text-slate-400">Doposud nejsou k dispozici žádná data. Statistiky se začnou vytvářet po spuštění alfa verze.</p>
             </div>
           )}
         </div>
