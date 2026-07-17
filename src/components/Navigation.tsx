@@ -27,7 +27,9 @@ import {
   HeartHandshake,
   BookOpen,
   LayoutDashboard,
-  Sliders
+  Sliders,
+  Briefcase,
+  Database
 } from 'lucide-react';
 import { User } from '../types';
 
@@ -55,8 +57,10 @@ export default function Navigation({
   const menuItems = [
     { id: 'home', label: 'Domů', icon: Home },
     { id: 'user-portal', label: 'Můj Portál', icon: LayoutDashboard },
+    { id: 'ai-case-manager', label: 'AI Case Manager', icon: Briefcase },
     { id: 'stories', label: 'Můj příběh', icon: History },
     { id: 'news', label: 'Články', icon: Bell },
+    { id: 'legal-wiki', label: 'Právní Encyklopedie', icon: Database },
     { id: 'judikatura', label: 'Judikatura', icon: Scale },
     { id: 'ke-stazeni', label: 'Vzory podání', icon: FileSpreadsheet },
     { id: 'ai-guide', label: 'AI Průvodce', icon: Sparkles },
@@ -127,18 +131,32 @@ export default function Navigation({
             })}
             
             {currentUser?.role === 'admin' && (
-              <button
-                id="nav-tab-admin"
-                onClick={() => handleTabClick('admin')}
-                className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all border ${
-                  activeTab === 'admin'
-                    ? 'bg-indigo-50 border-indigo-200 text-indigo-700'
-                    : 'bg-white border-slate-200 text-indigo-600 hover:bg-indigo-50/50 hover:text-indigo-700 hover:border-indigo-300'
-                } animate-pulse`}
-              >
-                <Shield className="w-3.5 h-3.5" />
-                Administrace
-              </button>
+              <>
+                <button
+                  id="nav-tab-ai-admin"
+                  onClick={() => handleTabClick('ai-admin')}
+                  className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all border ${
+                    activeTab === 'ai-admin'
+                      ? 'bg-indigo-600 border-indigo-700 text-white shadow-3xs'
+                      : 'bg-indigo-50 border-indigo-200 text-indigo-700 hover:bg-indigo-100'
+                  }`}
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-teal-500 animate-pulse" />
+                  AI Admin
+                </button>
+                <button
+                  id="nav-tab-admin"
+                  onClick={() => handleTabClick('admin')}
+                  className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all border ${
+                    activeTab === 'admin'
+                      ? 'bg-indigo-50 border-indigo-200 text-indigo-700 shadow-3xs'
+                      : 'bg-white border-slate-200 text-indigo-600 hover:bg-indigo-50/50 hover:text-indigo-700 hover:border-indigo-300'
+                  }`}
+                >
+                  <Shield className="w-3.5 h-3.5" />
+                  Administrace
+                </button>
+              </>
             )}
           </nav>
 

@@ -62,6 +62,9 @@ import KnihovnaStudies from './components/KnihovnaStudies';
 import VzdelavaniSection from './components/VzdelavaniSection';
 import PripadovaDatabaze from './components/PripadovaDatabaze';
 import CentrumFormularu from './components/CentrumFormularu';
+import AiCaseManager from './components/AiCaseManager';
+import LegalWiki from './components/LegalWiki';
+import AiAdmin from './components/AiAdmin';
 
 export default function App() {
   // Global Authentication & Navigation States
@@ -436,6 +439,18 @@ export default function App() {
 
             {activeTab === 'ai-guide' && (
               <AiGuideSection />
+            )}
+
+            {activeTab === 'ai-case-manager' && (
+              <AiCaseManager currentUser={currentUser} onOpenAuth={() => setAuthModalOpen(true)} />
+            )}
+
+            {activeTab === 'legal-wiki' && (
+              <LegalWiki />
+            )}
+
+            {activeTab === 'ai-admin' && (
+              <AiAdmin />
             )}
 
             {activeTab === 'ospod' && (
