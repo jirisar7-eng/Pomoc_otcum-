@@ -7,7 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Sparkles, Scale, Heart, Shield, BookOpen } from 'lucide-react';
 
-import { User, Article, ExperienceStory, ForumPost, Comment, Donation } from './types';
+import { User, Article, ExperienceStory, ForumPost, Comment, Donation, Partner } from './types';
 import { 
   getStoredState, 
   setStoredState, 
@@ -15,7 +15,8 @@ import {
   INITIAL_STORIES, 
   INITIAL_FORUM_POSTS, 
   INITIAL_COMMENTS,
-  INITIAL_DONATIONS
+  INITIAL_DONATIONS,
+  INITIAL_PARTNERS
 } from './initialState';
 import { 
   subscribeToAuth, 
@@ -102,6 +103,9 @@ export default function App() {
   const [donations, setLocalDonations] = useState<Donation[]>(() => 
     getStoredState<Donation[]>('donations', INITIAL_DONATIONS)
   );
+  const [partners, setLocalPartners] = useState<Partner[]>(() => 
+    getStoredState<Partner[]>('partners', INITIAL_PARTNERS)
+  );
 
   // Track if Firebase collections have been successfully loaded
   const [isFirebaseLoaded, setIsFirebaseLoaded] = useState<boolean>(false);
@@ -186,6 +190,7 @@ export default function App() {
   const setPosts = createSyncedSetter<ForumPost>('posts', setLocalPosts, () => !!currentUser);
   const setComments = createSyncedSetter<Comment>('comments', setLocalComments, () => !!currentUser);
   const setDonations = createSyncedSetter<Donation>('donations', setLocalDonations, () => true);
+  const setPartners = createSyncedSetter<Partner>('partners', setLocalPartners, () => currentUser?.role === 'admin');
 
   // 1. Subscribe to Firebase Authentication changes in real-time
   useEffect(() => {
@@ -264,6 +269,9 @@ export default function App() {
         const dbDonations = await getCollectionData<Donation>('donations', INITIAL_DONATIONS);
         setLocalDonations(dbDonations);
 
+        const dbPartners = await getCollectionData<Partner>('partners', INITIAL_PARTNERS);
+        setLocalPartners(dbPartners);
+
         setIsFirebaseLoaded(true);
         console.log("Firestore database synchronized successfully!");
       } catch (err) {
@@ -324,6 +332,10 @@ export default function App() {
   useEffect(() => {
     setStoredState('comments', comments);
   }, [comments]);
+
+  useEffect(() => {
+    setStoredState('partners', partners);
+  }, [partners]);
 
   useEffect(() => {
     setStoredState('donations', donations);
@@ -402,6 +414,7 @@ export default function App() {
                 onNavigate={setActiveTab}
                 onOpenAuth={() => setAuthModalOpen(true)}
                 isLoggedIn={!!currentUser}
+                partners={partners}
               />
             )}
 
@@ -560,11 +573,13 @@ export default function App() {
                 posts={posts}
                 comments={comments}
                 donations={donations}
+                partners={partners}
                 setArticles={setArticles}
                 setStories={setStories}
                 setPosts={setPosts}
                 setComments={setComments}
                 setDonations={setDonations}
+                setPartners={setPartners}
               />
             )}
           </motion.div>

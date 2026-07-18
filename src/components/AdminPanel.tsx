@@ -13,7 +13,7 @@ import {
   UserCheck, Users, Calendar, Cpu, BarChart2, Paintbrush, Search,
   Sliders, Settings, Activity, FileCode, Share2, Download, ArrowUp, ArrowDown
 } from 'lucide-react';
-import { Article, ExperienceStory, ForumPost, Comment, User, Donation } from '../types';
+import { Article, ExperienceStory, ForumPost, Comment, User, Donation, Partner } from '../types';
 import { getSupabaseUrl, getSupabaseAnonKey, isSupabaseConfigured, getSupabase } from '../lib/supabase';
 import { saveDocument, deleteDocument, getCollectionData } from '../lib/firebase';
 import { AIAdminActions } from '../lib/ai-admin/actions';
@@ -26,11 +26,13 @@ interface AdminPanelProps {
   posts: ForumPost[];
   comments: Comment[];
   donations: Donation[];
+  partners: Partner[];
   setArticles: React.Dispatch<React.SetStateAction<Article[]>>;
   setStories: React.Dispatch<React.SetStateAction<ExperienceStory[]>>;
   setPosts: React.Dispatch<React.SetStateAction<ForumPost[]>>;
   setComments: React.Dispatch<React.SetStateAction<Comment[]>>;
   setDonations: React.Dispatch<React.SetStateAction<Donation[]>>;
+  setPartners: React.Dispatch<React.SetStateAction<Partner[]>>;
 }
 
 export default function AdminPanel({
@@ -40,14 +42,112 @@ export default function AdminPanel({
   posts,
   comments,
   donations = [],
+  partners = [],
   setArticles,
   setStories,
   setPosts,
   setComments,
-  setDonations
+  setDonations,
+  setPartners
 }: AdminPanelProps) {
   // Navigation
   const [activeMenu, setActiveMenu] = useState<string>('dashboard');
+
+  // --- PARTNERS MANAGEMENT STATE & HANDLERS ---
+  const [partnerSearch, setPartnerSearch] = useState('');
+  const [editingPartner, setEditingPartner] = useState<Partner | null>(null);
+  const [isAddingPartner, setIsAddingPartner] = useState(false);
+
+  const [partnerName, setPartnerName] = useState('');
+  const [partnerDescription, setPartnerDescription] = useState('');
+  const [partnerLogoUrl, setPartnerLogoUrl] = useState('');
+  const [partnerLink, setPartnerLink] = useState('');
+  const [partnerCategory, setPartnerCategory] = useState<'Poradna' | 'Advokát' | 'Psycholog' | 'Mediátor' | 'Ostatní'>('Poradna');
+  const [partnerRegion, setPartnerRegion] = useState('');
+  const [partnerIsRecommended, setPartnerIsRecommended] = useState(false);
+  const [partnerShowOnMainPage, setPartnerShowOnMainPage] = useState(true);
+
+  const handleOpenAddPartner = () => {
+    setEditingPartner(null);
+    setPartnerName('');
+    setPartnerDescription('');
+    setPartnerLogoUrl('');
+    setPartnerLink('');
+    setPartnerCategory('Poradna');
+    setPartnerRegion('Celá ČR');
+    setPartnerIsRecommended(false);
+    setPartnerShowOnMainPage(true);
+    setIsAddingPartner(true);
+  };
+
+  const handleOpenEditPartner = (p: Partner) => {
+    setEditingPartner(p);
+    setPartnerName(p.name);
+    setPartnerDescription(p.description);
+    setPartnerLogoUrl(p.logoUrl || '');
+    setPartnerLink(p.link);
+    setPartnerCategory(p.category);
+    setPartnerRegion(p.region);
+    setPartnerIsRecommended(p.isRecommended);
+    setPartnerShowOnMainPage(p.showOnMainPage);
+    setIsAddingPartner(true);
+  };
+
+  const handleSavePartner = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!partnerName.trim() || !partnerLink.trim()) {
+      alert('Prosím vyplňte název partnera a odkaz.');
+      return;
+    }
+
+    if (editingPartner) {
+      const updatedPartner: Partner = {
+        ...editingPartner,
+        name: partnerName,
+        description: partnerDescription,
+        logoUrl: partnerLogoUrl,
+        link: partnerLink,
+        category: partnerCategory,
+        region: partnerRegion,
+        isRecommended: partnerIsRecommended,
+        showOnMainPage: partnerShowOnMainPage
+      };
+      setPartners(prev => prev.map(p => p.id === editingPartner.id ? updatedPartner : p));
+    } else {
+      const newPartner: Partner = {
+        id: `partner-${Date.now()}`,
+        name: partnerName,
+        description: partnerDescription,
+        logoUrl: partnerLogoUrl,
+        link: partnerLink,
+        category: partnerCategory,
+        region: partnerRegion,
+        isRecommended: partnerIsRecommended,
+        showOnMainPage: partnerShowOnMainPage,
+        createdAt: new Date().toISOString()
+      };
+      setPartners(prev => [newPartner, ...prev]);
+    }
+
+    setIsAddingPartner(false);
+    setEditingPartner(null);
+  };
+
+  const handleDeletePartner = (id: string) => {
+    if (confirm('Opravdu chcete tohoto partnera smazat?')) {
+      setPartners(prev => prev.filter(p => p.id !== id));
+    }
+  };
+
+  const handleToggleRecommended = (p: Partner) => {
+    const updated = { ...p, isRecommended: !p.isRecommended };
+    setPartners(prev => prev.map(item => item.id === p.id ? updated : item));
+  };
+
+  const handleToggleShowOnMain = (p: Partner) => {
+    const updated = { ...p, showOnMainPage: !p.showOnMainPage };
+    setPartners(prev => prev.map(item => item.id === p.id ? updated : item));
+  };
 
   // Supabase states
   const [supUrl] = useState(getSupabaseUrl());
@@ -961,6 +1061,7 @@ ${cases.map(c => `Název: ${c.title}\nStav: ${c.status}\nChronologie:\n` + (c.ch
               { id: 'editorial', label: 'Obsah & Redakční fronta', icon: FileText, badge: 'FRONT' },
               { id: 'judikatura', label: 'Judikatura & Rozhodnutí', icon: Scale },
               { id: 'documents', label: 'Dokumenty & Vzory', icon: FileCode },
+              { id: 'partners', label: 'Partneři & Odborníci', icon: Share2, highlight: true },
               { id: 'cases', label: 'Případové centrum', icon: Briefcase, highlight: true },
               { id: 'evidence', label: 'Správce důkazů (Drive)', icon: Camera },
               { id: 'community', label: 'Komunita & AI Moderace', icon: MessageCircle, badge: 'AI' },
@@ -3106,6 +3207,314 @@ ${cases.map(c => `Název: ${c.title}\nStav: ${c.status}\nChronologie:\n` + (c.ch
                   <strong className="font-bold block">Architektura autonomního řízení (Synthesis OS API-First)</strong>
                   <p className="mt-1 leading-relaxed">
                     Tato databázová vrstva je navržena tak, aby podporovala budoucí autonomní správu (AI Admin). Změny provedené v administraci se automaticky propagují na zabezpečené API endpointy, což umožňuje lokálním AI agentům efektivně auditovat a čistit data bez manuálních zásahů.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 15: PARTNERS MANAGEMENT */}
+          {activeMenu === 'partners' && (
+            <div className="space-y-6">
+              <div className="border-b border-slate-100 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h2 className="text-base font-bold text-slate-800 font-display flex items-center gap-2">
+                    <Share2 className="w-5 h-5 text-teal-600" />
+                    Správa doporučených partnerů & odborníků
+                  </h2>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Spravujte síť spolupracujících organizací, psychologů, mediátorů a právních poradců doporučovaných rodičům.
+                  </p>
+                </div>
+                {!isAddingPartner && (
+                  <button
+                    onClick={handleOpenAddPartner}
+                    className="inline-flex items-center gap-2 px-3.5 py-2 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs rounded-xl shadow-3xs hover:shadow-2xs transition-all cursor-pointer whitespace-nowrap"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Nový partner
+                  </button>
+                )}
+              </div>
+
+              {/* FORM CARD - ADD OR EDIT PARTNER */}
+              {isAddingPartner && (
+                <div className="bg-slate-50/50 rounded-2xl border border-slate-200/60 p-6 space-y-4">
+                  <div className="border-b border-slate-200/55 pb-2">
+                    <h3 className="font-bold text-sm text-slate-800 font-display">
+                      {editingPartner ? 'Upravit partnera' : 'Vytvořit nového partnera'}
+                    </h3>
+                    <p className="text-[11px] text-slate-400">
+                      Vyplňte profilové informace partnera, které se zobrazí uživatelům na domovské stránce.
+                    </p>
+                  </div>
+
+                  <form onSubmit={handleSavePartner} className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Název partnera *</label>
+                        <input
+                          type="text"
+                          required
+                          value={partnerName}
+                          onChange={(e) => setPartnerName(e.target.value)}
+                          placeholder="Např. Poradna pro tátu"
+                          className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 focus:border-teal-500 focus:outline-hidden"
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Kategorie *</label>
+                        <select
+                          value={partnerCategory}
+                          onChange={(e) => setPartnerCategory(e.target.value as any)}
+                          className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 focus:border-teal-500 focus:outline-hidden"
+                        >
+                          <option value="Poradna">Poradna</option>
+                          <option value="Advokát">Advokát</option>
+                          <option value="Psycholog">Psycholog</option>
+                          <option value="Mediátor">Mediátor</option>
+                          <option value="Ostatní">Ostatní</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Kraj / Územní působnost *</label>
+                        <input
+                          type="text"
+                          required
+                          value={partnerRegion}
+                          onChange={(e) => setPartnerRegion(e.target.value)}
+                          placeholder="Např. Celá ČR / Jihomoravský kraj"
+                          className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 focus:border-teal-500 focus:outline-hidden"
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Odkaz na web nebo Facebook *</label>
+                        <input
+                          type="url"
+                          required
+                          value={partnerLink}
+                          onChange={(e) => setPartnerLink(e.target.value)}
+                          placeholder="https://www.facebook.com/..."
+                          className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 focus:border-teal-500 focus:outline-hidden"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">URL adresa loga (nepovinné)</label>
+                      <input
+                        type="url"
+                        value={partnerLogoUrl}
+                        onChange={(e) => setPartnerLogoUrl(e.target.value)}
+                        placeholder="https://example.com/logo.png"
+                        className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 focus:border-teal-500 focus:outline-hidden"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Stručný popis činnosti / služeb *</label>
+                      <textarea
+                        required
+                        rows={3}
+                        value={partnerDescription}
+                        onChange={(e) => setPartnerDescription(e.target.value)}
+                        placeholder="Zde popište, jaké konkrétní služby partner nabízí..."
+                        className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 focus:border-teal-500 focus:outline-hidden resize-none"
+                      />
+                    </div>
+
+                    <div className="flex flex-wrap gap-6 pt-2">
+                      <label className="flex items-center gap-2.5 cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={partnerIsRecommended}
+                          onChange={(e) => setPartnerIsRecommended(e.target.checked)}
+                          className="w-4 h-4 text-teal-600 border-slate-300 rounded focus:ring-teal-500"
+                        />
+                        <div className="text-left">
+                          <span className="text-xs font-bold text-slate-700 block">Doporučený partner ⭐</span>
+                          <span className="text-[10px] text-slate-400 block">Zvýrazní se v rámečku s hvězdičkou jako prioritní</span>
+                        </div>
+                      </label>
+
+                      <label className="flex items-center gap-2.5 cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={partnerShowOnMainPage}
+                          onChange={(e) => setPartnerShowOnMainPage(e.target.checked)}
+                          className="w-4 h-4 text-teal-600 border-slate-300 rounded focus:ring-teal-500"
+                        />
+                        <div className="text-left">
+                          <span className="text-xs font-bold text-slate-700 block">Zobrazovat na hlavní stránce</span>
+                          <span className="text-[10px] text-slate-400 block">Pokud je zapnuto, zobrazí se v sekci partnerů na homepage</span>
+                        </div>
+                      </label>
+                    </div>
+
+                    <div className="flex justify-end gap-2.5 pt-3 border-t border-slate-200/50">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsAddingPartner(false);
+                          setEditingPartner(null);
+                        }}
+                        className="px-4 py-2 border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-600 font-bold text-xs rounded-xl transition-all cursor-pointer"
+                      >
+                        Zrušit
+                      </button>
+                      <button
+                        type="submit"
+                        className="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs rounded-xl shadow-3xs transition-all cursor-pointer"
+                      >
+                        {editingPartner ? 'Uložit změny' : 'Přidat partnera'}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              )}
+
+              {/* PARTNERS DATABASE SEARCH BAR */}
+              <div className="bg-white rounded-2xl border border-slate-100 p-4 flex flex-col md:flex-row gap-3 items-center justify-between shadow-3xs">
+                <div className="relative w-full md:max-w-xs">
+                  <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+                  <input
+                    type="text"
+                    value={partnerSearch}
+                    onChange={(e) => setPartnerSearch(e.target.value)}
+                    placeholder="Vyhledat partnera..."
+                    className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:border-teal-500 focus:outline-hidden"
+                  />
+                </div>
+                <div className="text-slate-400 text-xs font-mono">
+                  Celkem: <strong className="text-slate-700 font-extrabold">{partners.length}</strong> partnerů
+                </div>
+              </div>
+
+              {/* PARTNERS LISTING TABLE */}
+              <div className="bg-white border border-slate-100 rounded-2xl overflow-hidden shadow-3xs">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-slate-50 text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">
+                        <th className="px-5 py-3.5">Logo & Název</th>
+                        <th className="px-5 py-3.5">Kategorie</th>
+                        <th className="px-5 py-3.5">Působnost</th>
+                        <th className="px-5 py-3.5 text-center">Doporučený</th>
+                        <th className="px-5 py-3.5 text-center">Zobrazit na hlavním webu</th>
+                        <th className="px-5 py-3.5 text-right">Akce</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-50">
+                      {partners
+                        .filter(p => p.name.toLowerCase().includes(partnerSearch.toLowerCase()))
+                        .map((p) => (
+                          <tr key={p.id} className="hover:bg-slate-50/50 transition-colors">
+                            <td className="px-5 py-4">
+                              <div className="flex items-center gap-3">
+                                {p.logoUrl ? (
+                                  <img
+                                    src={p.logoUrl}
+                                    alt={p.name}
+                                    className="w-9 h-9 rounded-lg object-cover border border-slate-100 shadow-3xs shrink-0"
+                                    referrerPolicy="no-referrer"
+                                  />
+                                ) : (
+                                  <div className="w-9 h-9 rounded-lg bg-teal-50 text-teal-700 border border-teal-100/50 flex items-center justify-center font-bold text-xs font-display shadow-3xs shrink-0">
+                                    {p.name.substring(0, 2).toUpperCase()}
+                                  </div>
+                                )}
+                                <div className="space-y-0.5">
+                                  <strong className="text-xs text-slate-800 font-bold block">{p.name}</strong>
+                                  <a
+                                    href={p.link}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-[10px] text-teal-600 hover:underline block truncate max-w-[180px]"
+                                  >
+                                    {p.link}
+                                  </a>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="px-5 py-4">
+                              <span className="inline-block text-[9px] font-bold uppercase px-2 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200/40">
+                                {p.category}
+                              </span>
+                            </td>
+                            <td className="px-5 py-4">
+                              <span className="text-xs text-slate-500 font-medium">{p.region}</span>
+                            </td>
+                            <td className="px-5 py-4 text-center">
+                              <button
+                                onClick={() => handleToggleRecommended(p)}
+                                className={`p-1.5 rounded-lg border transition-all cursor-pointer ${
+                                  p.isRecommended
+                                    ? 'bg-amber-50 border-amber-200 text-amber-500'
+                                    : 'bg-slate-50 border-slate-100 text-slate-300 hover:text-slate-500'
+                                }`}
+                                title="Kliknutím přepnete doporučení"
+                              >
+                                <span className="text-xs">★</span>
+                              </button>
+                            </td>
+                            <td className="px-5 py-4 text-center">
+                              <button
+                                onClick={() => handleToggleShowOnMain(p)}
+                                className={`px-2.5 py-1 text-[10px] font-bold rounded-lg border transition-all cursor-pointer ${
+                                  p.showOnMainPage
+                                    ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
+                                    : 'bg-slate-50 border-slate-200 text-slate-400 hover:text-slate-600'
+                                }`}
+                                title="Zobrazovat na domovské stránce"
+                              >
+                                {p.showOnMainPage ? 'Ano (Aktivní)' : 'Ne (Skryto)'}
+                              </button>
+                            </td>
+                            <td className="px-5 py-4 text-right">
+                              <div className="flex items-center justify-end gap-1.5">
+                                <button
+                                  onClick={() => handleOpenEditPartner(p)}
+                                  className="p-1.5 text-slate-500 hover:text-teal-600 hover:bg-teal-50 rounded-lg transition-colors cursor-pointer"
+                                  title="Upravit profil partnera"
+                                >
+                                  <Edit3 className="w-3.5 h-3.5" />
+                                </button>
+                                <button
+                                  onClick={() => handleDeletePartner(p.id)}
+                                  className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                                  title="Smazat partnera"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      {partners.filter(p => p.name.toLowerCase().includes(partnerSearch.toLowerCase())).length === 0 && (
+                        <tr>
+                          <td colSpan={6} className="text-center py-8 text-slate-400 text-xs font-mono">
+                            Nebyly nalezeny žádné záznamy odpovídající hledanému výrazu.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* INTEGRATION NOTE */}
+              <div className="p-4 bg-teal-50 border border-teal-100 text-teal-950 rounded-2xl flex items-start gap-3 shadow-3xs">
+                <CheckCircle className="w-5 h-5 text-teal-600 shrink-0 mt-0.5" />
+                <div className="text-xs">
+                  <strong className="font-bold block">Autonomní API-First synchronizace partnerů</strong>
+                  <p className="mt-1 leading-relaxed">
+                    Tato sekce ukládá data přímo do Firestore kolekce <code className="font-mono bg-teal-100/50 px-1 py-0.2 rounded text-teal-900 font-semibold">partners</code>.
+                    Budoucí autonomní procesy (např. lokální AI admin) mohou kdykoli skrze backendová API spouštět audity odkazů, ověřovat funkčnost Facebook stránek partnerů nebo automaticky generovat shrnutí jejich činností na základě analýzy jejich veřejných profilů.
                   </p>
                 </div>
               </div>

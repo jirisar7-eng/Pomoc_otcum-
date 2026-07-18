@@ -241,4 +241,18 @@ export interface AuditLog {
   details: string;
 }
 
+export interface Partner {
+  id: string;
+  name: string;
+  description: string;
+  logoUrl?: string;
+  link: string;
+  category: 'Poradna' | 'Advokát' | 'Psycholog' | 'Mediátor' | 'Ostatní';
+  region: string;
+  isRecommended: boolean;
+  showOnMainPage: boolean;
+  createdAt: string;
+}
+
+
 

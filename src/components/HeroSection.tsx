@@ -18,14 +18,16 @@ import {
   AlertTriangle
 } from 'lucide-react';
 import fatherAndChildHero from '../assets/images/father_and_child_hero_1783886957826.jpg';
+import { Partner } from '../types';
 
 interface HeroSectionProps {
   onNavigate: (tabId: string) => void;
   onOpenAuth: () => void;
   isLoggedIn: boolean;
+  partners?: Partner[];
 }
 
-export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn }: HeroSectionProps) {
+export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn, partners = [] }: HeroSectionProps) {
   const steps = [
     { title: '1. Dohoda rodičů', desc: 'Nejšetrnější řešení pro obě strany a hlavně dítě.', status: 'Klíčový krok' },
     { title: '2. Podání návrhu', desc: 'Sepsání a odeslání návrhu k příslušnému okresnímu soudu.', status: 'Právní zahájení' },
@@ -197,6 +199,91 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn }: Hero
           </div>
         ))}
       </section>
+
+      {/* Partners section */}
+      {partners && partners.filter(p => p.showOnMainPage).length > 0 && (
+        <section className="bg-white rounded-3xl border border-slate-100 p-6 md:p-8 shadow-3xs space-y-6" id="partners-recommendation">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-base">🤝</span>
+                <span className="text-[10px] uppercase font-bold text-teal-600 tracking-wider">Ověřená spolupráce s odborníky</span>
+              </div>
+              <h3 className="text-xl font-bold text-slate-800 font-display">Doporučujeme naše partnery</h3>
+              <p className="text-slate-500 text-xs mt-1 max-w-3xl">
+                Věříme ve spolupráci s odborníky, kteří pomáhají rodičům zvládat náročné životní situace. Pokud hledáte individuální podporu, konzultaci nebo právní zastoupení, doporučujeme se obrátit na naše prověřené partnery.
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {partners
+              .filter(p => p.showOnMainPage)
+              .sort((a, b) => (b.isRecommended ? 1 : 0) - (a.isRecommended ? 1 : 0))
+              .map((partner) => (
+                <div 
+                  key={partner.id} 
+                  className={`p-5 rounded-2xl border transition-all flex flex-col justify-between ${
+                    partner.isRecommended 
+                      ? 'bg-gradient-to-br from-teal-50/20 to-white border-teal-200 shadow-3xs relative overflow-hidden' 
+                      : 'bg-slate-50/20 border-slate-100 hover:border-slate-200'
+                  }`}
+                >
+                  {partner.isRecommended && (
+                    <div className="absolute top-0 right-0 bg-teal-600 text-white text-[9px] font-bold uppercase tracking-wider px-3 py-1 rounded-bl-xl flex items-center gap-1 font-mono">
+                      <span className="text-amber-300">★</span> DOPORUČUJEME
+                    </div>
+                  )}
+
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-3">
+                      {partner.logoUrl ? (
+                        <img 
+                          src={partner.logoUrl} 
+                          alt={partner.name} 
+                          className="w-11 h-11 rounded-xl object-cover border border-slate-100 shadow-3xs shrink-0"
+                          referrerPolicy="no-referrer"
+                        />
+                      ) : (
+                        <div className="w-11 h-11 rounded-xl bg-teal-50 text-teal-700 border border-teal-100 flex items-center justify-center font-bold text-sm font-display shadow-3xs shrink-0">
+                          {partner.name.substring(0, 2).toUpperCase()}
+                        </div>
+                      )}
+
+                      <div className="space-y-0.5">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h4 className="font-extrabold text-slate-800 text-sm font-display leading-tight">{partner.name}</h4>
+                          <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200/50">
+                            {partner.category}
+                          </span>
+                        </div>
+                        <p className="text-[10px] text-slate-400">
+                          📍 Působnost: <strong className="text-slate-600 font-semibold">{partner.region}</strong>
+                        </p>
+                      </div>
+                    </div>
+
+                    <p className="text-slate-600 text-xs leading-relaxed">
+                      {partner.description}
+                    </p>
+                  </div>
+
+                  <div className="pt-4 mt-4 border-t border-slate-100/60 flex items-center justify-between">
+                    <a 
+                      href={partner.link} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 text-[11px] font-bold text-teal-700 hover:text-teal-800 bg-teal-50 hover:bg-teal-100/50 px-3.5 py-1.5 rounded-lg transition-all cursor-pointer border border-teal-100/30"
+                    >
+                      <span>Navštívit Facebook / Web</span>
+                      <span className="text-[10px]">➡</span>
+                    </a>
+                  </div>
+                </div>
+              ))}
+          </div>
+        </section>
+      )}
 
       {/* Cooperative Coparenting Focus CTA */}
       <section className="bg-gradient-to-r from-slate-800 via-slate-900 to-teal-950 text-white rounded-3xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden" id="coparenting-cta-banner">
