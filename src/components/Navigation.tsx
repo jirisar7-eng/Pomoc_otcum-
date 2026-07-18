@@ -59,25 +59,31 @@ export default function Navigation({
 }: NavigationProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
-  const [mobileExpandedSection, setMobileExpandedSection] = useState<string | null>('case');
+  const [mobileExpandedSection, setMobileExpandedSection] = useState<string | null>('about');
 
   // Unified categorized navigation structure
   const navigationSections = [
     {
+      id: 'about',
+      title: 'I. O portálu & Memento',
+      items: [
+        { id: 'memento', label: 'Základní pilíř & Memento', icon: Flame, desc: 'Já Jiří Šár jsem zakladatel. A důvod, proč ho tvořím, je ten, aby žádný otec nemusel podstupovat boje s úřady jako já.' },
+        { id: 'stories', label: 'Kořeny mého případu', icon: History, desc: 'Osobní příběh zakladatele Jiřího Šára jako memento a zdroj inspirace.' }
+      ]
+    },
+    {
       id: 'case',
-      title: 'I. Moje strategie & případ',
+      title: 'II. Moje strategie & případ',
       items: [
         { id: 'user-portal', label: 'Moje Pracovna', icon: LayoutDashboard, desc: 'Osobní prostor pro dokumenty, checklisty a přípravu na soud.' },
-        { id: 'ai-case-manager', label: 'Strategický Asistent', icon: Briefcase, desc: 'Analýza soudních spisů a doporučení strategie v reálném čase.' },
-        { id: 'stories', label: 'Kořeny mého případu', icon: History, desc: 'Osobní příběh zakladatele jako memento a zdroj inspirace.' },
-        { id: 'memento', label: 'Základní pilíř & Memento', icon: Flame, desc: 'Anatomie systémového selhání – proč tento web vznikl a jeho memento.' }
+        { id: 'ai-case-manager', label: 'Strategický Asistent', icon: Briefcase, desc: 'Analýza soudních spisů a doporučení strategie v reálném čase.' }
       ]
     },
     {
       id: 'legal',
-      title: 'II. Právní výzbroj',
+      title: 'III. Právní výzbroj',
       items: [
-        { id: 'news', label: 'Informační báze', icon: Bell, desc: 'Vzdělávací články, novinky a aktuality ze světa rodinného práva.' },
+        { id: 'news', label: 'Informační báze', icon: Bell, desc: 'Vzdělávací články, novinky a aktuality ze sveta rodinného práva.' },
         { id: 'legal-wiki', label: 'Právní minimum', icon: Database, desc: 'Srozumitelná encyklopedie práva a klíčových právních pojmů.' },
         { id: 'judikatura', label: 'Judikatura', icon: Scale, desc: 'Přehled klíčových rozhodnutí Ústavního a Nejvyššího soudu ČR.' },
         { id: 'ke-stazeni', label: 'Vzory podání', icon: FileSpreadsheet, desc: 'Ověřené vzory žalob, návrhů a podání připravené k vyplnění.' }
@@ -85,7 +91,7 @@ export default function Navigation({
     },
     {
       id: 'process',
-      title: 'III. Proces opatrovnictví',
+      title: 'IV. Proces opatrovnictví',
       items: [
         { id: 'ai-guide', label: 'Průvodce řízením', icon: Sparkles, desc: 'Interaktivní průvodce celou cestou od rozvodu po finální dohodu.' },
         { id: 'opatrovnicka-agenda', label: 'Opatrovnická agenda', icon: Landmark, desc: 'Klíčové informace o OSPOD, soudních procesech a pravidlech výživného.' },
@@ -94,7 +100,7 @@ export default function Navigation({
     },
     {
       id: 'community',
-      title: 'IV. Komunita a pomoc',
+      title: 'V. Komunita a pomoc',
       items: [
         { id: 'coparent-hub', label: 'Rodičovský hub', icon: HeartHandshake, desc: 'Nástroje pro hladkou komunikaci a plánování s druhým rodičem.' },
         { id: 'crisis', label: 'SOS Pomoc', icon: LifeBuoy, desc: 'Okamžitá právní, psychologická a krizová pomoc v nouzi.' },

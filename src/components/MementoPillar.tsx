@@ -49,6 +49,15 @@ export default function MementoPillar() {
               Proč tento web existuje
             </span>
           </h1>
+
+          {/* Founder Personal Manifesto Callout */}
+          <div className="bg-white/5 border border-white/10 backdrop-blur-xs p-5 rounded-2xl space-y-2 mt-4">
+            <span className="text-[9px] uppercase font-bold text-rose-300 tracking-wider font-mono">Slovo zakladatele</span>
+            <p className="text-white text-xs md:text-sm leading-relaxed font-semibold italic">
+              „Já Jiří Šár jsem zakladatel. A důvod, proč tento portál tvořím, je ten, aby žádný otec nemusel podstupovat boje s úřady jako já.“
+            </p>
+          </div>
+
           <p className="text-slate-300 text-xs md:text-sm leading-relaxed text-justify font-sans">
             Tato sekce stojí zcela mimo standardní informační obsah. Je to surové memento, osobní zpověď zakladatele a faktický rozbor konkrétních rozhodnutí státního aparátu. Slouží jako hluboká reflexe reality opatrovnického procesu v České republice a je hlavním hnacím motorem pro vznik celého portálu.
           </p>
