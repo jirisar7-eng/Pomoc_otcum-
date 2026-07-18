@@ -5,7 +5,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Mail, Lock, User as UserIcon, Shield, Sparkles, LogIn } from 'lucide-react';
+import { X, Mail, Lock, User as UserIcon, Shield, Sparkles, LogIn, Copy, Check } from 'lucide-react';
 import { User, UserRole } from '../types';
 import { loginWithGoogle, registerWithEmail, loginWithEmail } from '../lib/firebase';
 
@@ -24,6 +24,13 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [copiedDomain, setCopiedDomain] = useState(false);
+
+  const handleCopyDomain = (domain: string) => {
+    navigator.clipboard.writeText(domain);
+    setCopiedDomain(true);
+    setTimeout(() => setCopiedDomain(false), 2000);
+  };
 
   if (!isOpen) return null;
 
@@ -104,14 +111,28 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
     }
   };
 
-  const setDemoUser = (type: 'mallfuriionn') => {
-    if (type === 'mallfuriionn') {
+  const setDemoUser = async (type: 'mallfuriionn') => {
+    setError('');
+    setLoading(true);
+    try {
+      const loggedInUser = await loginWithEmail('mallfuriionn@gmail.com', '1234');
+      setSuccess(true);
+      setTimeout(() => {
+        onLogin(loggedInUser);
+        setSuccess(false);
+        setLoading(false);
+        onClose();
+      }, 1000);
+    } catch (err: any) {
+      setLoading(false);
+      console.error("Demo login error:", err);
+      // Fallback: just prefill if direct login fails
       setEmail('mallfuriionn@gmail.com');
       setPassword('1234');
       setName('Hlavní Administrátor');
       setRole('admin');
+      setIsRegister(false);
     }
-    setIsRegister(false);
   };
 
   return (
@@ -167,10 +188,42 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
                   <div className="bg-rose-50 text-rose-700 p-4.5 rounded-2xl text-xs border border-rose-150 space-y-2.5" id="auth-error">
                     <p className="font-bold leading-relaxed">{error}</p>
                     {error.includes('unauthorized-domain') && (
-                      <div className="bg-white/80 p-3 rounded-xl border border-rose-100 text-slate-700 font-medium space-y-1">
-                        <span className="font-extrabold uppercase text-[9px] text-rose-600 block tracking-wider">💡 DOPORUČENÉ ŘEŠENÍ:</span>
+                      <div className="bg-white/85 p-3 rounded-xl border border-rose-100 text-slate-700 font-medium space-y-2 text-left">
+                        <span className="font-extrabold uppercase text-[9px] text-rose-600 block tracking-wider">💡 JAK TO RYCHLE OPRAVIT:</span>
                         <p className="text-[11px] leading-relaxed">
-                          Chcete-li pokračovat ihned bez nastavování Firebase, <strong>vložte e-mail a heslo do formuláře níže</strong> a klikněte na tlačítko <strong>„Vytvořit účet“</strong> nebo klikněte na černé tlačítko <strong>„Hlavní Administrátor“</strong> níže. Přihlášení e-mailem a heslem funguje bez jakéhokoliv omezování domén!
+                          1. Přejděte do své <strong>Firebase Console</strong> &rarr; <strong>Authentication</strong> &rarr; záložka <strong>Settings</strong> &rarr; <strong>Authorized Domains</strong>.
+                        </p>
+                        <p className="text-[11px] leading-relaxed">
+                          2. Klikněte na <strong>Add domain</strong> a přidejte tyto domény:
+                          <span className="flex items-center gap-1.5 mt-1">
+                            <code className="flex-1 bg-slate-100 p-1.5 rounded font-mono text-[10px] break-all text-slate-800">
+                              {window.location.hostname}
+                            </code>
+                            <button
+                              type="button"
+                              onClick={() => handleCopyDomain(window.location.hostname)}
+                              className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 rounded transition-colors"
+                              title="Zkopírovat doménu"
+                            >
+                              {copiedDomain ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                            </button>
+                          </span>
+                          <span className="flex items-center gap-1.5 mt-1">
+                            <code className="flex-1 bg-slate-100 p-1.5 rounded font-mono text-[10px] break-all text-slate-800">
+                              localhost
+                            </code>
+                            <button
+                              type="button"
+                              onClick={() => handleCopyDomain('localhost')}
+                              className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 rounded transition-colors"
+                              title="Zkopírovat"
+                            >
+                              <Copy className="w-3.5 h-3.5" />
+                            </button>
+                          </span>
+                        </p>
+                        <p className="text-[11px] leading-relaxed pt-1 border-t border-slate-100">
+                          Nebo se <strong>přihlaste klasicky e-mailem a heslem níže</strong> (např. kliknutím na černé tlačítko „Hlavní Administrátor“), což funguje okamžitě a bez nutnosti nastavování domén!
                         </p>
                       </div>
                     )}
