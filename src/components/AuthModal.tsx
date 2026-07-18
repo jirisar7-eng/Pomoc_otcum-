@@ -63,11 +63,13 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
       console.error("Auth error:", err);
       // Translate common Firebase Auth errors to human-friendly Czech
       if (err.code === 'auth/email-already-in-use') {
-        setError('Tento e-mail již používá jiný účet.');
+        setError('Tento e-mail již používá jiný účet. Přepněte se prosím níže na "Přihlášení" a zadejte heslo k tomuto účtu pro pokračování.');
       } else if (err.code === 'auth/invalid-email') {
         setError('Neplatný formát e-mailové adresy.');
       } else if (err.code === 'auth/weak-password') {
-        setError('Heslo je příliš slabé. Použijte silnější heslo.');
+        setError('Heslo je příliš slabé. Použijte silnější heslo (minimálně 6 znaků).');
+      } else if (err.code === 'auth/unauthorized-domain') {
+        setError('Tato doména (náhledová adresa) není autorizována ve vaší Firebase konzoli. Povolte prosím aktuální doménu v nastavení Firebase Console (Authentication -> Settings -> Authorized Domains) nebo použijte k přihlášení běžný e-mail a heslo níže.');
       } else if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
         setError('Nesprávný e-mail nebo heslo.');
       } else {
@@ -92,8 +94,12 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
       setSuccess(false);
       setLoading(false);
       console.error("Google Auth error:", err);
-      if (err.code !== 'auth/popup-blocked-by-user') {
-        setError('Přihlášení přes Google se nezdařilo. Zkuste to znovu.');
+      if (err.code === 'auth/unauthorized-domain') {
+        setError('Tato doména (náhledová adresa) není autorizována pro Google přihlášení ve vaší Firebase konzoli. Povolte prosím aktuální doménu v nastavení Firebase Console (Authentication -> Settings -> Authorized Domains) nebo použijte k přihlášení běžný e-mail a heslo níže.');
+      } else if (err.code === 'auth/email-already-in-use') {
+        setError('Tento Google účet je již registrován pod jiným typem přihlášení. Použijte prosím přihlášení e-mailem a heslem.');
+      } else if (err.code !== 'auth/popup-blocked-by-user') {
+        setError('Přihlášení přes Google se nezdařilo. Zkuste to znovu nebo použijte e-mail a heslo níže.');
       }
     }
   };

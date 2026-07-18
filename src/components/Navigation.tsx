@@ -76,7 +76,7 @@ export default function Navigation({
       title: 'II. Moje strategie & případ',
       items: [
         { id: 'user-portal', label: 'Moje Pracovna', icon: LayoutDashboard, desc: 'Osobní prostor pro dokumenty, checklisty a přípravu na soud.' },
-        { id: 'ai-case-manager', label: 'Strategický Asistent', icon: Briefcase, desc: 'Analýza soudních spisů a doporučení strategie v reálném čase.' }
+        { id: 'ai-case-manager', label: 'Osobní složka případu', icon: Briefcase, desc: 'Bezpečné úložiště dokumentů, časová osa a AI analýza strategie v reálném čase.' }
       ]
     },
     {
