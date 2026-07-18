@@ -58,6 +58,12 @@ import UserPortal from './components/UserPortal';
 import SitemapTimeline from './components/SitemapTimeline';
 import CareSimulator from './components/CareSimulator';
 
+// Combined structured sections and partners
+import OpatrovnickaAgenda from './components/OpatrovnickaAgenda';
+import PlanPeceODite from './components/PlanPeceODite';
+import PartnersSection from './components/PartnersSection';
+import MementoPillar from './components/MementoPillar';
+
 // High-fidelity expert educational and legal tools
 import KnihovnaStudies from './components/KnihovnaStudies';
 import VzdelavaniSection from './components/VzdelavaniSection';
@@ -202,6 +208,15 @@ export default function App() {
     });
     return () => unsubscribe();
   }, []);
+
+  // Auto-redirect legacy tabs to the new unified structure for 100% backwards compatibility
+  useEffect(() => {
+    if (['ospod', 'soudni-rizeni', 'vyzivne'].includes(activeTab)) {
+      setActiveTab('opatrovnicka-agenda');
+    } else if (['pece-o-dite', 'care-simulator'].includes(activeTab)) {
+      setActiveTab('plan-pece');
+    }
+  }, [activeTab]);
 
   // 2. Fetch data from Firestore / Supabase on initial mount
   useEffect(() => {
@@ -466,24 +481,16 @@ export default function App() {
               <AiAdmin />
             )}
 
-            {activeTab === 'ospod' && (
-              <OspodSection />
+            {activeTab === 'opatrovnicka-agenda' && (
+              <OpatrovnickaAgenda />
             )}
 
-            {activeTab === 'soudni-rizeni' && (
-              <SoudniRizeniSection />
+            {activeTab === 'plan-pece' && (
+              <PlanPeceODite currentUser={currentUser} onOpenAuth={() => setAuthModalOpen(true)} setActiveTab={setActiveTab} />
             )}
 
-            {activeTab === 'vyzivne' && (
-              <VyzivneSection />
-            )}
-
-            {activeTab === 'pece-o-dite' && (
-              <PeceODiteSection currentUser={currentUser} onOpenAuth={() => setAuthModalOpen(true)} setActiveTab={setActiveTab} />
-            )}
-
-            {activeTab === 'care-simulator' && (
-              <CareSimulator />
+            {activeTab === 'partners' && (
+              <PartnersSection partners={partners} />
             )}
 
             {activeTab === 'advice' && (
@@ -501,6 +508,10 @@ export default function App() {
                 onStorySubmitted={handleStorySubmitted}
                 externalStories={stories}
               />
+            )}
+
+            {activeTab === 'memento' && (
+              <MementoPillar />
             )}
 
             {activeTab === 'forum' && (

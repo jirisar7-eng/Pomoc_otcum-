@@ -1,0 +1,202 @@
+import React, { useState } from 'react';
+import { Partner } from '../types';
+import { Search, Share2, MapPin, ExternalLink, ShieldCheck, HeartHandshake } from 'lucide-react';
+
+interface PartnersSectionProps {
+  partners: Partner[];
+}
+
+export default function PartnersSection({ partners = [] }: PartnersSectionProps) {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+
+  const categories = [
+    { id: 'all', label: 'Všichni partneři' },
+    { id: 'Poradna', label: 'Poradny' },
+    { id: 'Advokát', label: 'Advokáti' },
+    { id: 'Psycholog', label: 'Psychologové' },
+    { id: 'Mediátor', label: 'Mediátoři' },
+    { id: 'Ostatní', label: 'Ostatní specialisté' }
+  ];
+
+  const filteredPartners = partners.filter(p => {
+    const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                          p.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          p.region.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory === 'all' || p.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8" id="partners-page-root">
+      {/* Hero Header */}
+      <div className="bg-slate-900 rounded-3xl p-6 md:p-10 text-white relative overflow-hidden border border-slate-800 shadow-xl">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-teal-500 rounded-full blur-3xl opacity-10 -translate-y-20 translate-x-20"></div>
+        <div className="relative max-w-3xl space-y-3">
+          <div className="flex items-center gap-2">
+            <HeartHandshake className="w-5 h-5 text-teal-400" />
+            <span className="text-[10px] uppercase font-bold text-teal-400 tracking-wider font-mono">Prověřená síť kontaktů</span>
+          </div>
+          <h1 className="text-2xl md:text-4xl font-black tracking-tight font-display">
+            Spolupracující partneři & odborníci
+          </h1>
+          <p className="text-slate-300 text-xs md:text-sm leading-relaxed">
+            Věříme, že v náročných opatrovnických sporech je klíčová podpora opravdových odborníků. Zde naleznete seznam našich doporučených partnerů, kteří sdílejí naše hodnoty a aktivně pomáhají tátům i mámám nalézat konsenzuální řešení s ohledem na nejlepší zájem dětí.
+          </p>
+        </div>
+      </div>
+
+      {/* Filter and Search Bar */}
+      <div className="bg-white rounded-2xl border border-slate-100 p-4 md:p-6 shadow-3xs space-y-4">
+        <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+          <div className="relative w-full md:max-w-md">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Hledat podle jména, popisu nebo kraje..."
+              className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:border-teal-500 focus:outline-hidden transition-all"
+            />
+          </div>
+          <div className="text-slate-400 text-xs font-mono">
+            Nalezeno: <strong className="text-slate-700 font-extrabold">{filteredPartners.length}</strong> specialistů
+          </div>
+        </div>
+
+        {/* Categories Chips */}
+        <div className="flex flex-wrap gap-1.5 pt-1">
+          {categories.map((cat) => (
+            <button
+              key={cat.id}
+              onClick={() => setSelectedCategory(cat.id)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer border ${
+                selectedCategory === cat.id
+                  ? 'bg-teal-600 border-teal-700 text-white shadow-3xs'
+                  : 'bg-slate-50 border-slate-200/60 text-slate-600 hover:bg-slate-100'
+              }`}
+            >
+              {cat.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Recommended Grid Title */}
+      {filteredPartners.some(p => p.isRecommended) && (
+        <div className="space-y-1">
+          <h2 className="text-base font-bold text-slate-800 font-display flex items-center gap-1.5">
+            <span className="text-amber-400">★</span> Doporučení specialisté s ověřenou praxí
+          </h2>
+          <p className="text-[11px] text-slate-400">U těchto partnerů garantujeme profesionální a lidský přístup ke klientským situacím.</p>
+        </div>
+      )}
+
+      {/* Partners Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredPartners
+          .sort((a, b) => (b.isRecommended ? 1 : 0) - (a.isRecommended ? 1 : 0))
+          .map((partner) => (
+            <div
+              key={partner.id}
+              className={`bg-white rounded-2xl border transition-all flex flex-col justify-between p-5 ${
+                partner.isRecommended
+                  ? 'border-teal-200 bg-gradient-to-br from-teal-50/10 to-white shadow-2xs relative overflow-hidden'
+                  : 'border-slate-100 hover:border-slate-200 shadow-3xs'
+              }`}
+            >
+              {partner.isRecommended && (
+                <div className="absolute top-0 right-0 bg-teal-600 text-white text-[8px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-bl-xl flex items-center gap-1 font-mono">
+                  <span>★</span> DOPORUČUJEME
+                </div>
+              )}
+
+              <div className="space-y-4">
+                <div className="flex items-start gap-3">
+                  {partner.logoUrl ? (
+                    <img
+                      src={partner.logoUrl}
+                      alt={partner.name}
+                      className="w-12 h-12 rounded-xl object-cover border border-slate-100 shadow-3xs shrink-0"
+                      referrerPolicy="no-referrer"
+                    />
+                  ) : (
+                    <div className="w-12 h-12 rounded-xl bg-teal-50 text-teal-700 border border-teal-100/50 flex items-center justify-center font-black text-sm font-display shadow-3xs shrink-0">
+                      {partner.name.substring(0, 2).toUpperCase()}
+                    </div>
+                  )}
+
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <h3 className="font-extrabold text-slate-800 text-sm font-display leading-tight">{partner.name}</h3>
+                      <span className="text-[8px] font-bold uppercase px-1.5 py-0.2 bg-slate-100 text-slate-500 border border-slate-200/50 rounded">
+                        {partner.category}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-1 text-[10px] text-slate-400">
+                      <MapPin className="w-3 h-3 text-slate-400 shrink-0" />
+                      <span>{partner.region}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <p className="text-slate-600 text-xs leading-relaxed min-h-[60px]">
+                  {partner.description}
+                </p>
+              </div>
+
+              <div className="pt-4 mt-5 border-t border-slate-100/60 flex items-center justify-between">
+                <span className="text-[9px] text-slate-400 font-mono">
+                  Přidáno: {new Date(partner.createdAt).toLocaleDateString('cs-CZ')}
+                </span>
+
+                <a
+                  href={partner.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-[11px] font-bold text-teal-700 hover:text-white bg-teal-50 hover:bg-teal-600 px-3 py-1.5 rounded-lg transition-all cursor-pointer border border-teal-100"
+                >
+                  <span>Kontaktovat</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              </div>
+            </div>
+          ))}
+
+        {filteredPartners.length === 0 && (
+          <div className="col-span-full bg-slate-50/50 rounded-2xl border border-dashed border-slate-200 p-12 text-center space-y-2">
+            <p className="text-slate-400 text-xs font-mono">
+              Žádný partner neodpovídá zvoleným filtrům.
+            </p>
+            <button
+              onClick={() => { setSearchTerm(''); setSelectedCategory('all'); }}
+              className="text-xs text-teal-600 font-bold hover:underline"
+            >
+              Resetovat filtry a hledání
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Legal Partnership Footer */}
+      <div className="bg-gradient-to-br from-slate-50 to-teal-50/20 rounded-2xl border border-slate-100 p-5 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-teal-100/60 flex items-center justify-center shrink-0">
+            <ShieldCheck className="w-5.5 h-5.5 text-teal-700" />
+          </div>
+          <div>
+            <h4 className="font-bold text-xs text-slate-800">Chcete se stát naším doporučeným partnerem?</h4>
+            <p className="text-[11px] text-slate-500 mt-0.5">Pokud poskytujete odborné poradenské nebo právní služby s orientací na rodinné právo, ozvěte se nám.</p>
+          </div>
+        </div>
+        <a
+          href="mailto:partneri@tatamapravo.cz"
+          className="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs rounded-xl transition-colors shrink-0 text-center"
+        >
+          Kontaktovat pro spolupráci
+        </a>
+      </div>
+    </div>
+  );
+}
