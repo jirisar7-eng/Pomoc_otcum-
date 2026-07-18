@@ -63,6 +63,7 @@ import OpatrovnickaAgenda from './components/OpatrovnickaAgenda';
 import PlanPeceODite from './components/PlanPeceODite';
 import PartnersSection from './components/PartnersSection';
 import MementoPillar from './components/MementoPillar';
+import IntroScreen from './components/IntroScreen';
 
 // High-fidelity expert educational and legal tools
 import KnihovnaStudies from './components/KnihovnaStudies';
@@ -78,6 +79,7 @@ export default function App() {
   const [currentUser, setCurrentUser] = useState<User | null>(() => 
     getStoredState<User | null>('current_user', null)
   );
+  const [showIntro, setShowIntro] = useState<boolean>(() => localStorage.getItem('tata_ma_pravo_hide_intro') !== 'true');
   const [activeTab, setActiveTab] = useState<string>('home');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [authModalOpen, setAuthModalOpen] = useState<boolean>(false);
@@ -377,6 +379,10 @@ export default function App() {
   const handleStorySubmitted = (newStory: ExperienceStory) => {
     setStories(prev => [newStory, ...prev]);
   };
+
+  if (showIntro) {
+    return <IntroScreen onDismiss={() => setShowIntro(false)} />;
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col justify-between selection:bg-teal-500 selection:text-white" id="synthesis-hub-app-root">
