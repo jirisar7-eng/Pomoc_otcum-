@@ -164,8 +164,16 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
             ) : (
               <div className="space-y-4">
                 {error && (
-                  <div className="bg-rose-50 text-rose-600 p-3 rounded-xl text-xs border border-rose-100" id="auth-error">
-                    {error}
+                  <div className="bg-rose-50 text-rose-700 p-4.5 rounded-2xl text-xs border border-rose-150 space-y-2.5" id="auth-error">
+                    <p className="font-bold leading-relaxed">{error}</p>
+                    {error.includes('unauthorized-domain') && (
+                      <div className="bg-white/80 p-3 rounded-xl border border-rose-100 text-slate-700 font-medium space-y-1">
+                        <span className="font-extrabold uppercase text-[9px] text-rose-600 block tracking-wider">💡 DOPORUČENÉ ŘEŠENÍ:</span>
+                        <p className="text-[11px] leading-relaxed">
+                          Chcete-li pokračovat ihned bez nastavování Firebase, <strong>vložte e-mail a heslo do formuláře níže</strong> a klikněte na tlačítko <strong>„Vytvořit účet“</strong> nebo klikněte na černé tlačítko <strong>„Hlavní Administrátor“</strong> níže. Přihlášení e-mailem a heslem funguje bez jakéhokoliv omezování domén!
+                        </p>
+                      </div>
+                    )}
                   </div>
                 )}
 

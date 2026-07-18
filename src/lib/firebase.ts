@@ -41,7 +41,9 @@ const firebaseConfig = {
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || firebaseConfigJson.messagingSenderId,
   appId: import.meta.env.VITE_FIREBASE_APP_ID || firebaseConfigJson.appId,
   firestoreDatabaseId: import.meta.env.VITE_FIREBASE_DATABASE_ID || (firebaseConfigJson as any).firestoreDatabaseId,
-  oAuthClientId: firebaseConfigJson.oAuthClientId
+  oAuthClientId: firebaseConfigJson.oAuthClientId,
+  databaseURL: (firebaseConfigJson as any).databaseURL,
+  measurementId: (firebaseConfigJson as any).measurementId
 };
 
 // Sanitize firestoreDatabaseId: a valid Firestore database ID must consist only of lowercase letters, numbers, and hyphens (up to 63 chars), or be '(default)'.
