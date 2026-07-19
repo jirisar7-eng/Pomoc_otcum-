@@ -64,6 +64,8 @@ import PlanPeceODite from './components/PlanPeceODite';
 import PartnersSection from './components/PartnersSection';
 import MementoPillar from './components/MementoPillar';
 import IntroScreen from './components/IntroScreen';
+import { useLanguage } from './lib/LanguageContext';
+import LanguageSwitcher from './components/LanguageSwitcher';
 
 // High-fidelity expert educational and legal tools
 import KnihovnaStudies from './components/KnihovnaStudies';
@@ -75,10 +77,15 @@ import LegalWiki from './components/LegalWiki';
 import AiAdmin from './components/AiAdmin';
 
 export default function App() {
+  const { t } = useLanguage();
   // Global Authentication & Navigation States
-  const [currentUser, setCurrentUser] = useState<User | null>(() => 
-    getStoredState<User | null>('current_user', null)
-  );
+  const [currentUser, setCurrentUser] = useState<User | null>(() => {
+    const user = getStoredState<User | null>('current_user', null);
+    if (user && (user.email === 'mallfuriionn@gmail.com' || user.email === 'admin@synthesis.cz')) {
+      user.role = 'admin';
+    }
+    return user;
+  });
   const [showIntro, setShowIntro] = useState<boolean>(() => localStorage.getItem('tata_ma_pravo_hide_intro') !== 'true');
   const [activeTab, setActiveTab] = useState<string>('home');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -612,35 +619,35 @@ export default function App() {
             <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <Sparkles className="w-5 h-5 text-teal-400" />
-                <span className="font-bold text-base font-display">Táta má právo</span>
+                <span className="font-bold text-base font-display">{t('brand_name', 'Táta má právo')}</span>
               </div>
               <p className="text-slate-400 text-xs leading-relaxed max-w-sm">
-                Dítě potřebuje oba rodiče. Tento web vznikl proto, aby pomohl rodičům lépe se orientovat v opatrovnických řízeních, sdílet zkušenosti a najít užitečné informace.
+                {t('brand_mission')}
               </p>
             </div>
 
             {/* Quick Links */}
             <div className="space-y-3">
-              <h4 className="text-xs uppercase font-bold tracking-wider text-slate-300">Užitečné sekce</h4>
+              <h4 className="text-xs uppercase font-bold tracking-wider text-slate-300">{t('footer_useful_sections', 'Užitečné sekce')}</h4>
               <div className="grid grid-cols-2 gap-2 text-xs text-slate-400">
-                <button onClick={() => setActiveTab('soudni-rizeni')} className="text-left hover:text-teal-400 transition-colors cursor-pointer">Soudní řízení</button>
-                <button onClick={() => setActiveTab('ke-stazeni')} className="text-left hover:text-teal-400 transition-colors cursor-pointer">Vzory podání</button>
-                <button onClick={() => setActiveTab('vyzivne')} className="text-left hover:text-teal-400 transition-colors cursor-pointer">Výpočet výživného</button>
-                <button onClick={() => setActiveTab('pece-o-dite')} className="text-left hover:text-teal-400 transition-colors cursor-pointer">Péče o dítě</button>
+                <button onClick={() => setActiveTab('opatrovnicka-agenda')} className="text-left hover:text-teal-400 transition-colors cursor-pointer">{t('nav_opatrovnicka_agenda', 'Opatrovnická agenda')}</button>
+                <button onClick={() => setActiveTab('ke-stazeni')} className="text-left hover:text-teal-400 transition-colors cursor-pointer">{t('nav_ke_stazeni', 'Vzory podání')}</button>
+                <button onClick={() => setActiveTab('plan-pece')} className="text-left hover:text-teal-400 transition-colors cursor-pointer">{t('nav_plan_pece', 'Plán péče')}</button>
+                <button onClick={() => setActiveTab('user-portal')} className="text-left hover:text-teal-400 transition-colors cursor-pointer">{t('nav_user_portal', 'Moje Pracovna')}</button>
                 <button onClick={() => { setActiveTab('sitemap'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="text-left hover:text-teal-400 font-bold text-teal-400 transition-colors cursor-pointer flex items-center gap-1 mt-1">
-                  📂 Mapa stránek & Vývoj
+                  📂 {t('btn_sitemap', 'Mapa stránek & Vývoj')}
                 </button>
                 <button onClick={() => setActiveTab('support')} className="text-left text-teal-400 hover:text-teal-300 font-bold transition-colors cursor-pointer flex items-center gap-1 mt-1">
-                  <Heart className="w-3.5 h-3.5 text-teal-400 animate-pulse" /> Podpořit chod webu
+                  <Heart className="w-3.5 h-3.5 text-teal-400 animate-pulse" /> {t('btn_support', 'Podpořit chod webu')}
                 </button>
               </div>
             </div>
 
             {/* Disclaimer & Conditions of Use */}
             <div className="space-y-3">
-              <h4 className="text-xs uppercase font-bold tracking-wider text-slate-300">Podmínky užívání & AI Prohlášení</h4>
+              <h4 className="text-xs uppercase font-bold tracking-wider text-slate-300">{t('footer_disclaimer_title', 'Podmínky užívání & AI Prohlášení')}</h4>
               <p className="text-slate-400 text-[11px] leading-relaxed">
-                Tento web je budován svépomocí za použití umělé inteligence (AI), odborných zdrojů a mých vlastních zkušeností z opatrovnických sporů. <strong>Autor není právník ani nemá právní či psychologické vzdělání.</strong> Veškeré informace a vzory dokumentů jsou pouze <strong>informačního charakteru</strong>, mohou obsahovat chyby a jejich užitím souhlasíte s tím, že autor <strong>nenese žádnou odpovědnost</strong> za případné chyby, nepřesnosti či následky jejich použití. Vždy si informace ověřte.
+                {t('footer_disclaimer_text')}
               </p>
             </div>
 
@@ -648,22 +655,23 @@ export default function App() {
 
           <div className="border-t border-slate-800 mt-8 pt-6 flex flex-col md:flex-row items-center justify-between text-[11px] text-slate-500 font-mono">
             <div>
-              © 2026 Táta má právo. Vyvinuto s nejvyšším ohledem na blaho dětí. Vytvořil Jiří Š. pod záštitou studia Synthesis.
+              {t('footer_copyright')}
             </div>
             <div className="flex flex-wrap gap-4 mt-2 md:mt-0 items-center">
+              <LanguageSwitcher />
               <button
                 onClick={() => { setActiveTab('sitemap'); window.scrollTo({top: 0, behavior: 'smooth'}); }}
                 className="text-teal-400 hover:text-teal-300 font-bold hover:underline transition-colors cursor-pointer flex items-center gap-1 mr-2"
               >
-                📂 Mapa stránek & Vývoj projektu
+                📂 {t('btn_sitemap', 'Mapa stránek & Vývoj projektu')}
               </button>
               <span className="flex items-center gap-1 text-slate-400">
                 <Shield className="w-3.5 h-3.5" />
-                RBAC aktivní
+                {t('footer_rbac', 'RBAC aktivní')}
               </span>
               <span className="flex items-center gap-1 text-slate-400">
                 <Scale className="w-3.5 h-3.5" />
-                Nestrannost garantována
+                {t('footer_neutrality', 'Nestrannost garantována')}
               </span>
             </div>
           </div>

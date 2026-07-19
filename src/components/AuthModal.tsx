@@ -5,9 +5,9 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Mail, Lock, User as UserIcon, Shield, Sparkles, LogIn, Copy, Check, ChevronDown, ChevronUp, AlertTriangle, HelpCircle } from 'lucide-react';
+import { X, Mail, Lock, User as UserIcon, Shield, Sparkles, LogIn, Copy, Check, ChevronDown, ChevronUp, AlertTriangle, HelpCircle, Eye, EyeOff, RefreshCw } from 'lucide-react';
 import { User, UserRole } from '../types';
-import { loginWithGoogle, registerWithEmail, loginWithEmail } from '../lib/firebase';
+import { loginWithGoogle, registerWithEmail, loginWithEmail, auth, linkPasswordToGoogleAccount, sendPasswordReset } from '../lib/firebase';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -26,6 +26,25 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
   const [loading, setLoading] = useState(false);
   const [copiedDomain, setCopiedDomain] = useState(false);
   const [showGoogleGuide, setShowGoogleGuide] = useState(false);
+
+  // New states for Google Login password linkage & recovery
+  const [showPasswordSetup, setShowPasswordSetup] = useState(false);
+  const [setupPassword, setSetupPassword] = useState('');
+  const [showSetupPasswordText, setShowSetupPasswordText] = useState(true);
+  const [googleUser, setGoogleUser] = useState<User | null>(null);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [resetSuccessMessage, setResetSuccessMessage] = useState('');
+
+  const generateRandomPassword = () => {
+    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
+    let length = 12;
+    let newPass = '';
+    for (let i = 0; i < length; i++) {
+      newPass += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    setSetupPassword(newPass);
+  };
 
   const handleCopyDomain = (domain: string) => {
     navigator.clipboard.writeText(domain);
@@ -91,13 +110,36 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
     setLoading(true);
     try {
       const loggedInUser = await loginWithGoogle();
-      setSuccess(true);
-      setTimeout(() => {
-        onLogin(loggedInUser);
-        setSuccess(false);
+      
+      // Check if user has an email/password credential linked
+      const currentUser = auth.currentUser;
+      const isLinkedWithPassword = currentUser?.providerData.some(p => p.providerId === 'password');
+      
+      // Let's also detect if we're in fallback environment
+      const isFallbackLocalUser = currentUser && currentUser.email === 'mallfuriionn@gmail.com';
+
+      // Bypass password linking for the admin user
+      if (isFallbackLocalUser) {
+        setSuccess(true);
+        setTimeout(() => {
+          onLogin(loggedInUser);
+          setSuccess(false);
+          setLoading(false);
+          onClose();
+        }, 1000);
+      } else if (currentUser && !isLinkedWithPassword) {
+        setGoogleUser(loggedInUser);
+        setShowPasswordSetup(true);
         setLoading(false);
-        onClose();
-      }, 1000);
+      } else {
+        setSuccess(true);
+        setTimeout(() => {
+          onLogin(loggedInUser);
+          setSuccess(false);
+          setLoading(false);
+          onClose();
+        }, 1000);
+      }
     } catch (err: any) {
       setSuccess(false);
       setLoading(false);
@@ -108,6 +150,63 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
         setError('Tento Google účet je již registrován pod jiným typem přihlášení. Použijte prosím přihlášení e-mailem a heslem.');
       } else if (err.code !== 'auth/popup-blocked-by-user') {
         setError('Přihlášení přes Google se nezdařilo. Zkuste to znovu nebo použijte e-mail a heslo níže.');
+      }
+    }
+  };
+
+  const handleSetupPasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    
+    if (!setupPassword || setupPassword.length < 6) {
+      setError('Heslo musí mít alespoň 6 znaků.');
+      return;
+    }
+    
+    setLoading(true);
+    try {
+      await linkPasswordToGoogleAccount(setupPassword);
+      setSuccess(true);
+      setTimeout(() => {
+        if (googleUser) {
+          onLogin(googleUser);
+        }
+        setSuccess(false);
+        setLoading(false);
+        setShowPasswordSetup(false);
+        onClose();
+      }, 1500);
+    } catch (err: any) {
+      setLoading(false);
+      console.error("Linking password failed:", err);
+      setError(err.message || 'Nepodařilo se propojit záložní heslo. Můžete pokračovat i bez něj, nebo to zkusit znovu.');
+    }
+  };
+
+  const handleForgotPasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setResetSuccessMessage('');
+    
+    if (!resetEmail) {
+      setError('Zadejte prosím svou e-mailovou adresu.');
+      return;
+    }
+    
+    setLoading(true);
+    try {
+      await sendPasswordReset(resetEmail);
+      setResetSuccessMessage('Odkaz pro obnovení hesla byl úspěšně odeslán na váš e-mail. Zkontrolujte prosím doručenou poštu i složku se spamem.');
+      setLoading(false);
+    } catch (err: any) {
+      setLoading(false);
+      console.error("Forgot password error:", err);
+      if (err.code === 'auth/user-not-found') {
+        setError('Uživatel s touto e-mailovou adresou nebyl nalezen.');
+      } else if (err.code === 'auth/invalid-email') {
+        setError('Neplatný formát e-mailové adresy.');
+      } else {
+        setError('Odeslání odkazu selhalo. Zkontrolujte prosím zadanou adresu.');
       }
     }
   };
@@ -161,10 +260,20 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
               <span className="text-xs font-semibold tracking-wider uppercase text-teal-200">Synthesis Hub Security</span>
             </div>
             <h3 className="text-xl font-bold font-display">
-              {isRegister ? 'Vytvoření účtu' : 'Přihlášení do systému'}
+              {showPasswordSetup 
+                ? 'Záložní heslo k účtu' 
+                : showForgotPassword 
+                  ? 'Obnovení hesla' 
+                  : isRegister 
+                    ? 'Vytvoření účtu' 
+                    : 'Přihlášení do systému'}
             </h3>
             <p className="text-teal-100 text-xs mt-1">
-              Získejte přístup k diskusnímu fóru a interaktivnímu generátoru dokumentů.
+              {showPasswordSetup 
+                ? 'Nastavte si záložní přístup pro případ ztráty Google účtu.'
+                : showForgotPassword
+                  ? 'Zadejte svůj e-mail a obdržíte odkaz k obnovení hesla.'
+                  : 'Získejte přístup k diskusnímu fóru a interaktivnímu generátoru dokumentů.'}
             </p>
           </div>
 
@@ -182,6 +291,162 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
                 </div>
                 <h4 className="text-lg font-bold text-slate-800 font-display">Ověřování proběhlo úspěšně</h4>
                 <p className="text-slate-500 text-sm mt-1">Vítejte v ekosystému Synthesis Hub.</p>
+              </div>
+            ) : showPasswordSetup ? (
+              <div className="space-y-4" id="password-setup-state">
+                {error && (
+                  <div className="bg-rose-50 text-rose-700 p-4 border border-rose-150 rounded-xl text-xs font-bold leading-relaxed">
+                    {error}
+                  </div>
+                )}
+                
+                <div className="bg-amber-50/60 border border-amber-100 p-4 rounded-xl text-xs text-amber-950 space-y-2">
+                  <div className="flex items-center gap-1.5 font-bold text-amber-900">
+                    <Shield className="w-4 h-4 text-amber-600 shrink-0" />
+                    <span>Zabezpečení účtu heslem</span>
+                  </div>
+                  <p className="leading-relaxed text-[11px]">
+                    Úspěšně jste se přihlásili přes Google! Chceme zajistit, abyste měl(a) k portálu přístup <strong>i v případě ztráty nebo odcizení vašeho Google účtu</strong>.
+                  </p>
+                  <p className="leading-relaxed text-[11px] text-slate-500">
+                    Zvolte si své vlastní heslo nebo klikněte na tlačítko pro rychlé automatické vygenerování bezpečného klíče.
+                  </p>
+                </div>
+
+                <form onSubmit={handleSetupPasswordSubmit} className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-600 mb-1.5">E-mailová adresa (z Google)</label>
+                    <div className="relative">
+                      <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                      <input
+                        type="email"
+                        disabled
+                        value={googleUser?.email || auth.currentUser?.email || ''}
+                        className="w-full pl-9 pr-4 py-2 text-sm bg-slate-100 text-slate-500 border border-slate-200 rounded-xl outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-600 mb-1.5">Záložní heslo</label>
+                    <div className="relative">
+                      <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                      <input
+                        type={showSetupPasswordText ? 'text' : 'password'}
+                        value={setupPassword}
+                        onChange={(e) => setSetupPassword(e.target.value)}
+                        placeholder="Zadejte alespoň 6 znaků"
+                        className="w-full pl-9 pr-24 py-2 text-sm bg-slate-50 hover:bg-slate-100 focus:bg-white border border-slate-200 focus:border-teal-500 rounded-xl outline-none transition-all font-mono"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowSetupPasswordText(!showSetupPasswordText)}
+                        className="absolute right-20 top-2.5 text-slate-400 hover:text-slate-600 transition-colors p-0.5 rounded cursor-pointer"
+                        title={showSetupPasswordText ? "Skrýt heslo" : "Zobrazit heslo"}
+                      >
+                        {showSetupPasswordText ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={generateRandomPassword}
+                        className="absolute right-3 top-1.5 text-slate-500 hover:text-teal-600 font-bold text-[10px] bg-slate-100 hover:bg-teal-50 border border-slate-200 hover:border-teal-200 px-1.5 py-1 rounded transition-all cursor-pointer flex items-center gap-1"
+                        title="Vygenerovat heslo"
+                      >
+                        <RefreshCw className="w-3 h-3 shrink-0" />
+                        <span>Generovat</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {setupPassword && setupPassword.length >= 6 && (
+                    <div className="bg-slate-50 p-3 rounded-xl border border-slate-150 text-[11px] text-slate-600 space-y-1">
+                      <p className="font-semibold text-slate-700">Důležité upozornění:</p>
+                      <p>Toto heslo si prosím poznačte. Pokud přístup ke Google účtu ztratíte, kliknete na přihlašovací obrazovce na <strong>"Zapomněli jste heslo?"</strong> a získáte okamžitý přístup zpět pomocí svého e-mailu a tohoto hesla.</p>
+                    </div>
+                  )}
+
+                  <div className="flex gap-3 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (googleUser) {
+                          onLogin(googleUser);
+                        }
+                        setShowPasswordSetup(false);
+                        onClose();
+                      }}
+                      className="flex-1 py-2.5 border border-slate-200 hover:bg-slate-50 text-slate-600 font-semibold text-xs rounded-xl transition-all cursor-pointer text-center"
+                    >
+                      Přeskočit (Nedoporučeno)
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={loading || !setupPassword || setupPassword.length < 6}
+                      className="flex-1 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-semibold text-xs rounded-xl shadow-xs transition-all disabled:opacity-50 cursor-pointer text-center"
+                    >
+                      {loading ? 'Propojuji...' : 'Uložit a dokončit'}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            ) : showForgotPassword ? (
+              <div className="space-y-4" id="forgot-password-state">
+                {error && (
+                  <div className="bg-rose-50 text-rose-700 p-4 border border-rose-150 rounded-xl text-xs font-bold leading-relaxed">
+                    {error}
+                  </div>
+                )}
+                {resetSuccessMessage && (
+                  <div className="bg-teal-50 text-teal-850 p-4 border border-teal-150 rounded-xl text-xs font-semibold leading-relaxed space-y-1">
+                    <p className="font-bold text-teal-900 flex items-center gap-1.5">
+                      <Check className="w-4 h-4 text-teal-600" />
+                      E-mail byl odeslán!
+                    </p>
+                    <p>{resetSuccessMessage}</p>
+                  </div>
+                )}
+
+                <p className="text-xs text-slate-500 leading-relaxed">
+                  Zadejte e-mailovou adresu spojenou s vaším účtem (ať už Google účet nebo e-mailový účet). Zašleme vám přímý odkaz, pomocí kterého si budete moci nastavit nové bezpečné heslo.
+                </p>
+
+                <form onSubmit={handleForgotPasswordSubmit} className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-600 mb-1.5">E-mailová adresa</label>
+                    <div className="relative">
+                      <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                      <input
+                        type="email"
+                        required
+                        value={resetEmail}
+                        onChange={(e) => setResetEmail(e.target.value)}
+                        placeholder="novak@synthesis.cz"
+                        className="w-full pl-9 pr-4 py-2 text-sm bg-slate-50 hover:bg-slate-100 focus:bg-white border border-slate-200 focus:border-teal-500 rounded-xl outline-none transition-all"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowForgotPassword(false);
+                        setError('');
+                        setResetSuccessMessage('');
+                      }}
+                      className="flex-1 py-2.5 border border-slate-200 hover:bg-slate-50 text-slate-600 font-semibold text-xs rounded-xl transition-all cursor-pointer text-center"
+                    >
+                      Zpět k přihlášení
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="flex-1 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-semibold text-xs rounded-xl shadow-xs transition-all disabled:opacity-50 cursor-pointer text-center"
+                    >
+                      {loading ? 'Odesílám...' : 'Odeslat odkaz'}
+                    </button>
+                  </div>
+                </form>
               </div>
             ) : (
               <div className="space-y-4">
@@ -354,6 +619,21 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
                       className="w-full pl-9 pr-4 py-2 text-sm bg-slate-50 hover:bg-slate-100 focus:bg-white border border-slate-200 focus:border-teal-500 rounded-xl outline-none transition-all"
                     />
                   </div>
+                  {!isRegister && (
+                    <div className="flex justify-end text-[11px] mt-1.5">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowForgotPassword(true);
+                          setResetEmail(email);
+                          setError('');
+                        }}
+                        className="text-slate-400 hover:text-teal-650 transition-colors font-medium cursor-pointer"
+                      >
+                        Zapomenuté heslo?
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 {isRegister && (
@@ -393,7 +673,7 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
                 <button
                   id="auth-submit-btn"
                   type="submit"
-                  className="w-full py-2.5 bg-gradient-to-r from-teal-600 to-slate-800 text-white font-semibold text-sm rounded-xl hover:from-teal-700 hover:to-slate-900 shadow-md transition-all mt-4"
+                  className="w-full py-2.5 bg-gradient-to-r from-teal-600 to-slate-800 text-white font-semibold text-sm rounded-xl hover:from-teal-700 hover:to-slate-900 shadow-md transition-all mt-4 cursor-pointer"
                 >
                   {isRegister ? 'Zaregistrovat se' : 'Přihlásit se'}
                 </button>
@@ -403,7 +683,7 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
                     id="auth-toggle-mode"
                     type="button"
                     onClick={() => setIsRegister(!isRegister)}
-                    className="text-xs text-slate-500 hover:text-teal-600 font-medium transition-colors"
+                    className="text-xs text-slate-500 hover:text-teal-600 font-medium transition-colors cursor-pointer"
                   >
                     {isRegister ? 'Máte již účet? Přihlaste se' : 'Nemáte účet? Zaregistrujte se zdarma'}
                   </button>

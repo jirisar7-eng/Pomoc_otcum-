@@ -37,6 +37,7 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { User } from '../types';
+import { useLanguage } from '../lib/LanguageContext';
 
 interface NavigationProps {
   activeTab: string;
@@ -60,52 +61,54 @@ export default function Navigation({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [mobileExpandedSection, setMobileExpandedSection] = useState<string | null>('about');
+  
+  const { t, language } = useLanguage();
 
-  // Unified categorized navigation structure
+  // Unified categorized navigation structure (Fully Localized!)
   const navigationSections = [
     {
       id: 'about',
-      title: 'I. O portálu & Memento',
+      title: t('nav_section_about', 'I. O portálu & Memento'),
       items: [
-        { id: 'memento', label: 'Základní pilíř & Memento', icon: Flame, desc: 'Já Jiří Šár jsem zakladatel. A důvod, proč ho tvořím, je ten, aby žádný otec nemusel podstupovat boje s úřady jako já.' },
-        { id: 'stories', label: 'Kořeny mého případu', icon: History, desc: 'Osobní příběh zakladatele Jiřího Šára jako memento a zdroj inspirace.' }
+        { id: 'memento', label: t('nav_memento', 'Základní pilíř & Memento'), icon: Flame, desc: t('nav_memento_desc') },
+        { id: 'stories', label: t('nav_stories', 'Kořeny mého případu'), icon: History, desc: t('nav_stories_desc') }
       ]
     },
     {
       id: 'case',
-      title: 'II. Moje strategie & případ',
+      title: t('nav_section_case', 'II. Moje strategie & případ'),
       items: [
-        { id: 'user-portal', label: 'Moje Pracovna', icon: LayoutDashboard, desc: 'Osobní prostor pro dokumenty, checklisty a přípravu na soud.' },
-        { id: 'ai-case-manager', label: 'Osobní složka případu', icon: Briefcase, desc: 'Bezpečné úložiště dokumentů, časová osa a AI analýza strategie v reálném čase.' }
+        { id: 'user-portal', label: t('nav_user_portal', 'Moje Pracovna'), icon: LayoutDashboard, desc: t('nav_user_portal_desc') },
+        { id: 'ai-case-manager', label: t('nav_ai_case_manager', 'Osobní složka případu'), icon: Briefcase, desc: t('nav_ai_case_manager_desc') }
       ]
     },
     {
       id: 'legal',
-      title: 'III. Právní výzbroj',
+      title: t('nav_section_legal', 'III. Právní výzbroj'),
       items: [
-        { id: 'news', label: 'Informační báze', icon: Bell, desc: 'Vzdělávací články, novinky a aktuality ze sveta rodinného práva.' },
-        { id: 'legal-wiki', label: 'Právní minimum', icon: Database, desc: 'Srozumitelná encyklopedie práva a klíčových právních pojmů.' },
-        { id: 'judikatura', label: 'Judikatura', icon: Scale, desc: 'Přehled klíčových rozhodnutí Ústavního a Nejvyššího soudu ČR.' },
-        { id: 'ke-stazeni', label: 'Vzory podání', icon: FileSpreadsheet, desc: 'Ověřené vzory žalob, návrhů a podání připravené k vyplnění.' }
+        { id: 'news', label: t('nav_news', 'Informační báze'), icon: Bell, desc: t('nav_news_desc') },
+        { id: 'legal-wiki', label: t('nav_legal_wiki', 'Právní minimum'), icon: Database, desc: t('nav_legal_wiki_desc') },
+        { id: 'judikatura', label: t('nav_judikatura', 'Judikatura'), icon: Scale, desc: t('nav_judikatura_desc') },
+        { id: 'ke-stazeni', label: t('nav_ke_stazeni', 'Vzory podání'), icon: FileSpreadsheet, desc: t('nav_ke_stazeni_desc') }
       ]
     },
     {
       id: 'process',
-      title: 'IV. Proces opatrovnictví',
+      title: t('nav_section_process', 'IV. Proces opatrovnictví'),
       items: [
-        { id: 'ai-guide', label: 'Průvodce řízením', icon: Sparkles, desc: 'Interaktivní průvodce celou cestou od rozvodu po finální dohodu.' },
-        { id: 'opatrovnicka-agenda', label: 'Opatrovnická agenda', icon: Landmark, desc: 'Klíčové informace o OSPOD, soudních procesech a pravidlech výživného.' },
-        { id: 'plan-pece', label: 'Plán péče o dítě', icon: Heart, desc: 'Psychologie péče o dítě a interaktivní simulátor střídání.' }
+        { id: 'ai-guide', label: t('nav_ai_guide', 'Průvodce řízením'), icon: Sparkles, desc: t('nav_ai_guide_desc') },
+        { id: 'opatrovnicka-agenda', label: t('nav_opatrovnicka_agenda', 'Opatrovnická agenda'), icon: Landmark, desc: t('nav_opatrovnicka_agenda_desc') },
+        { id: 'plan-pece', label: t('nav_plan_pece', 'Plán péče o dítě'), icon: Heart, desc: t('nav_plan_pece_desc') }
       ]
     },
     {
       id: 'community',
-      title: 'V. Komunita a pomoc',
+      title: t('nav_section_community', 'V. Komunita a pomoc'),
       items: [
-        { id: 'coparent-hub', label: 'Rodičovský hub', icon: HeartHandshake, desc: 'Nástroje pro hladkou komunikaci a plánování s druhým rodičem.' },
-        { id: 'crisis', label: 'SOS Pomoc', icon: LifeBuoy, desc: 'Okamžitá právní, psychologická a krizová pomoc v nouzi.' },
-        { id: 'forum', label: 'Diskuze', icon: MessageCircle, desc: 'Komunitní fórum pro bezpečné sdílení zkušeností s ostatními táty.' },
-        { id: 'partners', label: 'Partneři', icon: Share2, desc: 'Doporučení odborníci, rodinní poradci, psychologové a advokáti.' }
+        { id: 'coparent-hub', label: t('nav_coparent_hub_label', 'Rodičovský hub'), icon: HeartHandshake, desc: t('nav_coparent_hub_desc', 'Nástroje pro hladkou komunikaci a plánování s druhým rodičem.') },
+        { id: 'crisis', label: t('nav_contacts', 'SOS Pomoc'), icon: LifeBuoy, desc: t('nav_contacts_desc') },
+        { id: 'forum', label: t('nav_forum', 'Diskuze'), icon: MessageCircle, desc: t('nav_forum_desc') },
+        { id: 'partners', label: t('nav_partners', 'Partneři'), icon: Share2, desc: t('nav_partners_desc') }
       ]
     }
   ];
@@ -133,9 +136,15 @@ export default function Navigation({
       {/* Official Launch Top Banner */}
       <div className="bg-gradient-to-r from-teal-600 via-indigo-600 to-slate-900 text-white text-[11px] font-mono py-2.5 px-4 text-center flex flex-wrap items-center justify-center gap-x-2 gap-y-1 font-semibold border-b border-teal-500/10">
         <Sparkles className="w-3.5 h-3.5 text-teal-300 animate-pulse shrink-0" />
-        <span>Oficiální spuštění alfa verze <strong>0.0.1.2</strong> portálu Táta má právo! 🚀</span>
+        <span>{t('hero_welcome')}</span>
         <span className="hidden md:inline text-teal-200">•</span>
-        <span className="hidden md:inline text-[10px] text-teal-100 font-sans">Uživatelská navigace byla kompletně restrukturalizována do intuitivních sekcí podle cesty uživatele.</span>
+        <span className="hidden md:inline text-[10px] text-teal-100 font-sans">
+          {language === 'sk' 
+            ? 'Užívateľská navigácia bola kompletne reštrukturalizovaná do intuitívnych sekcií podľa cesty užívateľa.' 
+            : language === 'en'
+            ? 'User navigation was completely restructured into intuitive sections based on user journey.'
+            : 'Uživatelská navigace byla kompletně restrukturalizována do intuitivních sekcí podle cesty uživatele.'}
+        </span>
       </div>
 
       <header className="sticky top-0 z-40 bg-white border-b border-slate-100 shadow-xs">
@@ -148,10 +157,20 @@ export default function Navigation({
                 <Sparkles className="w-5.5 h-5.5 text-teal-300" />
               </div>
               <div>
-                <span className="font-bold text-slate-800 text-base tracking-tight font-display flex items-center gap-1 leading-none">
-                  Táta má <span className="text-teal-600">právo</span>
-                </span>
-                <span className="text-[9px] text-slate-400 block mt-1 font-mono tracking-wider uppercase font-medium">Průvodce Opatrovnictvím</span>
+                {language === 'sk' ? (
+                  <span className="font-bold text-slate-800 text-base tracking-tight font-display flex items-center gap-1 leading-none">
+                    Otec má <span className="text-teal-600">právo</span>
+                  </span>
+                ) : language === 'en' ? (
+                  <span className="font-bold text-slate-800 text-base tracking-tight font-display flex items-center gap-1 leading-none">
+                    Father Has <span className="text-teal-600">Rights</span>
+                  </span>
+                ) : (
+                  <span className="font-bold text-slate-800 text-base tracking-tight font-display flex items-center gap-1 leading-none">
+                    Táta má <span className="text-teal-600">právo</span>
+                  </span>
+                )}
+                <span className="text-[9px] text-slate-400 block mt-1 font-mono tracking-wider uppercase font-medium">{t('brand_subtitle')}</span>
               </div>
             </div>
 
@@ -167,7 +186,7 @@ export default function Navigation({
                 }`}
               >
                 <Home className="w-3.5 h-3.5" />
-                Domů
+                {t('nav_home')}
               </button>
 
               {/* Grouped Categories as Dropdowns */}
@@ -280,7 +299,7 @@ export default function Navigation({
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Hledat..."
+                  placeholder={t('search_placeholder', 'Vyhledat v obsahu...')}
                   className="w-36 focus:w-44 pl-8 pr-7 py-1.5 bg-slate-50 hover:bg-slate-100 focus:bg-white border border-slate-200 focus:border-teal-500 rounded-xl text-xs outline-none transition-all placeholder:text-slate-400"
                 />
                 {searchQuery && (
@@ -299,7 +318,7 @@ export default function Navigation({
                 className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 font-bold text-[11px] rounded-xl transition-all cursor-pointer shadow-3xs"
               >
                 <BookOpen className="w-3.5 h-3.5 text-teal-600" />
-                Slovník
+                {t('glossary_btn', 'Slovník')}
               </button>
 
               {/* Srdíčkové tlačítko Podpořit */}
@@ -312,7 +331,7 @@ export default function Navigation({
                 }`}
               >
                 <Heart className={`w-3.5 h-3.5 text-teal-600 ${activeTab === 'support' ? '' : 'animate-pulse'}`} />
-                Podpořit web
+                {t('btn_support', 'Podpořit web')}
               </button>
 
               {/* Authentication Buttons */}
@@ -326,14 +345,14 @@ export default function Navigation({
                   <div className="flex flex-col text-left">
                     <span className="text-[10px] font-semibold text-slate-700 max-w-[70px] truncate leading-tight">{currentUser.name}</span>
                     <span className={`text-[7px] font-bold uppercase tracking-wider ${currentUser.role === 'admin' ? 'text-indigo-600' : 'text-teal-600'} leading-none`}>
-                      {currentUser.role === 'admin' ? 'Správce' : 'Rodič'}
+                      {currentUser.role === 'admin' ? t('role_admin', 'Správce') : t('role_parent', 'Rodič')}
                     </span>
                   </div>
                   <button 
                     id="logout-btn"
                     onClick={onLogout}
                     className="text-slate-400 hover:text-rose-600 p-1 hover:bg-rose-50 rounded-full transition-colors ml-1"
-                    title="Odhlásit se"
+                    title={t('btn_logout', 'Odhlásit se')}
                   >
                     <LogOut className="w-3 h-3" />
                   </button>
@@ -345,7 +364,7 @@ export default function Navigation({
                   className="flex items-center gap-1 px-3 py-1.5 bg-slate-800 hover:bg-slate-900 text-white font-semibold text-[11px] rounded-xl shadow-xs hover:shadow-md transition-all cursor-pointer"
                 >
                   <LogIn className="w-3 h-3 text-teal-300" />
-                  Přihlásit se
+                  {t('btn_login', 'Přihlásit se')}
                 </button>
               )}
             </div>
@@ -374,7 +393,7 @@ export default function Navigation({
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Vyhledat v obsahu..."
+                placeholder={t('search_placeholder', 'Vyhledat v obsahu...')}
                 className="w-full pl-9 pr-4 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-teal-500 focus:bg-white transition-all"
               />
             </div>
@@ -387,7 +406,7 @@ export default function Navigation({
               }`}
             >
               <Home className="w-4 h-4 text-slate-400" />
-              Domů
+              {t('nav_home')}
             </button>
 
             {/* Accordion Categories */}
