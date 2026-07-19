@@ -214,7 +214,7 @@ app.get('/api/health', (req, res) => {
 });
 
 // Secure API Proxy for Synthesis AI Assistant
-app.post('/api/gemini/chat', async (req, res) => {
+app.post(['/api/gemini/chat', '/api/chat'], async (req, res) => {
   try {
     const { prompt, history } = req.body;
 
