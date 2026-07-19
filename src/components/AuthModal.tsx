@@ -5,7 +5,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Mail, Lock, User as UserIcon, Shield, Sparkles, LogIn, Copy, Check } from 'lucide-react';
+import { X, Mail, Lock, User as UserIcon, Shield, Sparkles, LogIn, Copy, Check, ChevronDown, ChevronUp, AlertTriangle, HelpCircle } from 'lucide-react';
 import { User, UserRole } from '../types';
 import { loginWithGoogle, registerWithEmail, loginWithEmail } from '../lib/firebase';
 
@@ -25,6 +25,7 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const [copiedDomain, setCopiedDomain] = useState(false);
+  const [showGoogleGuide, setShowGoogleGuide] = useState(false);
 
   const handleCopyDomain = (domain: string) => {
     navigator.clipboard.writeText(domain);
@@ -246,6 +247,44 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
                   </svg>
                   Bezpečné přihlášení přes Google
                 </button>
+
+                {/* Google Verification Notice & Guide */}
+                <div id="google-verification-notice" className="bg-slate-50 border border-slate-150 rounded-xl p-3 text-xs">
+                  <button
+                    type="button"
+                    onClick={() => setShowGoogleGuide(!showGoogleGuide)}
+                    className="flex items-center justify-between w-full text-slate-700 hover:text-slate-900 font-bold transition-colors cursor-pointer text-left"
+                  >
+                    <div className="flex items-center gap-2">
+                      <HelpCircle className="w-4 h-4 text-teal-600 shrink-0" />
+                      <span>Návod: Jak projít varováním Google?</span>
+                    </div>
+                    {showGoogleGuide ? <ChevronUp className="w-4 h-4 text-slate-500" /> : <ChevronDown className="w-4 h-4 text-slate-500" />}
+                  </button>
+
+                  {showGoogleGuide && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      className="mt-2.5 pt-2.5 border-t border-slate-200 text-slate-600 space-y-2.5 text-[11px] leading-relaxed"
+                    >
+                      <div className="flex items-start gap-1.5 bg-amber-50 border border-amber-100 text-amber-900 p-2 rounded-lg font-medium">
+                        <AlertTriangle className="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" />
+                        <p>
+                          <strong>Aplikace je 100% bezpečná.</strong> Autor portálu (mallfuriionn@gmail.com) pouze není veden na Google Play jako placený vývojář a neprošel drahým korporátním ověřením.
+                        </p>
+                      </div>
+                      
+                      <p className="font-semibold text-slate-700">Jak se přihlásit (krok za krokem):</p>
+                      <ol className="list-decimal pl-4 space-y-1.5 text-slate-650">
+                        <li>Po kliknutí na tlačítko výše se otevře přihlašovací okno Google.</li>
+                        <li>Na varovné obrazovce <em>„Google tuto aplikaci neověřil“</em> klikněte vlevo dole na nenápadný odkaz <strong>Rozšířené možnosti</strong> (nebo <em>Advanced</em>).</li>
+                        <li>Poté klikněte na odkaz dole: <strong>Přejít na web pomocotcum.firebaseapp.com (nebezpečné)</strong> / <em>Go to pomocotcum.firebaseapp.com (unsafe)</em>.</li>
+                        <li>Klikněte na <strong>Pokračovat</strong> (Continue) pro bezpečné dokončení registrace do našeho systému.</li>
+                      </ol>
+                    </motion.div>
+                  )}
+                </div>
 
                 <div className="relative flex py-2 items-center">
                   <div className="flex-grow border-t border-slate-150"></div>
