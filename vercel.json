@@ -6,18 +6,17 @@
       "use": "@vercel/node"
     }
   ],
-  "rewrites": [
+  "routes": [
     {
-      "source": "/api/chat",
-      "destination": "/server.ts"
+      "src": "/api/(.*)",
+      "dest": "/server.ts"
     },
     {
-      "source": "/api/:path*",
-      "destination": "/server.ts"
+      "handle": "filesystem"
     },
     {
-      "source": "/(.*)",
-      "destination": "/dist/$1"
+      "src": "/(.*)",
+      "dest": "/index.html"
     }
   ]
 }
