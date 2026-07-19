@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { BookOpen, GraduationCap, Play, CheckCircle2, Award, ArrowRight, HelpCircle, AlertTriangle, Check, X, RefreshCw } from 'lucide-react';
+import { useLanguage } from '../lib/LanguageContext';
+import { getTranslatedObject } from '../data/dynamicTranslations';
 
 interface Course {
   id: string;
@@ -20,7 +22,7 @@ interface Question {
   explanation: string;
 }
 
-const COURSES: Course[] = [
+const COURSES_RAW: Course[] = [
   {
     id: 'course-1',
     title: 'Komunikační detox: Jak komunikovat s ex-partnerem bez konfliktů',
@@ -65,7 +67,7 @@ const COURSES: Course[] = [
   }
 ];
 
-const QUIZ_QUESTIONS: Question[] = [
+const QUIZ_QUESTIONS_RAW: Question[] = [
   {
     id: 1,
     text: 'Jaká je role kolizního opatrovníka (OSPOD) u soudu?',
@@ -117,6 +119,10 @@ const QUIZ_QUESTIONS: Question[] = [
 ];
 
 export default function VzdelavaniSection() {
+  const { language } = useLanguage();
+  const COURSES = COURSES_RAW.map(course => getTranslatedObject(course.id, course, language));
+  const QUIZ_QUESTIONS = QUIZ_QUESTIONS_RAW.map(q => getTranslatedObject(`quiz-${q.id}`, q, language));
+
   const [activeCourse, setActiveCourse] = useState<string | null>(null);
   const [completedLessons, setCompletedLessons] = useState<string[]>([]);
   

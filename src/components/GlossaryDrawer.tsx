@@ -17,6 +17,8 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { DICTIONARY_TERMS, DictionaryTerm } from '../data/dictionary';
+import { useLanguage } from '../lib/LanguageContext';
+import { getTranslatedObject } from '../data/dynamicTranslations';
 
 interface GlossaryDrawerProps {
   isOpen: boolean;
@@ -25,17 +27,37 @@ interface GlossaryDrawerProps {
 }
 
 export default function GlossaryDrawer({ isOpen, onClose, initialTermId }: GlossaryDrawerProps) {
+  const { language } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTerm, setSelectedTerm] = useState<DictionaryTerm | null>(null);
 
+  // Localized dictionary terms
+  const LOCALIZED_DICTIONARY_TERMS = React.useMemo<Record<string, DictionaryTerm>>(() => {
+    const res: Record<string, DictionaryTerm> = {};
+    for (const [key, val] of Object.entries(DICTIONARY_TERMS)) {
+      res[key] = getTranslatedObject(`dict-${key}`, val as DictionaryTerm, language);
+    }
+    return res;
+  }, [language]);
+
   // Set the selected term when initialTermId changes
   useEffect(() => {
-    if (initialTermId && DICTIONARY_TERMS[initialTermId.toLowerCase()]) {
-      setSelectedTerm(DICTIONARY_TERMS[initialTermId.toLowerCase()]);
-    } else if (!selectedTerm && Object.keys(DICTIONARY_TERMS).length > 0) {
-      setSelectedTerm(DICTIONARY_TERMS[Object.keys(DICTIONARY_TERMS)[0]]);
+    if (initialTermId && LOCALIZED_DICTIONARY_TERMS[initialTermId.toLowerCase()]) {
+      setSelectedTerm(LOCALIZED_DICTIONARY_TERMS[initialTermId.toLowerCase()]);
+    } else if (!selectedTerm && Object.keys(LOCALIZED_DICTIONARY_TERMS).length > 0) {
+      setSelectedTerm(LOCALIZED_DICTIONARY_TERMS[Object.keys(LOCALIZED_DICTIONARY_TERMS)[0]]);
     }
-  }, [initialTermId]);
+  }, [initialTermId, LOCALIZED_DICTIONARY_TERMS]);
+
+  // Sync selected term when language changes
+  useEffect(() => {
+    if (selectedTerm) {
+      const updated = LOCALIZED_DICTIONARY_TERMS[selectedTerm.id];
+      if (updated) {
+        setSelectedTerm(updated);
+      }
+    }
+  }, [language, LOCALIZED_DICTIONARY_TERMS]);
 
   // Handle ESC key to close
   useEffect(() => {
@@ -60,7 +82,7 @@ export default function GlossaryDrawer({ isOpen, onClose, initialTermId }: Gloss
     };
   }, [isOpen]);
 
-  const terms = Object.values(DICTIONARY_TERMS);
+  const terms: DictionaryTerm[] = Object.values(LOCALIZED_DICTIONARY_TERMS);
   
   const filteredTerms = terms.filter(item => {
     const query = searchQuery.toLowerCase();

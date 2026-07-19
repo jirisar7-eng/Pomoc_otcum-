@@ -25,6 +25,8 @@ import {
 import { Article, Comment, User } from '../types';
 import { INITIAL_ARTICLES, INITIAL_COMMENTS } from '../initialState';
 import { formatRichText } from '../utils';
+import { useLanguage } from '../lib/LanguageContext';
+import { getTranslatedObject } from '../data/dynamicTranslations';
 
 interface NewsSectionProps {
   searchQuery: string;
@@ -33,6 +35,12 @@ interface NewsSectionProps {
 }
 
 export default function NewsSection({ searchQuery: globalSearchQuery, currentUser, externalArticles }: NewsSectionProps) {
+  const { language } = useLanguage();
+
+  const translatedArticles = useMemo(() => {
+    return externalArticles.map(art => getTranslatedObject(art.id, art, language));
+  }, [externalArticles, language]);
+
   const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null);
   const [comments, setComments] = useState<Comment[]>(INITIAL_COMMENTS);
   const [newCommentText, setNewCommentText] = useState('');
@@ -42,11 +50,11 @@ export default function NewsSection({ searchQuery: globalSearchQuery, currentUse
   const [commentError, setCommentError] = useState('');
 
   const activeArticle = useMemo(() => {
-    return externalArticles.find(art => art.id === selectedArticleId) || null;
-  }, [externalArticles, selectedArticleId]);
+    return translatedArticles.find(art => art.id === selectedArticleId) || null;
+  }, [translatedArticles, selectedArticleId]);
 
   const filteredArticles = useMemo(() => {
-    return externalArticles.filter(art => {
+    return translatedArticles.filter(art => {
       const q = globalSearchQuery.toLowerCase();
       return (
         art.title.toLowerCase().includes(q) ||
@@ -55,7 +63,7 @@ export default function NewsSection({ searchQuery: globalSearchQuery, currentUse
         art.category.toLowerCase().includes(q)
       );
     });
-  }, [externalArticles, globalSearchQuery]);
+  }, [translatedArticles, globalSearchQuery]);
 
   const activeComments = useMemo(() => {
     if (!selectedArticleId) return [];

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { BookOpen, Search, Filter, Copy, Check, Download, Bookmark, BookmarkCheck, ArrowUpRight, Share2, Quote } from 'lucide-react';
+import { useLanguage } from '../lib/LanguageContext';
+import { getTranslatedObject } from '../data/dynamicTranslations';
 
 interface Study {
   id: string;
@@ -84,6 +86,7 @@ const EXPERT_STUDIES: Study[] = [
 ];
 
 export default function KnihovnaStudies() {
+  const { language } = useLanguage();
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [savedStudies, setSavedStudies] = useState<string[]>([]);
@@ -120,7 +123,9 @@ export default function KnihovnaStudies() {
     setTimeout(() => setCopiedId(null), 3000);
   };
 
-  const filtered = EXPERT_STUDIES.filter(study => {
+  const translatedStudies = EXPERT_STUDIES.map(study => getTranslatedObject(study.id, study, language));
+
+  const filtered = translatedStudies.filter(study => {
     const matchesSearch = study.title.toLowerCase().includes(search.toLowerCase()) ||
                           study.authors.toLowerCase().includes(search.toLowerCase()) ||
                           study.summary.toLowerCase().includes(search.toLowerCase());

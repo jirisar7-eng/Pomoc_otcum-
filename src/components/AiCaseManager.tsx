@@ -175,6 +175,52 @@ export default function AiCaseManager({ currentUser, onOpenAuth }: AiCaseManager
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisProgress, setAnalysisProgress] = useState(0);
   const [analysisReport, setAnalysisReport] = useState<any | null>(() => getStoredData('analysis_report', null));
+  const [isGeneratingDescription, setIsGeneratingDescription] = useState(false);
+
+  const generateAutoDescription = async (fileName: string, type: string) => {
+    setIsGeneratingDescription(true);
+    setNewDocNote('Generování automatického popisu a výtahu...');
+    try {
+      const response = await fetch('/api/ai-admin/execute', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          action: 'DESCRIBE_FILE',
+          params: {
+            fileName,
+            type
+          }
+        })
+      });
+      const resJson = await response.json();
+      if (resJson.success && resJson.data) {
+        const { description, extract } = resJson.data;
+        setNewDocNote(`${description}\n\n${extract}`);
+      } else {
+        throw new Error('Chyba při komunikaci s AI.');
+      }
+    } catch (err) {
+      console.warn('Failed to generate description, applying client fallback...', err);
+      const typeLabel = 
+        type === 'petition' ? 'Soudní žaloba / návrh' :
+        type === 'appeal' ? 'Odvolání / vyjádření' :
+        type === 'ospod' ? 'Zpráva OSPOD' :
+        type === 'email' ? 'E-mailová komunikace' :
+        type === 'evidence' ? 'Důkazní materiál / SMS' : 'Dokument';
+      setNewDocNote(`Dokument "${fileName}" (typ: ${typeLabel}) byl úspěšně nahrán do osobní složky.\n\n• Klíčový dopad: Listina prokazuje podstatné skutečnosti pro řízení.\n• Doporučený krok: Spusťte AI analýzu strategie.`);
+    } finally {
+      setIsGeneratingDescription(false);
+    }
+  };
+
+  const handleDocTypeChange = (type: CaseDocument['type']) => {
+    setNewDocType(type);
+    if (newDocName) {
+      generateAutoDescription(newDocName, type);
+    }
+  };
 
   // Dynamic remaining days calculator helper
   useEffect(() => {
@@ -215,6 +261,7 @@ export default function AiCaseManager({ currentUser, onOpenAuth }: AiCaseManager
       // Clean up file name extension for prettier display
       const cleanName = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
       setNewDocName(cleanName);
+      generateAutoDescription(cleanName, newDocType);
     }
   };
 
@@ -224,6 +271,7 @@ export default function AiCaseManager({ currentUser, onOpenAuth }: AiCaseManager
       setSelectedFile(file);
       const cleanName = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
       setNewDocName(cleanName);
+      generateAutoDescription(cleanName, newDocType);
     }
   };
 
@@ -562,7 +610,7 @@ export default function AiCaseManager({ currentUser, onOpenAuth }: AiCaseManager
                   <label className="text-[10px] font-bold font-mono text-slate-400 uppercase">Typ záznamu:</label>
                   <select
                     value={newDocType}
-                    onChange={(e) => setNewDocType(e.target.value as any)}
+                    onChange={(e) => handleDocTypeChange(e.target.value as any)}
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none font-medium cursor-pointer"
                   >
                     <option value="petition">Soudní žaloba / návrh</option>
@@ -585,12 +633,20 @@ export default function AiCaseManager({ currentUser, onOpenAuth }: AiCaseManager
               </div>
 
               <div className="space-y-1">
-                <label className="text-[10px] font-bold font-mono text-slate-400 uppercase">Poznámka / shrnutí klíčových informací:</label>
+                <div className="flex justify-between items-center">
+                  <label className="text-[10px] font-bold font-mono text-slate-400 uppercase">Poznámka / shrnutí klíčových informací:</label>
+                  {isGeneratingDescription && (
+                    <span className="text-[10px] text-teal-600 font-bold animate-pulse flex items-center gap-1 font-mono">
+                      <Sparkles className="w-3 h-3 text-teal-500 animate-spin" />
+                      AI popisuje soubor...
+                    </span>
+                  )}
+                </div>
                 <textarea
                   value={newDocNote}
                   onChange={(e) => setNewDocNote(e.target.value)}
-                  placeholder="Zde popište hlavní sdělení nebo přetáhněte klíčový text z dokumentu..."
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 focus:border-teal-500 focus:bg-white rounded-xl text-xs outline-none min-h-[75px] transition-all"
+                  placeholder="Zde se automaticky vygeneruje stručný popis a klíčové dopady doloženého dokumentu..."
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 focus:border-teal-500 focus:bg-white rounded-xl text-xs outline-none min-h-[110px] transition-all"
                 />
               </div>
 

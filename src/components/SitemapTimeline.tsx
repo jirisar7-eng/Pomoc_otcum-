@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
+import { useLanguage } from '../lib/LanguageContext';
+import { translateText } from '../data/dynamicTranslations';
 import { 
   Map, 
   Clock, 
@@ -43,11 +45,12 @@ interface TimelineEvent {
 }
 
 export default function SitemapTimeline({ setActiveTab, onOpenGlossary, currentUser }: SitemapTimelineProps) {
+  const { language } = useLanguage();
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const [expandedEvent, setExpandedEvent] = useState<number | null>(null);
 
   // Timeline events representing history from koncept in early 2025/2026 to current July 2026 and future 2026+
-  const timelineEvents: TimelineEvent[] = [
+  const timelineEventsRaw: TimelineEvent[] = [
     {
       date: 'Leden 2026',
       title: 'Zrození myšlenky & Návrh Synthesis OS',
@@ -142,12 +145,24 @@ export default function SitemapTimeline({ setActiveTab, onOpenGlossary, currentU
     }
   ];
 
+  // Dynamic localized timeline events
+  const timelineEvents = React.useMemo(() => {
+    return timelineEventsRaw.map(event => ({
+      ...event,
+      date: translateText(event.date, language),
+      title: translateText(event.title, language),
+      description: translateText(event.description, language),
+      details: event.details.map(d => translateText(d, language)),
+      techStack: event.techStack?.map(t => translateText(t, language))
+    }));
+  }, [timelineEventsRaw, language]);
+
   const categories = [
-    { id: 'all', label: 'Všechny události' },
-    { id: 'Právní/Obsah', label: 'Právní & Obsah' },
-    { id: 'Vlastní vývoj', label: 'Technický Vývoj' },
-    { id: 'AI & Integrace', label: 'AI & Integrace' },
-    { id: 'Komunita', label: 'Komunita & Lidé' }
+    { id: 'all', label: translateText('Všechny události', language) },
+    { id: 'Právní/Obsah', label: translateText('Právní & Obsah', language) },
+    { id: 'Vlastní vývoj', label: translateText('Technický Vývoj', language) },
+    { id: 'AI & Integrace', label: translateText('AI & Integrace', language) },
+    { id: 'Komunita', label: translateText('Komunita & Lidé', language) }
   ];
 
   const filteredEvents = filterCategory === 'all' 
@@ -155,7 +170,7 @@ export default function SitemapTimeline({ setActiveTab, onOpenGlossary, currentU
     : timelineEvents.filter(e => e.category === filterCategory);
 
   // Categories for sitemap representation with precise development statuses and phase details
-  const sitemapSections = [
+  const sitemapSectionsRaw = [
     {
       title: 'Opatrovnický Průvodce',
       description: 'Odborné a praktické sekce s návody a postupy',
@@ -310,6 +325,16 @@ export default function SitemapTimeline({ setActiveTab, onOpenGlossary, currentU
           version: 'V1.1'
         },
         { 
+          name: 'Osobní složka případu & AI Strategický asistent', 
+          tab: 'user-portal', 
+          desc: 'Plně funkční modul s integrací Gemini 3.5/2.5 Flash pro sémantický popis doložených dokumentů, automatický výtah a typování poznámek.', 
+          icon: <Cpu className="w-3.5 h-3.5 text-indigo-500" />,
+          highlight: true,
+          status: 'stable',
+          statusLabel: 'Plně funkční',
+          version: 'V1.5'
+        },
+        { 
           name: 'Podpořit projekt (Dary)', 
           tab: 'support', 
           desc: 'Integrovaný transparentní panel se seznamem sponzorů a možností podpory.', 
@@ -333,40 +358,55 @@ export default function SitemapTimeline({ setActiveTab, onOpenGlossary, currentU
           desc: 'Průvodce sestavením bezchybného podání nebo odvolání s kontrolou náležitostí.', 
           icon: <FileText className="w-3.5 h-3.5 text-indigo-600" />, 
           highlight: true,
-          status: 'beta',
-          statusLabel: 'Beta testování',
-          version: 'V0.8'
+          status: 'stable',
+          statusLabel: 'Plně funkční',
+          version: 'V1.2'
         },
         { 
           name: 'Případová Databáze rozsudků', 
           tab: 'pripadova-databaze', 
           desc: 'Katalog precedenčních rozsudků seřazených podle taktiky a věku dětí.', 
           icon: <Scale className="w-3.5 h-3.5 text-teal-600" />,
-          status: 'integration',
-          statusLabel: 'V integraci',
-          version: 'V0.7'
+          status: 'stable',
+          statusLabel: 'Plně funkční',
+          version: 'V1.1'
         },
         { 
           name: 'Knihovna vědeckých studií', 
           tab: 'knihovna-studii', 
           desc: 'Kompletní argumentační zdroje z oborů psychologie, lékařství a sociologie.', 
           icon: <BookOpen className="w-3.5 h-3.5 text-indigo-600" />,
-          status: 'beta',
-          statusLabel: 'Beta testování',
-          version: 'V0.8'
+          status: 'stable',
+          statusLabel: 'Plně funkční',
+          version: 'V1.1'
         },
         { 
           name: 'Akademie tátů (Právní kvízy)', 
           tab: 'vzdelavani', 
           desc: 'Edukační kvízy a zátěžové scénáře pro nácvik verbální obhajoby u soudu.', 
           icon: <Sliders className="w-3.5 h-3.5 text-emerald-600" />,
-          status: 'beta',
-          statusLabel: 'Beta testování',
-          version: 'V0.9'
+          status: 'stable',
+          statusLabel: 'Plně funkční',
+          version: 'V1.2'
         }
       ]
     }
   ];
+
+  // Dynamic localized sitemap sections
+  const sitemapSections = React.useMemo(() => {
+    return sitemapSectionsRaw.map(section => ({
+      ...section,
+      title: translateText(section.title, language),
+      description: translateText(section.description, language),
+      items: section.items.map(item => ({
+        ...item,
+        name: translateText(item.name, language),
+        desc: translateText(item.desc, language),
+        statusLabel: translateText(item.statusLabel, language)
+      }))
+    }));
+  }, [sitemapSectionsRaw, language]);
 
   const getStatusBadgeClass = (status?: string) => {
     switch (status) {
@@ -393,13 +433,13 @@ export default function SitemapTimeline({ setActiveTab, onOpenGlossary, currentU
         <div className="relative max-w-2xl space-y-4">
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-slate-800/80 border border-slate-700/50 rounded-full text-xs font-mono text-teal-400">
             <Map className="w-3.5 h-3.5" />
-            <span>Mapa Portálu & Časová Osa</span>
+            <span>{translateText('Mapa Portálu & Časová Osa', language)}</span>
           </div>
           <h1 className="text-2xl md:text-4xl font-extrabold tracking-tight font-display text-white">
-            Architektura & Vývoj Synthesis OS
+            {translateText('Architektura & Vývoj Synthesis OS', language)}
           </h1>
           <p className="text-slate-300 text-xs md:text-sm leading-relaxed">
-            Vítejte v technologickém zázemí portálu <strong>Táta má právo</strong>. Tato speciální skrytá sekce (přístupná pouze z paty webu) slouží jako transparentní sitemap rozcestník a časový deník (Roadmap) celého projektu od počátečních vizí po nasazení autonomních AI systémů.
+            {translateText('Vítejte v technologickém zázemí portálu Táta má právo. Tato speciální skrytá sekce (přístupná pouze z paty webu) slouží jako transparentní sitemap rozcestník a časový deník (Roadmap) celého projektu od počátečních vizí po nasazení autonomních AI systémů.', language)}
           </p>
           
           <div className="pt-2 flex flex-wrap gap-3">
@@ -411,7 +451,7 @@ export default function SitemapTimeline({ setActiveTab, onOpenGlossary, currentU
               className="px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-teal-900/20 cursor-pointer transition-all flex items-center gap-1.5"
             >
               <Compass className="w-4 h-4" />
-              Sitemap Portálu
+              {translateText('Sitemap Portálu', language)}
             </button>
             <button
               onClick={() => {
@@ -421,7 +461,7 @@ export default function SitemapTimeline({ setActiveTab, onOpenGlossary, currentU
               className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700/80 font-bold text-xs rounded-xl cursor-pointer transition-all flex items-center gap-1.5"
             >
               <Clock className="w-4 h-4 text-slate-400" />
-              Časová osa vývoje
+              {translateText('Časová osa vývoje', language)}
             </button>
           </div>
         </div>
@@ -432,18 +472,18 @@ export default function SitemapTimeline({ setActiveTab, onOpenGlossary, currentU
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200/50 pb-4">
           <div className="space-y-1">
             <span className="text-[10px] bg-indigo-100 text-indigo-800 font-extrabold uppercase px-2.5 py-0.5 rounded-full tracking-wider font-mono">
-              Systémový audit
+              {translateText('Systémový audit', language)}
             </span>
             <h3 className="text-base font-bold text-slate-800 font-display flex items-center gap-2">
               <Cpu className="w-5 h-5 text-indigo-600 animate-pulse" />
-              Aktuální stav & Architektura Synthesis OS Core
+              {translateText('Aktuální stav & Architektura Synthesis OS Core', language)}
             </h3>
           </div>
           <div className="text-left md:text-right">
-            <span className="text-xs text-slate-500 block">Celkový stav platformy:</span>
+            <span className="text-xs text-slate-500 block">{translateText('Celkový stav platformy:', language)}</span>
             <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-600">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping inline-block" />
-              92% Funkčnost (V1.2 Stable Prod)
+              92% {translateText('Funkčnost (V1.2 Stable Prod)', language)}
             </span>
           </div>
         </div>
@@ -452,48 +492,48 @@ export default function SitemapTimeline({ setActiveTab, onOpenGlossary, currentU
           {/* Stat 1 */}
           <div className="bg-white border border-slate-100 rounded-2xl p-4.5 space-y-2 shadow-3xs hover:border-indigo-100 transition-all">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-mono font-bold text-indigo-500 uppercase">Produkční Moduly</span>
+              <span className="text-[10px] font-mono font-bold text-indigo-500 uppercase">{translateText('Produkční Moduly', language)}</span>
               <CheckCircle2 className="w-4 h-4 text-emerald-500" />
             </div>
             <div className="space-y-0.5">
               <p className="text-2xl font-extrabold text-slate-800 font-display">14 / 18</p>
-              <p className="text-[10px] text-slate-400">Plně funkčních, otestovaných a nasazených modulů v produkci.</p>
+              <p className="text-[10px] text-slate-400">{translateText('Plně funkčních, otestovaných a nasazených modulů v produkci.', language)}</p>
             </div>
           </div>
 
           {/* Stat 2 */}
           <div className="bg-white border border-slate-100 rounded-2xl p-4.5 space-y-2 shadow-3xs hover:border-indigo-100 transition-all">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-mono font-bold text-teal-500 uppercase">Databáze & Ledger</span>
+              <span className="text-[10px] font-mono font-bold text-teal-500 uppercase">{translateText('Databáze & Ledger', language)}</span>
               <Network className="w-4 h-4 text-teal-500 animate-pulse" />
             </div>
             <div className="space-y-0.5">
-              <p className="text-2xl font-extrabold text-slate-800 font-display">Aktivní</p>
-              <p className="text-[10px] text-slate-400">Duální vrstva Firestore & Supabase PostgreSQL s auditním ledgerem.</p>
+              <p className="text-2xl font-extrabold text-slate-800 font-display">{translateText('Aktivní', language)}</p>
+              <p className="text-[10px] text-slate-400">{translateText('Duální vrstva Firestore & Supabase PostgreSQL s auditním ledgerem.', language)}</p>
             </div>
           </div>
 
           {/* Stat 3 */}
           <div className="bg-white border border-slate-100 rounded-2xl p-4.5 space-y-2 shadow-3xs hover:border-indigo-100 transition-all">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-mono font-bold text-amber-500 uppercase">Vývoj & Beta</span>
+              <span className="text-[10px] font-mono font-bold text-amber-500 uppercase">{translateText('Vývoj & Beta', language)}</span>
               <Hourglass className="w-4 h-4 text-amber-500" />
             </div>
             <div className="space-y-0.5">
-              <p className="text-2xl font-extrabold text-slate-800 font-display">4 Moduly</p>
-              <p className="text-[10px] text-slate-400">V beta testování a průběžném vylepšování pro plnou automatizaci.</p>
+              <p className="text-2xl font-extrabold text-slate-800 font-display">4 {translateText('Moduly', language)}</p>
+              <p className="text-[10px] text-slate-400">{translateText('V beta testování a průběžném vylepšování pro plnou automatizaci.', language)}</p>
             </div>
           </div>
 
           {/* Stat 4 */}
           <div className="bg-white border border-slate-100 rounded-2xl p-4.5 space-y-2 shadow-3xs hover:border-indigo-100 transition-all">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-mono font-bold text-purple-500 uppercase">AI Orchestrátor</span>
+              <span className="text-[10px] font-mono font-bold text-purple-500 uppercase">{translateText('AI Orchestrátor', language)}</span>
               <Sparkles className="w-4 h-4 text-purple-500 animate-bounce" />
             </div>
             <div className="space-y-0.5">
-              <p className="text-2xl font-extrabold text-slate-800 font-display">Připraven</p>
-              <p className="text-[10px] text-slate-400">Gemini 1.5 Flash SDK plně integrované pro sémantickou analýzu.</p>
+              <p className="text-2xl font-extrabold text-slate-800 font-display">{translateText('Připraven', language)}</p>
+              <p className="text-[10px] text-slate-400">{translateText('Gemini 1.5 Flash SDK plně integrované pro sémantickou analýzu.', language)}</p>
             </div>
           </div>
         </div>
@@ -504,10 +544,10 @@ export default function SitemapTimeline({ setActiveTab, onOpenGlossary, currentU
         <div className="border-b border-slate-100 pb-3">
           <h2 className="text-lg font-bold text-slate-800 font-display flex items-center gap-2">
             <span className="p-1.5 bg-slate-100 text-slate-700 rounded-lg"><Map className="w-5 h-5" /></span>
-            Strukturální Mapa Portálu (Sitemap)
+            {translateText('Strukturální Mapa Portálu (Sitemap)', language)}
           </h2>
           <p className="text-xs text-slate-500 mt-1">
-            Kliknutím na jakoukoliv sekci níže budete okamžitě přesměrováni do daného funkčního modulu. Všechny komponenty jsou dynamicky provázané.
+            {translateText('Kliknutím na jakoukoliv sekci níže budete okamžitě přesměrováni do daného funkčního modulu. Všechny komponenty jsou dynamicky provázané.', language)}
           </p>
         </div>
 
@@ -564,9 +604,9 @@ export default function SitemapTimeline({ setActiveTab, onOpenGlossary, currentU
 
               {/* Quick info block inside card */}
               <div className="mt-4 pt-4 border-t border-slate-50 flex items-center justify-between text-[10px] text-slate-400 font-mono">
-                <span>Modulární architektura</span>
+                <span>{translateText('Modulární architektura', language)}</span>
                 <span className={`px-2 py-0.5 rounded-full font-sans font-bold uppercase tracking-wider text-[8px] ${section.badgeColor}`}>
-                  Aktivní API
+                  {translateText('Aktivní API', language)}
                 </span>
               </div>
             </div>
@@ -584,9 +624,9 @@ export default function SitemapTimeline({ setActiveTab, onOpenGlossary, currentU
                 <BookOpen className="w-4 h-4" />
               </div>
               <div className="text-left space-y-0.5">
-                <h4 className="font-bold text-xs text-slate-800 uppercase tracking-wider">Odborný slovník pojmů</h4>
+                <h4 className="font-bold text-xs text-slate-800 uppercase tracking-wider">{translateText('Odborný slovník pojmů', language)}</h4>
                 <p className="text-[11px] text-slate-500">
-                  Definice pojmů jako syndrom zavrženého rodiče, střídavá péče, kolizní opatrovník OSPOD apod.
+                  {translateText('Definice pojmů jako syndrom zavrženého rodiče, střídavá péče, kolizní opatrovník OSPOD apod.', language)}
                 </p>
               </div>
             </div>
@@ -603,13 +643,13 @@ export default function SitemapTimeline({ setActiveTab, onOpenGlossary, currentU
               </div>
               <div className="text-left space-y-0.5">
                 <h4 className="font-bold text-xs text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
-                  Administrační rozhraní
+                  {translateText('Administrační rozhraní', language)}
                   {currentUser?.role === 'admin' && (
-                    <span className="bg-emerald-500 text-white text-[8px] px-1.5 py-0.2 rounded font-sans uppercase">Aktivní</span>
+                    <span className="bg-emerald-500 text-white text-[8px] px-1.5 py-0.2 rounded font-sans uppercase">{translateText('Aktivní', language)}</span>
                   )}
                 </h4>
                 <p className="text-[11px] text-slate-500">
-                  Přihlášení administrátora, schvalování nahlášeného obsahu a auditní záznamy pro AI Admina.
+                  {translateText('Přihlášení administrátora, schvalování nahlášeného obsahu a auditní záznamy pro AI Admina.', language)}
                 </p>
               </div>
             </div>
@@ -624,10 +664,10 @@ export default function SitemapTimeline({ setActiveTab, onOpenGlossary, currentU
           <div className="space-y-0.5">
             <h2 className="text-lg font-bold text-slate-800 font-display flex items-center gap-2">
               <span className="p-1.5 bg-slate-100 text-slate-700 rounded-lg"><Clock className="w-5 h-5" /></span>
-              Časová Osa Vývoje & Roadmapa
+              {translateText('Časová Osa Vývoje & Roadmapa', language)}
             </h2>
             <p className="text-xs text-slate-500">
-              Historie verzí, milníky, současný stav a budoucí autonomní plány pro rozvoj ekosystému Synthesis OS.
+              {translateText('Historie verzí, milníky, současný stav a budoucí autonomní plány pro rozvoj ekosystému Synthesis OS.', language)}
             </p>
           </div>
 

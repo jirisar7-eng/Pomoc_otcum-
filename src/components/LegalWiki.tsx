@@ -10,10 +10,39 @@ import {
   Video, HelpCircle, ChevronRight, CornerDownRight, Landmark, Info, ExternalLink
 } from 'lucide-react';
 import { 
-  HUB_GLOSSARY, HUB_ARTICLES, HUB_JUDGMENTS, HUB_STUDIES, HUB_TEMPLATES, HUB_FAQS, HubTerm 
+  HUB_GLOSSARY as HUB_GLOSSARY_RAW, HUB_ARTICLES as HUB_ARTICLES_RAW, HUB_JUDGMENTS as HUB_JUDGMENTS_RAW, HUB_STUDIES as HUB_STUDIES_RAW, HUB_TEMPLATES as HUB_TEMPLATES_RAW, HUB_FAQS as HUB_FAQS_RAW, HubTerm 
 } from '../data/contentHub';
+import { useLanguage } from '../lib/LanguageContext';
+import { getTranslatedObject } from '../data/dynamicTranslations';
 
 export default function LegalWiki() {
+  const { language } = useLanguage();
+
+  const HUB_GLOSSARY = React.useMemo(() => 
+    HUB_GLOSSARY_RAW.map(item => getTranslatedObject(item.id, item, language)),
+    [language]
+  );
+  const HUB_ARTICLES = React.useMemo(() => 
+    HUB_ARTICLES_RAW.map(item => getTranslatedObject(item.id, item, language)),
+    [language]
+  );
+  const HUB_JUDGMENTS = React.useMemo(() => 
+    HUB_JUDGMENTS_RAW.map(item => getTranslatedObject(item.id, item, language)),
+    [language]
+  );
+  const HUB_STUDIES = React.useMemo(() => 
+    HUB_STUDIES_RAW.map(item => getTranslatedObject(item.id, item, language)),
+    [language]
+  );
+  const HUB_TEMPLATES = React.useMemo(() => 
+    HUB_TEMPLATES_RAW.map(item => getTranslatedObject(item.id, item, language)),
+    [language]
+  );
+  const HUB_FAQS = React.useMemo(() => 
+    HUB_FAQS_RAW.map(item => getTranslatedObject(item.id, item, language)),
+    [language]
+  );
+
   const [selectedTermId, setSelectedTermId] = useState<string>('term-1');
   const [searchQuery, setSearchQuery] = useState('');
   const [activeSection, setActiveSection] = useState('definice');
