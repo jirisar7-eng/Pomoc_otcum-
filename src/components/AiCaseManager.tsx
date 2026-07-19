@@ -11,6 +11,9 @@ import {
   Paperclip, ArrowRight, ShieldAlert, FileMinus, HardDrive, ListCollapse, MessageSquare, Upload, Eye
 } from 'lucide-react';
 import { User } from '../types';
+import { db, storage } from '../lib/firebase';
+import { collection, getDocs, setDoc, doc, deleteDoc } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 interface CaseDocument {
   id: string;
@@ -20,6 +23,7 @@ interface CaseDocument {
   note: string;
   fileSize?: string;
   fileName?: string;
+  downloadURL?: string;
 }
 
 interface CaseEvent {
@@ -122,6 +126,39 @@ export default function AiCaseManager({ currentUser, onOpenAuth }: AiCaseManager
   const [isDragging, setIsDragging] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
+  // File Uploading & status indicators
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
+  // Sync documents with Firestore on login / mount
+  useEffect(() => {
+    if (!currentUser) return;
+    
+    const fetchFirestoreDocs = async () => {
+      try {
+        const docsRef = collection(db, 'users', currentUser.id, 'documents');
+        const querySnapshot = await getDocs(docsRef);
+        const docsList: CaseDocument[] = [];
+        querySnapshot.forEach((doc) => {
+          docsList.push(doc.data() as CaseDocument);
+        });
+        
+        // Sort by date descending
+        docsList.sort((a, b) => b.date.localeCompare(a.date));
+        
+        if (docsList.length > 0) {
+          setDocuments(docsList);
+          // Save a cached copy locally
+          localStorage.setItem(`tata_ma_pravo_case_documents_${currentUser.email}`, JSON.stringify(docsList));
+        }
+      } catch (err) {
+        console.warn("Failed to fetch documents from Firestore:", err);
+      }
+    };
+    
+    fetchFirestoreDocs();
+  }, [currentUser]);
+
   // Form Inputs
   const [newDocName, setNewDocName] = useState('');
   const [newDocType, setNewDocType] = useState<CaseDocument['type']>('petition');
@@ -191,39 +228,69 @@ export default function AiCaseManager({ currentUser, onOpenAuth }: AiCaseManager
   };
 
   // Add document handler
-  const handleAddDocument = (e: React.FormEvent) => {
+  const handleAddDocument = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newDocName) return;
 
-    const newDoc: CaseDocument = {
-      id: `doc-${Date.now()}`,
-      name: newDocName,
-      type: newDocType,
-      date: newDocDate,
-      note: newDocNote,
-      fileSize: selectedFile ? `${(selectedFile.size / 1024).toFixed(0)} KB` : `${Math.floor(Math.random() * 500) + 50} KB`,
-      fileName: selectedFile?.name
-    };
+    setIsUploading(true);
+    setUploadError(null);
 
-    // Auto-generate matching timeline event in the case's log
-    const newEv: CaseEvent = {
-      id: `ev-${Date.now()}`,
-      date: newDocDate,
-      title: `Uloženo do spisu: ${newDocName}`,
-      desc: newDocNote || `Do osobní složky byl bezpečně uložen nový dokument typu: ${newDocType}.`,
-      category: newDocType === 'ospod' ? 'ospod' : newDocType === 'judgment' || newDocType === 'petition' || newDocType === 'appeal' ? 'soud' : 'dokument'
-    };
+    let downloadURL = '';
 
-    const updatedDocs = [newDoc, ...documents];
-    const updatedEvs = [newEv, ...events].sort((a, b) => b.date.localeCompare(a.date));
+    try {
+      if (selectedFile) {
+        // Upload physical file to Firebase Storage: users/{userId}/documents/{fileName}
+        const storagePath = `users/${currentUser.id}/documents/${selectedFile.name}`;
+        const fileRef = ref(storage, storagePath);
+        const uploadResult = await uploadBytes(fileRef, selectedFile);
+        downloadURL = await getDownloadURL(uploadResult.ref);
+      }
 
-    updateDocuments(updatedDocs);
-    updateEvents(updatedEvs);
+      const docId = `doc-${Date.now()}`;
+      const newDoc: CaseDocument = {
+        id: docId,
+        name: newDocName,
+        type: newDocType,
+        date: newDocDate,
+        note: newDocNote,
+        fileSize: selectedFile ? `${(selectedFile.size / 1024).toFixed(0)} KB` : `${Math.floor(Math.random() * 500) + 50} KB`,
+        fileName: selectedFile?.name,
+        downloadURL: downloadURL || undefined
+      };
 
-    // Reset inputs
-    setNewDocName('');
-    setNewDocNote('');
-    setSelectedFile(null);
+      // Save document registry to Firestore: users/{userId}/documents/{documentId}
+      const firestoreDocRef = doc(db, 'users', currentUser.id, 'documents', docId);
+      await setDoc(firestoreDocRef, {
+        ...newDoc,
+        userId: currentUser.id,
+        createdAt: new Date().toISOString()
+      });
+
+      // Auto-generate matching timeline event in the case's log
+      const newEv: CaseEvent = {
+        id: `ev-${Date.now()}`,
+        date: newDocDate,
+        title: `Uloženo do spisu: ${newDocName}`,
+        desc: newDocNote || `Do osobní složky byl bezpečně uložen nový dokument typu: ${newDocType}.`,
+        category: newDocType === 'ospod' ? 'ospod' : newDocType === 'judgment' || newDocType === 'petition' || newDocType === 'appeal' ? 'soud' : 'dokument'
+      };
+
+      const updatedDocs = [newDoc, ...documents];
+      const updatedEvs = [newEv, ...events].sort((a, b) => b.date.localeCompare(a.date));
+
+      updateDocuments(updatedDocs);
+      updateEvents(updatedEvs);
+
+      // Reset inputs
+      setNewDocName('');
+      setNewDocNote('');
+      setSelectedFile(null);
+    } catch (err: any) {
+      console.error("Error saving document to Firestore/Storage:", err);
+      setUploadError("Nastala chyba při ukládání dokumentu do cloudu. Zkontrolujte prosím připojení.");
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   // Add Deadline handler
@@ -269,9 +336,17 @@ export default function AiCaseManager({ currentUser, onOpenAuth }: AiCaseManager
   };
 
   // Delete helpers
-  const handleRemoveDocument = (id: string) => {
+  const handleRemoveDocument = async (id: string) => {
     const updated = documents.filter(d => d.id !== id);
     updateDocuments(updated);
+
+    // Also delete from Firestore if logged in
+    try {
+      const firestoreDocRef = doc(db, 'users', currentUser.id, 'documents', id);
+      await deleteDoc(firestoreDocRef);
+    } catch (err) {
+      console.warn("Failed to delete document from Firestore:", err);
+    }
   };
 
   const handleRemoveEvent = (id: string) => {
@@ -519,12 +594,26 @@ export default function AiCaseManager({ currentUser, onOpenAuth }: AiCaseManager
                 />
               </div>
 
+              {uploadError && (
+                <div className="p-3 bg-rose-50 text-rose-600 rounded-xl text-[11px] font-semibold leading-relaxed border border-rose-100">
+                  ⚠️ {uploadError}
+                </div>
+              )}
+
               <button
                 type="submit"
-                disabled={!newDocName}
+                disabled={isUploading || !newDocName}
                 className="w-full py-2.5 bg-teal-600 hover:bg-teal-700 disabled:bg-slate-100 disabled:text-slate-400 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 cursor-pointer shadow-3xs transition-all uppercase tracking-wider"
               >
-                <Plus className="w-4 h-4" /> Uložit listinu do spisu
+                {isUploading ? (
+                  <>
+                    <Clock className="w-4 h-4 animate-spin" /> Nahrávání do cloudu...
+                  </>
+                ) : (
+                  <>
+                    <Plus className="w-4 h-4" /> Uložit listinu do spisu
+                  </>
+                )}
               </button>
             </form>
           </div>
@@ -572,13 +661,26 @@ export default function AiCaseManager({ currentUser, onOpenAuth }: AiCaseManager
                       </div>
                     </div>
 
-                    <button
-                      onClick={() => handleRemoveDocument(doc.id)}
-                      className="p-1 text-slate-300 hover:text-rose-600 rounded-md transition-colors"
-                      title="Smazat ze složky"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
+                    <div className="flex items-center gap-1">
+                      {doc.downloadURL && (
+                        <a
+                          href={doc.downloadURL}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-1 text-teal-600 hover:text-teal-800 rounded-md transition-colors shrink-0"
+                          title="Zobrazit / stáhnout fyzický soubor"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </a>
+                      )}
+                      <button
+                        onClick={() => handleRemoveDocument(doc.id)}
+                        className="p-1 text-slate-300 hover:text-rose-600 rounded-md transition-colors shrink-0"
+                        title="Smazat ze složky"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>

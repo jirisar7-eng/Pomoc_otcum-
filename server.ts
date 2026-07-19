@@ -16,17 +16,17 @@ const PORT = 3000;
 
 app.use(express.json());
 
-// Lazy-initialized Gemini SDK client
+// Inicializace podle standardu Synthesis OS (Lazy-initialized pro zamezení pádů při startu bez klíče)
 let aiClient: GoogleGenAI | null = null;
 
 function getAiClient(): GoogleGenAI {
   if (!aiClient) {
-    const key = process.env.GEMINI_API_KEY;
-    if (!key) {
-      throw new Error('GEMINI_API_KEY is missing. Please set it in Settings > Secrets in AI Studio.');
+    const aiKey = process.env.GEMINI_API_KEY;
+    if (!aiKey) {
+      throw new Error("Missing GEMINI_API_KEY environment variable. Nastavte prosím klíč v Settings > Secrets.");
     }
     aiClient = new GoogleGenAI({
-      apiKey: key,
+      apiKey: aiKey,
       httpOptions: {
         headers: {
           'User-Agent': 'aistudio-build',

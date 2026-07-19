@@ -4,6 +4,7 @@
  */
 
 import { initializeApp, getApps, getApp } from 'firebase/app';
+import { getStorage } from 'firebase/storage';
 import { 
   getAuth, 
   GoogleAuthProvider, 
@@ -76,6 +77,9 @@ if (typeof window !== 'undefined') {
 
 // Initialize Authentication
 export const auth = getAuth(app);
+
+// Initialize Storage
+export const storage = getStorage(app);
 
 // Authentication Helpers
 export const googleProvider = new GoogleAuthProvider();
