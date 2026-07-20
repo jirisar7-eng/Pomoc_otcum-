@@ -43,6 +43,21 @@ export interface AuditResult {
   timestamp: string;
 }
 
+export interface CrawlResultItem {
+  title: string;
+  source: string;
+  url: string;
+  date: string;
+  summary: string;
+  fullText: string;
+  category: 'Aktuality' | 'Zákony' | 'Soudy' | 'Psychologie';
+  relevanceScore: number;
+}
+
+export interface CrawlInternetResult {
+  results: CrawlResultItem[];
+}
+
 export const AIAdminActions = {
   /**
    * 1. ANALYZE EVIDENCE AND DRAFT PETITION
@@ -115,5 +130,14 @@ export const AIAdminActions = {
    */
   async performSelfAudit(cases?: any[]): Promise<AIAdminExecutionResponse<AuditResult>> {
     return AIAdminClient.execute<AuditResult>('SYSTEM_AUDIT', { cases });
+  },
+
+  /**
+   * 6. AI INTERNET CRAWLER & CONTENT COLLECTOR
+   * Searches the internet using Gemini Search Grounding to find, moderate, and
+   * prepare relevant child custody and family law resources for the portal.
+   */
+  async crawlInternet(query: string): Promise<AIAdminExecutionResponse<CrawlInternetResult>> {
+    return AIAdminClient.execute<CrawlInternetResult>('CRAWL_INTERNET', { query });
   }
 };
