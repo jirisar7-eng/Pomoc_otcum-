@@ -290,6 +290,7 @@ export async function loginWithGoogle(): Promise<User> {
   
   let role: UserRole = 'user';
   // If email is administrator, default to admin
+  const isSuperAdmin = fbUser.email && (fbUser.email === 'admin@synthesis.cz' || fbUser.email === 'mallfuriionn@gmail.com');
   if (fbUser.email && (fbUser.email === 'admin@synthesis.cz' || fbUser.email === 'mallfuriionn@gmail.com' || fbUser.email.includes('admin@'))) {
     role = 'admin';
   }
@@ -298,7 +299,7 @@ export async function loginWithGoogle(): Promise<User> {
     id: fbUser.uid,
     email: fbUser.email || '',
     name: fbUser.displayName || (fbUser.email === 'mallfuriionn@gmail.com' ? 'Administrátor (mallfuriionn)' : 'Uživatel'),
-    role: existingData ? (existingData.role as UserRole) : role,
+    role: isSuperAdmin ? 'admin' : (existingData ? (existingData.role as UserRole) : role),
     avatar: fbUser.photoURL || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(fbUser.displayName || fbUser.uid)}`,
     createdAt: existingData ? existingData.createdAt : new Date().toISOString()
   };
@@ -481,6 +482,9 @@ export function subscribeToAuth(callback: (user: User | null) => void): () => vo
       try {
         const localUser = JSON.parse(localUserStr);
         if (localUser) {
+          if (localUser.email === 'mallfuriionn@gmail.com' || localUser.email === 'admin@synthesis.cz') {
+            localUser.role = 'admin';
+          }
           callback(localUser);
         }
       } catch (e) {
@@ -496,6 +500,9 @@ export function subscribeToAuth(callback: (user: User | null) => void): () => vo
         const userSnap = await getDoc(userRef);
         if (userSnap.exists()) {
           const userData = userSnap.data() as User;
+          if (userData.email === 'mallfuriionn@gmail.com' || userData.email === 'admin@synthesis.cz') {
+            userData.role = 'admin';
+          }
           if (typeof window !== 'undefined') {
             localStorage.setItem('synthesis_hub_local_user', JSON.stringify(userData));
           }
