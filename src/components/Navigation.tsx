@@ -337,17 +337,23 @@ export default function Navigation({
               {/* Authentication Buttons */}
               {currentUser ? (
                 <div className="flex items-center gap-2 bg-slate-50 pl-2 pr-2.5 py-1 rounded-full border border-slate-100" id="user-profile-badge">
-                  <img 
-                    src={currentUser.avatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(currentUser.name)}`} 
-                    alt={currentUser.name} 
-                    className="w-6.5 h-6.5 rounded-full border border-teal-200"
-                  />
-                  <div className="flex flex-col text-left">
-                    <span className="text-[10px] font-semibold text-slate-700 max-w-[70px] truncate leading-tight">{currentUser.name}</span>
-                    <span className={`text-[7px] font-bold uppercase tracking-wider ${currentUser.role === 'admin' ? 'text-indigo-600' : 'text-teal-600'} leading-none`}>
-                      {currentUser.role === 'admin' ? t('role_admin', 'Správce') : t('role_parent', 'Rodič')}
-                    </span>
-                  </div>
+                  <button
+                    onClick={() => setActiveTab('profile')}
+                    className="flex items-center gap-2 text-left cursor-pointer hover:opacity-85 transition-opacity outline-none"
+                    title={t('btn_profile', 'Přejít na můj profil')}
+                  >
+                    <img 
+                      src={currentUser.avatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(currentUser.name)}`} 
+                      alt={currentUser.name} 
+                      className="w-6.5 h-6.5 rounded-full border border-teal-200"
+                    />
+                    <div className="flex flex-col text-left">
+                      <span className="text-[10px] font-semibold text-slate-700 max-w-[70px] truncate leading-tight">{currentUser.name}</span>
+                      <span className={`text-[7px] font-bold uppercase tracking-wider ${currentUser.role === 'admin' ? 'text-indigo-600' : 'text-teal-600'} leading-none`}>
+                        {currentUser.role === 'admin' ? t('role_admin', 'Správce') : t('role_parent', 'Rodič')}
+                      </span>
+                    </div>
+                  </button>
                   <button 
                     id="logout-btn"
                     onClick={onLogout}
@@ -504,7 +510,14 @@ export default function Navigation({
             <div className="border-t border-slate-100 pt-3">
               {currentUser ? (
                 <div className="flex items-center justify-between bg-slate-50 p-2.5 rounded-xl border border-slate-100" id="mobile-user-profile">
-                  <div className="flex items-center gap-2.5">
+                  <button
+                    onClick={() => {
+                      handleTabClick('profile');
+                      setMobileMenuOpen(false);
+                    }}
+                    className="flex items-center gap-2.5 text-left cursor-pointer hover:opacity-85 transition-opacity outline-none"
+                    title={t('btn_profile', 'Přejít na můj profil')}
+                  >
                     <img 
                       src={currentUser.avatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(currentUser.name)}`} 
                       alt={currentUser.name} 
@@ -514,7 +527,7 @@ export default function Navigation({
                       <span className="text-xs font-semibold text-slate-800">{currentUser.name}</span>
                       <span className="text-[9px] text-slate-400">{currentUser.email}</span>
                     </div>
-                  </div>
+                  </button>
                   <button
                     id="mobile-logout-btn"
                     onClick={() => {

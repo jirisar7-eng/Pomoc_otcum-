@@ -224,6 +224,63 @@ export default function AdminPanel({
     subRole: 'Registrovaný'
   });
 
+  // --- STATE AND HANDLERS FOR EDITING USERS ---
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [editUserForm, setEditUserForm] = useState({
+    name: '',
+    email: '',
+    role: 'user' as 'user' | 'admin',
+    subRole: 'Registrovaný',
+    phone: '',
+    city: '',
+    bio: '',
+    avatar: ''
+  });
+
+  const handleOpenEditUser = (user: User) => {
+    setEditingUser(user);
+    setEditUserForm({
+      name: user.name || '',
+      email: user.email || '',
+      role: user.role || 'user',
+      subRole: (user as any).subRole || (user.role === 'admin' ? 'Admin' : 'Registrovaný'),
+      phone: (user as any).phone || '',
+      city: (user as any).city || '',
+      bio: (user as any).bio || '',
+      avatar: user.avatar || ''
+    });
+  };
+
+  const handleSaveEditUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingUser) return;
+
+    setUserSyncStatus('saving');
+    const updatedUser: User = {
+      ...editingUser,
+      name: editUserForm.name,
+      email: editUserForm.email,
+      role: editUserForm.role,
+      avatar: editUserForm.avatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(editUserForm.name)}`,
+    };
+    
+    // Add custom properties safely
+    (updatedUser as any).phone = editUserForm.phone;
+    (updatedUser as any).city = editUserForm.city;
+    (updatedUser as any).bio = editUserForm.bio;
+    (updatedUser as any).subRole = editUserForm.subRole;
+
+    try {
+      await saveDocument('users', editingUser.id, updatedUser);
+    } catch (err) {
+      console.warn("Could not save edited user to Firestore:", err);
+    }
+
+    setUsersList(prev => prev.map(u => u.id === editingUser.id ? updatedUser : u));
+    setEditingUser(null);
+    setUserSyncStatus('synced');
+  };
+
 
   // --- AI AUDITOR V3.0 STATES ---
   const [isProjectAuditing, setIsProjectAuditing] = useState(false);
@@ -3464,6 +3521,133 @@ ${cases.map(c => `Název: ${c.title}\nStav: ${c.status}\nChronologie:\n` + (c.ch
                   </form>
                 )}
 
+                {/* EDIT USER FORM (EXPANDABLE) */}
+                {editingUser && (
+                  <form onSubmit={handleSaveEditUser} className="bg-indigo-50/40 p-5 rounded-xl border border-indigo-100 space-y-4 animate-fadeIn">
+                    <div className="border-b border-indigo-100/50 pb-2 flex items-center justify-between">
+                      <h3 className="text-xs font-bold text-indigo-900 uppercase tracking-wider flex items-center gap-1.5">
+                        <Edit3 className="w-3.5 h-3.5 text-indigo-600" />
+                        Editovat uživatelský profil: <span className="text-indigo-700 font-mono font-bold font-sans">{editingUser.name}</span>
+                      </h3>
+                      <span className="text-[9px] text-indigo-500 font-mono">ID: {editingUser.id}</span>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase block">Jméno a příjmení</label>
+                        <input
+                          type="text"
+                          required
+                          value={editUserForm.name}
+                          onChange={(e) => setEditUserForm({ ...editUserForm, name: e.target.value })}
+                          className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-700 focus:outline-none focus:border-indigo-500"
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase block">E-mailová adresa</label>
+                        <input
+                          type="email"
+                          required
+                          value={editUserForm.email}
+                          onChange={(e) => setEditUserForm({ ...editUserForm, email: e.target.value })}
+                          className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-700 focus:outline-none focus:border-indigo-500"
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase block">Základní oprávnění</label>
+                        <select
+                          value={editUserForm.role}
+                          onChange={(e) => setEditUserForm({ ...editUserForm, role: e.target.value as any })}
+                          className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-700 focus:outline-none focus:border-indigo-500"
+                        >
+                          <option value="user">Běžný uživatel (User)</option>
+                          <option value="admin">Administrátor (Admin)</option>
+                        </select>
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase block">Role v portálu (Portal Role)</label>
+                        <select
+                          value={editUserForm.subRole}
+                          onChange={(e) => setEditUserForm({ ...editUserForm, subRole: e.target.value })}
+                          className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-700 focus:outline-none focus:border-indigo-500"
+                        >
+                          <option value="SuperAdmin">👑 SuperAdmin</option>
+                          <option value="Admin">⚙️ Administrátor</option>
+                          <option value="Editor">✍️ Editor obsahu</option>
+                          <option value="PravniPoradce">⚖️ Právní poradce</option>
+                          <option value="Psycholog">🧠 Psycholog / Specialista</option>
+                          <option value="Moderator">🛡️ Moderátor fóra</option>
+                          <option value="OvenyUzivatel">⭐ Ověřený uživatel</option>
+                          <option value="Registrovaný">👤 Registrovaný</option>
+                          <option value="Zablokovaný">🚫 Zablokovaný</option>
+                        </select>
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase block">Telefon</label>
+                        <input
+                          type="text"
+                          placeholder="+420 777 123 456"
+                          value={editUserForm.phone}
+                          onChange={(e) => setEditUserForm({ ...editUserForm, phone: e.target.value })}
+                          className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-700 focus:outline-none focus:border-indigo-500"
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase block">Kraj / Město</label>
+                        <input
+                          type="text"
+                          placeholder="Praha"
+                          value={editUserForm.city}
+                          onChange={(e) => setEditUserForm({ ...editUserForm, city: e.target.value })}
+                          className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-700 focus:outline-none focus:border-indigo-500"
+                        />
+                      </div>
+
+                      <div className="space-y-1 md:col-span-2">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase block">Adresa obrázku (Avatar URL)</label>
+                        <input
+                          type="text"
+                          value={editUserForm.avatar}
+                          onChange={(e) => setEditUserForm({ ...editUserForm, avatar: e.target.value })}
+                          className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-700 focus:outline-none focus:border-indigo-500 font-mono"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold text-slate-500 uppercase block">Osobní memento / Bio</label>
+                      <textarea
+                        rows={2}
+                        placeholder="Krátký popis uživatele..."
+                        value={editUserForm.bio}
+                        onChange={(e) => setEditUserForm({ ...editUserForm, bio: e.target.value })}
+                        className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-700 focus:outline-none focus:border-indigo-500"
+                      />
+                    </div>
+
+                    <div className="flex justify-end gap-2 text-xs pt-2">
+                      <button
+                        type="button"
+                        onClick={() => setEditingUser(null)}
+                        className="px-3 py-1.5 border border-slate-200 rounded-lg text-slate-500 hover:bg-slate-100"
+                      >
+                        Zrušit
+                      </button>
+                      <button
+                        type="submit"
+                        className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg shadow-xs"
+                      >
+                        Uložit změny profilu
+                      </button>
+                    </div>
+                  </form>
+                )}
+
                 {/* USERS TABLE */}
                 <div className="overflow-x-auto border border-slate-100 rounded-xl">
                   <table className="w-full text-left text-xs border-collapse min-w-[700px]">
@@ -3536,7 +3720,14 @@ ${cases.map(c => `Název: ${c.title}\nStav: ${c.status}\nChronologie:\n` + (c.ch
                               <td className="p-3 text-slate-400 font-mono text-[10px]">
                                 {user.createdAt ? new Date(user.createdAt).toLocaleDateString('cs-CZ') : 'Neznámé'}
                               </td>
-                              <td className="p-3 text-right">
+                              <td className="p-3 text-right flex items-center justify-end gap-1.5">
+                                <button
+                                  onClick={() => handleOpenEditUser(user)}
+                                  className="p-1.5 rounded-lg border border-indigo-100/30 hover:bg-indigo-50 text-indigo-500 cursor-pointer transition-all"
+                                  title="Editovat údaje uživatele"
+                                >
+                                  <Edit3 className="w-3.5 h-3.5" />
+                                </button>
                                 <button
                                   onClick={() => handleDeleteUser(user.id)}
                                   disabled={user.id === 'user-mallfuriionn' || (currentUser && user.id === currentUser.id)}

@@ -55,6 +55,7 @@ import CoParentHub from './components/CoParentHub';
 import GlossaryDrawer from './components/GlossaryDrawer';
 import AiGuideSection from './components/AiGuideSection';
 import UserPortal from './components/UserPortal';
+import UserProfile from './components/UserProfile';
 import SitemapTimeline from './components/SitemapTimeline';
 import CareSimulator from './components/CareSimulator';
 
@@ -573,6 +574,14 @@ export default function App() {
               <UserPortal
                 currentUser={currentUser}
                 onOpenAuth={() => setAuthModalOpen(true)}
+              />
+            )}
+
+            {activeTab === 'profile' && (
+              <UserProfile
+                currentUser={currentUser}
+                onOpenAuth={() => setAuthModalOpen(true)}
+                onUpdateCurrentUser={(user) => setCurrentUser(user)}
               />
             )}
 
