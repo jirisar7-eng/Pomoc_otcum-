@@ -212,6 +212,35 @@ function getLocalFallbackData(action: string, params: any): any {
   }
 }
 
+// Robust JSON parser helper to handle potential Markdown and custom responses
+function parseJsonFromText(text: string): any {
+  const trimmed = text.trim();
+  try {
+    return JSON.parse(trimmed);
+  } catch (e) {
+    // Try to extract markdown JSON block
+    const match = trimmed.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
+    if (match) {
+      try {
+        return JSON.parse(match[1].trim());
+      } catch (e2) {
+        console.warn("[Synthesis OS] Failed parsing markdown JSON block:", e2);
+      }
+    }
+    // Try finding the outermost bounds of { ... }
+    const start = trimmed.indexOf('{');
+    const end = trimmed.lastIndexOf('}');
+    if (start !== -1 && end !== -1 && end > start) {
+      try {
+        return JSON.parse(trimmed.substring(start, end + 1));
+      } catch (e3) {
+        console.warn("[Synthesis OS] Failed parsing outer braces content:", e3);
+      }
+    }
+    throw e;
+  }
+}
+
 // Highly resilient generator with multiple model retries & offline fallbacks
 async function callGeminiWithLocalFallback(
   action: string,
@@ -220,6 +249,13 @@ async function callGeminiWithLocalFallback(
   responseSchema: any,
   params: any
 ): Promise<any> {
+  // If we are crawling the internet, we cannot use responseMimeType: 'application/json' with tools.
+  // We append a reminder to the prompt to output a clean markdown json block.
+  const isCrawl = action === 'CRAWL_INTERNET';
+  const finalPrompt = isCrawl 
+    ? `${prompt}\n\nDŮLEŽITÉ: Odpověz výhradně ve formátu JSON podle zadaného schématu, obaleném v bloku \`\`\`json \\n ... \\n \`\`\`. Nepřidávej žádný jiný doprovodný text mimo tento JSON blok.`
+    : prompt;
+
   // 1. Try getting the AI Client and calling Gemini
   try {
     const ai = getAiClient();
@@ -229,21 +265,22 @@ async function callGeminiWithLocalFallback(
       const config: any = {
         systemInstruction,
         temperature: action === 'SCAN_COMMENT' ? 0.1 : 0.3,
-        responseMimeType: 'application/json',
-        responseSchema: responseSchema,
       };
-      
-      if (action === 'CRAWL_INTERNET') {
+
+      if (isCrawl) {
         config.tools = [{ googleSearch: {} }];
+      } else {
+        config.responseMimeType = 'application/json';
+        config.responseSchema = responseSchema;
       }
 
       const response = await ai.models.generateContent({
         model: 'gemini-3.5-flash',
-        contents: prompt,
+        contents: finalPrompt,
         config: config
       });
       if (response.text) {
-        return JSON.parse(response.text);
+        return parseJsonFromText(response.text);
       }
     } catch (err1: any) {
       console.warn(`[Synthesis OS] Main model gemini-3.5-flash failed for action "${action}". Attempting gemini-2.5-flash... Reason: ${err1.message}`);
@@ -253,21 +290,22 @@ async function callGeminiWithLocalFallback(
         const config2: any = {
           systemInstruction,
           temperature: action === 'SCAN_COMMENT' ? 0.1 : 0.3,
-          responseMimeType: 'application/json',
-          responseSchema: responseSchema,
         };
         
-        if (action === 'CRAWL_INTERNET') {
+        if (isCrawl) {
           config2.tools = [{ googleSearch: {} }];
+        } else {
+          config2.responseMimeType = 'application/json';
+          config2.responseSchema = responseSchema;
         }
 
         const response2 = await ai.models.generateContent({
           model: 'gemini-2.5-flash',
-          contents: prompt,
+          contents: finalPrompt,
           config: config2
         });
         if (response2.text) {
-          return JSON.parse(response2.text);
+          return parseJsonFromText(response2.text);
         }
       } catch (err2: any) {
         console.error(`[Synthesis OS] Secondary model gemini-2.5-flash failed as well. Reason: ${err2.message}`);
