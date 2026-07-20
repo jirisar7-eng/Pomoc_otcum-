@@ -236,6 +236,9 @@ export default function AiGuideSection() {
               <p className="text-sm text-slate-700 leading-relaxed font-sans font-medium">
                 {perplexityResult.answer}
               </p>
+              <div className="p-3 bg-rose-50/50 border border-rose-100 rounded-xl text-[10px] text-rose-700 font-medium">
+                ⚠️ <strong>Upozornění:</strong> Tento obsah slouží pouze k obecným informačním účelům a nenahrazuje právní poradenství.
+              </div>
             </div>
 
             {/* Bento Grid: Articles, Studies, Judgments, etc. */}

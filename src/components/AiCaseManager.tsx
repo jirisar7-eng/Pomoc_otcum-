@@ -918,6 +918,9 @@ export default function AiCaseManager({ currentUser, onOpenAuth }: AiCaseManager
                   <div className="text-xs text-slate-200 leading-relaxed space-y-2">
                     <p className="text-justify whitespace-pre-line">{analysisReport.statusSummary}</p>
                   </div>
+                  <div className="p-3 bg-indigo-900/40 border border-indigo-800/40 rounded-xl text-[10px] text-teal-300 font-medium">
+                    ⚠️ <strong>Upozornění:</strong> Tento obsah slouží pouze k obecným informačním účelům a nenahrazuje právní poradenství.
+                  </div>
                 </div>
 
                 {/* Strategy Points */}

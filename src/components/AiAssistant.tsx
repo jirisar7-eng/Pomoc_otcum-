@@ -236,7 +236,7 @@ export default function AiAssistant() {
                   e.preventDefault();
                   handleSendMessage(inputText);
                 }}
-                className="flex gap-2"
+                className="flex gap-2 animate-fadeIn"
                 id="ai-input-form"
               >
                 <input
@@ -257,6 +257,9 @@ export default function AiAssistant() {
                   <Send className="w-4 h-4" />
                 </button>
               </form>
+              <div className="mt-1.5 text-center text-[9px] text-slate-400 leading-snug border-t border-slate-100 pt-1.5" id="ai-disclaimer">
+                ⚠️ <strong>Tento obsah slouží pouze k obecným informačním účelům a nenahrazuje právní poradenství.</strong>
+              </div>
             </div>
           </motion.div>
         )}
