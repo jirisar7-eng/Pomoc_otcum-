@@ -558,21 +558,6 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-4" id="auth-form">
-                  {/* Quick Demo Account buttons */}
-                  <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                    <span className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold block mb-2 text-center">
-                      Rychlé přihlášení (SuperAdmin):
-                    </span>
-                    <button
-                      id="demo-admin-mallfuriionn-btn"
-                      type="button"
-                      onClick={() => setDemoUser('mallfuriionn')}
-                      className="w-full py-1.5 px-3 text-xs bg-slate-950 hover:bg-slate-800 border border-slate-900 text-teal-300 rounded-lg font-bold transition-all text-center flex items-center justify-center gap-1.5 shadow-sm cursor-pointer"
-                    >
-                      <Sparkles className="w-3.5 h-3.5 text-teal-400 animate-pulse" />
-                      Hlavní Administrátor (mallfuriionn)
-                    </button>
-                  </div>
 
                 {isRegister && (
                   <div>
@@ -636,39 +621,6 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
                   )}
                 </div>
 
-                {isRegister && (
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-600 mb-1.5">Typ testovacího účtu</label>
-                    <div className="grid grid-cols-2 gap-3">
-                      <label className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all ${role === 'user' ? 'border-teal-500 bg-teal-50/40 text-teal-900' : 'border-slate-200 bg-slate-50/50 hover:bg-slate-50'}`}>
-                        <div className="flex flex-col">
-                          <span className="text-xs font-bold">Běžný uživatel</span>
-                          <span className="text-[10px] text-slate-500">Komentáře, fórum, dotazy</span>
-                        </div>
-                        <input
-                          type="radio"
-                          name="role-select"
-                          checked={role === 'user'}
-                          onChange={() => setRole('user')}
-                          className="w-4 h-4 text-teal-600 accent-teal-600"
-                        />
-                      </label>
-                      <label className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all ${role === 'admin' ? 'border-indigo-500 bg-indigo-50/40 text-indigo-900' : 'border-slate-200 bg-slate-50/50 hover:bg-slate-50'}`}>
-                        <div className="flex flex-col">
-                          <span className="text-xs font-bold">Administrátor</span>
-                          <span className="text-[10px] text-slate-500">Moderování, články, správa</span>
-                        </div>
-                        <input
-                          type="radio"
-                          name="role-select"
-                          checked={role === 'admin'}
-                          onChange={() => setRole('admin')}
-                          className="w-4 h-4 text-indigo-600 accent-indigo-600"
-                        />
-                      </label>
-                    </div>
-                  </div>
-                )}
 
                 <button
                   id="auth-submit-btn"

@@ -206,6 +206,17 @@ function getLocalFallbackData(action: string, params: any): any {
         ]
       };
     }
+
+    case 'REWRITE_BIFF': {
+      const { text = '' } = params || {};
+      return {
+        biffAnalysis: `[Záložní AI režim] Zpráva obsahuje vysokou míru emocí, výčitky minulosti nebo zbytečný sarkasmus. Pro účely soudního spisu a klidné domluvy je nutné odstranit osobní útoky a zaměřit se výhradně na věcná fakta týkající se dětí.`,
+        biffRewritten: text.length > 5 
+          ? `Ahoj, píšu ohledně organizace péče o děti. Navrhuji věcné řešení, abychom předešli jakýmkoliv nedorozuměním. Dej mi prosím vědět, zda ti navržený čas vyhovuje, abych mohl naplánovat zbytek logistiky. Děkuji.`
+          : "Dobrý den, prosím o potvrzení termínu a detailů předání dětí, abychom se mohli v klidu a věcně dohodnout. Děkuji.",
+        courtWarning: "Původní zpráva vykazuje známky vyostřeného konfliktu. Pokud by ji druhá strana předložila opatrovnickému soudu nebo OSPODu, mohla by být interpretována jako neochota ke smírné dohodě a neschopnost komunikovat v zájmu nezletilých dětí."
+      };
+    }
     
     default:
       return {};
@@ -578,6 +589,37 @@ Musíš vrátit validní JSON s přesně těmito klíči:
             cleanedText: { type: 'STRING' }
           },
           required: ['isSafe', 'score', 'classification', 'diagnosis', 'cleanedText']
+        };
+        break;
+      }
+
+      case 'REWRITE_BIFF': {
+        const { text } = params || {};
+        systemInstruction = `Jsi "Synthesis BIFF Communication Coach" - specializovaný komunikační trenér pro rodiče v rozvodových situacích v ČR.
+Tvojí úlohou je vzít silně emočně nabitou, útočnou nebo nevhodnou zprávu doručenou druhému rodiči (či zamýšlenou k odeslání) a kompletně ji přepsat a zformovat podle mezinárodně uznávané metody BIFF:
+- Brief (Stručná): Žádné zbytečné vyčítání minulosti, ideálně jen pár vět.
+- Informative (Informativní): Obsahuje pouze fakta bez hodnocení druhého rodiče.
+- Friendly (Přátelská): Slušný tón, bez ironie, rýpání, sarkasmu a vykřičníků.
+- Firm (Pevná / Jasná): Jasně stanovené hranice a konkrétní otázka či termín, na který lze odpovědět ANO/NE nebo konkrétním údajem.
+
+Zprávu přepiš do spisovné, věcné, a slušné češtiny. Výsledný text musí být 100% bezpečný pro případné předložení opatrovnickému soudu nebo OSPODu jako důkaz o tvé nekonfliktní a věcné povaze.
+
+Musíš vrátit validní JSON s přesně těmito klíči:
+- "biffAnalysis": stručné vysvětlení v češtině (2-3 věty), co je v původní zprávě z komunikačního hlediska nevhodné (útoky, manipulace, emoce, dlouhé odstavce) a jak ji změnit.
+- "biffRewritten": navržená přepsaná zpráva podle pravidel BIFF, připravená k okamžitému odeslání.
+- "courtWarning": stručné zhodnocení (1-2 věty) právního rizika původní zprávy, pokud by ji druhá strana předložila soudu jako důkaz o agresivním nebo nevhodném chování.`;
+
+        prompt = `Přepiš prosím tuto zprávu do formátu BIFF:
+"${text || ''}"`;
+
+        responseSchema = {
+          type: 'OBJECT',
+          properties: {
+            biffAnalysis: { type: 'STRING' },
+            biffRewritten: { type: 'STRING' },
+            courtWarning: { type: 'STRING' }
+          },
+          required: ['biffAnalysis', 'biffRewritten', 'courtWarning']
         };
         break;
       }

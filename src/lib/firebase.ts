@@ -303,11 +303,6 @@ export async function loginWithGoogle(): Promise<User> {
     createdAt: existingData ? existingData.createdAt : new Date().toISOString()
   };
 
-  // If we loaded it but want to ensure mallfuriionn has admin privileges always:
-  if (fbUser.email === 'mallfuriionn@gmail.com') {
-    userData.role = 'admin';
-  }
-
   // Persist / update profile in Firestore
   try {
     await setDoc(userRef, userData, { merge: true });
@@ -412,11 +407,6 @@ export async function loginWithEmail(email: string, pass: string): Promise<User>
       createdAt: existingData ? existingData.createdAt : new Date().toISOString()
     };
     
-    // Always enforce admin role for mallfuriionn
-    if (finalEmail === 'mallfuriionn@gmail.com') {
-      userData.role = 'admin';
-    }
-
     try {
       await setDoc(userRef, userData, { merge: true });
     } catch (firestoreErr: any) {
@@ -491,10 +481,6 @@ export function subscribeToAuth(callback: (user: User | null) => void): () => vo
       try {
         const localUser = JSON.parse(localUserStr);
         if (localUser) {
-          // If the cached user is mallfuriionn@gmail.com, ensure they are admin
-          if (localUser.email === 'mallfuriionn@gmail.com') {
-            localUser.role = 'admin';
-          }
           callback(localUser);
         }
       } catch (e) {
@@ -510,9 +496,6 @@ export function subscribeToAuth(callback: (user: User | null) => void): () => vo
         const userSnap = await getDoc(userRef);
         if (userSnap.exists()) {
           const userData = userSnap.data() as User;
-          if (fbUser.email === 'mallfuriionn@gmail.com') {
-            userData.role = 'admin';
-          }
           if (typeof window !== 'undefined') {
             localStorage.setItem('synthesis_hub_local_user', JSON.stringify(userData));
           }

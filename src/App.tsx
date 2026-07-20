@@ -368,10 +368,8 @@ export default function App() {
   // Auth Callbacks
   const handleLogin = (user: User) => {
     setCurrentUser(user);
-    // If logged in as admin, redirect to admin panel immediately for preview convenience
-    if (user.role === 'admin') {
-      setActiveTab('admin');
-    }
+    // Redirect to personal workspace on login
+    setActiveTab('user-portal');
   };
 
   const handleLogout = () => {
