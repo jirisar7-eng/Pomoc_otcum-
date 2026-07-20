@@ -502,8 +502,19 @@ export default function KontaktSection() {
                 <h3 className="text-sm font-bold text-slate-800 font-display">Kontaktovat zakladatele</h3>
               </div>
 
+              <div className="bg-white p-3 rounded-xl border border-slate-100 space-y-1.5 shadow-3xs">
+                <span className="text-[9px] uppercase font-extrabold text-teal-600 font-mono block">Přímý kontakt</span>
+                <p className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                  <Mail className="w-3.5 h-3.5 text-teal-500" />
+                  <a href="mailto:sarji@seznam.cz" className="hover:text-teal-600 transition-colors">sarji@seznam.cz</a>
+                </p>
+                <p className="text-[10px] text-slate-500 leading-normal">
+                  E-mail je určený pro dotazy veřejnosti, spolupráci a nahlášení podnětů.
+                </p>
+              </div>
+
               <p className="text-xs text-slate-600 leading-relaxed">
-                Máte doplňující dotazy k portálu, chcete nahlásit chybu, nebo byste rádi doporučili spolehlivého odborníka k zařazení do našeho adresáře? Napište nám zprávu níže:
+                Můžete nás kontaktovat přímo na výše uvedený e-mail, nebo využít náš kontaktní formulář:
               </p>
 
               {sent ? (

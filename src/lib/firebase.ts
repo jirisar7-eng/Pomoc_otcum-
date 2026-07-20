@@ -290,15 +290,16 @@ export async function loginWithGoogle(): Promise<User> {
   
   let role: UserRole = 'user';
   // If email is administrator, default to admin
-  const isSuperAdmin = fbUser.email && (fbUser.email === 'admin@synthesis.cz' || fbUser.email === 'mallfuriionn@gmail.com');
-  if (fbUser.email && (fbUser.email === 'admin@synthesis.cz' || fbUser.email === 'mallfuriionn@gmail.com' || fbUser.email.includes('admin@'))) {
+  const lowerFbEmail = (fbUser.email || '').toLowerCase().trim();
+  const isSuperAdmin = lowerFbEmail === 'admin@synthesis.cz' || lowerFbEmail === 'mallfuriionn@gmail.com' || lowerFbEmail === 'sarji@seznam.cz';
+  if (isSuperAdmin || lowerFbEmail.includes('admin@')) {
     role = 'admin';
   }
 
   const userData: User = {
     id: fbUser.uid,
     email: fbUser.email || '',
-    name: fbUser.displayName || (fbUser.email === 'mallfuriionn@gmail.com' ? 'Administrátor (mallfuriionn)' : 'Uživatel'),
+    name: fbUser.displayName || (lowerFbEmail === 'mallfuriionn@gmail.com' ? 'Administrátor (mallfuriionn)' : (lowerFbEmail === 'sarji@seznam.cz' ? 'Administrátor (sarji)' : 'Uživatel')),
     role: isSuperAdmin ? 'admin' : (existingData ? (existingData.role as UserRole) : role),
     avatar: fbUser.photoURL || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(fbUser.displayName || fbUser.uid)}`,
     createdAt: existingData ? existingData.createdAt : new Date().toISOString()
@@ -335,13 +336,14 @@ export async function authorizeGoogleWorkspace(): Promise<string> {
 
 export async function registerWithEmail(email: string, pass: string, name: string): Promise<User> {
   let role: UserRole = 'user';
-  if (email === 'admin@synthesis.cz' || email === 'mallfuriionn@gmail.com' || email.includes('admin@')) {
+  const lowerEmail = email.toLowerCase().trim();
+  if (lowerEmail === 'admin@synthesis.cz' || lowerEmail === 'mallfuriionn@gmail.com' || lowerEmail === 'sarji@seznam.cz' || lowerEmail.includes('admin@')) {
     role = 'admin';
   }
 
-  // If this is mallfuriionn registering with 1234, increase the length programmatically so Firebase accepts it
+  // If this is mallfuriionn or sarji registering with 1234, increase the length programmatically so Firebase accepts it
   let finalPass = pass;
-  if (email === 'mallfuriionn@gmail.com' && pass === '1234') {
+  if ((lowerEmail === 'mallfuriionn@gmail.com' || lowerEmail === 'sarji@seznam.cz') && pass === '1234') {
     finalPass = 'mallfuriionn1234_secure';
   }
 
@@ -373,8 +375,9 @@ export async function registerWithEmail(email: string, pass: string, name: strin
 export async function loginWithEmail(email: string, pass: string): Promise<User> {
   let finalEmail = email;
   let finalPass = pass;
+  const lowerEmailCheck = email.toLowerCase().trim();
   
-  if (email === 'mallfuriionn@gmail.com' && pass === '1234') {
+  if ((lowerEmailCheck === 'mallfuriionn@gmail.com' || lowerEmailCheck === 'sarji@seznam.cz') && pass === '1234') {
     finalPass = 'mallfuriionn1234_secure';
   }
 
@@ -395,14 +398,15 @@ export async function loginWithEmail(email: string, pass: string): Promise<User>
     }
 
     let role: UserRole = 'user';
-    if (finalEmail === 'admin@synthesis.cz' || finalEmail === 'mallfuriionn@gmail.com' || finalEmail.includes('admin@')) {
+    const lowerFinalEmail = finalEmail.toLowerCase().trim();
+    if (lowerFinalEmail === 'admin@synthesis.cz' || lowerFinalEmail === 'mallfuriionn@gmail.com' || lowerFinalEmail === 'sarji@seznam.cz' || lowerFinalEmail.includes('admin@')) {
       role = 'admin';
     }
 
     const userData: User = {
       id: fbUser.uid,
       email: finalEmail,
-      name: fbUser.displayName || (finalEmail === 'mallfuriionn@gmail.com' ? 'Administrátor (mallfuriionn)' : 'Aktivní Rodič'),
+      name: fbUser.displayName || (lowerFinalEmail === 'mallfuriionn@gmail.com' ? 'Administrátor (mallfuriionn)' : (lowerFinalEmail === 'sarji@seznam.cz' ? 'Administrátor (sarji)' : 'Aktivní Rodič')),
       role: role,
       avatar: `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(finalEmail)}`,
       createdAt: existingData ? existingData.createdAt : new Date().toISOString()
@@ -421,17 +425,17 @@ export async function loginWithEmail(email: string, pass: string): Promise<User>
     
     return userData;
   } catch (err: any) {
-    // If the error indicates user not found and it's mallfuriionn, we auto-create the account!
-    if (email === 'mallfuriionn@gmail.com' && (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential' || err.code === 'auth/invalid-login-credentials')) {
+    // If the error indicates user not found and it's mallfuriionn or sarji, we auto-create the account!
+    if ((lowerEmailCheck === 'mallfuriionn@gmail.com' || lowerEmailCheck === 'sarji@seznam.cz') && (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential' || err.code === 'auth/invalid-login-credentials')) {
       try {
         const result = await createUserWithEmailAndPassword(auth, finalEmail, finalPass);
         const fbUser = result.user;
         const userData: User = {
           id: fbUser.uid,
           email: finalEmail,
-          name: 'Administrátor (mallfuriionn)',
+          name: lowerEmailCheck === 'sarji@seznam.cz' ? 'Administrátor (sarji)' : 'Administrátor (mallfuriionn)',
           role: 'admin',
-          avatar: `https://api.dicebear.com/7.x/adventurer/svg?seed=mallfuriionn`,
+          avatar: `https://api.dicebear.com/7.x/adventurer/svg?seed=${lowerEmailCheck === 'sarji@seznam.cz' ? 'sarji' : 'mallfuriionn'}`,
           createdAt: new Date().toISOString()
         };
         await setDoc(doc(db, 'users', fbUser.uid), userData);
@@ -445,14 +449,14 @@ export async function loginWithEmail(email: string, pass: string): Promise<User>
     }
 
     // Direct foolproof bypass fallback if Firebase/Vercel connectivity is broken or blocked
-    if (email === 'mallfuriionn@gmail.com') {
-      console.warn("Using local fallback session bypass for mallfuriionn");
+    if (lowerEmailCheck === 'mallfuriionn@gmail.com' || lowerEmailCheck === 'sarji@seznam.cz') {
+      console.warn("Using local fallback session bypass for admin email:", lowerEmailCheck);
       const fallbackUser: User = {
-        id: 'admin-mallfuriionn-uid',
-        email: 'mallfuriionn@gmail.com',
-        name: 'Administrátor (mallfuriionn - Alfa)',
+        id: lowerEmailCheck === 'sarji@seznam.cz' ? 'admin-sarji-uid' : 'admin-mallfuriionn-uid',
+        email: lowerEmailCheck === 'sarji@seznam.cz' ? 'sarji@seznam.cz' : 'mallfuriionn@gmail.com',
+        name: lowerEmailCheck === 'sarji@seznam.cz' ? 'Administrátor (sarji - Alfa)' : 'Administrátor (mallfuriionn - Alfa)',
         role: 'admin',
-        avatar: `https://api.dicebear.com/7.x/adventurer/svg?seed=mallfuriionn`,
+        avatar: `https://api.dicebear.com/7.x/adventurer/svg?seed=${lowerEmailCheck === 'sarji@seznam.cz' ? 'sarji' : 'mallfuriionn'}`,
         createdAt: new Date().toISOString()
       };
       if (typeof window !== 'undefined') {
@@ -481,8 +485,9 @@ export function subscribeToAuth(callback: (user: User | null) => void): () => vo
     if (localUserStr) {
       try {
         const localUser = JSON.parse(localUserStr);
-        if (localUser) {
-          if (localUser.email === 'mallfuriionn@gmail.com' || localUser.email === 'admin@synthesis.cz') {
+        if (localUser && localUser.email) {
+          const lowerEmail = localUser.email.toLowerCase().trim();
+          if (lowerEmail === 'mallfuriionn@gmail.com' || lowerEmail === 'admin@synthesis.cz' || lowerEmail === 'sarji@seznam.cz') {
             localUser.role = 'admin';
           }
           callback(localUser);
@@ -500,7 +505,8 @@ export function subscribeToAuth(callback: (user: User | null) => void): () => vo
         const userSnap = await getDoc(userRef);
         if (userSnap.exists()) {
           const userData = userSnap.data() as User;
-          if (userData.email === 'mallfuriionn@gmail.com' || userData.email === 'admin@synthesis.cz') {
+          const uEmail = (userData.email || fbUser.email || '').toLowerCase().trim();
+          if (uEmail === 'mallfuriionn@gmail.com' || uEmail === 'admin@synthesis.cz' || uEmail === 'sarji@seznam.cz') {
             userData.role = 'admin';
           }
           if (typeof window !== 'undefined') {
@@ -510,13 +516,14 @@ export function subscribeToAuth(callback: (user: User | null) => void): () => vo
         } else {
           // If no doc exists, create a default profile
           let role: UserRole = 'user';
-          if (fbUser.email === 'admin@synthesis.cz' || fbUser.email === 'mallfuriionn@gmail.com' || (fbUser.email && fbUser.email.includes('admin@'))) {
+          const lowerEmail = (fbUser.email || '').toLowerCase().trim();
+          if (lowerEmail === 'admin@synthesis.cz' || lowerEmail === 'mallfuriionn@gmail.com' || lowerEmail === 'sarji@seznam.cz' || lowerEmail.includes('admin@')) {
             role = 'admin';
           }
           const userData: User = {
             id: fbUser.uid,
             email: fbUser.email || '',
-            name: fbUser.displayName || (fbUser.email === 'mallfuriionn@gmail.com' ? 'Administrátor (mallfuriionn)' : 'Aktivní Rodič'),
+            name: fbUser.displayName || (lowerEmail === 'mallfuriionn@gmail.com' ? 'Administrátor (mallfuriionn)' : (lowerEmail === 'sarji@seznam.cz' ? 'Administrátor (sarji)' : 'Aktivní Rodič')),
             role: role,
             avatar: fbUser.photoURL || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(fbUser.uid)}`,
             createdAt: new Date().toISOString()
@@ -536,13 +543,14 @@ export function subscribeToAuth(callback: (user: User | null) => void): () => vo
         // Fallback: If we can't load the profile from Firestore (e.g., offline or transient errors),
         // let's still return a valid User object based on the authenticated fbUser so the session stays active.
         let role: UserRole = 'user';
-        if (fbUser.email === 'admin@synthesis.cz' || fbUser.email === 'mallfuriionn@gmail.com' || (fbUser.email && fbUser.email.includes('admin@'))) {
+        const lowerEmail = (fbUser.email || '').toLowerCase().trim();
+        if (lowerEmail === 'admin@synthesis.cz' || lowerEmail === 'mallfuriionn@gmail.com' || lowerEmail === 'sarji@seznam.cz' || lowerEmail.includes('admin@')) {
           role = 'admin';
         }
         const fallbackUser: User = {
           id: fbUser.uid,
           email: fbUser.email || '',
-          name: fbUser.displayName || (fbUser.email === 'mallfuriionn@gmail.com' ? 'Administrátor (mallfuriionn)' : fbUser.email?.split('@')[0]) || 'Aktivní Rodič',
+          name: fbUser.displayName || (lowerEmail === 'mallfuriionn@gmail.com' ? 'Administrátor (mallfuriionn)' : (lowerEmail === 'sarji@seznam.cz' ? 'Administrátor (sarji)' : fbUser.email?.split('@')[0] || 'Aktivní Rodič')),
           role: role,
           avatar: fbUser.photoURL || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(fbUser.uid)}`,
           createdAt: new Date().toISOString()

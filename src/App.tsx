@@ -81,9 +81,20 @@ export default function App() {
   const { t } = useLanguage();
   // Global Authentication & Navigation States
   const [currentUser, setCurrentUser] = useState<User | null>(() => {
-    const user = getStoredState<User | null>('current_user', null);
-    if (user && (user.email === 'mallfuriionn@gmail.com' || user.email === 'admin@synthesis.cz')) {
-      user.role = 'admin';
+    let user = getStoredState<User | null>('current_user', null);
+    if (!user && typeof window !== 'undefined') {
+      try {
+        const localUserStr = localStorage.getItem('synthesis_hub_local_user');
+        if (localUserStr) {
+          user = JSON.parse(localUserStr);
+        }
+      } catch (e) {}
+    }
+    if (user && user.email) {
+      const lowerEmail = user.email.toLowerCase().trim();
+      if (lowerEmail === 'mallfuriionn@gmail.com' || lowerEmail === 'admin@synthesis.cz' || lowerEmail === 'sarji@seznam.cz') {
+        user.role = 'admin';
+      }
     }
     return user;
   });

@@ -63,7 +63,8 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
       return;
     }
 
-    if (password.length < 6 && !(email === 'mallfuriionn@gmail.com' && password === '1234')) {
+    const lowerEmail = email.toLowerCase().trim();
+    if (password.length < 6 && !((lowerEmail === 'mallfuriionn@gmail.com' || lowerEmail === 'sarji@seznam.cz') && password === '1234')) {
       setError('Heslo musí mít alespoň 6 znaků.');
       return;
     }
@@ -116,7 +117,10 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
       const isLinkedWithPassword = currentUser?.providerData.some(p => p.providerId === 'password');
       
       // Let's also detect if we're in fallback environment
-      const isFallbackLocalUser = currentUser && currentUser.email === 'mallfuriionn@gmail.com';
+      const isFallbackLocalUser = currentUser && (
+        currentUser.email?.toLowerCase().trim() === 'mallfuriionn@gmail.com' ||
+        currentUser.email?.toLowerCase().trim() === 'sarji@seznam.cz'
+      );
 
       // Bypass password linking for the admin user
       if (isFallbackLocalUser) {
@@ -211,11 +215,13 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
     }
   };
 
-  const setDemoUser = async (type: 'mallfuriionn') => {
+  const setDemoUser = async (type: 'mallfuriionn' | 'sarji') => {
     setError('');
     setLoading(true);
+    const targetEmail = type === 'sarji' ? 'sarji@seznam.cz' : 'mallfuriionn@gmail.com';
+    const targetName = type === 'sarji' ? 'Administrátor (sarji)' : 'Hlavní Administrátor (mallfuriionn)';
     try {
-      const loggedInUser = await loginWithEmail('mallfuriionn@gmail.com', '1234');
+      const loggedInUser = await loginWithEmail(targetEmail, '1234');
       setSuccess(true);
       setTimeout(() => {
         onLogin(loggedInUser);
@@ -227,9 +233,9 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
       setLoading(false);
       console.error("Demo login error:", err);
       // Fallback: just prefill if direct login fails
-      setEmail('mallfuriionn@gmail.com');
+      setEmail(targetEmail);
       setPassword('1234');
-      setName('Hlavní Administrátor');
+      setName(targetName);
       setRole('admin');
       setIsRegister(false);
     }
@@ -549,6 +555,32 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
                       </ol>
                     </motion.div>
                   )}
+                </div>
+
+                {/* Admin Quick Access Panel */}
+                <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2" id="admin-quick-access-panel">
+                  <div className="flex items-center gap-1.5">
+                    <Shield className="w-3.5 h-3.5 text-teal-600" />
+                    <span className="text-[9px] uppercase font-black text-slate-500 tracking-wider font-mono">Rychlé přihlášení správce</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setDemoUser('mallfuriionn')}
+                      className="py-1.5 px-2 bg-slate-800 hover:bg-slate-900 text-white font-bold text-[10px] rounded-lg transition-all flex items-center justify-center gap-1 cursor-pointer shadow-3xs"
+                      title="Přihlásit se jako Jiří Šár (mallfuriionn@gmail.com)"
+                    >
+                      Jiří Šár
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setDemoUser('sarji')}
+                      className="py-1.5 px-2 bg-teal-600 hover:bg-teal-700 text-white font-bold text-[10px] rounded-lg transition-all flex items-center justify-center gap-1 cursor-pointer shadow-3xs"
+                      title="Přihlásit se jako Sarji (sarji@seznam.cz)"
+                    >
+                      Sarji
+                    </button>
+                  </div>
                 </div>
 
                 <div className="relative flex py-2 items-center">

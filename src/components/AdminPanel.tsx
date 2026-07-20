@@ -1458,8 +1458,9 @@ ${cases.map(c => `Název: ${c.title}\nStav: ${c.status}\nChronologie:\n` + (c.ch
 
   // Checks RBAC authorization
   const isAdmin = currentUser?.role === 'admin' || 
-                  currentUser?.email === 'mallfuriionn@gmail.com' || 
-                  currentUser?.email === 'admin@synthesis.cz';
+                  currentUser?.email?.toLowerCase().trim() === 'mallfuriionn@gmail.com' || 
+                  currentUser?.email?.toLowerCase().trim() === 'admin@synthesis.cz' ||
+                  currentUser?.email?.toLowerCase().trim() === 'sarji@seznam.cz';
 
   if (!isAdmin) {
     return (
