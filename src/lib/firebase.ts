@@ -92,6 +92,42 @@ googleProvider.addScope('https://www.googleapis.com/auth/gmail.send');
 // In-memory cache for Google OAuth access token
 let cachedAccessToken: string | null = null;
 
+// Ultra-fast Firestore doc reader with 800ms fallback timeout
+async function getDocWithFastTimeout(docRef: any, ms = 800): Promise<any> {
+  return new Promise((resolve) => {
+    let finished = false;
+    const timer = setTimeout(() => {
+      if (!finished) {
+        finished = true;
+        resolve({ exists: () => false, data: () => null });
+      }
+    }, ms);
+
+    getDoc(docRef)
+      .then((snap) => {
+        if (!finished) {
+          finished = true;
+          clearTimeout(timer);
+          resolve(snap);
+        }
+      })
+      .catch(() => {
+        if (!finished) {
+          finished = true;
+          clearTimeout(timer);
+          resolve({ exists: () => false, data: () => null });
+        }
+      });
+  });
+}
+
+// Non-blocking background Firestore saver
+function saveDocNonBlocking(docRef: any, data: any, options?: any) {
+  setDoc(docRef, data, options).catch((err) => {
+    console.warn("Background setDoc skipped or offline:", err?.message || err);
+  });
+}
+
 export function getCachedAccessToken(): string | null {
   return cachedAccessToken;
 }
@@ -123,7 +159,7 @@ export async function loginWithGoogle(): Promise<User> {
       const userRef = doc(db, 'users', fbUser.uid);
       let existingData: any = null;
       try {
-        const userSnap = await getDoc(userRef);
+        const userSnap = await getDocWithFastTimeout(userRef, 800);
         if (userSnap.exists()) {
           existingData = userSnap.data();
         }
@@ -140,11 +176,7 @@ export async function loginWithGoogle(): Promise<User> {
         createdAt: existingData ? existingData.createdAt : new Date().toISOString()
       };
       
-      try {
-        await setDoc(userRef, userData, { merge: true });
-      } catch (saveErr) {
-        console.log("Could not save fallback user to Firestore (offline):", saveErr);
-      }
+      saveDocNonBlocking(userRef, userData, { merge: true });
       
       if (typeof window !== 'undefined') {
         localStorage.setItem('synthesis_hub_local_user', JSON.stringify(userData));
@@ -168,7 +200,7 @@ export async function loginWithGoogle(): Promise<User> {
             createdAt: new Date().toISOString()
           };
           
-          await setDoc(userRef, userData, { merge: true });
+          saveDocNonBlocking(userRef, userData, { merge: true });
           
           if (typeof window !== 'undefined') {
             localStorage.setItem('synthesis_hub_local_user', JSON.stringify(userData));
@@ -204,7 +236,7 @@ export async function loginWithGoogle(): Promise<User> {
         const userRef = doc(db, 'users', fbUser.uid);
         let existingData: any = null;
         try {
-          const userSnap = await getDoc(userRef);
+          const userSnap = await getDocWithFastTimeout(userRef, 800);
           if (userSnap.exists()) {
             existingData = userSnap.data();
           }
@@ -221,11 +253,7 @@ export async function loginWithGoogle(): Promise<User> {
           createdAt: existingData ? existingData.createdAt : new Date().toISOString()
         };
         
-        try {
-          await setDoc(userRef, userData, { merge: true });
-        } catch (saveErr) {
-          console.warn("Could not save fallback user to Firestore:", saveErr);
-        }
+        saveDocNonBlocking(userRef, userData, { merge: true });
         
         if (typeof window !== 'undefined') {
           localStorage.setItem('synthesis_hub_local_user', JSON.stringify(userData));
@@ -249,7 +277,7 @@ export async function loginWithGoogle(): Promise<User> {
               createdAt: new Date().toISOString()
             };
             
-            await setDoc(userRef, userData, { merge: true });
+            saveDocNonBlocking(userRef, userData, { merge: true });
             
             if (typeof window !== 'undefined') {
               localStorage.setItem('synthesis_hub_local_user', JSON.stringify(userData));
@@ -280,7 +308,7 @@ export async function loginWithGoogle(): Promise<User> {
   
   let existingData: any = null;
   try {
-    const userSnap = await getDoc(userRef);
+    const userSnap = await getDocWithFastTimeout(userRef, 800);
     if (userSnap.exists()) {
       existingData = userSnap.data();
     }
@@ -305,12 +333,8 @@ export async function loginWithGoogle(): Promise<User> {
     createdAt: existingData ? existingData.createdAt : new Date().toISOString()
   };
 
-  // Persist / update profile in Firestore
-  try {
-    await setDoc(userRef, userData, { merge: true });
-  } catch (err: any) {
-    console.log("Could not save user profile to Firestore (likely offline):", err);
-  }
+  // Persist / update profile in Firestore in background
+  saveDocNonBlocking(userRef, userData, { merge: true });
 
   // Also cache locally to bypass issues
   if (typeof window !== 'undefined') {
@@ -359,11 +383,7 @@ export async function registerWithEmail(email: string, pass: string, name: strin
     createdAt: new Date().toISOString()
   };
 
-  try {
-    await setDoc(doc(db, 'users', fbUser.uid), userData);
-  } catch (err) {
-    console.warn("Could not save registered user profile to Firestore (likely offline):", err);
-  }
+  saveDocNonBlocking(doc(db, 'users', fbUser.uid), userData);
   
   if (typeof window !== 'undefined') {
     localStorage.setItem('synthesis_hub_local_user', JSON.stringify(userData));
@@ -389,7 +409,7 @@ export async function loginWithEmail(email: string, pass: string): Promise<User>
     let userSnap = null;
     let existingData: any = null;
     try {
-      userSnap = await getDoc(userRef);
+      userSnap = await getDocWithFastTimeout(userRef, 800);
       if (userSnap.exists()) {
         existingData = userSnap.data();
       }
@@ -412,11 +432,7 @@ export async function loginWithEmail(email: string, pass: string): Promise<User>
       createdAt: existingData ? existingData.createdAt : new Date().toISOString()
     };
     
-    try {
-      await setDoc(userRef, userData, { merge: true });
-    } catch (firestoreErr: any) {
-      console.warn("Could not save user profile to Firestore during login (likely offline):", firestoreErr);
-    }
+    saveDocNonBlocking(userRef, userData, { merge: true });
     
     // Also cache locally to bypass Vercel domains issue on hot refresh
     if (typeof window !== 'undefined') {
@@ -440,7 +456,7 @@ export async function loginWithEmail(email: string, pass: string): Promise<User>
           avatar: `https://api.dicebear.com/7.x/adventurer/svg?seed=${lowerEmailCheck === 'sarji@seznam.cz' ? 'sarji' : 'mallfuriionn'}`,
           createdAt: new Date().toISOString()
         };
-        await setDoc(doc(db, 'users', fbUser.uid), userData);
+        saveDocNonBlocking(doc(db, 'users', fbUser.uid), userData);
         if (typeof window !== 'undefined') {
           localStorage.setItem('synthesis_hub_local_user', JSON.stringify(userData));
         }
@@ -510,7 +526,7 @@ export function subscribeToAuth(callback: (user: User | null) => void): () => vo
     if (fbUser) {
       try {
         const userRef = doc(db, 'users', fbUser.uid);
-        const userSnap = await getDoc(userRef);
+        const userSnap = await getDocWithFastTimeout(userRef, 800);
         if (userSnap.exists()) {
           const userData = userSnap.data() as User;
           const uEmail = (userData.email || fbUser.email || '').toLowerCase().trim();
@@ -536,7 +552,7 @@ export function subscribeToAuth(callback: (user: User | null) => void): () => vo
             avatar: fbUser.photoURL || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(fbUser.uid)}`,
             createdAt: new Date().toISOString()
           };
-          await setDoc(userRef, userData);
+          saveDocNonBlocking(userRef, userData);
           if (typeof window !== 'undefined') {
             localStorage.setItem('synthesis_hub_local_user', JSON.stringify(userData));
           }
