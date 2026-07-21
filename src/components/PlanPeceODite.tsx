@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Heart, Sliders, CalendarRange } from 'lucide-react';
+import { Heart, Sliders, CalendarRange, Sparkles } from 'lucide-react';
 import PeceODiteSection from './PeceODiteSection';
 import CareSimulator from './CareSimulator';
+import CareSimulatorWizard from './CareSimulatorWizard';
 import { User } from '../types';
 
 interface PlanPeceODiteProps {
@@ -11,20 +12,26 @@ interface PlanPeceODiteProps {
 }
 
 export default function PlanPeceODite({ currentUser, onOpenAuth, setActiveTab }: PlanPeceODiteProps) {
-  const [subTab, setSubTab] = useState<'principles' | 'simulator'>('principles');
+  const [subTab, setSubTab] = useState<'principles' | 'simulator' | 'wizard'>('wizard');
 
   const tabs = [
     {
-      id: 'principles',
-      label: 'Principy & Zásady péče',
-      icon: Heart,
-      desc: 'Formy péče, psychologické dopady, Dr. Warshak, dětští psychologové.'
+      id: 'wizard',
+      label: 'Simulátor Péče & Sourozenců (Průvodce)',
+      icon: Sparkles,
+      desc: 'Krokový průvodce (5 kroků), posouzení sourozenecké vazby a generování podkladu pro Soud/OSPOD.'
     },
     {
       id: 'simulator',
       label: 'Simulátor střídání (Kalendář)',
       icon: Sliders,
       desc: 'Interaktivní plánovač, výpočet dnů a procentuálního podílu péče.'
+    },
+    {
+      id: 'principles',
+      label: 'Principy & Zásady péče',
+      icon: Heart,
+      desc: 'Formy péče, psychologické dopady, Dr. Warshak, dětští psychologové.'
     }
   ] as const;
 
@@ -48,14 +55,14 @@ export default function PlanPeceODite({ currentUser, onOpenAuth, setActiveTab }:
       </div>
 
       {/* Controller Buttons */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 bg-slate-50 p-2.5 rounded-2xl border border-slate-100 shadow-3xs">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 bg-slate-50 p-2.5 rounded-2xl border border-slate-100 shadow-3xs">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = subTab === tab.id;
           return (
             <button
               key={tab.id}
-              onClick={() => setSubTab(tab.id)}
+              onClick={() => setSubTab(tab.id as any)}
               className={`flex items-start gap-3 p-3.5 rounded-xl text-left transition-all cursor-pointer border ${
                 isActive
                   ? 'bg-white border-teal-200/60 shadow-3xs text-teal-950 scale-[1.01]'
@@ -82,7 +89,9 @@ export default function PlanPeceODite({ currentUser, onOpenAuth, setActiveTab }:
 
       {/* Tab Render Area */}
       <div className="bg-white rounded-3xl border border-slate-100 shadow-3xs p-1 md:p-3">
-        {subTab === 'principles' ? (
+        {subTab === 'wizard' ? (
+          <CareSimulatorWizard />
+        ) : subTab === 'principles' ? (
           <PeceODiteSection 
             currentUser={currentUser} 
             onOpenAuth={onOpenAuth} 
