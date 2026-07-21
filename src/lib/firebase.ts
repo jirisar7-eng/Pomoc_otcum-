@@ -128,7 +128,7 @@ export async function loginWithGoogle(): Promise<User> {
           existingData = userSnap.data();
         }
       } catch (dbErr) {
-        console.warn("Firestore access failed during fallback login:", dbErr);
+        console.log("Firestore access offline during fallback login:", dbErr);
       }
       
       const userData: User = {
@@ -143,7 +143,7 @@ export async function loginWithGoogle(): Promise<User> {
       try {
         await setDoc(userRef, userData, { merge: true });
       } catch (saveErr) {
-        console.warn("Could not save fallback user to Firestore:", saveErr);
+        console.log("Could not save fallback user to Firestore (offline):", saveErr);
       }
       
       if (typeof window !== 'undefined') {
@@ -285,7 +285,7 @@ export async function loginWithGoogle(): Promise<User> {
       existingData = userSnap.data();
     }
   } catch (err: any) {
-    console.warn("Firestore offline or unavailable during Google login. Using fallback.", err);
+    console.log("Firestore offline or unavailable during Google login. Using local storage.", err);
   }
   
   let role: UserRole = 'user';
@@ -309,7 +309,7 @@ export async function loginWithGoogle(): Promise<User> {
   try {
     await setDoc(userRef, userData, { merge: true });
   } catch (err: any) {
-    console.warn("Could not save user profile to Firestore (likely offline):", err);
+    console.log("Could not save user profile to Firestore (likely offline):", err);
   }
 
   // Also cache locally to bypass issues

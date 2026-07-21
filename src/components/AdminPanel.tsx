@@ -596,7 +596,7 @@ export default function AdminPanel({
           }
           setFirebaseStatus('active');
         } catch (err) {
-          console.warn("Could not fetch user list from Firestore:", err);
+          console.log("Firestore offline or unavailable (using local fallback list):", err);
           setFirebaseStatus('offline');
         }
       })();
