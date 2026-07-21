@@ -19,6 +19,8 @@ import { useLanguage } from '../lib/LanguageContext';
 import { saveDocument, deleteDocument, getCollectionData } from '../lib/firebase';
 import { AIAdminActions } from '../lib/ai-admin/actions';
 import { AIAdminClient } from '../lib/ai-admin/client';
+import AdminAuditLogs from './AdminAuditLogs';
+import { logDatabaseActivity } from '../utils';
 
 interface AdminPanelProps {
   currentUser: User | null;
@@ -272,8 +274,10 @@ export default function AdminPanel({
 
     try {
       await saveDocument('users', editingUser.id, updatedUser);
-    } catch (err) {
+      logDatabaseActivity('UPDATE_USER', 'SUCCESS', `Uživatel s ID ${editingUser.id} (${updatedUser.email}) byl úspěšně aktualizován.`);
+    } catch (err: any) {
       console.warn("Could not save edited user to Firestore:", err);
+      logDatabaseActivity('UPDATE_USER', 'ERROR', `Aktualizace uživatele s ID ${editingUser.id} selhala.`, err.message || err.toString());
     }
 
     setUsersList(prev => prev.map(u => u.id === editingUser.id ? updatedUser : u));
@@ -682,8 +686,10 @@ export default function AdminPanel({
 
     try {
       await saveDocument('users', newId, newUserObj);
-    } catch (err) {
+      logDatabaseActivity('CREATE_USER', 'SUCCESS', `Uživatel s ID ${newId} (${newUserObj.email}) byl úspěšně vytvořen.`);
+    } catch (err: any) {
       console.warn("Could not save new user to Firestore directly:", err);
+      logDatabaseActivity('CREATE_USER', 'ERROR', `Vytvoření uživatele s ID ${newId} selhalo.`, err.message || err.toString());
     }
 
     setUsersList(prev => [...prev, newUserObj]);
@@ -727,8 +733,10 @@ export default function AdminPanel({
     if (targetUser) {
       try {
         await saveDocument('users', id, targetUser);
-      } catch (err) {
+        logDatabaseActivity('CHANGE_USER_ROLE', 'SUCCESS', `Uživateli s ID ${id} (${targetUser.email}) byla změněna role na ${newRole} (${newSubRole || 'bez podrole'}).`);
+      } catch (err: any) {
         console.warn("Could not update user role in Firestore:", err);
+        logDatabaseActivity('CHANGE_USER_ROLE', 'ERROR', `Změna role pro uživatele s ID ${id} selhala.`, err.message || err.toString());
       }
     }
 
@@ -4104,6 +4112,9 @@ ${cases.map(c => `Název: ${c.title}\nStav: ${c.status}\nChronologie:\n` + (c.ch
                   ))}
                 </div>
               </div>
+
+              {/* New database-connected Audit Logs section */}
+              <AdminAuditLogs />
 
               {/* Ledger audit trail table */}
               <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-2xs space-y-4">

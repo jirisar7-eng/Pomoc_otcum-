@@ -236,11 +236,12 @@ export interface PrivateMessage {
 }
 
 export interface AuditLog {
-  id: string;
+  id?: string;
+  timestamp: string;
   action: string;
-  userName: string;
-  date: string;
+  status: 'SUCCESS' | 'ERROR';
   details: string;
+  errorMessage?: string;
 }
 
 export interface Partner {

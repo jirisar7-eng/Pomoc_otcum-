@@ -6,6 +6,7 @@
 import express from 'express';
 import path from 'path';
 import dotenv from 'dotenv';
+import fs from 'fs';
 import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI } from '@google/genai';
 
@@ -333,6 +334,93 @@ async function callGeminiWithLocalFallback(
 // 1. API ROUTES FIRST
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Audit Log Persistence & Endpoints
+const AUDIT_LOGS_FILE = path.join(process.cwd(), 'audit_logs_db.json');
+let inMemoryAuditLogs: any[] = [];
+
+function readAuditLogs(): any[] {
+  try {
+    if (fs.existsSync(AUDIT_LOGS_FILE)) {
+      const data = fs.readFileSync(AUDIT_LOGS_FILE, 'utf-8');
+      const parsed = JSON.parse(data);
+      if (Array.isArray(parsed)) {
+        return parsed;
+      }
+    }
+  } catch (err) {
+    console.error('Failed to read audit logs from file:', err);
+  }
+  return inMemoryAuditLogs;
+}
+
+function writeAuditLog(log: any): boolean {
+  try {
+    // Add to memory
+    inMemoryAuditLogs.unshift(log);
+    if (inMemoryAuditLogs.length > 500) {
+      inMemoryAuditLogs.length = 500;
+    }
+    
+    // Read current logs from file
+    let logs: any[] = [];
+    if (fs.existsSync(AUDIT_LOGS_FILE)) {
+      const data = fs.readFileSync(AUDIT_LOGS_FILE, 'utf-8');
+      const parsed = JSON.parse(data);
+      if (Array.isArray(parsed)) {
+        logs = parsed;
+      }
+    }
+    
+    logs.unshift(log);
+    if (logs.length > 500) {
+      logs.length = 500;
+    }
+    
+    fs.writeFileSync(AUDIT_LOGS_FILE, JSON.stringify(logs, null, 2), 'utf-8');
+    return true;
+  } catch (err) {
+    console.error('Failed to write audit log to file:', err);
+    return false;
+  }
+}
+
+// POST endpoint to record audit logs
+app.post('/api/audit-log', (req, res) => {
+  try {
+    const { action, status, details, errorMessage } = req.body;
+    
+    if (!action || !status || !details) {
+      res.status(400).json({ error: 'Chybí povinné parametry: action, status, details.' });
+      return;
+    }
+    
+    const newLog = {
+      id: 'log-' + Math.random().toString(36).substring(2, 11),
+      timestamp: new Date().toISOString(),
+      action,
+      status, // 'SUCCESS' | 'ERROR'
+      details,
+      errorMessage: errorMessage || undefined
+    };
+    
+    writeAuditLog(newLog);
+    res.status(201).json({ success: true, log: newLog });
+  } catch (err: any) {
+    res.status(500).json({ error: 'Interní chyba při ukládání logu', details: err.message });
+  }
+});
+
+// GET endpoint to fetch latest 50 logs
+app.get('/api/audit-logs', (req, res) => {
+  try {
+    const logs = readAuditLogs();
+    const limitedLogs = logs.slice(0, 50);
+    res.json(limitedLogs);
+  } catch (err: any) {
+    res.status(500).json({ error: 'Interní chyba při načítání logů', details: err.message });
+  }
 });
 
 // Secure API Proxy for Synthesis AI Assistant
