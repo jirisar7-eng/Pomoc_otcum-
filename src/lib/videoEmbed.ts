@@ -161,6 +161,22 @@ export function parseVideoUrl(
         id = 'ig-' + Math.abs(hashCode(trimmedUrl));
       }
     }
+
+    // 6. X (Twitter) Parser
+    // Matches:
+    // - https://x.com/username/status/123456789
+    // - https://twitter.com/username/status/123456789
+    else if (/x\.com|twitter\.com/i.test(trimmedUrl)) {
+      platform = 'x';
+      const match = trimmedUrl.match(/status\/(\d+)/i);
+      if (match && match[1]) {
+        id = match[1];
+        embedUrl = `https://platform.twitter.com/embed/Tweet.html?id=${id}`;
+      } else {
+        embedUrl = trimmedUrl;
+        id = 'x-' + Math.abs(hashCode(trimmedUrl));
+      }
+    }
   } catch (error) {
     console.error('Error parsing video URL:', error);
   }

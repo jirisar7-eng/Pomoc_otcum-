@@ -33,6 +33,7 @@ import {
   Database,
   Share2,
   Landmark,
+  Tv,
   ChevronDown,
   ChevronRight
 } from 'lucide-react';
@@ -92,6 +93,7 @@ export default function Navigation({
       id: 'study',
       title: 'III. Studijní centrum',
       items: [
+        { id: 'videoteka', label: 'Videotéka & Rozhovory', icon: Tv, desc: 'Odborná videa, rozbory judikátů a rozhovory.' },
         { id: 'knihovna-studies', label: 'Knihovna studií', icon: BookOpen, desc: 'Vědecké výzkumy o střídavé péči a psychologii.' },
         { id: 'news', label: 'Články & Informační báze', icon: Bell, desc: 'Odborné články, rady a právní rozbory.' },
         { id: 'vzdelavani', label: 'Vzdělávání & Poradna', icon: ShieldCheck, desc: 'Metodiky zvládání rozvodového konfliktu.' }

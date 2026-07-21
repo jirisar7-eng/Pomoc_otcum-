@@ -257,12 +257,39 @@ export interface Partner {
   createdAt: string;
 }
 
+export type VideoPlatform = 'youtube' | 'facebook' | 'vimeo' | 'tiktok' | 'instagram' | 'x' | 'unknown';
+export type VideoStatus = 'Approved' | 'Draft' | 'Archived';
+
+export interface VideoItem {
+  id: string;
+  title: string;
+  description: string;
+  shareUrl: string;
+  platform: VideoPlatform;
+  author: string;
+  source: string;
+  partnerId?: string;
+  partnerName?: string;
+  tags: string[];
+  category: string;
+  createdAt: string;
+  updatedAt: string;
+  createdBy: string;
+  status: VideoStatus;
+  isFeatured: boolean;
+  views: number;
+  likes: number;
+  language: 'CS' | 'SK' | 'EN';
+  thumbnailUrl?: string;
+  embedUrl?: string;
+}
+
 export interface VideoSource {
   id: string;
   url: string;
   title: string;
   author: string;
-  platform: 'youtube' | 'facebook' | 'vimeo' | 'tiktok' | 'instagram' | 'unknown';
+  platform: VideoPlatform;
   embedUrl: string;
   tags?: string[];
   savedAt?: string;

@@ -109,6 +109,8 @@ export default function SmartVideoEmbed({
         return { label: 'Instagram', color: 'bg-pink-50 text-pink-700 border-pink-200/50', icon: Video };
       case 'facebook':
         return { label: 'Facebook', color: 'bg-blue-50 text-blue-700 border-blue-200/50', icon: Video };
+      case 'x':
+        return { label: 'X (Twitter)', color: 'bg-slate-900 text-white border-slate-700', icon: Video };
       default:
         return { label: 'Video odkaz', color: 'bg-slate-50 text-slate-700 border-slate-200/50', icon: Video };
     }

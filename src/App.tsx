@@ -74,6 +74,7 @@ import LanguageSwitcher from './components/LanguageSwitcher';
 
 // High-fidelity expert educational and legal tools
 import KnihovnaStudies from './components/KnihovnaStudies';
+import VideotekaView from './components/VideotekaView';
 import VzdelavaniSection from './components/VzdelavaniSection';
 import PripadovaDatabaze from './components/PripadovaDatabaze';
 import CentrumFormularu from './components/CentrumFormularu';
@@ -478,6 +479,14 @@ export default function App() {
 
             {activeTab === 'ke-stazeni' && (
               <KeStazeniSection />
+            )}
+
+            {activeTab === 'videoteka' && (
+              <VideotekaView 
+                setActiveTab={setActiveTab} 
+                currentUserRole={currentUser?.role} 
+                partners={partners} 
+              />
             )}
 
             {activeTab === 'knihovna-studii' && (

@@ -121,6 +121,15 @@ export const SEO_CONFIGS: Record<string, PageSeoConfig> = {
     category: 'Studijní centrum',
     parentLabel: 'Studijní centrum'
   },
+  videoteka: {
+    title: 'Videotéka rodinného práva a rozhovory | Táta má právo',
+    h1: 'Odborná videa, rozbory judikátů a rozhovory s experty',
+    description: 'Univerzální vzdělávací videotéka. Přednášky psychologů, návody k OSPOD, soudní rozbory a příběhy otců z YouTube, Vimeo, Facebooku a dalších platforem.',
+    keywords: 'videotéka, videa střídavá péče, rozhovory opatrovnictví, OSPOD návody video, judikáty video',
+    canonicalPath: '/videoteka',
+    category: 'Studijní centrum',
+    parentLabel: 'Studijní centrum'
+  },
   news: {
     title: 'Informační báze a odborné články | Táta má právo',
     h1: 'Aktuality, odborné analýzy a průvodce',

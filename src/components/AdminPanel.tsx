@@ -11,7 +11,7 @@ import {
   Database, Copy, RefreshCw, Play, Sparkles, LayoutDashboard,
   Scale, Folder, Briefcase, Camera, Video, Mic, MessageCircle,
   UserCheck, Users, Calendar, Cpu, BarChart2, Paintbrush, Search,
-  Sliders, Settings, Activity, FileCode, Share2, Download, ArrowUp, ArrowDown
+  Sliders, Settings, Activity, FileCode, Share2, Download, ArrowUp, ArrowDown, Tv
 } from 'lucide-react';
 import { Article, ExperienceStory, ForumPost, Comment, User, Donation, Partner } from '../types';
 import { getSupabaseUrl, getSupabaseAnonKey, isSupabaseConfigured, getSupabase, resetSupabaseInstance } from '../lib/supabase';
@@ -20,6 +20,7 @@ import { saveDocument, deleteDocument, getCollectionData } from '../lib/firebase
 import { AIAdminActions } from '../lib/ai-admin/actions';
 import { AIAdminClient } from '../lib/ai-admin/client';
 import AdminAuditLogs from './AdminAuditLogs';
+import AdminVideoteka from './AdminVideoteka';
 import { logDatabaseActivity } from '../utils';
 
 interface AdminPanelProps {
@@ -1538,6 +1539,7 @@ ${cases.map(c => `Název: ${c.title}\nStav: ${c.status}\nChronologie:\n` + (c.ch
                 category: 'II. Obsah & Databáze',
                 items: [
                   { id: 'editorial', label: 'Obsah & Redakční fronta', icon: FileText, badge: 'OBSAH' },
+                  { id: 'videoteka', label: 'Videotéka & Správa videí', icon: Tv, badge: 'VIDEO', highlight: true },
                   { id: 'judikatura', label: 'Judikatura & Rozhodnutí', icon: Scale },
                   { id: 'documents', label: 'Dokumenty & Vzory', icon: FileCode },
                   { id: 'cases', label: 'Případové centrum', icon: Briefcase },
@@ -1957,6 +1959,11 @@ ${cases.map(c => `Název: ${c.title}\nStav: ${c.status}\nChronologie:\n` + (c.ch
                 </form>
               </div>
             </div>
+          )}
+
+          {/* TAB VIDEOTEKA */}
+          {activeMenu === 'videoteka' && (
+            <AdminVideoteka partners={partners} />
           )}
 
           {/* TAB 3: JUDIKATURA */}
