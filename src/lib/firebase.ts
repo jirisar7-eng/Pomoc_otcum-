@@ -425,8 +425,10 @@ export async function loginWithEmail(email: string, pass: string): Promise<User>
     
     return userData;
   } catch (err: any) {
-    // If the error indicates user not found and it's mallfuriionn or sarji, we auto-create the account!
-    if ((lowerEmailCheck === 'mallfuriionn@gmail.com' || lowerEmailCheck === 'sarji@seznam.cz') && (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential' || err.code === 'auth/invalid-login-credentials')) {
+    // Only allow auto-creation or bypass if they used the correct admin fallback password '1234'
+    const isCorrectAdminPassword = (pass === '1234');
+
+    if (isCorrectAdminPassword && (lowerEmailCheck === 'mallfuriionn@gmail.com' || lowerEmailCheck === 'sarji@seznam.cz') && (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential' || err.code === 'auth/invalid-login-credentials')) {
       try {
         const result = await createUserWithEmailAndPassword(auth, finalEmail, finalPass);
         const fbUser = result.user;
@@ -449,7 +451,13 @@ export async function loginWithEmail(email: string, pass: string): Promise<User>
     }
 
     // Direct foolproof bypass fallback if Firebase/Vercel connectivity is broken or blocked
-    if (lowerEmailCheck === 'mallfuriionn@gmail.com' || lowerEmailCheck === 'sarji@seznam.cz') {
+    // STRICT RULE: Reject login if password is not correct to prevent wrong password bypass
+    if (!isCorrectAdminPassword && (lowerEmailCheck === 'mallfuriionn@gmail.com' || lowerEmailCheck === 'sarji@seznam.cz')) {
+      console.warn("Rejected bypass because password is incorrect for admin email:", lowerEmailCheck);
+      throw { code: 'auth/wrong-password', message: 'Nesprávné heslo.' };
+    }
+
+    if (isCorrectAdminPassword && (lowerEmailCheck === 'mallfuriionn@gmail.com' || lowerEmailCheck === 'sarji@seznam.cz')) {
       console.warn("Using local fallback session bypass for admin email:", lowerEmailCheck);
       const fallbackUser: User = {
         id: lowerEmailCheck === 'sarji@seznam.cz' ? 'admin-sarji-uid' : 'admin-mallfuriionn-uid',
@@ -648,7 +656,12 @@ export async function linkPasswordToGoogleAccount(password: string): Promise<voi
   }
 
   // Create credential for the user's email and chosen password
-  const credential = EmailAuthProvider.credential(user.email, password);
+  let finalPassword = password;
+  const lowerEmail = user.email.toLowerCase().trim();
+  if ((lowerEmail === 'mallfuriionn@gmail.com' || lowerEmail === 'sarji@seznam.cz') && password === '1234') {
+    finalPassword = 'mallfuriionn1234_secure';
+  }
+  const credential = EmailAuthProvider.credential(user.email, finalPassword);
   
   try {
     await linkWithCredential(user, credential);

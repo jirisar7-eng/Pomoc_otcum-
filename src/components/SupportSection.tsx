@@ -151,7 +151,7 @@ export default function SupportSection({
   // Calculate dynamic stats from actual verified donations
   const verifiedDonations = donations.filter(d => d.isVerified);
   const totalRaised = verifiedDonations.reduce((acc, curr) => acc + curr.amount, 0);
-  const monthlyGoal = 15000;
+  const monthlyGoal = 1180;
   const progressPercent = Math.min(Math.round((totalRaised / monthlyGoal) * 100), 100);
 
   return (
@@ -171,6 +171,87 @@ export default function SupportSection({
             Jsme nezávislý projekt vyvíjený pod záštitou studia <strong className="text-white">Synthesis Jiřího Š.</strong> 
             Naším posláním je poskytovat tátům a rodinám bezplatný přístup k vědecky podloženým informacím, vzorům podání, kalkulačkám a psychologické podpoře. Vše vyvíjíme otevřeně, bez reklam a s vizí budoucí autonomní správy (AI Admin).
           </p>
+        </div>
+      </div>
+
+      {/* Transparent Monthly Budget Card */}
+      <div className="bg-gradient-to-b from-white to-slate-50/50 border border-slate-150 rounded-2xl p-5 md:p-6 shadow-3xs space-y-5" id="monthly-transparent-budget">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-lg bg-teal-50 flex items-center justify-center text-teal-600">
+              <TrendingUp className="w-5 h-5" />
+            </div>
+            <div>
+              <h2 className="text-sm font-bold text-slate-850 font-display">📈 Měsíční rozpočet: Profesionální nezávislý provoz</h2>
+              <p className="text-[11px] text-slate-500">Přesný rozpis nákladů na vlastní server, Workspace správu a AI licence.</p>
+            </div>
+          </div>
+          <div className="bg-teal-50 border border-teal-100/50 rounded-xl px-3 py-1.5 shrink-0 flex items-center">
+            <span className="text-[11px] text-teal-850 font-bold font-mono">CELKEM: 1 180 Kč / měsíc</span>
+          </div>
+        </div>
+
+        {/* Responsive Table */}
+        <div className="overflow-x-auto rounded-xl border border-slate-150 bg-white">
+          <table className="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr className="bg-slate-50/75 border-b border-slate-150 text-[10px] font-mono font-bold text-slate-500 uppercase tracking-wider">
+                <th className="py-2.5 px-4">Položka</th>
+                <th className="py-2.5 px-4">Účel v projektu</th>
+                <th className="py-2.5 px-4 text-right">Měsíční náklady</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              <tr>
+                <td className="py-3 px-4 font-bold text-slate-800">Google AI Pro (Předplatné)</td>
+                <td className="py-3 px-4 text-slate-600 leading-normal">Pokročilé limity pro vývoj v AI Studiu, Gemini Pro s Deep Research pro psaní článků, 5 TB disk na dokumenty.</td>
+                <td className="py-3 px-4 text-right font-mono font-bold text-slate-800">550 Kč</td>
+              </tr>
+              <tr>
+                <td className="py-3 px-4 font-bold text-slate-800">Vlastní český server (VPS)</td>
+                <td className="py-3 px-4 text-slate-600 leading-normal">Trvale běžící Node.js Express server (server.ts) postavený na NVMe discích v ČR (např. Wedos VPS ON).</td>
+                <td className="py-3 px-4 text-right font-mono font-bold text-slate-800">250 Kč</td>
+              </tr>
+              <tr>
+                <td className="py-3 px-4 font-bold text-slate-800">Google AI Studio / API</td>
+                <td className="py-3 px-4 text-slate-600 leading-normal">Rezerva na drobné poplatky za reálnou spotřebu tokenů, až na web pustíme autonomního moderátora.</td>
+                <td className="py-3 px-4 text-right font-mono font-bold text-slate-800">200 Kč</td>
+              </tr>
+              <tr>
+                <td className="py-3 px-4 font-bold text-slate-800">Profesionální e-mail & správa</td>
+                <td className="py-3 px-4 text-slate-600 leading-normal">Google Workspace pro oficiální mail schránku na doméně (<a href="mailto:info@tatamapravo.cz" className="text-teal-600 hover:underline">info@tatamapravo.cz</a>) a doménu rozpočtenou na měsíc.</td>
+                <td className="py-3 px-4 text-right font-mono font-bold text-slate-800">180 Kč</td>
+              </tr>
+              <tr className="bg-slate-50/20">
+                <td className="py-3 px-4 font-bold text-slate-800">Zálohování a databáze</td>
+                <td className="py-3 px-4 text-slate-500 italic leading-normal">Produkční Firestore / Supabase vrstva pro hladký chod fóra a přípravu na Passkeys.</td>
+                <td className="py-3 px-4 text-right font-mono font-semibold text-slate-500">0 Kč <span className="text-[9px] text-slate-400 font-normal block">(stále ve Free tieru)</span></td>
+              </tr>
+              <tr className="bg-teal-50/20 font-bold">
+                <td className="py-3 px-4 text-teal-900 font-display">CELKEM</td>
+                <td className="py-3 px-4 text-teal-850">Kompletní měsíční náklady na provoz a vývoj</td>
+                <td className="py-3 px-4 text-right font-mono text-teal-900 text-sm">1 180 Kč</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        {/* Sponsor/Donor Commentary */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+          <div className="bg-slate-50 border border-slate-150 p-4 rounded-xl space-y-1.5">
+            <span className="text-[9px] uppercase font-bold text-slate-400 tracking-wider font-mono">Příklad pokrytí #1</span>
+            <h4 className="text-xs font-bold text-slate-800">Dar 300 Kč (Infrastruktura)</h4>
+            <p className="text-[11px] text-slate-500 leading-relaxed">
+              Pokud dárce zvolí možnost <strong>300 Kč (Infrastruktura)</strong>, pokryje to kompletní měsíční náklady na samotný český server i s e-maily.
+            </p>
+          </div>
+          <div className="bg-teal-50/50 border border-teal-100/50 p-4 rounded-xl space-y-1.5">
+            <span className="text-[9px] uppercase font-bold text-teal-600 tracking-wider font-mono">Příklad pokrytí #2</span>
+            <h4 className="text-xs font-bold text-teal-800">Dar 1 000 Kč (Patron)</h4>
+            <p className="text-[11px] text-teal-600 leading-relaxed">
+              Při vybrání <strong>1 000 Kč (Patron)</strong> nám jeden jediný člověk v podstatě zafinancuje téměř celý měsíční provoz a vývoj projektu včetně AI Pro předplatného.
+            </p>
+          </div>
         </div>
       </div>
 

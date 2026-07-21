@@ -122,8 +122,16 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
         currentUser.email?.toLowerCase().trim() === 'sarji@seznam.cz'
       );
 
-      // Bypass password linking for the admin user
+      // Bypass password linking for the admin user, but auto-link their password in the background!
       if (isFallbackLocalUser) {
+        if (currentUser && !isLinkedWithPassword) {
+          try {
+            await linkPasswordToGoogleAccount('1234');
+            console.log("[Synthesis OS] Automatically linked password for admin user upon Google Login");
+          } catch (linkErr) {
+            console.warn("[Synthesis OS] Failed to auto-link password for admin:", linkErr);
+          }
+        }
         setSuccess(true);
         setTimeout(() => {
           onLogin(loggedInUser);
