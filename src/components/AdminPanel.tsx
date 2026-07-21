@@ -1525,52 +1525,79 @@ ${cases.map(c => `Název: ${c.title}\nStav: ${c.status}\nChronologie:\n` + (c.ch
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Sekce administrační konzole</span>
           </div>
 
-          <nav className="space-y-1">
+          <nav className="space-y-4">
             {[
-              { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-              { id: 'editorial', label: 'Obsah & Redakční fronta', icon: FileText, badge: 'FRONT' },
-              { id: 'judikatura', label: 'Judikatura & Rozhodnutí', icon: Scale },
-              { id: 'documents', label: 'Dokumenty & Vzory', icon: FileCode },
-              { id: 'partners', label: 'Partneři & Odborníci', icon: Share2, highlight: true },
-              { id: 'cases', label: 'Případové centrum', icon: Briefcase, highlight: true },
-              { id: 'evidence', label: 'Správce důkazů (Drive)', icon: Camera },
-              { id: 'community', label: 'Komunita & AI Moderace', icon: MessageCircle, badge: 'AI' },
-              { id: 'aicentre', label: 'AI Generátor & Nástroje', icon: Cpu },
-              { id: 'aiauditor', label: 'AI Projektový Auditor 3.0', icon: Shield, badge: 'AUDIT', highlight: true },
-              { id: 'aimoderator', label: 'AI Internetový Sběrač', icon: Search, badge: 'CRAWLER', highlight: true },
-              { id: 'users', label: 'Správa uživatelů & RBAC', icon: Users },
-              { id: 'simulator', label: 'Nastavení simulátoru', icon: Sliders },
-              { id: 'appearance', label: 'Vzhled & Šablony', icon: Paintbrush },
-              { id: 'stats', label: 'Návštěvnost & Statistiky', icon: BarChart2 },
-              { id: 'audit', label: 'Systémový audit & Zálohy', icon: Activity },
-              { id: 'supabase', label: 'Databáze & Cloud', icon: Database }
-            ].map((item) => {
-              const Icon = item.icon;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => setActiveMenu(item.id)}
-                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold tracking-wide transition-all cursor-pointer ${
-                    activeMenu === item.id 
-                      ? 'bg-slate-900 text-white shadow-md' 
-                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
-                  }`}
-                >
-                  <div className="flex items-center gap-2.5">
-                    <Icon className={`w-4 h-4 ${activeMenu === item.id ? 'text-teal-400' : 'text-slate-400'}`} />
-                    <span>{item.label}</span>
-                  </div>
-                  {item.badge && (
-                    <span className={`text-[8px] font-mono px-1.5 py-0.2 rounded-md font-extrabold ${activeMenu === item.id ? 'bg-teal-500 text-slate-950' : 'bg-slate-100 text-slate-500'}`}>
-                      {item.badge}
-                    </span>
-                  )}
-                  {item.highlight && !item.badge && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-teal-500 animate-ping" />
-                  )}
-                </button>
-              );
-            })}
+              {
+                category: 'I. Přehled & Správa',
+                items: [
+                  { id: 'dashboard', label: 'Dashboard & Statistiky', icon: LayoutDashboard },
+                  { id: 'stats', label: 'Návštěvnost & Analýza', icon: BarChart2 }
+                ]
+              },
+              {
+                category: 'II. Obsah & Databáze',
+                items: [
+                  { id: 'editorial', label: 'Obsah & Redakční fronta', icon: FileText, badge: 'OBSAH' },
+                  { id: 'judikatura', label: 'Judikatura & Rozhodnutí', icon: Scale },
+                  { id: 'documents', label: 'Dokumenty & Vzory', icon: FileCode },
+                  { id: 'cases', label: 'Případové centrum', icon: Briefcase },
+                  { id: 'evidence', label: 'Správce důkazů (Drive)', icon: Camera },
+                  { id: 'partners', label: 'Partneři & Advokáti', icon: Share2 }
+                ]
+              },
+              {
+                category: 'III. AI Nástroje & Moderace',
+                items: [
+                  { id: 'community', label: 'Komunita & AI Moderace', icon: MessageCircle, badge: 'AI' },
+                  { id: 'aicentre', label: 'AI Generátor & Nástroje', icon: Cpu },
+                  { id: 'aiauditor', label: 'AI Auditor 3.0', icon: Shield, badge: 'AUDIT', highlight: true },
+                  { id: 'aimoderator', label: 'AI Internetový Sběrač', icon: Search, badge: 'CRAWLER' }
+                ]
+              },
+              {
+                category: 'IV. Uživatelé & Systém',
+                items: [
+                  { id: 'users', label: 'Správa uživatelů & RBAC', icon: Users },
+                  { id: 'simulator', label: 'Nastavení simulátoru', icon: Sliders },
+                  { id: 'appearance', label: 'Vzhled & Šablony', icon: Paintbrush },
+                  { id: 'audit', label: 'Systémový audit & Zálohy', icon: Activity },
+                  { id: 'supabase', label: 'Databáze & Cloud Status', icon: Database }
+                ]
+              }
+            ].map((group) => (
+              <div key={group.category} className="space-y-1">
+                <div className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider px-2 py-0.5">
+                  {group.category}
+                </div>
+                {group.items.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => setActiveMenu(item.id)}
+                      className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold tracking-wide transition-all cursor-pointer ${
+                        activeMenu === item.id 
+                          ? 'bg-slate-900 text-white shadow-md' 
+                          : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <Icon className={`w-4 h-4 ${activeMenu === item.id ? 'text-teal-400' : 'text-slate-400'}`} />
+                        <span>{item.label}</span>
+                      </div>
+                      {item.badge && (
+                        <span className={`text-[8px] font-mono px-1.5 py-0.2 rounded-md font-extrabold ${activeMenu === item.id ? 'bg-teal-500 text-slate-950' : 'bg-slate-100 text-slate-500'}`}>
+                          {item.badge}
+                        </span>
+                      )}
+                      {item.highlight && !item.badge && (
+                        <span className="w-1.5 h-1.5 rounded-full bg-teal-500 animate-ping" />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            ))}
           </nav>
 
           {/* Quick info footer */}

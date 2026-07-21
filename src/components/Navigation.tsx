@@ -64,51 +64,75 @@ export default function Navigation({
   
   const { t, language } = useLanguage();
 
-  // Unified categorized navigation structure (Fully Localized!)
+  // Restructured Information Architecture v4.0 (Fully Localized!)
   const navigationSections = [
     {
-      id: 'about',
-      title: t('nav_section_about', 'I. O portálu & Memento'),
-      items: [
-        { id: 'memento', label: t('nav_memento', 'Základní pilíř & Memento'), icon: Flame, desc: t('nav_memento_desc') },
-        { id: 'stories', label: t('nav_stories', 'Kořeny mého případu'), icon: History, desc: t('nav_stories_desc') }
-      ]
-    },
-    {
-      id: 'case',
-      title: t('nav_section_case', 'II. Moje strategie & případ'),
-      items: [
-        { id: 'user-portal', label: t('nav_user_portal', 'Moje Pracovna'), icon: LayoutDashboard, desc: t('nav_user_portal_desc') },
-        { id: 'ai-case-manager', label: t('nav_ai_case_manager', 'Osobní složka případu'), icon: Briefcase, desc: t('nav_ai_case_manager_desc') }
-      ]
-    },
-    {
       id: 'legal',
-      title: t('nav_section_legal', 'III. Právní výzbroj'),
+      title: 'I. Právní pomoc',
       items: [
-        { id: 'news', label: t('nav_news', 'Informační báze'), icon: Bell, desc: t('nav_news_desc') },
-        { id: 'legal-wiki', label: t('nav_legal_wiki', 'Právní minimum'), icon: Database, desc: t('nav_legal_wiki_desc') },
-        { id: 'judikatura', label: t('nav_judikatura', 'Judikatura'), icon: Scale, desc: t('nav_judikatura_desc') },
-        { id: 'ke-stazeni', label: t('nav_ke_stazeni', 'Vzory podání'), icon: FileSpreadsheet, desc: t('nav_ke_stazeni_desc') }
+        { id: 'legal-wiki', label: 'Právní minimum', icon: Database, desc: 'Základní právní pojmy, zákony a lhůty.' },
+        { id: 'opatrovnicka-agenda', label: 'Opatrovnická agenda', icon: Landmark, desc: 'Průvodce procesem opatrovnického řízení.' },
+        { id: 'ke-stazeni', label: 'Vzory podání & formuláře', icon: FileSpreadsheet, desc: 'Editovatelné vzory návrhů k soudu a OSPOD.' },
+        { id: 'vyzivne', label: 'Kalkulačky výživného', icon: Coins, desc: 'Výpočet alimentů podle metodiky MS ČR 2026.' },
+        { id: 'plan-pece', label: 'Plán péče o dítě', icon: Heart, desc: 'Parenting plan a dohoda o péči.' },
+        { id: 'judikatura', label: 'Judikatura Ústavního soudu', icon: Scale, desc: 'Rozsudky a nálezy garantující práva rodičů.' }
       ]
     },
     {
-      id: 'process',
-      title: t('nav_section_process', 'IV. Proces opatrovnictví'),
+      id: 'cases',
+      title: 'II. Případy',
       items: [
-        { id: 'ai-guide', label: t('nav_ai_guide', 'Průvodce řízením'), icon: Sparkles, desc: t('nav_ai_guide_desc') },
-        { id: 'opatrovnicka-agenda', label: t('nav_opatrovnicka_agenda', 'Opatrovnická agenda'), icon: Landmark, desc: t('nav_opatrovnicka_agenda_desc') },
-        { id: 'plan-pece', label: t('nav_plan_pece', 'Plán péče o dítě'), icon: Heart, desc: t('nav_plan_pece_desc') }
+        { id: 'pripadova-databaze', label: 'Databáze případů', icon: Database, desc: 'Anonymizované reálné opatrovnické spory.' },
+        { id: 'sitemap', label: 'Časová osa & Vývoj', icon: History, desc: 'Interaktivní strom fází řízení a procesních lhůt.' },
+        { id: 'ai-case-manager', label: 'Důkazy & Osobní složka', icon: Briefcase, desc: 'Evidence komunikace a příprava podkladů.' },
+        { id: 'simulator', label: 'Simulátor péče', icon: Sliders, desc: 'Modelování ročního rozdělení času a nákladů.' }
+      ]
+    },
+    {
+      id: 'study',
+      title: 'III. Studijní centrum',
+      items: [
+        { id: 'knihovna-studies', label: 'Knihovna studií', icon: BookOpen, desc: 'Vědecké výzkumy o střídavé péči a psychologii.' },
+        { id: 'news', label: 'Články & Informační báze', icon: Bell, desc: 'Odborné články, rady a právní rozbory.' },
+        { id: 'vzdelavani', label: 'Vzdělávání & Poradna', icon: ShieldCheck, desc: 'Metodiky zvládání rozvodového konfliktu.' }
       ]
     },
     {
       id: 'community',
-      title: t('nav_section_community', 'V. Komunita a pomoc'),
+      title: 'IV. Komunita',
       items: [
-        { id: 'coparent-hub', label: t('nav_coparent_hub_label', 'Rodičovský hub'), icon: HeartHandshake, desc: t('nav_coparent_hub_desc', 'Nástroje pro hladkou komunikaci a plánování s druhým rodičem.') },
-        { id: 'crisis', label: t('nav_contacts', 'SOS Pomoc'), icon: LifeBuoy, desc: t('nav_contacts_desc') },
-        { id: 'forum', label: t('nav_forum', 'Diskuze'), icon: MessageCircle, desc: t('nav_forum_desc') },
-        { id: 'partners', label: t('nav_partners', 'Partneři'), icon: Share2, desc: t('nav_partners_desc') }
+        { id: 'forum', label: 'Diskusní Fórum', icon: MessageCircle, desc: 'Sdílení zkušeností a vzájemná podpora.' },
+        { id: 'stories', label: 'Příběhy otců', icon: History, desc: 'Skutečné příběhy rodičů z praxe.' },
+        { id: 'coparent-hub', label: 'Rodičovský hub', icon: HeartHandshake, desc: 'Asistovaná komunikace a sdílené události.' },
+        { id: 'partners', label: 'Partneři & Advokáti', icon: Share2, desc: 'Ověření právníci, mediátoři a psychologové.' }
+      ]
+    },
+    {
+      id: 'ai-tools',
+      title: 'V. AI nástroje',
+      items: [
+        { id: 'ai-assistant', label: 'AI Právní Asistent', icon: Sparkles, desc: 'Rychlé odpovídání na opatrovnické dotazy.' },
+        { id: 'ai-guide', label: 'AI Průvodce řízením', icon: Sparkles, desc: 'Personalizovaná analýza vašeho procesního kroku.' },
+        { id: 'aiauditor', label: 'AI Analýza & Audit', icon: Shield, desc: 'Automatická kontrola správnosti podání.' },
+        { id: 'ai-admin', label: 'AI Administrátor', icon: LayoutDashboard, desc: 'Systémový pomocník správy obsahu.' }
+      ]
+    },
+    {
+      id: 'support',
+      title: 'VI. Podpora',
+      items: [
+        { id: 'support', label: 'Darovat & Podpořit', icon: Heart, desc: 'Podpořte bezplatný provoz a vývoj portálu.' },
+        { id: 'memento', label: 'Transparentní rozpočet', icon: Flame, desc: 'Přehled využití finančních prostředků.' },
+        { id: 'crisis', label: 'Krizová pomoc SOS', icon: LifeBuoy, desc: 'Kontakty na linky krizové intervence.' }
+      ]
+    },
+    {
+      id: 'about',
+      title: 'VII. O projektu',
+      items: [
+        { id: 'memento', label: 'Mise & Memento', icon: Flame, desc: 'Základní hodnotový pilíř ochrany dětí.' },
+        { id: 'kontakt', label: 'Tým & Kontakt', icon: PhoneCall, desc: 'Kontaktní údaje a podněty zakladatelům.' },
+        { id: 'rights', label: 'Často kladené dotazy', icon: ShieldCheck, desc: 'Odpovědi na nejčastější právní otázky.' }
       ]
     }
   ];

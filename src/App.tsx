@@ -27,6 +27,10 @@ import {
 } from './lib/firebase';
 import { SupabaseService, isSupabaseConfigured } from './lib/supabase';
 
+import Breadcrumbs from './components/Breadcrumbs';
+import RelatedContent from './components/RelatedContent';
+import { updatePageSeo } from './lib/seo';
+
 // Component imports
 import Navigation from './components/Navigation';
 import AuthModal from './components/AuthModal';
@@ -337,6 +341,7 @@ export default function App() {
 
   useEffect(() => {
     setStoredState('active_tab', activeTab);
+    updatePageSeo(activeTab);
     
     // Smooth scroll to the content area or page top on tab selection
     if (activeTab === 'home') {
@@ -414,6 +419,9 @@ export default function App() {
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
       />
+
+      {/* Drobečková navigace (Breadcrumbs) */}
+      <Breadcrumbs activeTab={activeTab} setActiveTab={setActiveTab} />
 
       {/* Main Content Workspace viewport */}
       <main id="synthesis-main-content" className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 flex-grow">
@@ -632,6 +640,11 @@ export default function App() {
             )}
           </motion.div>
         </AnimatePresence>
+
+        {/* Související doporučený obsah & akční propojení */}
+        {activeTab !== 'home' && (
+          <RelatedContent activeTab={activeTab} setActiveTab={setActiveTab} />
+        )}
       </main>
 
       {/* Breathtaking and Professional Footer */}
