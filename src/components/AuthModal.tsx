@@ -31,7 +31,8 @@ import {
   ShieldCheck,
   BadgeCheck,
   KeyRound,
-  UserCheck
+  UserCheck,
+  Fingerprint
 } from 'lucide-react';
 import { User, UserRole } from '../types';
 import { 
@@ -42,6 +43,7 @@ import {
   linkPasswordToGoogleAccount, 
   sendPasswordReset 
 } from '../lib/firebase';
+import { isPasskeySupported, loginWithPasskey } from '../services/passkeyService';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -89,6 +91,18 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
 
   // Database Connection Status
   const [dbStatus, setDbStatus] = useState<'online' | 'offline'>('online');
+
+  // Passkey / WebAuthn Biometric Support State
+  const [passkeyAvailable, setPasskeyAvailable] = useState<boolean>(false);
+
+  // Check passkey support on modal open
+  useEffect(() => {
+    if (isOpen) {
+      isPasskeySupported()
+        .then((supported) => setPasskeyAvailable(supported))
+        .catch(() => setPasskeyAvailable(false));
+    }
+  }, [isOpen]);
 
   // Welcome state data
   const [authenticatedUser, setAuthenticatedUser] = useState<User | null>(null);
@@ -444,6 +458,54 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
       } else {
         setErrorNotice('Odeslání selhalo.', 'Zkontrolujte připojení k síti a zkuste to znovu.');
       }
+    }
+  };
+
+  // E. Passkey / WebAuthn Biometric Login
+  const handlePasskeyLogin = async () => {
+    if (loading) return;
+
+    setLoading(true);
+    setCurrentStep(2);
+    setStatus({
+      type: 'loading',
+      title: 'Probíhá ověřování biometrie...',
+      text: 'Přiložte prst k snímači otisků nebo použijte FaceID na vašem zařízení...'
+    });
+
+    try {
+      const result = await loginWithPasskey(email || undefined);
+
+      if (result.success && result.user) {
+        setCurrentStep(3);
+        setStatus({
+          type: 'success',
+          title: 'Biometrické přihlášení úspěšné!',
+          text: `Vítáme vás zpět, ${result.user.name}. Načítám váš uživatelský profil...`
+        });
+
+        setTimeout(() => {
+          setAuthenticatedUser(result.user!);
+          setMode('welcome');
+          setLoading(false);
+        }, 800);
+      } else if (result.cancelled) {
+        setLoading(false);
+        setCurrentStep(1);
+        setStatus({
+          type: 'warning',
+          title: 'Biometrické ověření zrušeno',
+          text: 'Snímání obličeje nebo otisku bylo zrušeno. Můžete se přihlásit e-mailem nebo přes Google.'
+        });
+      } else {
+        setLoading(false);
+        setCurrentStep(1);
+        setErrorNotice('Biometrické ověření selhalo.', result.error || 'Nepodařilo se ověřit Passkey klíč.');
+      }
+    } catch (err: any) {
+      setLoading(false);
+      setCurrentStep(1);
+      setErrorNotice('Chyba biometrického přihlášení.', err.message || 'Při snímání biometrie došlo k neočekávané chybě.');
     }
   };
 
@@ -872,6 +934,20 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
             {/* MODE 4 & 5: LOGIN & REGISTER FORMS */}
             {(mode === 'login' || mode === 'register') && (
               <div className="space-y-4">
+                {/* Passkey / Biometric Login Button (Primary if supported) */}
+                {passkeyAvailable && (
+                  <button
+                    id="passkey-login-btn"
+                    type="button"
+                    disabled={loading}
+                    onClick={handlePasskeyLogin}
+                    className="w-full py-3 px-4 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-600 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed border border-emerald-400/30 group"
+                  >
+                    <Fingerprint className="w-5 h-5 text-emerald-200 group-hover:scale-110 transition-transform shrink-0" />
+                    <span>Přihlásit se pomocí Passkey (Otisk prstu / FaceID)</span>
+                  </button>
+                )}
+
                 {/* Google OAuth Button */}
                 <button
                   id="google-login-btn"
