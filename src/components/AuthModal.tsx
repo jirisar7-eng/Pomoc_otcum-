@@ -45,6 +45,7 @@ import {
 } from '../lib/firebase';
 import { isPasskeySupported, loginWithPasskey, registerPasskey } from '../services/passkeyService';
 import { isBiometricsAvailable } from '../utils/passkey';
+import { normalizeUserIdentity } from '../services/identityHubService';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -110,7 +111,8 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
 
   // Welcome state data
   const [authenticatedUser, setAuthenticatedUser] = useState<User | null>(null);
-  const [welcomeCountdown, setWelcomeCountdown] = useState(3);
+  const [welcomeCountdown, setWelcomeCountdown] = useState(1);
+  const welcomeFinishedRef = useRef(false);
 
   // Focus trap ref
   const modalRef = useRef<HTMLDivElement>(null);
@@ -165,27 +167,36 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
       setAuthenticatedUser(null);
       setTouched({});
       setErrorNotice('');
+      welcomeFinishedRef.current = false;
     }
   }, [isOpen]);
 
-  // Welcome screen auto-login countdown
+  // Welcome screen auto-login countdown - auto skips smoothly after 1.2s
   useEffect(() => {
     let timer: NodeJS.Timeout;
+    let interval: NodeJS.Timeout;
+
     if (mode === 'welcome' && authenticatedUser) {
-      setWelcomeCountdown(3);
-      timer = setInterval(() => {
-        setWelcomeCountdown((prev) => {
-          if (prev <= 1) {
-            clearInterval(timer);
-            completeAuthentication(authenticatedUser);
-            return 0;
-          }
-          return prev - 1;
-        });
+      welcomeFinishedRef.current = false;
+      setWelcomeCountdown(1);
+
+      timer = setTimeout(() => {
+        if (!welcomeFinishedRef.current) {
+          welcomeFinishedRef.current = true;
+          completeAuthentication(authenticatedUser);
+        }
+      }, 1200);
+
+      interval = setInterval(() => {
+        setWelcomeCountdown((prev) => Math.max(0, prev - 1));
       }, 1000);
     }
-    return () => clearInterval(timer);
-  }, [mode, authenticatedUser]);
+
+    return () => {
+      if (timer) clearTimeout(timer);
+      if (interval) clearInterval(interval);
+    };
+  }, [mode, authenticatedUser?.id]);
 
   if (!isOpen) return null;
 
@@ -245,7 +256,8 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
   };
 
   const handleFinishWelcome = () => {
-    if (authenticatedUser) {
+    if (authenticatedUser && !welcomeFinishedRef.current) {
+      welcomeFinishedRef.current = true;
       completeAuthentication(authenticatedUser);
     }
   };
