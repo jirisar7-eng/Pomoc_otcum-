@@ -5,6 +5,37 @@
 
 export type UserRole = 'user' | 'admin';
 
+export type AuthProviderType = 'google' | 'password' | 'passkey' | 'magic_link' | 'sms';
+
+export interface LinkedIdentity {
+  provider: AuthProviderType;
+  emailOrDetail: string;
+  connectedAt: string;
+  isPrimary?: boolean;
+}
+
+export interface ActiveDevice {
+  id: string;
+  deviceName: string;
+  deviceType: 'desktop' | 'mobile' | 'tablet';
+  browser: string;
+  os: string;
+  ipAddress?: string;
+  lastActive: string;
+  isCurrent?: boolean;
+}
+
+export interface SecurityAuditEntry {
+  id: string;
+  timestamp: string;
+  action: string;
+  method: string;
+  deviceInfo: string;
+  ipAddress?: string;
+  status: 'SUCCESS' | 'WARNING' | 'FAILED';
+  details?: string;
+}
+
 export interface User {
   id: string;
   email: string;
@@ -12,6 +43,21 @@ export interface User {
   role: UserRole;
   avatar?: string;
   createdAt: string;
+  // Extra profile fields
+  phone?: string;
+  city?: string;
+  bio?: string;
+  // Identity Hub Security Fields
+  linkedIdentities?: LinkedIdentity[];
+  hasPassword?: boolean;
+  hasPasskey?: boolean;
+  hasGoogle?: boolean;
+  hasMagicLink?: boolean;
+  hasTwoFactor?: boolean;
+  twoFactorType?: 'app' | 'email' | 'sms';
+  lastLogin?: string;
+  activeDevices?: ActiveDevice[];
+  securityAuditLogs?: SecurityAuditEntry[];
 }
 
 export type ContentType = 'article' | 'forum' | 'advice';

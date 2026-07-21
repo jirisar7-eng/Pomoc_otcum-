@@ -28,6 +28,7 @@ import {
 import { User as UserType } from '../types';
 import { saveDocument } from '../lib/firebase';
 import { useLanguage } from '../lib/LanguageContext';
+import IdentityHubSettings from './IdentityHubSettings';
 
 interface UserProfileProps {
   currentUser: UserType | null;
@@ -338,7 +339,13 @@ export default function UserProfile({
         </div>
       </div>
 
-      {/* 3. PROFILE DETAILS & EDIT FORM */}
+      {/* 3. IDENTITY HUB SECURITY & LOGIN METHODS */}
+      <IdentityHubSettings 
+        currentUser={currentUser} 
+        onUpdateCurrentUser={onUpdateCurrentUser} 
+      />
+
+      {/* 4. PROFILE DETAILS & EDIT FORM */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         {/* Left 2 Columns: Edit Form */}
