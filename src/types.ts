@@ -41,6 +41,7 @@ export interface Article {
   commentsCount: number;
   readTime: string;
   tags: string[];
+  videoUrl?: string;
 }
 
 export interface FormField {
@@ -89,6 +90,7 @@ export interface ForumPost {
   commentsCount: number;
   tags: string[];
   reported: boolean;
+  videoUrl?: string;
 }
 
 export interface SupportContact {
@@ -253,6 +255,18 @@ export interface Partner {
   showOnMainPage: boolean;
   createdAt: string;
 }
+
+export interface VideoSource {
+  id: string;
+  url: string;
+  title: string;
+  author: string;
+  platform: 'youtube' | 'facebook' | 'vimeo' | 'tiktok' | 'instagram' | 'unknown';
+  embedUrl: string;
+  tags?: string[];
+  savedAt?: string;
+}
+
 
 
 

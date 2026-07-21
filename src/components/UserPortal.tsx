@@ -45,6 +45,7 @@ import {
   Notebook,
   CheckSquare
 } from 'lucide-react';
+import SmartVideoEmbed from './SmartVideoEmbed';
 
 import { 
   User as UserType, 
@@ -204,6 +205,9 @@ export default function UserPortal({ currentUser, onOpenAuth }: UserPortalProps)
     return saved || '';
   });
 
+  // Saved Videos
+  const [savedVideos, setSavedVideos] = useState<any[]>([]);
+
   // Timeline UI States
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [isEditingNode, setIsEditingNode] = useState<boolean>(false);
@@ -297,6 +301,23 @@ export default function UserPortal({ currentUser, onOpenAuth }: UserPortalProps)
   useEffect(() => {
     localStorage.setItem('sh_portal_ai_notes', aiNotes);
   }, [aiNotes]);
+
+  useEffect(() => {
+    const loadSavedVideos = () => {
+      try {
+        const list = JSON.parse(localStorage.getItem('synthesis_saved_videos') || '[]');
+        setSavedVideos(list);
+      } catch (err) {
+        console.error('Error loading saved videos in UserPortal', err);
+      }
+    };
+
+    loadSavedVideos();
+    window.addEventListener('saved_videos_updated', loadSavedVideos);
+    return () => {
+      window.removeEventListener('saved_videos_updated', loadSavedVideos);
+    };
+  }, []);
 
   // Extract all unique tags for evidence
   const allTags = ['all', ...Array.from(new Set(evidenceList.flatMap(e => e.tags)))];
@@ -2274,6 +2295,52 @@ Tento koncept byl formulován v souladu se zásadami věcné, jasné a nekonfron
                   </div>
                 )}
               </div>
+            </div>
+
+            {/* SAVED VIDEOS PANEL */}
+            <div className="bg-white border border-slate-200/60 rounded-3xl p-6 shadow-xs space-y-4">
+              <h4 className="font-bold text-sm text-slate-800 font-display flex items-center gap-2 pb-2 border-b border-slate-100">
+                <Video className="w-5 h-5 text-indigo-600" />
+                Uložená Odborná Videa ({savedVideos.length})
+              </h4>
+
+              {savedVideos.length === 0 ? (
+                <div className="p-8 text-center text-xs text-slate-400 italic">
+                  Nemáte uložena žádná doprovodná videa. Prozkoumejte články, AI průvodce, knihovnu studií nebo diskuzi a uložte si přínosná videa kliknutím na ikonu záložky.
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                  {savedVideos.map((vid) => (
+                    <div key={vid.url} className="relative">
+                      <div className="absolute top-3 right-3 z-20">
+                        <button
+                          onClick={() => {
+                            try {
+                              const savedList = JSON.parse(localStorage.getItem('synthesis_saved_videos') || '[]');
+                              const filtered = savedList.filter((v: any) => v.url !== vid.url);
+                              localStorage.setItem('synthesis_saved_videos', JSON.stringify(filtered));
+                              setSavedVideos(filtered);
+                              window.dispatchEvent(new Event('saved_videos_updated'));
+                            } catch (e) {
+                              console.error(e);
+                            }
+                          }}
+                          className="p-1.5 bg-white/90 hover:bg-rose-500 hover:text-white text-slate-600 rounded-lg shadow-sm transition-all cursor-pointer"
+                          title="Odebrat ze záložek"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                      <SmartVideoEmbed
+                        url={vid.url}
+                        title={vid.title}
+                        author={vid.author}
+                        tags={vid.tags}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </motion.div>
         )}

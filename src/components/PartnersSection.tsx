@@ -191,7 +191,7 @@ export default function PartnersSection({ partners = [] }: PartnersSectionProps)
           </div>
         </div>
         <a
-          href="mailto:partneri@tatamapravo.cz"
+          href="mailto:sarji@seznam.cz"
           className="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs rounded-xl transition-colors shrink-0 text-center"
         >
           Kontaktovat pro spolupráci

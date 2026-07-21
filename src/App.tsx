@@ -534,7 +534,10 @@ export default function App() {
             )}
 
             {activeTab === 'memento' && (
-              <MementoPillar />
+              <MementoPillar 
+                currentUser={currentUser}
+                onOpenAuth={() => setAuthModalOpen(true)}
+              />
             )}
 
             {activeTab === 'forum' && (
@@ -550,7 +553,10 @@ export default function App() {
             )}
 
             {activeTab === 'contacts' && (
-              <KontaktSection />
+              <KontaktSection
+                currentUser={currentUser}
+                onOpenAuth={() => setAuthModalOpen(true)}
+              />
             )}
 
             {activeTab === 'crisis' && (

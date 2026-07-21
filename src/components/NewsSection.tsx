@@ -27,6 +27,7 @@ import { INITIAL_ARTICLES, INITIAL_COMMENTS } from '../initialState';
 import { formatRichText } from '../utils';
 import { useLanguage } from '../lib/LanguageContext';
 import { getTranslatedObject } from '../data/dynamicTranslations';
+import SmartVideoEmbed from './SmartVideoEmbed';
 
 interface NewsSectionProps {
   searchQuery: string;
@@ -179,6 +180,17 @@ export default function NewsSection({ searchQuery: globalSearchQuery, currentUse
               <div className="text-slate-600 text-xs leading-relaxed space-y-4 pt-2 whitespace-pre-line" id="article-main-body-text">
                 {formatRichText(activeArticle.content)}
               </div>
+
+              {activeArticle.videoUrl && (
+                <div className="pt-4 max-w-2xl">
+                  <SmartVideoEmbed
+                    url={activeArticle.videoUrl}
+                    title={activeArticle.title}
+                    author={activeArticle.author}
+                    tags={activeArticle.tags}
+                  />
+                </div>
+              )}
             </div>
 
             <div className="border-t border-slate-100 pt-5 flex items-center justify-between text-xs">

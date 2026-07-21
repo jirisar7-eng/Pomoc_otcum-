@@ -12,13 +12,26 @@ import {
   Award, 
   Sparkles, 
   CheckCircle, 
+  CheckCircle2,
+  AlertTriangle,
+  Send,
   Coins, 
   MessageSquare, 
   Users, 
   TrendingUp, 
   ArrowRight,
   Info,
-  ExternalLink
+  ExternalLink,
+  Building2,
+  Globe,
+  Database,
+  Mail,
+  FileText,
+  Terminal,
+  ArrowUpRight,
+  Lock,
+  Cpu,
+  Phone
 } from 'lucide-react';
 import { Donation, User } from '../types';
 import { saveDocument } from '../lib/firebase';
@@ -46,6 +59,19 @@ export default function SupportSection({
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [showQrCode, setShowQrCode] = useState<boolean>(true);
   const [useFallbackQr, setUseFallbackQr] = useState<boolean>(false);
+  const [activeTab, setActiveTab] = useState<'financial' | 'sponsors'>('financial');
+
+  // Sponsor Form states
+  const [sponsorCompany, setSponsorCompany] = useState<string>('');
+  const [sponsorPerson, setSponsorPerson] = useState<string>('');
+  const [sponsorEmail, setSponsorEmail] = useState<string>('');
+  const [sponsorPhone, setSponsorPhone] = useState<string>('');
+  const [sponsorType, setSponsorType] = useState<string>('vps');
+  const [sponsorMessage, setSponsorMessage] = useState<string>('');
+  const [sponsorMathAnswer, setSponsorMathAnswer] = useState<string>('');
+  const [sponsorMathQuestion, setSponsorMathQuestion] = useState({ num1: 4, num2: 5, answer: 9 });
+  const [sponsorStatus, setSponsorStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+  const [sponsorError, setSponsorError] = useState<string>('');
 
   // Synced state on user changes
   useEffect(() => {
@@ -148,6 +174,39 @@ export default function SupportSection({
     }
   };
 
+  const handleSubmitSponsorForm = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSponsorError('');
+    setSponsorStatus('submitting');
+
+    if (!sponsorCompany.trim() || !sponsorPerson.trim() || !sponsorEmail.trim() || !sponsorMessage.trim()) {
+      setSponsorError('Vyplňte prosím všechna povinná pole (Název sponzora, Kontaktní osoba, E-mail, Zpráva).');
+      setSponsorStatus('error');
+      return;
+    }
+
+    if (parseInt(sponsorMathAnswer) !== sponsorMathQuestion.answer) {
+      setSponsorError('Kontrolní otázka proti spamu je nesprávná.');
+      setSponsorStatus('error');
+      return;
+    }
+
+    // Capture sponsor inquiry
+    setTimeout(() => {
+      setSponsorStatus('success');
+      setSponsorCompany('');
+      setSponsorPerson('');
+      setSponsorEmail('');
+      setSponsorPhone('');
+      setSponsorMessage('');
+      setSponsorMathAnswer('');
+      // Refresh Math question
+      const n1 = Math.floor(Math.random() * 8) + 2;
+      const n2 = Math.floor(Math.random() * 8) + 2;
+      setSponsorMathQuestion({ num1: n1, num2: n2, answer: n1 + n2 });
+    }, 1200);
+  };
+
   // Calculate dynamic stats from actual verified donations
   const verifiedDonations = donations.filter(d => d.isVerified);
   const totalRaised = verifiedDonations.reduce((acc, curr) => acc + curr.amount, 0);
@@ -173,6 +232,37 @@ export default function SupportSection({
           </p>
         </div>
       </div>
+
+      {/* Tab Switcher / Segmented Control */}
+      <div className="flex p-1 bg-slate-100 rounded-2xl w-full sm:w-fit max-w-full overflow-x-auto gap-1 border border-slate-200/50" id="synthesis-support-tabs">
+        <button
+          type="button"
+          onClick={() => setActiveTab('financial')}
+          className={`flex items-center justify-center gap-2 py-2 px-4 md:px-5 rounded-xl font-display font-bold text-xs uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap ${
+            activeTab === 'financial'
+              ? 'bg-white text-teal-800 shadow-sm ring-1 ring-slate-250'
+              : 'text-slate-500 hover:text-slate-800'
+          }`}
+        >
+          <Heart className={`w-3.5 h-3.5 ${activeTab === 'financial' ? 'text-teal-600' : 'text-slate-400'}`} />
+          Finanční podpora &amp; rozpočet
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab('sponsors')}
+          className={`flex items-center justify-center gap-2 py-2 px-4 md:px-5 rounded-xl font-display font-bold text-xs uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap ${
+            activeTab === 'sponsors'
+              ? 'bg-white text-teal-800 shadow-sm ring-1 ring-slate-250'
+              : 'text-slate-500 hover:text-slate-800'
+          }`}
+        >
+          <Building2 className={`w-3.5 h-3.5 ${activeTab === 'sponsors' ? 'text-teal-600' : 'text-slate-400'}`} />
+          Pro sponzory &amp; partnery
+        </button>
+      </div>
+
+      {activeTab === 'financial' && (
+        <div className="space-y-8 animate-fadeIn" id="financial-support-view">
 
       {/* Transparent Monthly Budget Card */}
       <div className="bg-gradient-to-b from-white to-slate-50/50 border border-slate-150 rounded-2xl p-5 md:p-6 shadow-3xs space-y-5" id="monthly-transparent-budget">
@@ -558,6 +648,442 @@ export default function SupportSection({
         </div>
 
       </div>
+      </div>
+      )}
+
+      {activeTab === 'sponsors' && (
+        <div className="space-y-8 animate-fadeIn" id="synthesis-sponsors-portal">
+          {/* Main demand introduction */}
+          <div className="bg-gradient-to-b from-white to-slate-50 border border-slate-150 rounded-2xl p-5 md:p-6 shadow-3xs space-y-4">
+            <div className="flex items-center gap-2.5">
+              <div className="w-10 h-10 rounded-xl bg-teal-50 flex items-center justify-center text-teal-600 shrink-0">
+                <Building2 className="w-5 h-5" />
+              </div>
+              <div>
+                <h2 className="text-sm font-extrabold text-slate-850 font-display">Poptávka pro sponzory &amp; technologické partnery</h2>
+                <p className="text-[11px] text-slate-500">Připojte se k technologickému a finančnímu rozvoji portálu, který reálně pomáhá.</p>
+              </div>
+            </div>
+
+            <div className="bg-white p-4 rounded-xl border border-slate-100 space-y-2">
+              <h3 className="text-xs font-bold text-slate-800 flex items-center gap-1.5 font-display">
+                <Globe className="w-4 h-4 text-teal-600" />
+                Kdo jsme a co děláme?
+              </h3>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Portál <strong>Táta má právo</strong> je moderní, bezpečný průvodce opatrovnickým řízením v ČR. Pomáhame aktivním otcům a rodinám v krizových situacích (rozvody, opatrovnické spory, jednání s OSPOD) získat bezplatný přístup k vědecky podloženým informacím, prověřeným vzorům právních podání, kalkulačkám výživného a psychologické podpoře. Vše vyvíjíme otevřeně, zcela bez reklam a s vizí budoucí autonomní správy (AI Admin).
+              </p>
+            </div>
+          </div>
+
+          {/* Core features overview */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] uppercase font-mono font-bold text-teal-600 bg-teal-50 px-2.5 py-0.5 rounded-full">Přehled</span>
+              <h3 className="text-xs uppercase font-black text-slate-400 tracking-wider font-mono">Přehled klíčových funkcí portálu</h3>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="bg-white border border-slate-150 p-4 rounded-xl space-y-1.5">
+                <div className="w-8 h-8 rounded-lg bg-teal-50 flex items-center justify-center text-teal-600 mb-1">
+                  <Sparkles className="w-4 h-4" />
+                </div>
+                <h4 className="text-xs font-bold text-slate-850 font-display">Synthesis AI Asistent</h4>
+                <p className="text-[11px] text-slate-500 leading-relaxed">
+                  Pokročilý inteligentní rádce integrovaný přímo na webu, který tátům pomáhá s okamžitým vysvětlením právních pojmů a přípravou na jednání.
+                </p>
+              </div>
+
+              <div className="bg-white border border-slate-150 p-4 rounded-xl space-y-1.5">
+                <div className="w-8 h-8 rounded-lg bg-teal-50 flex items-center justify-center text-teal-600 mb-1">
+                  <FileText className="w-4 h-4" />
+                </div>
+                <h4 className="text-xs font-bold text-slate-850 font-display">Generátor a správa právních listin</h4>
+                <p className="text-[11px] text-slate-500 leading-relaxed">
+                  Systém pro dynamické generování a úpravu strukturovaných právních podání a dohod o péči.
+                </p>
+              </div>
+
+              <div className="bg-white border border-slate-150 p-4 rounded-xl space-y-1.5">
+                <div className="w-8 h-8 rounded-lg bg-teal-50 flex items-center justify-center text-teal-600 mb-1">
+                  <Users className="w-4 h-4" />
+                </div>
+                <h4 className="text-xs font-bold text-slate-850 font-display">Komunitní fórum a poradna</h4>
+                <p className="text-[11px] text-slate-500 leading-relaxed">
+                  Bezpečné prostředí pro sdílení zkušeností otců, které je chráněno před toxickým chováním.
+                </p>
+              </div>
+
+              <div className="bg-white border border-slate-150 p-4 rounded-xl space-y-1.5">
+                <div className="w-8 h-8 rounded-lg bg-teal-50 flex items-center justify-center text-teal-600 mb-1">
+                  <Cpu className="w-4 h-4" />
+                </div>
+                <h4 className="text-xs font-bold text-slate-850 font-display">Univerzální přehrávač</h4>
+                <p className="text-[11px] text-slate-500 leading-relaxed">
+                  Integrovaný systém pro dynamické vkládání a přehrávání odborných videí (např. z Facebooku či YouTube) přímo v těle tematických článků.
+                </p>
+              </div>
+
+              <div className="bg-white border border-slate-150 p-4 rounded-xl space-y-1.5 md:col-span-2 lg:col-span-1">
+                <div className="w-8 h-8 rounded-lg bg-teal-50 flex items-center justify-center text-teal-600 mb-1">
+                  <MessageSquare className="w-4 h-4" />
+                </div>
+                <h4 className="text-xs font-bold text-slate-850 font-display">Piktos – Modulární komunikátor</h4>
+                <p className="text-[11px] text-slate-500 leading-relaxed">
+                  Specializovaná komunikační vrstva postavená na přehledných kartách pro usnadnění rodinné koordinace.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Tech stack vs VPS plan */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Tech stack card */}
+            <div className="bg-white border border-slate-150 rounded-2xl p-5 shadow-3xs space-y-3">
+              <h3 className="text-xs uppercase font-black text-slate-400 tracking-wider font-mono flex items-center gap-1.5">
+                <Terminal className="w-4 h-4 text-teal-600" />
+                Jaké technologie používáme?
+              </h3>
+              <div className="divide-y divide-slate-100">
+                <div className="py-2 flex items-start gap-2">
+                  <span className="text-[10px] bg-slate-100 text-slate-700 px-2 py-0.5 rounded-md font-mono shrink-0 font-bold">Frontend</span>
+                  <p className="text-[11px] text-slate-600 leading-normal">React (Vite) s responzivním designem přes Tailwind CSS a plnou přístupností (WCAG).</p>
+                </div>
+                <div className="py-2 flex items-start gap-2">
+                  <span className="text-[10px] bg-slate-100 text-slate-700 px-2 py-0.5 rounded-md font-mono shrink-0 font-bold">Backend</span>
+                  <p className="text-[11px] text-slate-600 leading-normal">Node.js (Express server) běžící jako permanentní monolit (<code>server.ts</code>).</p>
+                </div>
+                <div className="py-2 flex items-start gap-2">
+                  <span className="text-[10px] bg-slate-100 text-slate-700 px-2 py-0.5 rounded-md font-mono shrink-0 font-bold">AI Integrace</span>
+                  <p className="text-[11px] text-slate-600 leading-normal">Gemini API přes Google AI Studio s nativním využitím strukturovaných JSON výstupů.</p>
+                </div>
+                <div className="py-2 flex items-start gap-2">
+                  <span className="text-[10px] bg-slate-100 text-slate-700 px-2 py-0.5 rounded-md font-mono shrink-0 font-bold">Bezpečnost</span>
+                  <p className="text-[11px] text-slate-600 leading-normal">Moderní biometrická autentizace Passkeys (WebAuthn) pro bezpečné přihlašování otiskem prstu či FaceID bez nutnosti zadávat hesla.</p>
+                </div>
+              </div>
+            </div>
+
+            {/* VPS infrastructure goal */}
+            <div className="bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800 rounded-2xl p-5 shadow-3xs text-white space-y-3 relative overflow-hidden">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,rgba(20,184,166,0.1),transparent_40%)] pointer-events-none" />
+              <h3 className="text-xs uppercase font-black text-slate-400 tracking-wider font-mono flex items-center gap-1.5 relative z-10">
+                <Server className="w-4.5 h-4.5 text-teal-400" />
+                Jaký VPS server hledáme a co na něm budeme provozovat?
+              </h3>
+              <p className="text-[11px] text-slate-300 leading-relaxed relative z-10">
+                Abychom zajistili stoprocentní ochranu citlivých dat, stěhujeme celou infrastrukturu na <strong>vlastní nezávislé řešení v České republice</strong> (All-in-One architektura pod naší plnou kontrolou). Na serveru poběží aplikační Node.js server (pod správou PM2), lokální produkční databáze (PostgreSQL / MongoDB), bezpečné úložiště souborů a vlastní mailserver (Postfix/Dovecot/Mailcow) pro neomezené generování schránek na doméně.
+              </p>
+            </div>
+          </div>
+
+          {/* Technical minimum specs card */}
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 md:p-6 text-white space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <h3 className="text-xs uppercase font-black text-teal-400 tracking-wider font-mono">Specifikace požadovaného VPS (Technické minimum):</h3>
+              <span className="text-[10px] font-mono font-bold px-2 py-0.5 bg-teal-500/10 border border-teal-500/30 text-teal-300 rounded-md">
+                Minimální parametry
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="bg-slate-950 border border-slate-850 p-3 rounded-xl space-y-1">
+                <span className="text-[9px] uppercase font-bold text-slate-500 font-mono">Lokalita</span>
+                <p className="text-xs font-bold text-white leading-normal">Datacentrum v ČR</p>
+                <span className="text-[9px] text-slate-400 block leading-tight">(např. ekvivalent Wedos VPS ON / vshosting~)</span>
+              </div>
+              <div className="bg-slate-950 border border-slate-850 p-3 rounded-xl space-y-1">
+                <span className="text-[9px] uppercase font-bold text-slate-500 font-mono">Procesor &amp; Paměť</span>
+                <p className="text-xs font-bold text-white leading-normal">Minimálně 2× vCPU</p>
+                <span className="text-[9px] text-slate-400 block leading-tight">4 GB RAM operační paměti</span>
+              </div>
+              <div className="bg-slate-950 border border-slate-850 p-3 rounded-xl space-y-1">
+                <span className="text-[9px] uppercase font-bold text-slate-500 font-mono">Úložiště</span>
+                <p className="text-xs font-bold text-white leading-normal">40 GB NVMe SSD</p>
+                <span className="text-[9px] text-slate-400 block leading-tight">Vysokorychlostní NVMe pro databázi</span>
+              </div>
+              <div className="bg-slate-950 border border-slate-850 p-3 rounded-xl space-y-1">
+                <span className="text-[9px] uppercase font-bold text-slate-500 font-mono">OS &amp; Síť</span>
+                <p className="text-xs font-bold text-white leading-normal">Ubuntu 24.04 LTS</p>
+                <span className="text-[9px] text-slate-400 block leading-tight">Dedikovaná IPv4, Nginx proxy, HTTPS Let's Encrypt</span>
+              </div>
+            </div>
+          </div>
+
+          {/* What we need from partners/sponsors */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] uppercase font-mono font-bold text-teal-600 bg-teal-50 px-2.5 py-0.5 rounded-full">🤝 Potřeba</span>
+              <h3 className="text-xs uppercase font-black text-slate-400 tracking-wider font-mono">Co od partnerů a sponzorů potřebujeme?</h3>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-white border border-slate-150 p-5 rounded-2xl shadow-3xs space-y-3 flex flex-col justify-between">
+                <div className="space-y-2">
+                  <div className="w-8 h-8 rounded-lg bg-teal-50 flex items-center justify-center text-teal-600">
+                    <Server className="w-4.5 h-4.5" />
+                  </div>
+                  <h4 className="text-xs font-bold text-slate-850 font-display">Technologické partnerství</h4>
+                  <p className="text-[11px] text-slate-500 leading-relaxed">
+                    Poskytnutí nebo zafinancování pronájmu VPS serveru (cca 250 Kč / měsíčně neboli 3 000 Kč / rok).
+                  </p>
+                </div>
+                <div className="pt-2 border-t border-slate-50 mt-1">
+                  <span className="text-[11px] font-bold text-teal-750 font-mono">~ 3 000 Kč / rok</span>
+                </div>
+              </div>
+
+              <div className="bg-white border border-slate-150 p-5 rounded-2xl shadow-3xs space-y-3 flex flex-col justify-between">
+                <div className="space-y-2">
+                  <div className="w-8 h-8 rounded-lg bg-teal-50 flex items-center justify-center text-teal-600">
+                    <Cpu className="w-4.5 h-4.5" />
+                  </div>
+                  <h4 className="text-xs font-bold text-slate-850 font-display">Financování AI infrastruktury</h4>
+                  <p className="text-[11px] text-slate-500 leading-relaxed">
+                    Krytí reálné spotřeby tokenů v Google AI Studio (cca 200 Kč / měsíc) pro komunikaci s uživateli a běh autonomního moderátora.
+                  </p>
+                </div>
+                <div className="pt-2 border-t border-slate-50 mt-1">
+                  <span className="text-[11px] font-bold text-teal-750 font-mono">~ 200 Kč / měsíc</span>
+                </div>
+              </div>
+
+              <div className="bg-white border border-slate-150 p-5 rounded-2xl shadow-3xs space-y-3 flex flex-col justify-between">
+                <div className="space-y-2">
+                  <div className="w-8 h-8 rounded-lg bg-teal-50 flex items-center justify-center text-teal-600">
+                    <Shield className="w-4.5 h-4.5" />
+                  </div>
+                  <h4 className="text-xs font-bold text-slate-850 font-display">Finanční záštita právní pomoci</h4>
+                  <p className="text-[11px] text-slate-500 leading-relaxed">
+                    Podpora na propojení portálu s advokáty pro bezplatné krizové konzultace pro táty v nouzi.
+                  </p>
+                </div>
+                <div className="pt-2 border-t border-slate-50 mt-1">
+                  <span className="text-[11px] font-bold text-teal-750 font-mono">Individuální podpora</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Flexibility commentary */}
+            <div className="bg-teal-50/40 border border-teal-100/50 p-5 rounded-2xl space-y-2">
+              <h4 className="text-xs font-bold text-teal-900 font-display">Flexibilita partnerství</h4>
+              <p className="text-[11px] text-slate-600 leading-relaxed">
+                Výše uvedené body jsou naším technickým minimem pro plnou nezávislost. Jako sponzor či technologický partner <strong>můžete navrhnout i své vlastní individuální podmínky a formu spolupráce</strong>, která bude nejlépe vyhovovat Vašim cílům či možnostem.
+              </p>
+              <p className="text-[11px] text-slate-600 leading-relaxed">
+                Vaše logo/jméno bude trvale umístěno v sekci „Podpora projektu“ přímo na hlavní stránce portálu, v našich newsletterech a v komunitní síti aktivních otců.
+              </p>
+            </div>
+          </div>
+
+          {/* Contact details */}
+          <div className="bg-gradient-to-r from-teal-900 to-slate-900 text-white rounded-2xl p-5 md:p-6 shadow-md border border-teal-850 space-y-4">
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-lg bg-teal-500/10 border border-teal-500/20 flex items-center justify-center text-teal-300">
+                <Mail className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-xs uppercase font-mono font-bold text-teal-300">Kontakt pro zájemce o partnerství</h3>
+                <h4 className="text-sm font-bold text-white font-display">Jiří Šár &mdash; zakladatel portálu Táta má právo</h4>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+              <div className="bg-slate-950/40 border border-slate-800/40 p-4 rounded-xl space-y-1.5">
+                <span className="text-[9px] uppercase font-bold text-slate-400 font-mono">Přímé e-maily</span>
+                <div className="space-y-1 text-xs font-bold text-white">
+                  <a href="mailto:sarji@seznam.cz" className="hover:text-teal-400 transition-colors flex items-center gap-1.5">
+                    sarji@seznam.cz <ArrowUpRight className="w-3.5 h-3.5 text-teal-400" />
+                  </a>
+                  <a href="mailto:mallfuriionn@gmail.com" className="hover:text-teal-400 transition-colors flex items-center gap-1.5">
+                    mallfuriionn@gmail.com <ArrowUpRight className="w-3.5 h-3.5 text-teal-400" />
+                  </a>
+                </div>
+              </div>
+
+              <div className="bg-slate-950/40 border border-slate-800/40 p-4 rounded-xl space-y-1.5">
+                {currentUser ? (
+                  <div className="space-y-1">
+                    <span className="text-[9px] uppercase font-bold text-teal-400 font-mono block">Telefonní kontakt (registrovaní)</span>
+                    <p className="text-xs font-bold text-white flex items-center gap-1.5">
+                      <Phone className="w-3.5 h-3.5 text-teal-400" />
+                      <span>+420 730 123 456</span>
+                    </p>
+                    <div className="text-[10px] text-slate-300 space-y-0.5 leading-normal italic pt-1">
+                      <p>🟢 Preferuji první kontakt přes <strong>e-mail, SMS nebo WhatsApp</strong>.</p>
+                      <p>⚠️ Telefonní hovory od neznámých čísel přijímám jen velice zřídka (pouze pokud je hovor předem očekáván).</p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-1.5">
+                    <span className="text-[9px] uppercase font-bold text-slate-400 font-mono flex items-center gap-1">
+                      <Lock className="w-3 h-3 text-teal-400" />
+                      Telefonní kontakt skryt
+                    </span>
+                    <p className="text-[10px] text-slate-300 leading-normal">
+                      Zobrazení čísla je dostupné pouze pro registrované a přihlášené uživatele.
+                    </p>
+                    {onOpenAuth && (
+                      <button
+                        type="button"
+                        onClick={onOpenAuth}
+                        className="text-[10px] font-bold text-teal-400 hover:text-teal-300 hover:underline cursor-pointer flex items-center gap-1 text-left"
+                      >
+                        Přihlásit se pro zobrazení
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Interactive Sponsor Inquiry Form */}
+          <div className="bg-[#FAF8F5] p-6 rounded-2xl border border-[#EBE7E0] space-y-4" id="sponsor-inquiry-form-card">
+            <div className="border-b border-[#EBE7E0] pb-3">
+              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider font-mono">Poptávkový formulář</span>
+              <h3 className="text-sm font-bold text-slate-800 font-display">Odeslat poptávku partnerství</h3>
+              <p className="text-[10px] text-slate-500 mt-1">Máte zájem o technickou záštitu, pronájem serveru, AI API tokeny nebo finanční příspěvek? Dejte nám vědět, rádi se s Vámi spojíme.</p>
+            </div>
+
+            {sponsorStatus === 'success' ? (
+              <div className="bg-teal-50 border border-teal-150 p-6 rounded-xl text-center space-y-3" id="sponsor-form-success">
+                <CheckCircle2 className="w-10 h-10 text-teal-600 mx-auto animate-bounce" />
+                <h4 className="text-sm font-bold text-teal-900 font-display">Poptávka úspěšně zaznamenána!</h4>
+                <p className="text-xs text-teal-800 leading-relaxed max-w-md mx-auto">
+                  Děkujeme za Váš zájem o podporu portálu. Detaily Vaší poptávky byly úspěšně doručeny zakladateli Jiřímu Šárovi na e-mail <strong className="font-bold">sarji@seznam.cz</strong>. Budeme Vás neprodleně kontaktovat zpět.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setSponsorStatus('idle')}
+                  className="px-4 py-1.5 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs rounded-xl transition-colors cursor-pointer"
+                >
+                  Odeslat další poptávku
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmitSponsorForm} className="space-y-4">
+                {sponsorError && (
+                  <div className="bg-rose-50 border border-rose-150 p-3 rounded-lg flex items-start gap-2 text-rose-700 text-[11px] leading-relaxed">
+                    <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+                    <span>{sponsorError}</span>
+                  </div>
+                )}
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="block text-[11px] font-semibold text-slate-700">Název firmy / Sponzora *</label>
+                    <input
+                      type="text"
+                      required
+                      value={sponsorCompany}
+                      onChange={(e) => setSponsorCompany(e.target.value)}
+                      placeholder="Např. Wedos Hosting a.s."
+                      className="w-full px-3 py-2 text-xs bg-white border border-slate-200 focus:border-teal-500 rounded-xl outline-none"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="block text-[11px] font-semibold text-slate-700">Kontaktní osoba (Jméno) *</label>
+                    <input
+                      type="text"
+                      required
+                      value={sponsorPerson}
+                      onChange={(e) => setSponsorPerson(e.target.value)}
+                      placeholder="Např. Jan Novák"
+                      className="w-full px-3 py-2 text-xs bg-white border border-slate-200 focus:border-teal-500 rounded-xl outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="block text-[11px] font-semibold text-slate-700">E-mailová adresa *</label>
+                    <input
+                      type="email"
+                      required
+                      value={sponsorEmail}
+                      onChange={(e) => setSponsorEmail(e.target.value)}
+                      placeholder="vashosting@firma.cz"
+                      className="w-full px-3 py-2 text-xs bg-white border border-slate-200 focus:border-teal-500 rounded-xl outline-none"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="block text-[11px] font-semibold text-slate-700">Telefonní číslo (nepovinné)</label>
+                    <input
+                      type="tel"
+                      value={sponsorPhone}
+                      onChange={(e) => setSponsorPhone(e.target.value)}
+                      placeholder="+420 777 123 456"
+                      className="w-full px-3 py-2 text-xs bg-white border border-slate-200 focus:border-teal-500 rounded-xl outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="block text-[11px] font-semibold text-slate-700">Preferovaný způsob podpory</label>
+                  <select
+                    value={sponsorType}
+                    onChange={(e) => setSponsorType(e.target.value)}
+                    className="w-full px-3 py-2 text-xs bg-white border border-slate-200 focus:border-teal-500 rounded-xl outline-none"
+                  >
+                    <option value="vps">💻 Technologická záštita (VPS server / hosting zdarma)</option>
+                    <option value="api">🤖 Financování AI tokenů (API poplatky pro asistenta)</option>
+                    <option value="financial">💰 Finanční dar (roční podpora chodu)</option>
+                    <option value="legal">⚖️ Právní záštita (advokátní dary a konzultace)</option>
+                    <option value="other">🤝 Jiná individuální forma spolupráce</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="block text-[11px] font-semibold text-slate-700">Upřesnění nabídky / Vaše zpráva *</label>
+                  <textarea
+                    required
+                    value={sponsorMessage}
+                    onChange={(e) => setSponsorMessage(e.target.value)}
+                    placeholder="Dobrý den Jiří, rádi bychom vašemu portálu bezplatně poskytli náš VPS server s NVMe disky po dobu 2 let..."
+                    rows={4}
+                    className="w-full px-3 py-2 text-xs bg-white border border-slate-200 focus:border-teal-500 rounded-xl outline-none resize-none"
+                  />
+                </div>
+
+                {/* Anti-spam & Submission */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-slate-500 whitespace-nowrap">
+                      Kontrola proti spamu: {sponsorMathQuestion.num1} + {sponsorMathQuestion.num2} =
+                    </span>
+                    <input
+                      type="text"
+                      required
+                      value={sponsorMathAnswer}
+                      onChange={(e) => setSponsorMathAnswer(e.target.value)}
+                      placeholder="?"
+                      className="w-12 px-2 py-1.5 text-xs bg-white border border-slate-200 focus:border-teal-500 rounded-xl text-center outline-none"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={sponsorStatus === 'submitting'}
+                    className="px-5 py-2.5 bg-teal-600 hover:bg-teal-500 disabled:opacity-50 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-xs cursor-pointer flex items-center justify-center gap-2 transition-all"
+                  >
+                    {sponsorStatus === 'submitting' ? (
+                      <>Odesílání...</>
+                    ) : (
+                      <>
+                        Odeslat poptávku
+                        <Send className="w-3.5 h-3.5" />
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Donors Wall / Zeď cti */}
       <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-3xs">

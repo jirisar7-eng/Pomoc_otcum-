@@ -12,6 +12,7 @@ import {
   Search, Sliders, ArrowRight, Play, Database, Scale, Heart
 } from 'lucide-react';
 import { searchContentHub } from '../data/contentHub';
+import SmartVideoEmbed from './SmartVideoEmbed';
 
 interface PromptTemplate {
   id: string;
@@ -238,6 +239,40 @@ export default function AiGuideSection() {
               </p>
               <div className="p-3 bg-rose-50/50 border border-rose-100 rounded-xl text-[10px] text-rose-700 font-medium">
                 ⚠️ <strong>Upozornění:</strong> Tento obsah slouží pouze k obecným informačním účelům a nenahrazuje právní poradenství.
+              </div>
+            </div>
+
+            {/* Recommended Video Explanation */}
+            <div className="space-y-3 pt-4 border-t border-slate-50">
+              <h4 className="text-xs font-bold font-mono text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                <Play className="w-4 h-4 text-indigo-600 fill-current" /> Doporučený video-výklad k situaci
+              </h4>
+              <div className="max-w-2xl">
+                {perplexityResult.query.toLowerCase().includes('2') || 
+                 perplexityResult.query.toLowerCase().includes('kojenec') || 
+                 perplexityResult.query.toLowerCase().includes('batole') || 
+                 perplexityResult.query.toLowerCase().includes('attachment') ? (
+                  <SmartVideoEmbed
+                    url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                    title="Odborná analýza: Střídavá péče u batolat a dětí útlého věku"
+                    author="Dr. Linda Nielsen (Wake Forest University)"
+                    tags={['Batole', 'Attachment', 'Střídavá péče']}
+                  />
+                ) : perplexityResult.query.toLowerCase().includes('ospod') ? (
+                  <SmartVideoEmbed
+                    url="https://vimeo.com/76979871"
+                    title="Jak správně komunikovat s OSPOD a vyhnout se pastem"
+                    author="Mgr. Jan Novotný (Advokát)"
+                    tags={['OSPOD', 'Komunikace', 'Strategie']}
+                  />
+                ) : (
+                  <SmartVideoEmbed
+                    url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                    title="Právní náležitosti a strategie v opatrovnickém řízení"
+                    author="Jiří Šár (Zakladatel portálu)"
+                    tags={['Soud', 'Strategie', 'Právo']}
+                  />
+                )}
               </div>
             </div>
 

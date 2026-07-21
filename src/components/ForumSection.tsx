@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { ForumCategory, ForumPost, Comment, User } from '../types';
 import { INITIAL_FORUM_CATEGORIES, INITIAL_FORUM_POSTS, INITIAL_COMMENTS } from '../initialState';
+import SmartVideoEmbed from './SmartVideoEmbed';
 
 interface ForumSectionProps {
   currentUser: User | null;
@@ -62,6 +63,7 @@ export default function ForumSection({
   const [newPostTitle, setNewPostTitle] = useState('');
   const [newPostContent, setNewPostContent] = useState('');
   const [newPostTags, setNewPostTags] = useState('');
+  const [newPostVideoUrl, setNewPostVideoUrl] = useState('');
   const [guestPostName, setGuestPostName] = useState('');
   const [postSpamAnswer, setPostSpamAnswer] = useState('');
   const [postSpamQuestion, setPostSpamQuestion] = useState({ num1: 3, num2: 6, answer: 9 });
@@ -156,7 +158,8 @@ export default function ForumSection({
       likes: 0,
       commentsCount: 0,
       tags: tagsArray,
-      reported: false
+      reported: false,
+      videoUrl: newPostVideoUrl.trim() || undefined
     };
 
     setPosts(prev => [newPost, ...prev]);
@@ -170,6 +173,7 @@ export default function ForumSection({
     setNewPostTitle('');
     setNewPostContent('');
     setNewPostTags('');
+    setNewPostVideoUrl('');
     setGuestPostName('');
     setNewPostOpen(false);
     handleRefreshPostSpam();
@@ -379,6 +383,18 @@ export default function ForumSection({
                   />
                 </div>
 
+                <div className="space-y-1">
+                  <label className="block text-xs font-semibold text-slate-600">Odkaz na video (nepovinné — YouTube, Facebook, Vimeo, TikTok, Instagram)</label>
+                  <input
+                    id="post-input-video-url"
+                    type="text"
+                    value={newPostVideoUrl}
+                    onChange={(e) => setNewPostVideoUrl(e.target.value)}
+                    placeholder="Vložte odkaz na video (např. https://www.youtube.com/watch?v=...)"
+                    className="w-full px-3 py-1.5 text-xs bg-slate-50 border border-slate-200 focus:border-teal-500 rounded-xl outline-none"
+                  />
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div className="space-y-1">
                     <label className="block text-xs font-semibold text-slate-600">Klíčová slova (oddělená čárkou)</label>
@@ -545,6 +561,17 @@ export default function ForumSection({
             <div className="space-y-2">
               <h3 className="font-bold text-base md:text-lg text-slate-800 font-display">{selectedPost.title}</h3>
               <p className="text-slate-600 text-xs leading-relaxed whitespace-pre-wrap">{selectedPost.content}</p>
+              
+              {selectedPost.videoUrl && (
+                <div className="pt-3 max-w-2xl">
+                  <SmartVideoEmbed
+                    url={selectedPost.videoUrl}
+                    title={selectedPost.title}
+                    author={selectedPost.userName}
+                    tags={selectedPost.tags}
+                  />
+                </div>
+              )}
             </div>
 
             <div className="flex flex-wrap gap-1.5 pt-2 border-t border-slate-50">

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { BookOpen, Search, Filter, Copy, Check, Download, Bookmark, BookmarkCheck, ArrowUpRight, Share2, Quote } from 'lucide-react';
+import { BookOpen, Search, Filter, Copy, Check, Download, Bookmark, BookmarkCheck, ArrowUpRight, Share2, Quote, Play } from 'lucide-react';
 import { useLanguage } from '../lib/LanguageContext';
 import { getTranslatedObject } from '../data/dynamicTranslations';
+import SmartVideoEmbed from './SmartVideoEmbed';
 
 interface Study {
   id: string;
@@ -16,6 +17,7 @@ interface Study {
   courtArgument: string; // Ready-to-use citation for custody proceedings
   rating: string; // Scientific strength indicator
   doi?: string;
+  videoUrl?: string;
 }
 
 const EXPERT_STUDIES: Study[] = [
@@ -33,7 +35,8 @@ const EXPERT_STUDIES: Study[] = [
       'Děti sdílející domov s oběma rodiči vykazují méně psychosomatických potíží.'
     ],
     courtArgument: '„Z doložené meta-analýzy Dr. Lindy Nielsen (2018), publikované American Psychological Association, vyplývá, že střídavá péče je pro vývoj dítěte nejvhodnějším uspořádáním, a to i v případech zvýšeného konfliktu mezi rodiči. Bránění střídavé péči s poukazem na komunikační neshody rodičů je v rozporu se soudobým vědeckým konsensem a poškozuje zájem nezletilého na zachování plnohodnotné vazby k oběma rodičům.“',
-    rating: 'A+ (Meta-analýza 60 studií)'
+    rating: 'A+ (Meta-analýza 60 studií)',
+    videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
   },
   {
     id: 'study-2',
@@ -253,6 +256,20 @@ export default function KnihovnaStudies() {
                       ))}
                     </ul>
                   </div>
+
+                  {study.videoUrl && (
+                    <div className="mt-5 max-w-xl">
+                      <h4 className="text-[10px] font-mono font-bold text-indigo-600 uppercase tracking-wider flex items-center gap-1 mb-2">
+                        <Play className="w-3.5 h-3.5 text-indigo-600 fill-current" /> Video-výklad autora k této studii:
+                      </h4>
+                      <SmartVideoEmbed
+                        url={study.videoUrl}
+                        title={`Výklad studie: ${study.title}`}
+                        author={study.authors}
+                        tags={['Vědecká studie', study.authors]}
+                      />
+                    </div>
+                  )}
 
                   {/* Ready court citation section */}
                   <div className="mt-5 p-4 bg-indigo-50/40 border border-indigo-100/80 rounded-xl relative">

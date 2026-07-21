@@ -25,7 +25,8 @@ import {
   Compass,
   Building,
   Flag,
-  Check
+  Check,
+  Lock
 } from 'lucide-react';
 
 interface Contact {
@@ -115,7 +116,12 @@ interface OrgCategory {
   items: OrgItem[];
 }
 
-export default function KontaktSection() {
+interface KontaktSectionProps {
+  currentUser?: any;
+  onOpenAuth?: () => void;
+}
+
+export default function KontaktSection({ currentUser, onOpenAuth }: KontaktSectionProps = {}) {
   const [activeSubTab, setActiveSubTab] = useState<'orgs' | 'specialists'>('orgs');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'lawyer' | 'mediator' | 'psych' | 'org'>('all');
@@ -502,19 +508,61 @@ export default function KontaktSection() {
                 <h3 className="text-sm font-bold text-slate-800 font-display">Kontaktovat zakladatele</h3>
               </div>
 
-              <div className="bg-white p-3 rounded-xl border border-slate-100 space-y-1.5 shadow-3xs">
-                <span className="text-[9px] uppercase font-extrabold text-teal-600 font-mono block">Přímý kontakt</span>
-                <p className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                  <Mail className="w-3.5 h-3.5 text-teal-500" />
-                  <a href="mailto:sarji@seznam.cz" className="hover:text-teal-600 transition-colors">sarji@seznam.cz</a>
-                </p>
-                <p className="text-[10px] text-slate-500 leading-normal">
-                  E-mail je určený pro dotazy veřejnosti, spolupráci a nahlášení podnětů.
-                </p>
+              {/* Jiří Šár profile block */}
+              <div className="space-y-3">
+                <div className="bg-white p-3 rounded-xl border border-slate-100 space-y-2 shadow-3xs">
+                  <span className="text-[9px] uppercase font-extrabold text-teal-600 font-mono block">Zakladatel portálu</span>
+                  <h4 className="text-xs font-extrabold text-slate-850 font-display">Jiří Šár</h4>
+                  
+                  <div className="space-y-1.5 pt-1 border-t border-slate-50 text-xs">
+                    <div className="flex items-start gap-1.5 text-slate-700">
+                      <Mail className="w-3.5 h-3.5 text-teal-500 shrink-0 mt-0.5" />
+                      <div className="space-y-0.5">
+                        <a href="mailto:sarji@seznam.cz" className="font-semibold text-slate-800 hover:text-teal-600 transition-colors block">sarji@seznam.cz</a>
+                        <a href="mailto:mallfuriionn@gmail.com" className="font-semibold text-slate-800 hover:text-teal-600 transition-colors block">mallfuriionn@gmail.com</a>
+                      </div>
+                    </div>
+
+                    <div className="pt-2 border-t border-slate-50">
+                      {currentUser ? (
+                        <div className="space-y-1.5">
+                          <span className="text-[9px] uppercase font-bold text-teal-600 font-mono block">Přímý telefon (pouze pro registrované)</span>
+                          <p className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                            <Phone className="w-3.5 h-3.5 text-teal-500" />
+                            <span>+420 730 123 456</span>
+                          </p>
+                          <div className="text-[10px] text-slate-500 space-y-1 leading-normal italic">
+                            <p>🟢 Preferuji první kontakt přes <strong>e-mail, SMS nebo WhatsApp</strong>.</p>
+                            <p>⚠️ Telefonní hovory od čísel, které nemám uložené v kontaktech, přijímám jen velice zřídka (pouze pokud je hovor předem očekáván).</p>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="space-y-1.5 bg-slate-50 p-2.5 rounded-lg border border-slate-150">
+                          <span className="text-[9px] uppercase font-bold text-slate-400 font-mono flex items-center gap-1">
+                            <Lock className="w-3 h-3 text-slate-400" />
+                            Telefonní kontakt skryt
+                          </span>
+                          <p className="text-[10px] text-slate-500 leading-normal">
+                            Telefonní číslo zakladatele uvidí pouze registrovaní a přihlášení uživatelé.
+                          </p>
+                          {onOpenAuth && (
+                            <button
+                              type="button"
+                              onClick={onOpenAuth}
+                              className="text-[10px] font-bold text-teal-600 hover:text-teal-700 hover:underline cursor-pointer flex items-center gap-1 text-left"
+                            >
+                              Přihlásit se pro zobrazení
+                            </button>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <p className="text-xs text-slate-600 leading-relaxed">
-                Můžete nás kontaktovat přímo na výše uvedený e-mail, nebo využít náš kontaktní formulář:
+                Všechny kontaktní formuláře jsou odesílány přímo zakladateli na e-mail <strong className="text-slate-800 font-bold">sarji@seznam.cz</strong>. Můžete využít náš formulář níže:
               </p>
 
               {sent ? (

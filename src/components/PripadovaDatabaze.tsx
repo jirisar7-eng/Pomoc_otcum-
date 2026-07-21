@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Database, Search, Filter, Copy, Check, Bookmark, BookmarkCheck, ArrowUpRight, Scale, Sliders, CheckCircle2 } from 'lucide-react';
+import { Database, Search, Filter, Copy, Check, Bookmark, BookmarkCheck, ArrowUpRight, Scale, Sliders, CheckCircle2, Play } from 'lucide-react';
+import SmartVideoEmbed from './SmartVideoEmbed';
 
 interface CaseDecision {
   id: string;
@@ -14,6 +15,7 @@ interface CaseDecision {
   summary: string;
   precedentCitations: string; // Ready legal precedent quote
   verdict: string; // Final legal verdict summary
+  videoUrl?: string;
 }
 
 const CASE_DATABASE_DECISIONS: CaseDecision[] = [
@@ -28,7 +30,8 @@ const CASE_DATABASE_DECISIONS: CaseDecision[] = [
     ospodOpinion: 'Záporné (překonáno)',
     summary: 'Ústavní soud zrušil rozhodnutí obecných soudů, které zamítly střídavou péči o osmnáctiměsíční dítě s odkazem na nízký věk a tvrzenou nutnost nepřetržité přítomnosti matky. Soud zdůraznil, že odepření střídavé péče s pouhým poukazem na věkovou hranici je diskriminační a brání budování rané otcovské vazby.',
     precedentCitations: '„Nízký věk dítěte nemůže být sám o sobě překážkou pro svěření do střídavé péče, pokud jsou oba rodiče kompetentní a schopní péči zajistit. Raná vazba dítěte k otci je stejně kritická jako k matce.“',
-    verdict: 'Vyhověno stížnosti otce, nařízena asymetrická střídavá péče 4-3 dny se zavedením postupné symetrie od 3 let věku dítka.'
+    verdict: 'Vyhověno stížnosti otce, nařízena asymetrická střídavá péče 4-3 dny se zavedením postupné symetrie od 3 let věku dítka.',
+    videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
   },
   {
     id: 'case-2',
@@ -302,6 +305,20 @@ export default function PripadovaDatabaze() {
                       </button>
                     </div>
                   </div>
+
+                  {decision.videoUrl && (
+                    <div className="mt-4 max-w-xl">
+                      <h4 className="text-[10px] font-mono font-bold text-indigo-600 uppercase tracking-wider flex items-center gap-1 mb-2">
+                        <Play className="w-3.5 h-3.5 text-indigo-600 fill-current" /> Video rozbor judikátu s expertem:
+                      </h4>
+                      <SmartVideoEmbed
+                        url={decision.videoUrl}
+                        title={`Rozbor judikátu: ${decision.caseCode}`}
+                        author="Jiří Šár (Táta má právo)"
+                        tags={['Judikát', decision.caseCode]}
+                      />
+                    </div>
+                  )}
                 </div>
 
               </motion.div>
