@@ -178,9 +178,14 @@ export default function Navigation({
           <div className="flex items-center justify-between min-h-[72px] py-2">
             
             {/* Logo & Slogan */}
-            <div className="flex items-center gap-2.5 cursor-pointer shrink-0" onClick={() => handleTabClick('home')}>
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-teal-600 to-slate-800 flex items-center justify-center text-white shadow-md shadow-teal-100">
-                <Sparkles className="w-5.5 h-5.5 text-teal-300" />
+            <div className="flex items-center gap-3 cursor-pointer shrink-0" onClick={() => handleTabClick('home')}>
+              <div className="w-10 h-10 rounded-xl bg-slate-900 border border-slate-200 shadow-md overflow-hidden flex items-center justify-center shrink-0">
+                <img 
+                  src="/src/assets/images/tata_ma_pravo_logo_1784660128096.jpg" 
+                  alt="Táta má právo Logo" 
+                  className="w-full h-full object-cover"
+                  referrerPolicy="no-referrer"
+                />
               </div>
               <div>
                 {language === 'sk' ? (

@@ -49,6 +49,26 @@ export const DEFAULT_VIDEO_SOURCES = [
 
 export const INITIAL_VIDEOS: VideoItem[] = [
   {
+    id: 'vid-promo',
+    title: 'Oficiální propagační spot: Táta má právo – Právní vzory a AI asistence',
+    description: 'Bojujete o své dítě? Oficiální videoprezentace portálu Táta má právo. Získejte kompletní právní vzory, náhledy AI asistentů pro střídavou péči a navštivte tatavacesta.vercel.app.',
+    shareUrl: 'https://tatavacesta.vercel.app',
+    platform: 'unknown',
+    author: 'Jiří Šár (Táta má právo)',
+    source: 'Oficiální propagační spot',
+    tags: ['Táta má právo', 'Právní vzory', 'AI asistent', 'Střídavá péče'],
+    category: 'Práva otců',
+    createdAt: '2026-07-21T12:00:00Z',
+    updatedAt: '2026-07-21T12:00:00Z',
+    createdBy: 'Admin',
+    status: 'Approved',
+    isFeatured: true,
+    views: 2450,
+    likes: 312,
+    language: 'CS',
+    embedUrl: ''
+  },
+  {
     id: 'vid-001',
     title: 'Střídavá péče v praxi: Nálezy Ústavního soudu a jak obhájit rovnocennou péči',
     description: 'Detailní právní rozbor klíčových nálezů Ústavního soudu garantujících právo obou rodičů na výchovu dětí. Jak správně formulovat návrh k soudu a jak reagovat na námitky OSPOD.',

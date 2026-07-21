@@ -26,7 +26,11 @@ import {
   Building,
   Flag,
   Check,
-  Lock
+  Lock,
+  Play,
+  Tv,
+  Sparkles,
+  ShieldCheck
 } from 'lucide-react';
 
 interface Contact {
@@ -311,6 +315,83 @@ export default function KontaktSection({ currentUser, onOpenAuth }: KontaktSecti
         <p className="text-slate-500 text-sm leading-relaxed max-w-3xl mt-3">
           Rodinný a opatrovnický spor nemusíte zvládat sami a v izolaci. V České republice existuje několik typů organizací, krizových služeb a specialistů, kteří se zaměřují na pomoc tátům i mámám s cílem zachovat plnohodnotné rodičovství obou rodičů.
         </p>
+      </div>
+
+      {/* Official Promotional Video Banner Section */}
+      <div className="bg-gradient-to-br from-slate-900 via-slate-850 to-slate-900 rounded-2xl border border-slate-800 p-6 md:p-8 text-white shadow-lg relative overflow-hidden" id="promo-video-banner">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center relative z-10">
+          <div className="lg:col-span-7 space-y-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="bg-teal-500/20 text-teal-300 border border-teal-500/30 text-[10px] uppercase font-mono font-bold px-2.5 py-1 rounded-full flex items-center gap-1.5">
+                <Tv className="w-3.5 h-3.5 text-teal-400" />
+                Oficiální propagační video
+              </span>
+              <span className="bg-slate-800 text-slate-300 text-[10px] font-mono px-2.5 py-1 rounded-full border border-slate-700">
+                Táta má právo
+              </span>
+            </div>
+
+            <h3 className="text-xl md:text-2xl font-bold font-display text-white leading-tight">
+              Bojujete o své dítě? Táta má právo je váš průvodce
+            </h3>
+
+            <p className="text-slate-300 text-xs md:text-sm leading-relaxed">
+              Získejte kompletní právní vzory, asistenci umělé inteligence pro opatrovnickou agendu a potřebnou podporu pro zachování rovnocenné péče obou rodičů.
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1 text-xs">
+              <div className="flex items-center gap-2 bg-slate-800/80 border border-slate-700/60 p-2.5 rounded-xl text-slate-200">
+                <ShieldCheck className="w-4 h-4 text-teal-400 shrink-0" />
+                <span>Právní vzory a generování návrhů</span>
+              </div>
+              <div className="flex items-center gap-2 bg-slate-800/80 border border-slate-700/60 p-2.5 rounded-xl text-slate-200">
+                <Sparkles className="w-4 h-4 text-teal-400 shrink-0" />
+                <span>AI asistent pro opatrovnickou péči</span>
+              </div>
+            </div>
+
+            <div className="pt-2 flex flex-wrap items-center gap-3">
+              <a
+                href="https://tatavacesta.vercel.app"
+                target="_blank"
+                referrerPolicy="no-referrer"
+                className="px-4 py-2 bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-xs rounded-xl transition-all shadow-md flex items-center gap-2 cursor-pointer"
+              >
+                <span>Přejít na tatavacesta.vercel.app</span>
+                <ExternalLink className="w-3.5 h-3.5" />
+              </a>
+            </div>
+          </div>
+
+          <div className="lg:col-span-5">
+            <div className="bg-slate-950 rounded-2xl border border-slate-800 overflow-hidden shadow-2xl relative group">
+              <div className="aspect-video relative bg-slate-950 flex flex-col items-center justify-center p-6 text-center">
+                <div className="absolute inset-0 bg-gradient-to-tr from-teal-950/50 via-slate-900 to-indigo-950/50 opacity-90" />
+                
+                <div className="relative z-10 space-y-3">
+                  <div className="w-14 h-14 rounded-full bg-teal-500/20 border border-teal-400/40 flex items-center justify-center text-teal-300 mx-auto shadow-lg group-hover:scale-105 transition-transform">
+                    <Play className="w-6 h-6 ml-1 fill-current" />
+                  </div>
+
+                  <div>
+                    <h4 className="text-sm font-bold text-white font-display">Propagační video portálu</h4>
+                    <p className="text-[11px] text-slate-400 mt-1">Braňte právo svých dětí &bull; AI Synthesis</p>
+                  </div>
+
+                  <div className="pt-1">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-800/90 text-teal-300 text-[10px] font-mono rounded-lg border border-slate-700">
+                      <Check className="w-3 h-3 text-teal-400" />
+                      Informační spot
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {activeSubTab === 'orgs' ? (
