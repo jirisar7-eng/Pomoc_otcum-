@@ -43,7 +43,8 @@ import {
   linkPasswordToGoogleAccount, 
   sendPasswordReset 
 } from '../lib/firebase';
-import { isPasskeySupported, loginWithPasskey } from '../services/passkeyService';
+import { isPasskeySupported, loginWithPasskey, registerPasskey } from '../services/passkeyService';
+import { isBiometricsAvailable } from '../utils/passkey';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -95,12 +96,15 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
   // Passkey / WebAuthn Biometric Support State
   const [passkeyAvailable, setPasskeyAvailable] = useState<boolean>(false);
 
-  // Check passkey support on modal open
+  // Check passkey / biometrics support on modal open via WebAuthn API
   useEffect(() => {
     if (isOpen) {
-      isPasskeySupported()
+      isBiometricsAvailable()
         .then((supported) => setPasskeyAvailable(supported))
-        .catch(() => setPasskeyAvailable(false));
+        .catch((err) => {
+          console.warn('Chyba při detekci Passkeys/WebAuthn:', err);
+          setPasskeyAvailable(false);
+        });
     }
   }, [isOpen]);
 
@@ -489,13 +493,13 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
           setMode('welcome');
           setLoading(false);
         }, 800);
-      } else if (result.cancelled) {
+      } else if (result.noKey || result.cancelled) {
         setLoading(false);
         setCurrentStep(1);
         setStatus({
           type: 'warning',
-          title: 'Biometrické ověření zrušeno',
-          text: 'Snímání obličeje nebo otisku bylo zrušeno. Můžete se přihlásit e-mailem nebo přes Google.'
+          title: 'V tomto zařízení zatím nemáte vytvořený Passkey',
+          text: 'Na tomto telefonu/počítači ještě nemáte uložený přístupový klíč pro doménu. Přihlaste se nejdříve e-mailem nebo přes Google. Po přihlášení si můžete jedním kliknutím uložit Passkey pro příští rychlé přihlášení.'
         });
       } else {
         setLoading(false);
@@ -506,6 +510,44 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
       setLoading(false);
       setCurrentStep(1);
       setErrorNotice('Chyba biometrického přihlášení.', err.message || 'Při snímání biometrie došlo k neočekávané chybě.');
+    }
+  };
+
+  // E2. Register Passkey on Current Device
+  const handleCreatePasskey = async () => {
+    if (!authenticatedUser || loading) return;
+
+    setLoading(true);
+    setStatus({
+      type: 'loading',
+      title: 'Registruji nový přístupový klíč (Passkey)...',
+      text: 'Potvrďte vytvoření otiskem prstu nebo FaceID v dialogu vašeho zařízení...'
+    });
+
+    try {
+      const regRes = await registerPasskey(authenticatedUser);
+      setLoading(false);
+
+      if (regRes.success) {
+        setStatus({
+          type: 'success',
+          title: 'Přístupový klíč byl úspěšně vytvořen!',
+          text: 'Při příští návštěvě se budete moci přihlásit okamžitě pomocí otisku prstu / FaceID!'
+        });
+      } else {
+        setStatus({
+          type: 'warning',
+          title: 'Vytvoření klíče bylo zrušeno',
+          text: regRes.error || 'Přístupový klíč nebyl uložen.'
+        });
+      }
+    } catch (err: any) {
+      setLoading(false);
+      setStatus({
+        type: 'error',
+        title: 'Chyba při registraci Passkey',
+        text: err.message || 'Nepodařilo se uložit přístupový klíč.'
+      });
     }
   };
 
@@ -792,6 +834,18 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
                 </div>
 
                 <div className="pt-2 space-y-2">
+                  {passkeyAvailable && (
+                    <button
+                      type="button"
+                      disabled={loading}
+                      onClick={handleCreatePasskey}
+                      className="w-full py-2.5 px-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 shadow-xs"
+                    >
+                      <Fingerprint className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>Uložit Passkey pro toto zařízení (Otisk / FaceID)</span>
+                    </button>
+                  )}
+
                   <button
                     type="button"
                     onClick={handleFinishWelcome}
