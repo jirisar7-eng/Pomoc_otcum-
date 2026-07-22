@@ -671,9 +671,7 @@ export default function App() {
         </AnimatePresence>
 
         {/* Související doporučený obsah & akční propojení */}
-        {activeTab !== 'home' && (
-          <RelatedContent activeTab={activeTab} setActiveTab={setActiveTab} />
-        )}
+        <RelatedContent activeTab={activeTab} setActiveTab={setActiveTab} />
       </main>
 
       {/* Breathtaking and Professional Footer */}
