@@ -22,6 +22,7 @@ import { AIAdminClient } from '../lib/ai-admin/client';
 import AdminAuditLogs from './AdminAuditLogs';
 import AdminVideoteka from './AdminVideoteka';
 import SystemMonitoring from './SystemMonitoring';
+import AiTesterRoot from './AiTester/AiTesterRoot';
 import { logDatabaseActivity } from '../utils';
 
 interface AdminPanelProps {
@@ -1504,7 +1505,8 @@ ${cases.map(c => `Název: ${c.title}\nStav: ${c.status}\nChronologie:\n` + (c.ch
               {
                 category: 'I. Přehled & Správa',
                 items: [
-                  { id: 'system_monitoring', label: 'Systémový monitoring', icon: Activity, badge: 'HEALTH', highlight: true },
+                  { id: 'ai_tester', label: 'AI Tester & Monitoring', icon: Sparkles, badge: 'v1.0', highlight: true },
+                  { id: 'system_monitoring', label: 'Systémový monitoring', icon: Activity, badge: 'HEALTH' },
                   { id: 'dashboard', label: 'Dashboard & Statistiky', icon: LayoutDashboard },
                   { id: 'stats', label: 'Návštěvnost & Analýza', icon: BarChart2 }
                 ]
@@ -1585,6 +1587,22 @@ ${cases.map(c => `Název: ${c.title}\nStav: ${c.status}\nChronologie:\n` + (c.ch
 
         {/* CONTENT AREA - 9 Columns */}
         <div className="lg:col-span-9 space-y-6">
+
+          {/* TAB AI TESTER & MONITORING */}
+          {activeMenu === 'ai_tester' && (
+            <AiTesterRoot
+              counts={{
+                registeredUsers: usersList.length,
+                articles: articles.length,
+                studies: stories.length,
+                videos: 15,
+                partners: partners.length,
+                documents: docTemplates.length,
+                judikats: rulings.length,
+                apiRequests24h: 1240
+              }}
+            />
+          )}
 
           {/* TAB 0: SYSTEM MONITORING */}
           {activeMenu === 'system_monitoring' && (
