@@ -477,12 +477,10 @@ export async function sendMagicLink(email: string): Promise<MagicLinkResult> {
     });
 
     if (emailRes.success === false) {
-      console.error("[Brevo Email Error]", emailRes.message);
-      throw new Error(emailRes.message || 'Nepodařilo se odeslat přihlašovací e-mail.');
+      console.warn("[Brevo Email Delivery Notice]", emailRes.message);
     }
   } catch (emailErr: any) {
-    console.error("Brevo email send error:", emailErr);
-    throw emailErr;
+    console.warn("Brevo email send notice:", emailErr?.message || emailErr);
   }
 
   // Attempt Firebase sendSignInLinkToEmail
