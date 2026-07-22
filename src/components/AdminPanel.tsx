@@ -21,6 +21,7 @@ import { AIAdminActions } from '../lib/ai-admin/actions';
 import { AIAdminClient } from '../lib/ai-admin/client';
 import AdminAuditLogs from './AdminAuditLogs';
 import AdminVideoteka from './AdminVideoteka';
+import SystemMonitoring from './SystemMonitoring';
 import { logDatabaseActivity } from '../utils';
 
 interface AdminPanelProps {
@@ -1503,6 +1504,7 @@ ${cases.map(c => `Název: ${c.title}\nStav: ${c.status}\nChronologie:\n` + (c.ch
               {
                 category: 'I. Přehled & Správa',
                 items: [
+                  { id: 'system_monitoring', label: 'Systémový monitoring', icon: Activity, badge: 'HEALTH', highlight: true },
                   { id: 'dashboard', label: 'Dashboard & Statistiky', icon: LayoutDashboard },
                   { id: 'stats', label: 'Návštěvnost & Analýza', icon: BarChart2 }
                 ]
@@ -1583,6 +1585,19 @@ ${cases.map(c => `Název: ${c.title}\nStav: ${c.status}\nChronologie:\n` + (c.ch
 
         {/* CONTENT AREA - 9 Columns */}
         <div className="lg:col-span-9 space-y-6">
+
+          {/* TAB 0: SYSTEM MONITORING */}
+          {activeMenu === 'system_monitoring' && (
+            <SystemMonitoring
+              currentUser={currentUser}
+              articles={articles}
+              stories={stories}
+              posts={posts}
+              comments={comments}
+              donations={donations}
+              partners={partners}
+            />
+          )}
 
           {/* TAB 1: DASHBOARD */}
           {activeMenu === 'dashboard' && (
