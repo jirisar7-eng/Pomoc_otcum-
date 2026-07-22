@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { User } from '../types';
+import { User, UserRole } from '../types';
 import { isBiometricsAvailable } from '../utils/passkey';
 
 /**
@@ -28,7 +28,7 @@ interface LocalPasskeyRecord {
   userId: string;
   userEmail: string;
   userName: string;
-  userRole: 'admin' | 'user';
+  userRole: UserRole;
   createdAt: string;
 }
 

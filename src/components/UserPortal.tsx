@@ -46,6 +46,7 @@ import {
   CheckSquare
 } from 'lucide-react';
 import SmartVideoEmbed from './SmartVideoEmbed';
+import UserProgressTracker from './UserProgressTracker';
 
 import { 
   User as UserType, 
@@ -111,7 +112,7 @@ const DEFAULT_MESSAGES: PrivateMessage[] = [];
 
 export default function UserPortal({ currentUser, onOpenAuth }: UserPortalProps) {
   // Navigation tabs inside portal
-  const [portalTab, setPortalTab] = useState<'case-map' | 'evidence' | 'calendar' | 'ai-helper' | 'inbox' | 'saved-content' | 'ai-notes'>('case-map');
+  const [portalTab, setPortalTab] = useState<'case-map' | 'evidence' | 'calendar' | 'ai-helper' | 'inbox' | 'saved-content' | 'ai-notes' | 'progress'>('case-map');
 
   // Print Mode State
   const [showPrintOverlay, setShowPrintOverlay] = useState<boolean>(false);
@@ -769,6 +770,15 @@ Jaký krok nebo otázku dnes společně probereme?`;
             Mapa případu
           </button>
           <button
+            onClick={() => setPortalTab('progress')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+              portalTab === 'progress' ? 'bg-white text-slate-900 shadow-3xs' : 'text-slate-500 hover:text-slate-900'
+            }`}
+          >
+            <CheckSquare className="w-3.5 h-3.5 text-teal-600" />
+            Můj postup
+          </button>
+          <button
             onClick={() => setPortalTab('evidence')}
             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
               portalTab === 'evidence' ? 'bg-white text-slate-900 shadow-3xs' : 'text-slate-500 hover:text-slate-900'
@@ -831,6 +841,19 @@ Jaký krok nebo otázku dnes společně probereme?`;
       {/* RENDER ACTIVE PORTAL TAB */}
       <AnimatePresence mode="wait">
         
+        {/* TAB 0: MŮJ POSTUP & PŘIPRAVENOST */}
+        {portalTab === 'progress' && (
+          <motion.div
+            key="progress"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+          >
+            <UserProgressTracker />
+          </motion.div>
+        )}
+
         {/* TAB 1: CASE MAP & TIMELINE */}
         {portalTab === 'case-map' && (
           <motion.div

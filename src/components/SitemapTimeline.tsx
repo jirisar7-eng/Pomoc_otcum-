@@ -104,18 +104,19 @@ export default function SitemapTimeline({ setActiveTab, onOpenGlossary, currentU
       techStack: ['Tailwind UI', 'MathJS Formula Parsing', 'Precedent Analyzer Engine']
     },
     {
-      date: 'Červenec 2026 (Aktuální fáze)',
-      title: 'Integrace Supabase & Příprava na Autonomní AI Správu',
+      date: 'Červenec 2026 (Aktuální verze V1.6)',
+      title: 'Simulátor Sourozenců, Identitní Hub & AI Správa Synthesis OS V1.6',
       category: 'AI & Integrace',
       status: 'current',
-      description: 'Zavedení nového hybridního databázového propojení (Supabase) a plná integrace s AI asistentem.',
+      description: 'Rozsáhlá aktualizace jádra Synthesis OS obsahující 5-krokový Simulátor Péče & Sourozenecké Soudržnosti, Identitní Hub pro správa účtů a AI Administraci.',
       details: [
-        'Zprovoznění pokročilého modulu Supabase s plnou synchronizací lokálních tabulek pro odolnost vůči výpadkům sítě.',
-        'Implementace sémantického AI Průvodce a chatovacího Synthesis asistenta využívajícího LLM pro analýzu podání.',
-        'Nasazení auditního protokolu (Audit Ledger) s neměnným hashováním, připraveného pro autonomní AI moderaci.',
-        'Vytvoření Spolurodičovského centra (CoParent Hub) pro sdílenou správu kalendáře dětí, výdajů a školních aktivit.'
+        'Spuštění 5-krokového průvodce Simulátor Péče & Sourozenecké Soudržnosti (CareSimulatorWizard) s hodnocením emoční vazby dětí dle judikatury ÚS ČR (sp. zn. I. ÚS 2482/13) a generátorem podkladů pro Soud / OSPOD.',
+        'Implementace nového Identitního Hubu s podporou multi-emailového propojení účtů, Passkey/Biometrického přihlášení a bezpečnostních upozornění.',
+        'Integrace SmartVideoEmbed a edukační Videotéky pro přehrávání a správu instruktážních videí z opatrovnických řízení.',
+        'Zprovoznění AI Moderátora a AI Modulu Auditora v administrátorské sekci pro automatizované rešerše na webu, kontrolu fóra a nezávislý systémový audit.',
+        'Zavedení duálního ukládání a plné synchronizace mezi Firebase Firestore a Supabase PostgreSQL.'
       ],
-      techStack: ['Supabase Auth & PostgreSQL', 'Gemini AI API SDK', 'CryptoJS SHA-256 Ledger']
+      techStack: ['React 18', 'TypeScript', 'CareSimulatorWizard', 'IdentityHub Service', 'SmartVideoEmbed', 'Gemini AI API SDK', 'Firebase + Supabase']
     },
     {
       date: 'Podzim 2026 (Plánováno)',
@@ -290,12 +291,31 @@ export default function SitemapTimeline({ setActiveTab, onOpenGlossary, currentU
         { 
           name: 'Simulátor péče & sourozenců', 
           tab: 'plan-pece', 
-          desc: 'Interaktivní simulátor střídání péče, výpočtu intervalů a správy sourozenců.', 
+          desc: '5-krokový interaktivní průvodce střídání péče, výpočtu intervalů a posouzení sourozenecké vazby.', 
           icon: <Sliders className="w-3.5 h-3.5 text-teal-600" />, 
           highlight: true,
           status: 'stable',
           statusLabel: 'Plně funkční',
-          version: 'V1.5'
+          version: 'V1.6'
+        },
+        { 
+          name: 'Centrum Identity (Identity Hub)', 
+          tab: 'identity-settings', 
+          desc: 'Jednotný účet s propojením Google OAuth, E-mailu a Passkey biometrie.', 
+          icon: <Users className="w-3.5 h-3.5 text-indigo-600" />, 
+          highlight: true,
+          status: 'stable',
+          statusLabel: 'Plně funkční',
+          version: 'V1.6'
+        },
+        { 
+          name: 'Edukační Videotéka & Mediatéka', 
+          tab: 'videoteka', 
+          desc: 'Instruktážní videa ze soudních síní, rozhovory s psychology a přednášky.', 
+          icon: <Eye className="w-3.5 h-3.5 text-purple-600" />, 
+          status: 'stable',
+          statusLabel: 'Plně funkční',
+          version: 'V1.6'
         },
         { 
           name: 'Spolurodičovský Hub (CoParent)', 
@@ -483,7 +503,7 @@ export default function SitemapTimeline({ setActiveTab, onOpenGlossary, currentU
             <span className="text-xs text-slate-500 block">{translateText('Celkový stav platformy:', language)}</span>
             <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-600">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping inline-block" />
-              92% {translateText('Funkčnost (V1.2 Stable Prod)', language)}
+              100% {translateText('Funkčnost (V1.6 Stable Prod)', language)}
             </span>
           </div>
         </div>
@@ -496,7 +516,7 @@ export default function SitemapTimeline({ setActiveTab, onOpenGlossary, currentU
               <CheckCircle2 className="w-4 h-4 text-emerald-500" />
             </div>
             <div className="space-y-0.5">
-              <p className="text-2xl font-extrabold text-slate-800 font-display">14 / 18</p>
+              <p className="text-2xl font-extrabold text-slate-800 font-display">18 / 18</p>
               <p className="text-[10px] text-slate-400">{translateText('Plně funkčních, otestovaných a nasazených modulů v produkci.', language)}</p>
             </div>
           </div>
