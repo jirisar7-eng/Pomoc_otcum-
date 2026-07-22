@@ -1,4 +1,4 @@
-import { Resend } from 'resend';
+import { resend } from '../lib/resend';
 
 export type EmailType = 
   | 'MAGIC_LINK'
@@ -32,6 +32,7 @@ export interface SendEmailOptions {
   to: string;
   type: EmailType;
   data: EmailData;
+  fromName?: string;
 }
 
 export interface SendEmailResponse {
@@ -42,22 +43,48 @@ export interface SendEmailResponse {
   message?: string;
 }
 
-// Lazy initialization of Resend client to avoid startup crash if key is missing
-let resendClient: Resend | null = null;
-
-function getResendClient(): Resend | null {
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey || apiKey.trim() === '') {
-    return null;
-  }
-  if (!resendClient) {
-    resendClient = new Resend(apiKey);
-  }
-  return resendClient;
-}
-
-const FROM_EMAIL = 'Táta má právo <onboarding@resend.dev>';
 const DEFAULT_ADMIN_RECIPIENT = 'sarji@seznam.cz';
+
+/**
+ * Standard Resend email sender following official Resend docs
+ */
+export async function sendPortalEmail({
+  to,
+  subject,
+  html,
+  fromName = 'Táta má právo'
+}: {
+  to: string;
+  subject: string;
+  html: string;
+  fromName?: string;
+}) {
+  try {
+    const fromAddress = process.env.RESEND_DOMAIN_EMAIL || 'onboarding@resend.dev';
+
+    if (!process.env.RESEND_API_KEY) {
+      console.warn('RESEND_API_KEY missing. Simulating email delivery.');
+      return { success: true, delivered: false, message: 'Simulované doručení (chybí RESEND_API_KEY).' };
+    }
+
+    const { data, error } = await resend.emails.send({
+      from: `${fromName} <${fromAddress}>`,
+      to: [to],
+      subject: subject,
+      html: html,
+    });
+
+    if (error) {
+      console.error('Resend API Error:', error);
+      return { success: false, error: error.message || error };
+    }
+
+    return { success: true, data };
+  } catch (err: any) {
+    console.error('Internal Email Service Error:', err);
+    return { success: false, error: err?.message || err };
+  }
+}
 
 /**
  * Generates responsive, green-dark themed HTML email templates
@@ -286,7 +313,7 @@ ${content}
 /**
  * Universal email sending function powered by Resend SDK
  */
-export async function sendEmail({ to, type, data }: SendEmailOptions): Promise<SendEmailResponse> {
+export async function sendEmail({ to, type, data, fromName }: SendEmailOptions): Promise<SendEmailResponse> {
   const recipient = (type === 'ADMIN_ALERT' && (!to || to.trim() === '')) ? DEFAULT_ADMIN_RECIPIENT : to;
 
   if (!recipient || recipient.trim() === '') {
@@ -295,46 +322,27 @@ export async function sendEmail({ to, type, data }: SendEmailOptions): Promise<S
   }
 
   const { subject, html } = generateEmailHtml(type, data);
-  const resend = getResendClient();
 
-  if (!resend) {
-    console.warn(`[Resend Email Service] RESEND_API_KEY is not configured in environment variables. Simulating delivery for type=${type}, to=${recipient}`);
-    return {
-      success: true,
-      delivered: false,
-      message: `E-mail typu "${type}" byl připraven. Pro reálné doručení nastavte klíč RESEND_API_KEY.`
-    };
-  }
+  console.log(`[Resend Email Service] Sending email type="${type}" to="${recipient}" subject="${subject}"`);
+  
+  const result = await sendPortalEmail({
+    to: recipient,
+    subject,
+    html,
+    fromName: fromName || 'Táta má právo'
+  });
 
-  try {
-    console.log(`[Resend Email Service] Sending email type="${type}" to="${recipient}" subject="${subject}"`);
-    
-    const sendResult = await resend.emails.send({
-      from: FROM_EMAIL,
-      to: [recipient],
-      subject,
-      html
-    });
-
-    if (sendResult.error) {
-      console.error('[Resend Email Error]', sendResult.error);
-      return {
-        success: false,
-        error: sendResult.error.message || 'Resend API vrátilo chybu při odesílání.'
-      };
-    }
-
-    console.log(`[Resend Email Success] ID:`, sendResult.data?.id);
-    return {
-      success: true,
-      delivered: true,
-      data: sendResult.data
-    };
-  } catch (err: any) {
-    console.error('[Resend Email Fatal Error]', err);
+  if (!result.success) {
     return {
       success: false,
-      error: err?.message || 'Nepodařilo se odeslat e-mail přes Resend.'
+      error: typeof result.error === 'string' ? result.error : JSON.stringify(result.error)
     };
   }
+
+  return {
+    success: true,
+    delivered: result.delivered ?? true,
+    data: result.data,
+    message: result.message
+  };
 }
