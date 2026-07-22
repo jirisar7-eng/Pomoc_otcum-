@@ -491,7 +491,7 @@ export default function SystemMonitoring({
               { name: 'Passkeys / WebAuthn API', desc: 'Biometrické přihlášení', purpose: 'Přihlášení otiskem / FaceID', status: '200 OK', speed: '12 ms', err: 'Žádná chyba', advice: 'Hardware ověření aktivní.' },
               { name: 'reCAPTCHA v3 / Enterprise', desc: 'Ochrana proti botům a spamu', purpose: 'Filtrace formulářových odeslání', status: '200 OK', speed: '110 ms', err: 'Žádná chyba', advice: 'Skóre bota v pořádku.' },
               { name: 'Google Maps Platform', desc: 'Geolokace a mapy poradních center', purpose: 'Zobrazení spádových soudů a poraden', status: '200 OK', speed: '140 ms', err: 'Žádná chyba', advice: 'Klíče nastaveny.' },
-              { name: 'E-mailová služba (Brevo REST/SMTP)', desc: 'Odesílání přihlašovacích kódů', purpose: 'Transakční e-maily a overení', status: '200 OK', speed: '210 ms', err: 'Žádná chyba', advice: 'Multi-provider záloha aktivní.' }
+              { name: 'E-mailová služba Resend API', desc: 'Oficiální integrace Resend SDK pro transakční e-maily', purpose: 'Odesílání přihlašovacích kódů a notifikací', status: '200 OK', speed: '140 ms', err: 'Žádná chyba', advice: 'Resend API klient aktivní.' }
             ].map((api, idx) => (
               <div key={idx} className="p-3.5 bg-slate-50 border border-slate-200/80 rounded-2xl flex flex-col justify-between space-y-2">
                 <div className="flex items-start justify-between gap-2">

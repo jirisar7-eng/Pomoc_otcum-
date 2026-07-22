@@ -9,7 +9,7 @@ import dotenv from 'dotenv';
 import fs from 'fs';
 import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI } from '@google/genai';
-import { sendBrevoEmail } from './api/send-code';
+import { sendEmail } from './src/services/resendServerService';
 
 dotenv.config();
 
@@ -545,7 +545,30 @@ PRAVIDLA PRO REAKCI:
   }
 });
 
-// Brevo SMTP Magic Link / Verification Email Route
+// Resend Universal Email API Route
+app.post('/api/send-email', async (req, res) => {
+  try {
+    const { to, type, data, recipientEmail, code, magicUrl } = req.body || {};
+    const recipient = (to || recipientEmail || '').trim();
+    const emailType = (type || 'MAGIC_LINK') as any;
+    const emailData = data || { code, magicUrl };
+
+    if (!recipient) {
+      return res.status(400).json({ success: false, error: 'Chybí cílový e-mail (to).' });
+    }
+
+    const result = await sendEmail({ to: recipient, type: emailType, data: emailData });
+    return res.status(200).json(result);
+  } catch (error: any) {
+    console.error('[API /api/send-email Error]:', error);
+    return res.status(200).json({
+      success: false,
+      error: error.message || 'Nepodařilo se odeslat e-mail přes Resend.'
+    });
+  }
+});
+
+// Legacy Magic Link / Code Route mapped to Resend Email Service
 app.post(['/api/send-code', '/api/send-magic-link'], async (req, res) => {
   try {
     const { recipientEmail, email, code, magicUrl } = req.body || {};
@@ -555,21 +578,26 @@ app.post(['/api/send-code', '/api/send-magic-link'], async (req, res) => {
       return res.status(400).json({ success: false, error: 'Chybí e-mail nebo kód' });
     }
 
-    const result = await sendBrevoEmail({ recipientEmail: targetEmail, code, magicUrl });
+    const result = await sendEmail({
+      to: targetEmail,
+      type: 'MAGIC_LINK',
+      data: { code, magicUrl }
+    });
+
     if (result.success === false) {
       console.error('[API /api/send-code Error Result]:', result.error);
       return res.status(200).json({
         success: false,
-        error: result.error || 'Nepodařilo se odeslat e-mail přes Brevo.'
+        error: result.error || 'Nepodařilo se odeslat e-mail přes Resend.'
       });
     }
 
     return res.status(200).json(result);
   } catch (error: any) {
-    console.error('Error sending magic link email via SMTP:', error);
+    console.error('Error sending magic link email via Resend:', error);
     return res.status(200).json({
       success: false,
-      error: error.message || 'Nepodařilo se odeslat e-mail přes Brevo.'
+      error: error.message || 'Nepodařilo se odeslat e-mail přes Resend.'
     });
   }
 });
