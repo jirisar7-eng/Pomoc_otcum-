@@ -59,7 +59,7 @@ export default function IntroScreen({ onDismiss }: IntroScreenProps) {
             </p>
             
             <p>
-              Portál <strong>Táta má právo</strong> je zatím ve velmi rané fázi vývoje a to, co je nyní veřejně dostupné, představuje alfa verzi. Po obsahové stránce je většina hlavních sekcí již připravena, ale řada funkcí zatím není dokončená nebo ještě vůbec není aktivní. Přihlášení, některé interaktivní nástroje a další části portálu se budou postupně zprovozňovat.
+              Portál <strong>Táta má právo</strong> je v aktivní fázi vývoje (alfa verze). Systém přihlašování je již plně funkční a 100% bezpečný. Využíváme moderní biometrické ověření Passkeys (otisk prstu / FaceID) a přihlášení přes Google, takže vaše účty i citlivá data jsou v maximálním bezpečí bez nutnosti ukládat klasická hesla. Po obsahové i funkční stránce je většina hlavních sekcí připravena a další interaktivní nástroje postupně rozšiřujeme.
             </p>
 
             <p>
