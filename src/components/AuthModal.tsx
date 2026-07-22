@@ -347,11 +347,11 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
       const isLinkedWithPassword = currentUser?.providerData.some(p => p.providerId === 'password');
 
       const lowerEmail = (loggedInUser.email || '').toLowerCase().trim();
-      const isFallbackLocalUser = lowerEmail === 'mallfuriionn@gmail.com' || lowerEmail === 'sarji@seznam.cz';
+      const isFallbackLocalUser = lowerEmail === 'mallfuriionn@gmail.com';
 
       if (isFallbackLocalUser && currentUser && !isLinkedWithPassword) {
         try {
-          await linkPasswordToGoogleAccount('1234');
+          await linkPasswordToGoogleAccount('159753');
         } catch (linkErr) {
           console.warn("Failed to auto-link password for admin:", linkErr);
         }
@@ -564,22 +564,22 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
   };
 
   // E. Quick Demo Admin Login
-  const setDemoUser = async (type: 'mallfuriionn' | 'sarji') => {
+  const setDemoUser = async () => {
     if (loading) return;
 
-    const targetEmail = type === 'sarji' ? 'sarji@seznam.cz' : 'mallfuriionn@gmail.com';
-    const targetName = type === 'sarji' ? 'Administrátor (sarji)' : 'Hlavní Administrátor (Jiří Šár)';
+    const targetEmail = 'mallfuriionn@gmail.com';
+    const targetName = 'Hlavní Administrátor (mallfuriionn)';
 
     setLoading(true);
     setCurrentStep(2);
     setStatus({
       type: 'loading',
-      title: `Přihlašuji správce (${type})...`,
+      title: 'Přihlašuji správce (mallfuriionn)...',
       text: 'Ověřuji administrátorská práva a načítám systémovou konzoli...'
     });
 
     try {
-      const loggedInUser = await loginWithEmail(targetEmail, '1234');
+      const loggedInUser = await loginWithEmail(targetEmail, '159753');
       setCurrentStep(3);
       setStatus({
         type: 'success',
@@ -597,7 +597,7 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
       setCurrentStep(1);
       console.error("Demo login error:", err);
       setEmail(targetEmail);
-      setPassword('1234');
+      setPassword('159753');
       setName(targetName);
       setRole('admin');
       setMode('login');
@@ -1072,29 +1072,19 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
                     <div className="flex items-center gap-1.5">
                       <Shield className="w-3.5 h-3.5 text-teal-600" />
                       <span className="text-[9px] uppercase font-black text-slate-500 tracking-wider font-mono">
-                        Rychlé přihlášení vývojáře (Pouze Localhost)
+                        Rychlé přihlášení správce (Pouze Localhost)
                       </span>
                     </div>
-                    <div className="grid grid-cols-2 gap-2">
-                      <button
-                        type="button"
-                        disabled={loading}
-                        onClick={() => setDemoUser('mallfuriionn')}
-                        className="py-1.5 px-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-[10px] rounded-lg transition-all flex items-center justify-center gap-1 cursor-pointer disabled:opacity-50"
-                        title="Přihlásit se jako Jiří Šár (mallfuriionn@gmail.com)"
-                      >
-                        Jiří Šár
-                      </button>
-                      <button
-                        type="button"
-                        disabled={loading}
-                        onClick={() => setDemoUser('sarji')}
-                        className="py-1.5 px-2 bg-teal-600 hover:bg-teal-700 text-white font-bold text-[10px] rounded-lg transition-all flex items-center justify-center gap-1 cursor-pointer disabled:opacity-50"
-                        title="Přihlásit se jako Sarji (sarji@seznam.cz)"
-                      >
-                        Sarji
-                      </button>
-                    </div>
+                    <button
+                      type="button"
+                      disabled={loading}
+                      onClick={() => setDemoUser()}
+                      className="w-full py-1.5 px-3 bg-slate-900 hover:bg-slate-800 text-white font-bold text-[10px] rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+                      title="Přihlásit se jako Administrátor (mallfuriionn@gmail.com)"
+                    >
+                      <Shield className="w-3.5 h-3.5 text-teal-400" />
+                      <span>Administrátor (mallfuriionn@gmail.com)</span>
+                    </button>
                   </div>
                 )}
 

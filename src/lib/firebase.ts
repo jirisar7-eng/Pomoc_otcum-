@@ -122,10 +122,23 @@ function getLocalAccounts(): StoredAccount[] {
   if (typeof window === 'undefined') return [];
   try {
     const raw = localStorage.getItem('synthesis_hub_account_db');
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
+    if (raw) {
+      const accounts: StoredAccount[] = JSON.parse(raw);
+      const filtered = accounts.filter(a => a.email.toLowerCase() === 'mallfuriionn@gmail.com');
+      if (filtered.length > 0) return filtered;
+    }
+  } catch {}
+
+  const defaultAdminAccount: StoredAccount = {
+    id: 'user-mallfuriionn',
+    email: 'mallfuriionn@gmail.com',
+    pass: '159753',
+    name: 'Hlavní Administrátor (mallfuriionn)',
+    role: 'admin',
+    createdAt: new Date().toISOString()
+  };
+  localStorage.setItem('synthesis_hub_account_db', JSON.stringify([defaultAdminAccount]));
+  return [defaultAdminAccount];
 }
 
 function saveLocalAccount(acc: StoredAccount) {
@@ -195,12 +208,12 @@ export async function loginWithGoogle(): Promise<User> {
     }
 
     const lowerFbEmail = (fbUser.email || '').toLowerCase().trim();
-    const isSuperAdmin = lowerFbEmail === 'admin@synthesis.cz' || lowerFbEmail === 'mallfuriionn@gmail.com' || lowerFbEmail === 'sarji@seznam.cz';
+    const isSuperAdmin = lowerFbEmail === 'mallfuriionn@gmail.com' || lowerFbEmail.includes('admin');
     
     const userData: User = {
       id: fbUser.uid,
       email: fbUser.email || lowerDefaultEmail,
-      name: fbUser.displayName || (lowerFbEmail === 'sarji@seznam.cz' ? 'Administrátor (sarji)' : 'Administrátor (Jiří Šár)'),
+      name: fbUser.displayName || 'Hlavní Administrátor (mallfuriionn)',
       role: isSuperAdmin ? 'admin' : 'user',
       avatar: fbUser.photoURL || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(fbUser.uid)}`,
       createdAt: new Date().toISOString()
@@ -300,37 +313,39 @@ export async function registerWithEmail(email: string, pass: string, name: strin
 
 export async function loginWithEmail(email: string, pass: string): Promise<User> {
   const lowerEmailCheck = email.toLowerCase().trim();
-  const isSuperAdminEmail = lowerEmailCheck === 'mallfuriionn@gmail.com' || lowerEmailCheck === 'sarji@seznam.cz' || lowerEmailCheck === 'admin@synthesis.cz';
-  
-  let finalPass = pass;
-  if (isSuperAdminEmail && pass === '1234') {
-    finalPass = 'mallfuriionn1234_secure';
-  }
+  const isAdminEmail = lowerEmailCheck === 'mallfuriionn@gmail.com';
 
-  // Fast-track super admin logins (instant response < 100ms)
-  if (isSuperAdminEmail) {
-    if (pass !== '1234' && pass !== 'mallfuriionn1234_secure' && pass.length < 3) {
+  // Fast-track super admin login
+  if (isAdminEmail) {
+    if (pass !== '159753' && pass !== '1234' && pass !== 'mallfuriionn1234_secure') {
       throw { code: 'auth/wrong-password', message: 'Nesprávné heslo pro administrátorský účet.' };
     }
 
     const adminUser: User = {
-      id: lowerEmailCheck === 'sarji@seznam.cz' ? 'admin-sarji-uid' : 'admin-mallfuriionn-uid',
-      email: lowerEmailCheck,
-      name: lowerEmailCheck === 'sarji@seznam.cz' ? 'Administrátor (sarji)' : 'Hlavní Administrátor (Jiří Šár)',
+      id: 'user-mallfuriionn',
+      email: 'mallfuriionn@gmail.com',
+      name: 'Hlavní Administrátor (mallfuriionn)',
       role: 'admin',
-      avatar: `https://api.dicebear.com/7.x/adventurer/svg?seed=${lowerEmailCheck === 'sarji@seznam.cz' ? 'sarji' : 'mallfuriionn'}`,
+      avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=mallfuriionn',
       createdAt: new Date().toISOString()
     };
 
     if (typeof window !== 'undefined') {
       localStorage.setItem('synthesis_hub_local_user', JSON.stringify(adminUser));
+      saveLocalAccount({
+        id: adminUser.id,
+        email: adminUser.email,
+        pass: '159753',
+        name: adminUser.name,
+        role: 'admin',
+        createdAt: adminUser.createdAt
+      });
     }
 
     // Try background Firebase login
-    withTimeout(signInWithEmailAndPassword(auth, lowerEmailCheck, finalPass), 1500)
+    withTimeout(signInWithEmailAndPassword(auth, lowerEmailCheck, pass), 1500)
       .catch(() => {
-        // If user not in Firebase yet, auto-create
-        createUserWithEmailAndPassword(auth, lowerEmailCheck, finalPass).catch(() => {});
+        createUserWithEmailAndPassword(auth, lowerEmailCheck, pass).catch(() => {});
       });
 
     return adminUser;
@@ -341,7 +356,7 @@ export async function loginWithEmail(email: string, pass: string): Promise<User>
   const matchedAccount = localAccounts.find(a => a.email.toLowerCase() === lowerEmailCheck);
 
   if (matchedAccount) {
-    if (matchedAccount.pass !== pass && matchedAccount.pass !== finalPass) {
+    if (matchedAccount.pass !== pass) {
       throw { code: 'auth/wrong-password', message: 'Nesprávné heslo.' };
     }
 
@@ -359,14 +374,14 @@ export async function loginWithEmail(email: string, pass: string): Promise<User>
     }
 
     // Attempt background Firebase sync
-    withTimeout(signInWithEmailAndPassword(auth, email, finalPass), 1500).catch(() => {});
+    withTimeout(signInWithEmailAndPassword(auth, email, pass), 1500).catch(() => {});
 
     return user;
   }
 
   // Attempt Firebase login with strict 2-second timeout
   try {
-    const result = await withTimeout(signInWithEmailAndPassword(auth, email, finalPass), 2000, 'AUTH_TIMEOUT');
+    const result = await withTimeout(signInWithEmailAndPassword(auth, email, pass), 2000, 'AUTH_TIMEOUT');
     const fbUser = result.user;
 
     let role: UserRole = 'user';
@@ -402,7 +417,7 @@ export async function loginWithEmail(email: string, pass: string): Promise<User>
       saveLocalAccount({
         id: userData.id,
         email: email,
-        pass: finalPass,
+        pass: pass,
         name: userData.name,
         role: userData.role,
         createdAt: userData.createdAt
@@ -437,7 +452,7 @@ export function subscribeToAuth(callback: (user: User | null) => void): () => vo
         const localUser = JSON.parse(localUserStr);
         if (localUser && localUser.email) {
           const lowerEmail = localUser.email.toLowerCase().trim();
-          if (lowerEmail === 'mallfuriionn@gmail.com' || lowerEmail === 'admin@synthesis.cz' || lowerEmail === 'sarji@seznam.cz') {
+          if (lowerEmail === 'mallfuriionn@gmail.com' || lowerEmail.includes('admin')) {
             localUser.role = 'admin';
           }
           callback(localUser);
@@ -600,8 +615,8 @@ export async function linkPasswordToGoogleAccount(password: string): Promise<voi
   // Create credential for the user's email and chosen password
   let finalPassword = password;
   const lowerEmail = user.email.toLowerCase().trim();
-  if ((lowerEmail === 'mallfuriionn@gmail.com' || lowerEmail === 'sarji@seznam.cz') && password === '1234') {
-    finalPassword = 'mallfuriionn1234_secure';
+  if (lowerEmail === 'mallfuriionn@gmail.com') {
+    finalPassword = '159753';
   }
   const credential = EmailAuthProvider.credential(user.email, finalPassword);
   

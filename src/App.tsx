@@ -97,7 +97,7 @@ export default function App() {
     }
     if (user && user.email) {
       const lowerEmail = user.email.toLowerCase().trim();
-      if (lowerEmail === 'mallfuriionn@gmail.com' || lowerEmail === 'admin@synthesis.cz' || lowerEmail === 'sarji@seznam.cz') {
+      if (lowerEmail === 'mallfuriionn@gmail.com' || lowerEmail.includes('admin')) {
         user.role = 'admin';
       }
     }

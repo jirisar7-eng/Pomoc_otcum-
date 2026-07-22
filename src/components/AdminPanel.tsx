@@ -168,7 +168,11 @@ export default function AdminPanel({
     if (typeof window !== 'undefined') {
       try {
         const saved = localStorage.getItem('synthesis_hub_registered_users');
-        if (saved) return JSON.parse(saved);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          const filtered = parsed.filter((u: any) => u.email?.toLowerCase().trim() === 'mallfuriionn@gmail.com');
+          if (filtered.length > 0) return filtered;
+        }
       } catch (e) {
         console.warn("Error parsing synthesis_hub_registered_users:", e);
       }
@@ -176,43 +180,11 @@ export default function AdminPanel({
     return [
       {
         id: 'user-mallfuriionn',
-        name: 'Ondřej Novák (mallfuriionn)',
+        name: 'Hlavní Administrátor (mallfuriionn)',
         email: 'mallfuriionn@gmail.com',
         role: 'admin',
         avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=mallfuriionn',
         createdAt: '2026-02-10T14:30:00.000Z'
-      },
-      {
-        id: 'user-admin',
-        name: 'Administrátor OS',
-        email: 'admin@synthesis.cz',
-        role: 'admin',
-        avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=admin',
-        createdAt: '2026-02-12T09:15:00.000Z'
-      },
-      {
-        id: 'user-petr',
-        name: 'Petr Novák',
-        email: 'petr.novak@email.cz',
-        role: 'user',
-        avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=PetrNovak',
-        createdAt: '2026-05-18T11:22:00.000Z'
-      },
-      {
-        id: 'user-pavel',
-        name: 'PhDr. Pavel Černý',
-        email: 'pavel.cerny@akcerny.cz',
-        role: 'user',
-        avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=PavelCerny',
-        createdAt: '2026-06-01T16:45:00.000Z'
-      },
-      {
-        id: 'user-jan',
-        name: 'Mgr. Jan Novotný',
-        email: 'ak.jan.novotny@pravnik.cz',
-        role: 'user',
-        avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=JanNovotny',
-        createdAt: '2026-06-15T08:10:00.000Z'
       }
     ];
   });
