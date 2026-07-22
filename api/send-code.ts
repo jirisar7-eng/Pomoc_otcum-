@@ -1,12 +1,80 @@
 import nodemailer from 'nodemailer';
 
+async function sendViaBrevoRestApi(apiKey: string, fromEmail: string, recipientEmail: string, subject: string, htmlContent: string) {
+  const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+    method: 'POST',
+    headers: {
+      'accept': 'application/json',
+      'api-key': apiKey,
+      'content-type': 'application/json'
+    },
+    body: JSON.stringify({
+      sender: { name: 'Táta má právo', email: fromEmail },
+      to: [{ email: recipientEmail }],
+      subject,
+      htmlContent
+    })
+  });
+
+  const responseText = await response.text();
+  let data: any = {};
+  try {
+    data = JSON.parse(responseText);
+  } catch {
+    data = { raw: responseText };
+  }
+
+  if (!response.ok) {
+    const errorMsg = data.message || data.code || `Brevo REST API chyba (status ${response.status}): ${responseText}`;
+    throw new Error(errorMsg);
+  }
+
+  return data;
+}
+
+async function sendViaNodemailerSmtp(host: string, port: number, user: string, pass: string, fromEmail: string, recipientEmail: string, subject: string, htmlContent: string) {
+  const transporter = nodemailer.createTransport({
+    host,
+    port,
+    secure: port === 465,
+    auth: {
+      user,
+      pass,
+    },
+    tls: {
+      rejectUnauthorized: false
+    }
+  });
+
+  const info = await transporter.sendMail({
+    from: `"Táta má právo" <${fromEmail}>`,
+    to: recipientEmail,
+    subject,
+    html: htmlContent,
+  });
+
+  return info;
+}
+
 export async function sendBrevoEmail({ recipientEmail, code, magicUrl }: { recipientEmail: string; code: string; magicUrl?: string }) {
   const host = process.env.SMTP_HOST || 'smtp-relay.brevo.com';
   const port = parseInt(process.env.SMTP_PORT || '587', 10);
   const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
+  const pass = process.env.SMTP_PASS || process.env.BREVO_API_KEY;
   const fromEmail = process.env.SMTP_FROM || 'sarji@seznam.cz';
 
+  console.log(`[Brevo Email Attempt] Target: ${recipientEmail}, Host: ${host}:${port}, User: ${user ? (user.substring(0, 4) + '***') : 'NONE'}, From: ${fromEmail}`);
+
+  if (!pass && !user) {
+    const errText = 'E-mailové SMTP přihlašovací údaje (SMTP_USER / SMTP_PASS) nejsou nastaveny v proměnných prostředí (Environment Variables / Secrets).';
+    console.error(`[Brevo Email Error] ${errText}`);
+    return {
+      success: false,
+      error: errText
+    };
+  }
+
+  const subject = "Váš přihlašovací kód do portálu Táta má právo";
   const htmlContent = `
     <!DOCTYPE html>
     <html lang="cs">
@@ -63,7 +131,7 @@ export async function sendBrevoEmail({ recipientEmail, code, magicUrl }: { recip
                 <td style="background-color:#f8fafc; border-top: 1px solid #f1f5f9; padding: 20px 32px; text-align: center;">
                   <p style="color:#94a3b8; font-size: 11px; margin: 0; line-height: 1.5;">
                     &copy; ${new Date().getFullYear()} Táta má právo | Právní asistent a spravedlivá péče o děti<br>
-                    Tento e-mail byl automaticky vygenerován systémem Brevo Relay.
+                    Tento e-mail byl automaticky vygenerován systémem Brevo.
                   </p>
                 </td>
               </tr>
@@ -76,34 +144,52 @@ export async function sendBrevoEmail({ recipientEmail, code, magicUrl }: { recip
     </html>
   `;
 
-  if (!user || !pass) {
-    console.warn(`[SMTP Warning] SMTP_USER or SMTP_PASS environment variables are missing. Code: ${code} for ${recipientEmail}.`);
-    return { success: true, delivered: false, message: 'Kód byl vygenerován (zatím nenastaveny SMTP kódové údaje v secrets).' };
+  let restError: any = null;
+  let smtpError: any = null;
+
+  // 1. Try Brevo REST API first if pass / API Key is available
+  if (pass) {
+    try {
+      console.log(`[Brevo Email] Attempting Brevo REST API...`);
+      const restResult = await sendViaBrevoRestApi(pass, fromEmail, recipientEmail, subject, htmlContent);
+      console.log(`[Brevo Email Success via REST API] MessageId:`, restResult.messageId);
+      return {
+        success: true,
+        delivered: true,
+        messageId: restResult.messageId,
+        provider: 'brevo-rest'
+      };
+    } catch (err: any) {
+      restError = err;
+      console.error(`[Brevo Email REST API Failed]:`, err?.message || err);
+    }
   }
 
-  const transporter = nodemailer.createTransport({
-    host,
-    port,
-    secure: port === 465,
-    auth: {
-      user,
-      pass,
-    },
-    tls: {
-      rejectUnauthorized: false
+  // 2. Try Nodemailer SMTP
+  if (user && pass) {
+    try {
+      console.log(`[Brevo Email] Attempting Nodemailer SMTP (${host}:${port})...`);
+      const smtpResult = await sendViaNodemailerSmtp(host, port, user, pass, fromEmail, recipientEmail, subject, htmlContent);
+      console.log(`[Brevo Email Success via SMTP] MessageId:`, smtpResult.messageId, `Response:`, smtpResult.response);
+      return {
+        success: true,
+        delivered: true,
+        messageId: smtpResult.messageId,
+        provider: 'brevo-smtp'
+      };
+    } catch (err: any) {
+      smtpError = err;
+      console.error(`[Brevo Email SMTP Failed]:`, err?.message || err);
     }
-  });
+  }
 
-  const mailOptions = {
-    from: `"Táta má právo" <${fromEmail}>`,
-    to: recipientEmail,
-    subject: "Váš přihlašovací kód do portálu Táta má právo",
-    html: htmlContent,
+  const finalDetail = restError?.message || smtpError?.message || 'Chyba autentizace nebo sítě.';
+  console.error(`[Brevo Email Fatal Error] Failed to send email to ${recipientEmail}: ${finalDetail}`);
+
+  return {
+    success: false,
+    error: `Nepodařilo se odeslat e-mail. Důvod od Brevo/SMTP: ${finalDetail}`
   };
-
-  const info = await transporter.sendMail(mailOptions);
-  console.log(`[SMTP Success] Email sent to ${recipientEmail}, MessageId: ${info.messageId}`);
-  return { success: true, delivered: true, messageId: info.messageId };
 }
 
 export default async function handler(req: any, res: any) {
@@ -120,12 +206,20 @@ export default async function handler(req: any, res: any) {
     }
 
     const result = await sendBrevoEmail({ recipientEmail: targetEmail, code, magicUrl });
+    if (result.success === false) {
+      return res.status(200).json({
+        success: false,
+        error: result.error || 'Nepodařilo se odeslat e-mail přes Brevo.'
+      });
+    }
+
     return res.status(200).json(result);
   } catch (error: any) {
     console.error('Error in /api/send-code:', error);
     return res.status(200).json({
       success: false,
-      error: error.message || 'Chyba při odesílání e-mailu přes Brevo SMTP.'
+      error: error.message || 'Chyba při odesílání e-mailu přes Brevo.'
     });
   }
 }
+

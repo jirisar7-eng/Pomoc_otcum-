@@ -556,12 +556,20 @@ app.post(['/api/send-code', '/api/send-magic-link'], async (req, res) => {
     }
 
     const result = await sendBrevoEmail({ recipientEmail: targetEmail, code, magicUrl });
+    if (result.success === false) {
+      console.error('[API /api/send-code Error Result]:', result.error);
+      return res.status(200).json({
+        success: false,
+        error: result.error || 'Nepodařilo se odeslat e-mail přes Brevo.'
+      });
+    }
+
     return res.status(200).json(result);
   } catch (error: any) {
     console.error('Error sending magic link email via SMTP:', error);
     return res.status(200).json({
       success: false,
-      error: error.message || 'Nepodařilo se odeslat e-mail přes Brevo SMTP.'
+      error: error.message || 'Nepodařilo se odeslat e-mail přes Brevo.'
     });
   }
 });

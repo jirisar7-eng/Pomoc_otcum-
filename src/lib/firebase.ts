@@ -468,15 +468,21 @@ export async function sendMagicLink(email: string): Promise<MagicLinkResult> {
     localStorage.setItem('synthesis_magic_session', JSON.stringify(magicSession));
   }
 
-  // Send real email via Brevo SMTP
+  // Send real email via Brevo SMTP / API
   try {
-    await sendMagicLinkEmail({
+    const emailRes = await sendMagicLinkEmail({
       recipientEmail: lowerEmail,
       code,
       magicUrl
     });
-  } catch (emailErr) {
-    console.warn("Brevo SMTP email send error:", emailErr);
+
+    if (emailRes.success === false) {
+      console.error("[Brevo Email Error]", emailRes.message);
+      throw new Error(emailRes.message || 'Nepodařilo se odeslat přihlašovací e-mail.');
+    }
+  } catch (emailErr: any) {
+    console.error("Brevo email send error:", emailErr);
+    throw emailErr;
   }
 
   // Attempt Firebase sendSignInLinkToEmail
