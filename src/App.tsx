@@ -23,7 +23,8 @@ import {
   getCollectionData, 
   saveDocument, 
   deleteDocument,
-  logoutUser 
+  logoutUser,
+  verifyMagicLink
 } from './lib/firebase';
 import { SupabaseService, isSupabaseConfigured } from './lib/supabase';
 
@@ -233,6 +234,25 @@ export default function App() {
       }
     });
     return () => unsubscribe();
+  }, []);
+
+  // Magic Link URL token auto-login handler
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const magicToken = params.get('magic_token');
+      const magicEmail = params.get('magic_email');
+      if (magicToken && magicEmail) {
+        verifyMagicLink(magicEmail, magicToken)
+          .then((user) => {
+            setCurrentUser(user);
+            window.history.replaceState({}, document.title, window.location.pathname);
+          })
+          .catch((err) => {
+            console.warn("Magic link auto login error:", err);
+          });
+      }
+    }
   }, []);
 
   // Auto-redirect legacy tabs to the new unified structure for 100% backwards compatibility

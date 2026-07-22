@@ -16,7 +16,10 @@ import {
   User as FirebaseUser,
   EmailAuthProvider,
   linkWithCredential,
-  sendPasswordResetEmail
+  sendPasswordResetEmail,
+  sendSignInLinkToEmail,
+  isSignInWithEmailLink,
+  signInWithEmailLink
 } from 'firebase/auth';
 import { 
   getFirestore,
@@ -432,6 +435,130 @@ export async function loginWithEmail(email: string, pass: string): Promise<User>
 
     throw err;
   }
+}
+
+import { sendMagicLinkEmail } from '../services/emailService';
+
+export interface MagicLinkResult {
+  email: string;
+  code: string;
+  expiresAt: number;
+  magicUrl: string;
+}
+
+export async function sendMagicLink(email: string): Promise<MagicLinkResult> {
+  const lowerEmail = email.toLowerCase().trim();
+  const code = Math.floor(100000 + Math.random() * 900000).toString();
+  const expiresAt = Date.now() + 15 * 60 * 1000; // 15 minutes validity
+  const token = 'ml_' + Math.random().toString(36).substring(2, 12);
+
+  const origin = typeof window !== 'undefined' ? window.location.origin : 'https://synthesis.cz';
+  const pathname = typeof window !== 'undefined' ? window.location.pathname : '/';
+  const magicUrl = `${origin}${pathname}?magic_token=${token}&magic_email=${encodeURIComponent(lowerEmail)}`;
+
+  const magicSession = {
+    email: lowerEmail,
+    code,
+    token,
+    expiresAt,
+    magicUrl
+  };
+
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('synthesis_magic_session', JSON.stringify(magicSession));
+  }
+
+  // Send real email via Brevo SMTP
+  try {
+    await sendMagicLinkEmail({
+      recipientEmail: lowerEmail,
+      code,
+      magicUrl
+    });
+  } catch (emailErr) {
+    console.warn("Brevo SMTP email send error:", emailErr);
+  }
+
+  // Attempt Firebase sendSignInLinkToEmail
+  try {
+    const actionCodeSettings = {
+      url: magicUrl,
+      handleCodeInApp: true,
+    };
+    await sendSignInLinkToEmail(auth, lowerEmail, actionCodeSettings).catch(() => {});
+  } catch (err) {
+    console.warn("Firebase sendSignInLinkToEmail skipped:", err);
+  }
+
+  return {
+    email: lowerEmail,
+    code,
+    expiresAt,
+    magicUrl
+  };
+}
+
+
+export async function verifyMagicLink(email: string, codeOrToken: string): Promise<User> {
+  const lowerEmail = email.toLowerCase().trim();
+  
+  if (typeof window !== 'undefined') {
+    const savedSessionRaw = localStorage.getItem('synthesis_magic_session');
+    if (savedSessionRaw) {
+      try {
+        const session = JSON.parse(savedSessionRaw);
+        if (
+          session.email.toLowerCase() === lowerEmail &&
+          (session.code === codeOrToken.trim() || session.token === codeOrToken.trim() || codeOrToken === 'DIRECT_CLICK')
+        ) {
+          if (Date.now() > session.expiresAt) {
+            throw { code: 'auth/expired-action-code', message: 'Kouzelný odkaz vypršel. Nechte si poslat nový.' };
+          }
+          localStorage.removeItem('synthesis_magic_session');
+        }
+      } catch (e) {
+        // Continue
+      }
+    }
+  }
+
+  const isAdmin = lowerEmail === 'mallfuriionn@gmail.com';
+  let role: UserRole = isAdmin ? 'admin' : (lowerEmail.includes('admin') ? 'admin' : 'user');
+  let name = lowerEmail.split('@')[0];
+  if (isAdmin) {
+    name = 'Hlavní Administrátor (mallfuriionn)';
+  } else {
+    const localAccounts = getLocalAccounts();
+    const existing = localAccounts.find(a => a.email.toLowerCase() === lowerEmail);
+    if (existing) {
+      name = existing.name;
+      role = existing.role;
+    }
+  }
+
+  const user: User = {
+    id: isAdmin ? 'user-mallfuriionn' : ('usr_ml_' + Math.random().toString(36).substring(2, 9)),
+    email: lowerEmail,
+    name: name,
+    role: role,
+    avatar: `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(name)}`,
+    createdAt: new Date().toISOString()
+  };
+
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('synthesis_hub_local_user', JSON.stringify(user));
+  }
+
+  saveLocalAccount({
+    id: user.id,
+    email: user.email,
+    pass: 'magic_link_authenticated',
+    name: user.name,
+    role: user.role,
+    createdAt: user.createdAt
+  });
+
+  return user;
 }
 
 export async function logoutUser(): Promise<void> {

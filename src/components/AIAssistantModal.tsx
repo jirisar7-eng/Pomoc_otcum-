@@ -1,8 +1,3 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
@@ -10,22 +5,25 @@ import {
   Send, 
   X, 
   Sparkles, 
-  MessageSquare, 
   AlertCircle, 
   Loader2, 
-  HelpCircle,
-  Clock
+  HelpCircle 
 } from 'lucide-react';
 
-interface ChatMessage {
+export interface ChatMessage {
   id: string;
   sender: 'user' | 'ai';
   text: string;
   timestamp: string;
 }
 
-export default function AiAssistant() {
-  const [isOpen, setIsOpen] = useState(false);
+export interface AIAssistantModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  initialPrompt?: string;
+}
+
+export default function AIAssistantModal({ isOpen, onClose, initialPrompt }: AIAssistantModalProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: 'welcome',
@@ -45,6 +43,12 @@ export default function AiAssistant() {
       chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages, isLoading]);
+
+  useEffect(() => {
+    if (initialPrompt && isOpen) {
+      handleSendMessage(initialPrompt);
+    }
+  }, [initialPrompt, isOpen]);
 
   const presetQuestions = [
     'Jak se připravit na jednání s OSPOD?',
@@ -75,6 +79,7 @@ export default function AiAssistant() {
         body: JSON.stringify({ prompt: textToSend })
       });
 
+      // Robustní ošetření načtení JSON z odpovědi (předcházení chybám při HTML 500 odpovědích)
       let data: any = null;
       try {
         const rawText = await response.text();
@@ -95,7 +100,9 @@ export default function AiAssistant() {
       }
 
       if (!response.ok || data.success === false) {
-        throw new Error(data.error || 'Dočasná chyba při spojení s AI. Zkontrolujte API klíč nebo to zkusíte za chvíli znovu.');
+        const errorMsg = data.error || 'Dočasná chyba při spojení s AI. Zkontrolujte API klíč nebo to zkusíte za chvíli znovu.';
+        setErrorText(errorMsg);
+        return;
       }
 
       const aiMsg: ChatMessage = {
@@ -107,7 +114,7 @@ export default function AiAssistant() {
 
       setMessages(prev => [...prev, aiMsg]);
     } catch (err: any) {
-      console.error(err);
+      console.error('AIAssistantModal fetch error:', err);
       setErrorText(err.message || 'Dočasná chyba při spojení s AI. Zkontrolujte API klíč nebo to zkusíte za chvíli znovu.');
     } finally {
       setIsLoading(false);
@@ -115,36 +122,15 @@ export default function AiAssistant() {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end" id="ai-assistant-wrapper">
-      
-      {/* Collapsed floating action button (FAB) */}
-      <AnimatePresence>
-        {!isOpen && (
-          <motion.button
-            id="ai-assistant-fab"
-            onClick={() => setIsOpen(true)}
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.8, opacity: 0 }}
-            className="w-12.5 h-12.5 rounded-full bg-slate-850 hover:bg-teal-600 text-white flex items-center justify-center shadow-lg hover:shadow-teal-500/20 cursor-pointer group transition-all"
-          >
-            <Bot className="w-5.5 h-5.5 group-hover:rotate-12 transition-transform" />
-            <span className="absolute right-14 bg-slate-850 text-white font-bold text-[10px] py-1 px-2.5 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity uppercase tracking-wider border border-slate-700/50">
-              Chytrá Synthesis AI
-            </span>
-          </motion.button>
-        )}
-      </AnimatePresence>
-
-      {/* Expanded chat panel drawer */}
-      <AnimatePresence>
-        {isOpen && (
+    <AnimatePresence>
+      {isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
           <motion.div
-            id="ai-assistant-panel"
-            initial={{ opacity: 0, y: 30, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 30, scale: 0.95 }}
-            className="w-80 md:w-96 h-[500px] bg-white rounded-2xl border border-slate-100 shadow-2xl flex flex-col justify-between overflow-hidden"
+            id="ai-assistant-modal-panel"
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            className="w-full max-w-lg h-[600px] bg-white rounded-2xl border border-slate-100 shadow-2xl flex flex-col overflow-hidden"
           >
             {/* Header */}
             <div className="bg-slate-850 text-white p-4 flex items-center justify-between border-b border-slate-800">
@@ -162,8 +148,8 @@ export default function AiAssistant() {
               </div>
 
               <button
-                id="close-ai-assistant-btn"
-                onClick={() => setIsOpen(false)}
+                id="close-ai-modal-btn"
+                onClick={onClose}
                 className="text-slate-400 hover:text-white p-1 rounded-lg transition-colors cursor-pointer"
               >
                 <X className="w-4 h-4" />
@@ -171,7 +157,7 @@ export default function AiAssistant() {
             </div>
 
             {/* Message Thread viewport */}
-            <div className="flex-1 p-4 overflow-y-auto space-y-4 bg-slate-50/50 scrollbar-thin" id="ai-messages-container">
+            <div className="flex-1 p-4 overflow-y-auto space-y-4 bg-slate-50/50 scrollbar-thin">
               {messages.map((msg) => (
                 <div
                   key={msg.id}
@@ -211,7 +197,7 @@ export default function AiAssistant() {
 
               {/* Error block */}
               {errorText && (
-                <div className="bg-rose-50 border border-rose-100 text-rose-700 p-3.5 rounded-xl text-[11px] flex gap-2" id="ai-error-indicator">
+                <div className="bg-rose-50 border border-rose-100 text-rose-700 p-3.5 rounded-xl text-[11px] flex gap-2" id="ai-modal-error-indicator">
                   <AlertCircle className="w-4.5 h-4.5 text-rose-500 shrink-0 mt-0.5" />
                   <div>
                     <span className="font-bold block">Chyba připojení</span>
@@ -225,8 +211,6 @@ export default function AiAssistant() {
 
             {/* Presets and Chat input controls */}
             <div className="p-3 bg-white border-t border-slate-100 space-y-3">
-              
-              {/* Presets - only shown if thread is short or empty input */}
               {!isLoading && !inputText && (
                 <div className="space-y-1">
                   <span className="text-[9px] uppercase font-bold tracking-wider text-slate-400 block px-1 flex items-center gap-1">
@@ -235,7 +219,7 @@ export default function AiAssistant() {
                   <div className="flex flex-wrap gap-1">
                     {presetQuestions.map((q, idx) => (
                       <button
-                        id={`ai-preset-question-${idx}`}
+                        id={`ai-modal-preset-${idx}`}
                         key={idx}
                         onClick={() => handleSendMessage(q)}
                         className="text-[10px] text-slate-600 hover:text-teal-900 bg-slate-50 hover:bg-teal-50 border border-slate-200 hover:border-teal-300 px-2.5 py-1 rounded-lg text-left transition-all cursor-pointer truncate max-w-full"
@@ -253,11 +237,10 @@ export default function AiAssistant() {
                   e.preventDefault();
                   handleSendMessage(inputText);
                 }}
-                className="flex gap-2 animate-fadeIn"
-                id="ai-input-form"
+                className="flex gap-2"
               >
                 <input
-                  id="ai-text-input"
+                  id="ai-modal-input"
                   type="text"
                   value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
@@ -266,7 +249,7 @@ export default function AiAssistant() {
                   className="flex-1 px-3.5 py-1.5 text-xs bg-slate-50 border border-slate-200 focus:border-teal-500 focus:bg-white rounded-xl outline-none transition-all disabled:opacity-50"
                 />
                 <button
-                  id="ai-submit-send-btn"
+                  id="ai-modal-send-btn"
                   type="submit"
                   disabled={isLoading || !inputText.trim()}
                   className="p-1.5 bg-teal-600 hover:bg-teal-700 disabled:bg-slate-100 text-white disabled:text-slate-400 rounded-xl transition-all shadow-xs disabled:shadow-none flex items-center justify-center cursor-pointer shrink-0"
@@ -274,14 +257,13 @@ export default function AiAssistant() {
                   <Send className="w-4 h-4" />
                 </button>
               </form>
-              <div className="mt-1.5 text-center text-[9px] text-slate-400 leading-snug border-t border-slate-100 pt-1.5" id="ai-disclaimer">
+              <div className="mt-1.5 text-center text-[9px] text-slate-400 leading-snug border-t border-slate-100 pt-1.5">
                 ⚠️ <strong>Tento obsah slouží pouze k obecným informačním účelům a nenahrazuje právní poradenství.</strong>
               </div>
             </div>
           </motion.div>
-        )}
-      </AnimatePresence>
-
-    </div>
+        </div>
+      )}
+    </AnimatePresence>
   );
 }

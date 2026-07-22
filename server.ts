@@ -9,6 +9,7 @@ import dotenv from 'dotenv';
 import fs from 'fs';
 import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI } from '@google/genai';
+import { sendBrevoEmail } from './api/send-code';
 
 dotenv.config();
 
@@ -18,24 +19,19 @@ const PORT = 3000;
 app.use(express.json());
 
 // Inicializace podle standardu Synthesis OS (Lazy-initialized pro zamezení pádů při startu bez klíče)
-let aiClient: GoogleGenAI | null = null;
-
 function getAiClient(): GoogleGenAI {
-  if (!aiClient) {
-    const aiKey = process.env.GEMINI_API_KEY;
-    if (!aiKey) {
-      throw new Error("Missing GEMINI_API_KEY environment variable. Nastavte prosím klíč v Settings > Secrets.");
-    }
-    aiClient = new GoogleGenAI({
-      apiKey: aiKey,
-      httpOptions: {
-        headers: {
-          'User-Agent': 'aistudio-build',
-        }
-      }
-    });
+  const aiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
+  if (!aiKey) {
+    throw new Error("Missing GEMINI_API_KEY environment variable. Nastavte prosím klíč v Settings > Secrets.");
   }
-  return aiClient;
+  return new GoogleGenAI({
+    apiKey: aiKey,
+    httpOptions: {
+      headers: {
+        'User-Agent': 'aistudio-build',
+      }
+    }
+  });
 }
 
 // Resilient fallback dataset for offline/high-demand scenarios
@@ -470,11 +466,23 @@ app.get('/api/audit-logs', (req, res) => {
 // Secure API Proxy for Synthesis AI Assistant
 app.post(['/api/gemini/chat', '/api/chat'], async (req, res) => {
   try {
-    const { prompt, history } = req.body;
+    // 1. KONTROLA API KLÍČE
+    const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
+    if (!apiKey) {
+      return res.status(200).json({
+        success: false,
+        error: "Dočasná chyba při spojení s AI. Zkontrolujte API klíč nebo to zkusíte za chvíli znovu."
+      });
+    }
 
-    if (!prompt) {
-      res.status(400).json({ error: 'Chybí dotaz (prompt).' });
-      return;
+    const { prompt, history, message } = req.body || {};
+    const textPrompt = prompt || message;
+
+    if (!textPrompt) {
+      return res.status(400).json({
+        success: false,
+        error: 'Chybí dotaz (prompt).'
+      });
     }
     
     const systemInstruction = `
@@ -494,8 +502,8 @@ PRAVIDLA PRO REAKCI:
     try {
       const ai = getAiClient();
       const response = await ai.models.generateContent({
-        model: 'gemini-3.5-flash',
-        contents: prompt,
+        model: 'gemini-3.6-flash',
+        contents: textPrompt,
         config: {
           systemInstruction,
           temperature: 0.7,
@@ -503,12 +511,12 @@ PRAVIDLA PRO REAKCI:
       });
       responseText = response.text || '';
     } catch (chatError: any) {
-      console.warn(`[Synthesis OS] Chat primary model or initialization failed. Attempting 2.5-flash or falling back... Reason: ${chatError.message}`);
+      console.warn(`[Synthesis OS] Chat primary model failed. Attempting fallback... Reason: ${chatError.message}`);
       try {
         const ai = getAiClient();
         const response2 = await ai.models.generateContent({
-          model: 'gemini-2.5-flash',
-          contents: prompt,
+          model: 'gemini-3.5-flash',
+          contents: textPrompt,
           config: {
             systemInstruction,
             temperature: 0.7,
@@ -516,24 +524,44 @@ PRAVIDLA PRO REAKCI:
         });
         responseText = response2.text || '';
       } catch (chatError2: any) {
-        console.error('[Synthesis OS] All Gemini models or initialization failed. Replying with offline local Czech custody guidance.');
-        responseText = `Ahoj! Jsem Synthesis AI, tvůj rodinný asistent v záložním režimu (Local Offline Engine). Vzhledem k dočasnému vysokému zatížení hlavního serveru odpovídám pomocí svých lokálních opatrovnických instrukcí.
-
-Pro úspěšný postup a ochranu zájmů dětí doporučuji tyto 3 základní pilíře:
-1. **Respektujte nejlepší zájem dítěte** – veškerou argumentaci stavte na potřebách dítěte (vztah se sourozenci, stabilita zázemí), nikoliv na osobních sporech s druhým rodičem.
-2. **Udržujte věcnou komunikaci** – s druhým rodičem i orgány (OSPOD) komunikujte klidně, bez emocí a písemně (e-mail, zprávy), abyste měli průkaznou stopu pro soud.
-3. **Předkládejte důkazy včas** – klíčové dokumenty (znalecké posudky, fotografie) doručte soudu nejméně 10 dnů před nařízeným stáním s odkazem na relevantní judikaturu (např. nález Ústavního soudu sp. zn. II. ÚS 132/24).
-
-Máte nějaký konkrétní dotaz ohledně podání návrhu nebo komunikace s opatrovníkem? Jsem tu, abych vám pomohl.`;
+        console.error('[Synthesis OS] All Gemini models failed:', chatError2);
+        return res.status(200).json({
+          success: false,
+          error: "Dočasná chyba při spojení s AI. Zkontrolujte API klíč nebo to zkusíte za chvíli znovu."
+        });
       }
     }
 
-    res.json({ text: responseText });
+    return res.status(200).json({
+      success: true,
+      text: responseText
+    });
   } catch (error: any) {
     console.error('Gemini API Error:', error);
-    res.status(500).json({ 
-      error: 'Nepodařilo se vygenerovat odpověď od AI.',
-      details: error.message || 'Neznámá chyba serveru'
+    return res.status(200).json({ 
+      success: false, 
+      error: "Dočasná chyba při spojení s AI. Zkontrolujte API klíč nebo to zkusíte za chvíli znovu." 
+    });
+  }
+});
+
+// Brevo SMTP Magic Link / Verification Email Route
+app.post(['/api/send-code', '/api/send-magic-link'], async (req, res) => {
+  try {
+    const { recipientEmail, email, code, magicUrl } = req.body || {};
+    const targetEmail = (recipientEmail || email || '').trim();
+
+    if (!targetEmail || !code) {
+      return res.status(400).json({ success: false, error: 'Chybí e-mail nebo kód' });
+    }
+
+    const result = await sendBrevoEmail({ recipientEmail: targetEmail, code, magicUrl });
+    return res.status(200).json(result);
+  } catch (error: any) {
+    console.error('Error sending magic link email via SMTP:', error);
+    return res.status(200).json({
+      success: false,
+      error: error.message || 'Nepodařilo se odeslat e-mail přes Brevo SMTP.'
     });
   }
 });
@@ -861,13 +889,22 @@ Vygeneruj 3 položky odpovídající schématu v českém jazyce.`;
 
   } catch (error: any) {
     console.error('AI Admin Execute Error:', error);
-    res.status(500).json({
+    res.status(200).json({
       success: false,
       action: req.body?.action || 'unknown',
       error: error.message || 'Chyba při provádění AI akce na serveru.',
       timestamp: new Date().toISOString()
     });
   }
+});
+
+// Global API fallback error handler to prevent HTML response on /api/* routes
+app.use('/api', (err: any, req: any, res: any, next: any) => {
+  console.error('[API Catch-all Error]:', err);
+  res.status(200).json({
+    success: false,
+    error: "Dočasná chyba při spojení s AI. Zkontrolujte API klíč nebo to zkusíte za chvíli znovu."
+  });
 });
 
 // 2. VITE MIDDLEWARE SETUP FOR DEV VS STATIC PROD

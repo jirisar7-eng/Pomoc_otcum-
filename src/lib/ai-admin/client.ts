@@ -45,13 +45,23 @@ export class AIAdminClient {
         body: JSON.stringify({ action, params }),
       });
 
-      if (!response.ok) {
-        const errData = await response.json().catch(() => ({}));
+      let errData: any = {};
+      try {
+        const rawText = await response.text();
+        try {
+          errData = JSON.parse(rawText);
+        } catch {
+          errData = { error: 'Dočasná chyba při spojení s AI. Zkontrolujte API klíč nebo to zkusíte za chvíli znovu.' };
+        }
+      } catch {
+        errData = { error: 'Dočasná chyba při spojení s AI. Zkontrolujte API klíč nebo to zkusíte za chvíli znovu.' };
+      }
+
+      if (!response.ok || errData.success === false) {
         throw new Error(errData.error || `Server returned status ${response.status}`);
       }
 
-      const result = await response.json();
-      return result as AIAdminExecutionResponse<T>;
+      return errData as AIAdminExecutionResponse<T>;
     } catch (error: any) {
       console.error(`[AIAdminClient] Execution of "${action}" failed:`, error);
       return {
@@ -78,11 +88,22 @@ export class AIAdminClient {
         body: JSON.stringify({ prompt, systemInstruction }),
       });
 
-      if (!response.ok) {
-        throw new Error(`Služba vrátila chybu: ${response.status}`);
+      let data: any = {};
+      try {
+        const rawText = await response.text();
+        try {
+          data = JSON.parse(rawText);
+        } catch {
+          data = { success: false, error: 'Dočasná chyba při spojení s AI. Zkontrolujte API klíč nebo to zkusíte za chvíli znovu.' };
+        }
+      } catch {
+        data = { success: false, error: 'Dočasná chyba při spojení s AI. Zkontrolujte API klíč nebo to zkusíte za chvíli znovu.' };
       }
 
-      const data = await response.json();
+      if (!response.ok || data.success === false) {
+        throw new Error(data.error || `Služba vrátila chybu: ${response.status}`);
+      }
+
       return data.text || '';
     } catch (error: any) {
       console.error('[AIAdminClient] Gemini Query Error:', error);

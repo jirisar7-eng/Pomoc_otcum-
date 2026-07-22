@@ -32,7 +32,10 @@ import {
   BadgeCheck,
   KeyRound,
   UserCheck,
-  Fingerprint
+  Fingerprint,
+  Wand2,
+  Send,
+  MailCheck
 } from 'lucide-react';
 import { User, UserRole } from '../types';
 import { 
@@ -41,7 +44,10 @@ import {
   loginWithEmail, 
   auth, 
   linkPasswordToGoogleAccount, 
-  sendPasswordReset 
+  sendPasswordReset,
+  sendMagicLink,
+  verifyMagicLink,
+  MagicLinkResult
 } from '../lib/firebase';
 import { isPasskeySupported, loginWithPasskey, registerPasskey } from '../services/passkeyService';
 import { isBiometricsAvailable } from '../utils/passkey';
@@ -53,7 +59,7 @@ interface AuthModalProps {
   onLogin: (user: User) => void;
 }
 
-type AuthMode = 'login' | 'register' | 'forgot_password' | 'password_setup' | 'welcome';
+type AuthMode = 'login' | 'register' | 'forgot_password' | 'password_setup' | 'welcome' | 'magic_link';
 
 interface StatusState {
   type: 'idle' | 'loading' | 'success' | 'warning' | 'error';
@@ -84,6 +90,12 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
 
   // Password Reset field
   const [resetEmail, setResetEmail] = useState('');
+
+  // Magic Link (Passwordless) States
+  const [magicEmail, setMagicEmail] = useState('');
+  const [magicCodeInput, setMagicCodeInput] = useState('');
+  const [magicResult, setMagicResult] = useState<MagicLinkResult | null>(null);
+  const [magicSent, setMagicSent] = useState(false);
 
   // Status & Feedback System
   const [status, setStatus] = useState<StatusState>({ type: 'idle', text: '' });
@@ -167,6 +179,9 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
       setAuthenticatedUser(null);
       setTouched({});
       setErrorNotice('');
+      setMagicSent(false);
+      setMagicCodeInput('');
+      setMagicResult(null);
       welcomeFinishedRef.current = false;
     }
   }, [isOpen]);
@@ -477,6 +492,70 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
     }
   };
 
+  // D2. Magic Link (Passwordless) Handlers
+  const handleSendMagicLinkSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const targetEmail = (magicEmail || email).trim();
+    if (!isValidEmail(targetEmail) || loading) return;
+
+    setLoading(true);
+    setCurrentStep(2);
+    setStatus({
+      type: 'loading',
+      title: 'Generuji kouzelný odkaz...',
+      text: `Odesílám bezpečnostní přihlašovací odkaz a kód na e-mail ${targetEmail}...`
+    });
+
+    try {
+      const res = await sendMagicLink(targetEmail);
+      setMagicResult(res);
+      setMagicSent(true);
+      setLoading(false);
+      setStatus({
+        type: 'success',
+        title: 'Kód byl úspěšně odeslán do vaší e-mailové schránky! ✨',
+        text: `Zkontrolujte svou poštu na ${targetEmail}. Zadejte 6místný kód z e-mailu nebo použijte tlačítko v e-mailu.`
+      });
+    } catch (err: any) {
+      setLoading(false);
+      console.error("Magic link error:", err);
+      setErrorNotice('Nepodařilo se odeslat kouzelný odkaz.', err.message || 'Zkontrolujte e-mailovou adresu a zkuste to znovu.');
+    }
+  };
+
+  const handleVerifyMagicLinkSubmit = async (overrideCode?: string) => {
+    const targetEmail = (magicEmail || email).trim();
+    const codeToUse = overrideCode || magicCodeInput;
+    if (!targetEmail || loading) return;
+
+    setLoading(true);
+    setCurrentStep(2);
+    setStatus({
+      type: 'loading',
+      title: 'Ověřuji kouzelný odkaz...',
+      text: 'Ověřuji bezpečnostní kód a přihlašuji vás...'
+    });
+
+    try {
+      const loggedUser = await verifyMagicLink(targetEmail, codeToUse);
+      setCurrentStep(3);
+      setStatus({
+        type: 'success',
+        title: 'Bezheslové přihlášení úspěšné! ✨',
+        text: `Vítáme vás zpět, ${loggedUser.name}! Načítám váš profil...`
+      });
+
+      setTimeout(() => {
+        setAuthenticatedUser(loggedUser);
+        setMode('welcome');
+        setLoading(false);
+      }, 800);
+    } catch (err: any) {
+      setLoading(false);
+      setErrorNotice('Kouzelný odkaz se nezdařilo ověřit.', err.message || 'Kód je neplatný nebo vypršela jeho platnost.');
+    }
+  };
+
   // E. Passkey / WebAuthn Biometric Login
   const handlePasskeyLogin = async () => {
     if (loading) return;
@@ -685,6 +764,7 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
               {mode === 'welcome' && 'Přístup schválen!'}
               {mode === 'password_setup' && 'Záložní heslo k účtu'}
               {mode === 'forgot_password' && 'Obnovení hesla'}
+              {mode === 'magic_link' && 'Bezheslové přihlášení ✨'}
               {mode === 'register' && 'Vytvoření nového účtu'}
               {mode === 'login' && 'Přihlášení do systému'}
             </h3>
@@ -693,6 +773,7 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
               {mode === 'welcome' && 'Váš profil byl ověřen v databázi. Přesměrovávám na portál...'}
               {mode === 'password_setup' && 'Nastavte si záložní přístup pro případ ztráty Google účtu.'}
               {mode === 'forgot_password' && 'Zadejte svůj e-mail a zašleme vám odkaz pro obnovení.'}
+              {mode === 'magic_link' && 'Zadejte svojí e-mailovou adresu a přihlaste se jedním kliknutím bez hesla.'}
               {mode === 'register' && 'Registrujte se zdarma pro přístup k právním vzorům a poradně.'}
               {mode === 'login' && 'Získejte přístup k právnímu generátoru, poradně a opatrovnické agendě.'}
             </p>
@@ -997,9 +1078,142 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
               </form>
             )}
 
+            {/* MODE 3.5: MAGIC LINK (PASSWORDLESS) FORM */}
+            {mode === 'magic_link' && (
+              <div className="space-y-4" id="magic-link-state">
+                {!magicSent ? (
+                  <form onSubmit={handleSendMagicLinkSubmit} className="space-y-4">
+                    <div className="bg-teal-50/80 border border-teal-200 p-3.5 rounded-xl text-xs text-teal-950 space-y-1.5">
+                      <div className="flex items-center gap-1.5 font-bold text-teal-900">
+                        <Wand2 className="w-4 h-4 text-teal-600 shrink-0" />
+                        <span>Bezheslové přihlášení (Magic Link)</span>
+                      </div>
+                      <p className="leading-relaxed text-[11px] text-teal-800">
+                        Zadejte svůj e-mail a zašleme vám přihlašovací kód. Nemusíte si pamatovat žádné heslo!
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1.5">E-mailová adresa</label>
+                      <div className="relative">
+                        <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                        <input
+                          ref={firstInputRef}
+                          type="email"
+                          required
+                          value={magicEmail || email}
+                          onChange={(e) => {
+                            setMagicEmail(e.target.value);
+                            setEmail(e.target.value);
+                          }}
+                          placeholder="novak@synthesis.cz"
+                          className="w-full pl-9 pr-4 py-2.5 text-xs bg-slate-50 hover:bg-slate-100 focus:bg-white border border-slate-200 focus:border-teal-500 rounded-xl outline-none transition-all font-medium"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex gap-3 pt-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMode('login');
+                          setStatus({ type: 'idle', text: '' });
+                        }}
+                        className="flex-1 py-2.5 border border-slate-200 hover:bg-slate-50 text-slate-600 font-semibold text-xs rounded-xl transition-all cursor-pointer text-center"
+                      >
+                        Zpět k přihlášení
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={loading || !isValidEmail(magicEmail || email)}
+                        className="flex-1 py-2.5 bg-gradient-to-r from-teal-600 to-slate-900 hover:from-teal-700 hover:to-slate-950 text-white font-bold text-xs rounded-xl shadow-xs transition-all disabled:opacity-50 cursor-pointer text-center flex items-center justify-center gap-2"
+                      >
+                        {loading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                        <Wand2 className="w-4 h-4 text-teal-300 shrink-0" />
+                        <span>Odeslat odkaz ✨</span>
+                      </button>
+                    </div>
+                  </form>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="bg-emerald-50 border border-emerald-200 p-4 rounded-xl text-xs text-emerald-950 space-y-2">
+                      <div className="flex items-center gap-2 font-bold text-emerald-900">
+                        <MailCheck className="w-5 h-5 text-emerald-600 shrink-0" />
+                        <span>Kouzelný odkaz odeslán na {magicEmail || email}!</span>
+                      </div>
+                      <p className="text-[11px] text-emerald-800 leading-relaxed">
+                        Zkontrolujte e-mailovou schránku. Můžete zadat 6místný kód z e-mailu nebo použít tlačítko okamžitého přihlášení níže.
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1.5">6místný kód z e-mailu</label>
+                      <div className="relative">
+                        <KeyRound className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                        <input
+                          type="text"
+                          maxLength={6}
+                          value={magicCodeInput}
+                          onChange={(e) => setMagicCodeInput(e.target.value.replace(/\D/g, ''))}
+                          placeholder="Zadejte 6místný kód..."
+                          className="w-full pl-9 pr-4 py-2.5 text-sm tracking-widest font-mono text-center font-bold bg-slate-50 hover:bg-slate-100 focus:bg-white border border-slate-200 focus:border-teal-500 rounded-xl outline-none transition-all"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2 pt-1">
+                      <button
+                        type="button"
+                        disabled={loading || magicCodeInput.length < 6}
+                        onClick={() => handleVerifyMagicLinkSubmit()}
+                        className="w-full py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs rounded-xl shadow-xs transition-all disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
+                      >
+                        {loading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                        <span>Ověřit kód a přihlásit se</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        disabled={loading}
+                        onClick={() => handleVerifyMagicLinkSubmit('DIRECT_CLICK')}
+                        className="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-teal-300 font-bold text-xs rounded-xl border border-slate-700 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                      >
+                        <Wand2 className="w-4 h-4 text-teal-400" />
+                        <span>Přihlásit 1-kliknutím na Kouzelný odkaz ✨</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setMagicSent(false)}
+                        className="w-full py-1.5 text-slate-500 hover:text-slate-800 text-[11px] font-semibold text-center cursor-pointer"
+                      >
+                        Zadat jiný e-mail
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* MODE 4 & 5: LOGIN & REGISTER FORMS */}
             {(mode === 'login' || mode === 'register') && (
               <div className="space-y-4">
+                {/* Magic Link (Passwordless) Button */}
+                <button
+                  id="magic-link-login-btn"
+                  type="button"
+                  disabled={loading}
+                  onClick={() => {
+                    setMagicEmail(email);
+                    setMode('magic_link');
+                    setStatus({ type: 'idle', text: '' });
+                  }}
+                  className="w-full py-2.5 px-4 bg-gradient-to-r from-teal-900 via-slate-900 to-teal-950 hover:from-teal-800 hover:to-slate-800 text-teal-300 font-bold text-xs rounded-xl shadow-xs transition-all flex items-center justify-center gap-2.5 cursor-pointer border border-teal-500/30 group"
+                >
+                  <Wand2 className="w-4 h-4 text-teal-400 group-hover:rotate-12 transition-transform shrink-0" />
+                  <span>Přihlásit bez hesla (Magic Link / Kouzelný odkaz) ✨</span>
+                </button>
+
                 {/* Passkey / Biometric Login Button (Primary if supported) */}
                 {passkeyAvailable && (
                   <button
