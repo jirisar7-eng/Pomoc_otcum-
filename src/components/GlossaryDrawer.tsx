@@ -10,13 +10,13 @@ import {
   BookOpen, 
   Scale, 
   Compass, 
-  ExternalLink, 
   Sparkles, 
   ChevronRight,
-  Info
+  Info,
+  Filter
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { DICTIONARY_TERMS, DictionaryTerm } from '../data/dictionary';
+import { DICTIONARY_TERMS, DictionaryTerm, DictionaryCategory } from '../data/dictionary';
 import { useLanguage } from '../lib/LanguageContext';
 import { getTranslatedObject } from '../data/dynamicTranslations';
 
@@ -26,9 +26,20 @@ interface GlossaryDrawerProps {
   initialTermId?: string | null;
 }
 
+const CATEGORY_MAP: Record<string, { label: string; color: string; badgeBg: string }> = {
+  all: { label: 'Všechny pojmy', color: 'bg-slate-100 text-slate-700 hover:bg-slate-200', badgeBg: 'bg-slate-100 text-slate-800' },
+  process: { label: 'Proces & Právo', color: 'bg-blue-50 text-blue-700 hover:bg-blue-100', badgeBg: 'bg-blue-100 text-blue-800' },
+  subjects: { label: 'Subjekty & Soud', color: 'bg-purple-50 text-purple-700 hover:bg-purple-100', badgeBg: 'bg-purple-100 text-purple-800' },
+  custody: { label: 'Péče & Práva', color: 'bg-teal-50 text-teal-700 hover:bg-teal-100', badgeBg: 'bg-teal-100 text-teal-800' },
+  psychology: { label: 'Psychologie & Důkazy', color: 'bg-amber-50 text-amber-800 hover:bg-amber-100', badgeBg: 'bg-amber-100 text-amber-900' },
+  finance: { label: 'Finance & Výkon', color: 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100', badgeBg: 'bg-emerald-100 text-emerald-800' },
+  technical: { label: 'Technické & AI', color: 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100', badgeBg: 'bg-indigo-100 text-indigo-800' },
+};
+
 export default function GlossaryDrawer({ isOpen, onClose, initialTermId }: GlossaryDrawerProps) {
   const { language } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedTerm, setSelectedTerm] = useState<DictionaryTerm | null>(null);
 
   // Localized dictionary terms
@@ -85,13 +96,17 @@ export default function GlossaryDrawer({ isOpen, onClose, initialTermId }: Gloss
   const terms: DictionaryTerm[] = Object.values(LOCALIZED_DICTIONARY_TERMS);
   
   const filteredTerms = terms.filter(item => {
+    const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory;
     const query = searchQuery.toLowerCase();
-    return (
+    const matchesSearch = 
       item.term.toLowerCase().includes(query) ||
       item.czechTranslation.toLowerCase().includes(query) ||
       item.shortDefinition.toLowerCase().includes(query) ||
-      item.definition.toLowerCase().includes(query)
-    );
+      item.definition.toLowerCase().includes(query) ||
+      item.importanceInCourt.toLowerCase().includes(query) ||
+      item.context.toLowerCase().includes(query);
+
+    return matchesCategory && matchesSearch;
   });
 
   const handleSelectTerm = (term: DictionaryTerm) => {
@@ -121,13 +136,18 @@ export default function GlossaryDrawer({ isOpen, onClose, initialTermId }: Gloss
             id="glossary-drawer"
           >
             {/* Header */}
-            <div className="bg-white border-b border-slate-100 px-6 py-4.5 flex items-center justify-between shrink-0">
+            <div className="bg-white border-b border-slate-100 px-6 py-4 flex items-center justify-between shrink-0">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-xl bg-teal-50 flex items-center justify-center text-teal-600">
                   <BookOpen className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-slate-900 text-base font-display">Odborný slovník pojmů</h3>
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-bold text-slate-900 text-base font-display">Odborný slovník pojmů</h3>
+                    <span className="text-[10px] bg-teal-100 text-teal-800 font-extrabold px-2 py-0.5 rounded-full font-mono">
+                      {terms.length} pojmů v10.0
+                    </span>
+                  </div>
                   <p className="text-[10px] text-slate-400 font-mono tracking-wider uppercase font-medium">Synthesis OS • Táta má právo</p>
                 </div>
               </div>
@@ -143,18 +163,39 @@ export default function GlossaryDrawer({ isOpen, onClose, initialTermId }: Gloss
             <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
               
               {/* Left sidebar - Terms List */}
-              <div className="w-full md:w-80 bg-white border-r border-slate-200/60 flex flex-col h-1/3 md:h-full shrink-0">
+              <div className="w-full md:w-88 bg-white border-r border-slate-200/60 flex flex-col h-2/5 md:h-full shrink-0">
                 {/* Search */}
-                <div className="p-4 border-b border-slate-100 shrink-0">
+                <div className="p-3.5 border-b border-slate-100 shrink-0 space-y-2">
                   <div className="relative">
                     <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
                     <input
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Hledat v pojmech..."
+                      placeholder="Hledat mezi 50+ odbornými pojmy..."
                       className="w-full pl-9 pr-4 py-1.5 bg-slate-50 border border-slate-200 focus:border-teal-500 rounded-xl text-xs outline-none focus:bg-white transition-all placeholder:text-slate-400"
                     />
+                  </div>
+
+                  {/* Category Filter Pills */}
+                  <div className="flex items-center gap-1 overflow-x-auto pb-1 no-scrollbar text-[10px] font-mono">
+                    <Filter className="w-3 h-3 text-slate-400 shrink-0 mr-0.5" />
+                    {Object.entries(CATEGORY_MAP).map(([catKey, catMeta]) => {
+                      const isActive = selectedCategory === catKey;
+                      return (
+                        <button
+                          key={catKey}
+                          onClick={() => setSelectedCategory(catKey)}
+                          className={`px-2 py-0.5 rounded-lg whitespace-nowrap transition-all font-medium cursor-pointer ${
+                            isActive
+                              ? 'bg-teal-600 text-white font-bold shadow-3xs'
+                              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                          }`}
+                        >
+                          {catMeta.label}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -163,21 +204,24 @@ export default function GlossaryDrawer({ isOpen, onClose, initialTermId }: Gloss
                   {filteredTerms.length > 0 ? (
                     filteredTerms.map((item) => {
                       const isSelected = selectedTerm?.id === item.id;
+                      const catBadge = CATEGORY_MAP[item.category || 'custody'] || CATEGORY_MAP.custody;
                       return (
                         <button
                           key={item.id}
                           onClick={() => handleSelectTerm(item)}
-                          className={`w-full text-left p-3 rounded-xl transition-all cursor-pointer flex items-center justify-between group ${
+                          className={`w-full text-left p-2.5 rounded-xl transition-all cursor-pointer flex items-center justify-between group ${
                             isSelected
                               ? 'bg-teal-50 text-teal-900 border border-teal-100 shadow-3xs'
                               : 'hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-transparent'
                           }`}
                         >
-                          <div className="min-w-0 flex-1">
-                            <span className="font-bold text-xs font-display block truncate">
-                              {item.term}
-                            </span>
-                            <span className={`text-[10px] block truncate ${isSelected ? 'text-teal-700/80' : 'text-slate-400'}`}>
+                          <div className="min-w-0 flex-1 space-y-0.5">
+                            <div className="flex items-center gap-1.5">
+                              <span className="font-bold text-xs font-display block truncate">
+                                {item.term}
+                              </span>
+                            </div>
+                            <span className={`text-[10px] block truncate ${isSelected ? 'text-teal-700/90' : 'text-slate-400'}`}>
                               {item.czechTranslation}
                             </span>
                           </div>
@@ -188,8 +232,14 @@ export default function GlossaryDrawer({ isOpen, onClose, initialTermId }: Gloss
                       );
                     })
                   ) : (
-                    <div className="p-6 text-center text-slate-400 text-xs font-mono">
-                      Nebyly nalezeny žádné pojmy.
+                    <div className="p-6 text-center text-slate-400 text-xs font-mono space-y-1">
+                      <p>Nebyly nalezeny žádné pojmy.</p>
+                      <button 
+                        onClick={() => { setSearchQuery(''); setSelectedCategory('all'); }}
+                        className="text-teal-600 hover:underline text-[11px]"
+                      >
+                        Resetovat filtry
+                      </button>
                     </div>
                   )}
                 </div>
@@ -209,8 +259,10 @@ export default function GlossaryDrawer({ isOpen, onClose, initialTermId }: Gloss
                     <div className="bg-white border border-slate-200/60 rounded-2xl p-6 shadow-3xs space-y-3">
                       <div className="flex flex-wrap items-start justify-between gap-3">
                         <div className="space-y-1">
-                          <span className="text-[9px] bg-teal-100 text-teal-800 font-bold uppercase tracking-wider font-mono px-2.5 py-0.5 rounded-full inline-block">
-                            Akademický termín
+                          <span className={`text-[9px] font-bold uppercase tracking-wider font-mono px-2.5 py-0.5 rounded-full inline-block ${
+                            (CATEGORY_MAP[selectedTerm.category || 'custody'] || CATEGORY_MAP.custody).badgeBg
+                          }`}>
+                            {(CATEGORY_MAP[selectedTerm.category || 'custody'] || CATEGORY_MAP.custody).label}
                           </span>
                           <h2 className="text-xl md:text-2xl font-bold font-display text-slate-900 tracking-tight">
                             {selectedTerm.term}
@@ -220,7 +272,7 @@ export default function GlossaryDrawer({ isOpen, onClose, initialTermId }: Gloss
                           </p>
                         </div>
                       </div>
-                      <p className="text-xs text-slate-600 leading-relaxed font-sans pt-1 border-t border-slate-100">
+                      <p className="text-xs text-slate-600 leading-relaxed font-sans pt-2 border-t border-slate-100">
                         {selectedTerm.shortDefinition}
                       </p>
                     </div>
@@ -229,7 +281,7 @@ export default function GlossaryDrawer({ isOpen, onClose, initialTermId }: Gloss
                     <div className="bg-white border border-slate-200/60 rounded-2xl p-6 shadow-3xs space-y-2">
                       <h4 className="text-xs font-bold font-display text-slate-800 uppercase tracking-wider font-mono flex items-center gap-1.5">
                         <BookOpen className="w-3.5 h-3.5 text-teal-500" />
-                        Podrobný význam a psychologický rozbor
+                        Podrobný význam a právně-psychologický rozbor
                       </h4>
                       <p className="text-xs text-slate-600 leading-relaxed font-sans">
                         {selectedTerm.definition}
@@ -240,7 +292,7 @@ export default function GlossaryDrawer({ isOpen, onClose, initialTermId }: Gloss
                     <div className="bg-white border border-teal-100 rounded-2xl p-6 shadow-3xs space-y-2 border-l-4 border-l-teal-500">
                       <h4 className="text-xs font-bold font-display text-teal-900 uppercase tracking-wider font-mono flex items-center gap-1.5">
                         <Scale className="w-3.5 h-3.5 text-teal-600 animate-pulse" />
-                        Jak tento pojem úspěšně uplatnit u soudu
+                        Praktický dopad a způsob uplatnění u soudu pro otce
                       </h4>
                       <p className="text-xs text-slate-700 leading-relaxed font-sans bg-teal-50/30 p-3.5 rounded-xl border border-teal-100/50">
                         {selectedTerm.importanceInCourt}
@@ -251,7 +303,7 @@ export default function GlossaryDrawer({ isOpen, onClose, initialTermId }: Gloss
                     <div className="bg-white border border-slate-200/60 rounded-2xl p-6 shadow-3xs space-y-2.5">
                       <h4 className="text-xs font-bold font-display text-slate-800 uppercase tracking-wider font-mono flex items-center gap-1.5">
                         <Compass className="w-3.5 h-3.5 text-teal-500" />
-                        Vědecký kontext, studie a prameny
+                        Právní řád ČR, vědecký kontext a judikatura
                       </h4>
                       <div className="bg-slate-50 p-4 rounded-xl border border-slate-200/50 space-y-2 font-mono text-[11px] text-slate-500">
                         <p className="leading-relaxed">
@@ -275,7 +327,7 @@ export default function GlossaryDrawer({ isOpen, onClose, initialTermId }: Gloss
             <div className="bg-white border-t border-slate-100 px-6 py-3 flex items-center justify-between text-[10px] text-slate-400 font-mono shrink-0">
               <span className="flex items-center gap-1">
                 <Sparkles className="w-3.5 h-3.5 text-teal-500" />
-                Vždy aktuální data založená na vědeckém konsenzu
+                Kompletní lexikon 50+ opatrovnických pojmů v10.0
               </span>
               <span>
                 Synthesis Hub v2.5
