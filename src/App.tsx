@@ -82,6 +82,7 @@ import CentrumFormularu from './components/CentrumFormularu';
 import AiCaseManager from './components/AiCaseManager';
 import LegalWiki from './components/LegalWiki';
 import AiAdmin from './components/AiAdmin';
+import CategoryDetailView from './components/CategoryDetailView';
 
 export default function App() {
   const { t } = useLanguage();
@@ -534,7 +535,17 @@ export default function App() {
             )}
 
             {activeTab === 'legal-wiki' && (
-              <LegalWiki />
+              <LegalWiki setActiveTab={setActiveTab} />
+            )}
+
+            {activeTab.startsWith('category-') && (
+              <CategoryDetailView
+                categorySlug={activeTab.replace('category-', '')}
+                setActiveTab={setActiveTab}
+                setSearchQuery={setSearchQuery}
+                currentUser={currentUser}
+                onOpenAuth={() => setAuthModalOpen(true)}
+              />
             )}
 
             {activeTab === 'ai-admin' && (

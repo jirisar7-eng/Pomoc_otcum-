@@ -1,6 +1,7 @@
 import React from 'react';
 import { Home, ChevronRight, Layers } from 'lucide-react';
 import { SEO_CONFIGS } from '../lib/seo';
+import { HUB_CATEGORIES } from '../data/contentHub';
 
 interface BreadcrumbsProps {
   activeTab: string;
@@ -10,12 +11,31 @@ interface BreadcrumbsProps {
 export default function Breadcrumbs({ activeTab, setActiveTab }: BreadcrumbsProps) {
   if (activeTab === 'home') return null;
 
-  const config = SEO_CONFIGS[activeTab] || {
-    title: activeTab,
-    h1: activeTab,
-    category: 'Sekce',
-    parentLabel: 'Informační část'
-  };
+  let config = SEO_CONFIGS[activeTab];
+
+  if (activeTab.startsWith('category-')) {
+    const slug = activeTab.replace('category-', '');
+    const cat = HUB_CATEGORIES.find(c => c.slug === slug || c.id === slug);
+    config = {
+      title: cat ? `${cat.name} | Táta má právo` : 'Detail kategorie',
+      h1: cat ? `${cat.icon} ${cat.name}` : 'Detail kategorie',
+      category: 'Odborné okruhy',
+      parentLabel: 'Odborná témata & Okruhy',
+      description: cat?.description || '',
+      keywords: cat?.slug || '',
+      canonicalPath: `/kategorie/${slug}`
+    };
+  } else if (!config) {
+    config = {
+      title: activeTab,
+      h1: activeTab,
+      category: 'Sekce',
+      parentLabel: 'Informační část',
+      description: '',
+      keywords: '',
+      canonicalPath: `/${activeTab}`
+    };
+  }
 
   return (
     <nav 

@@ -15,7 +15,11 @@ import {
 import { useLanguage } from '../lib/LanguageContext';
 import { getTranslatedObject } from '../data/dynamicTranslations';
 
-export default function LegalWiki() {
+interface LegalWikiProps {
+  setActiveTab?: (tab: string) => void;
+}
+
+export default function LegalWiki({ setActiveTab }: LegalWikiProps) {
   const { language } = useLanguage();
 
   const HUB_GLOSSARY = React.useMemo(() => 
@@ -425,7 +429,16 @@ export default function LegalWiki() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {HUB_CATEGORIES.map(cat => (
-            <div key={cat.id} className="p-4 bg-slate-800/80 hover:bg-slate-800 border border-slate-700/60 rounded-2xl space-y-2 transition-all group">
+            <div 
+              key={cat.id} 
+              onClick={() => {
+                if (setActiveTab) {
+                  setActiveTab(`category-${cat.slug}`);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+              }}
+              className="p-4 bg-slate-800/80 hover:bg-slate-800 border border-slate-700/60 hover:border-indigo-500/80 rounded-2xl space-y-2 transition-all cursor-pointer group shadow-3xs"
+            >
               <div className="flex items-center gap-2.5">
                 <span className="text-2xl group-hover:scale-110 transition-transform">{cat.icon}</span>
                 <h4 className="font-extrabold text-xs text-white group-hover:text-indigo-400 transition-colors">
@@ -437,7 +450,7 @@ export default function LegalWiki() {
               </p>
               <div className="pt-1 flex items-center justify-between text-[10px] font-mono text-indigo-400 font-bold">
                 <span>Slug: #{cat.slug}</span>
-                <span className="text-slate-500">Aktivní databáze</span>
+                <span className="text-indigo-300 hover:underline">Otevřít okruh →</span>
               </div>
             </div>
           ))}

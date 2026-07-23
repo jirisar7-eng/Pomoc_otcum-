@@ -117,9 +117,10 @@ export default function Navigation({
   };
 
   const handleCategoryClick = (categorySlug: string, categoryName: string) => {
-    const target = CATEGORY_TAB_MAP[categorySlug] || { tab: 'legal-wiki', search: categoryName };
-    setSearchQuery(target.search);
-    handleTabClick(target.tab);
+    setActiveTab(`category-${categorySlug}`);
+    setOpenDropdown(null);
+    setMobileMenuOpen(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // Close dropdown on click outside
