@@ -3,22 +3,48 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React from 'react';
-import { motion } from 'motion/react';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { 
-  Heart, 
+  Sparkles, 
+  ArrowRight, 
+  ShieldAlert, 
   Scale, 
+  BookOpen, 
+  FileText, 
+  HeartHandshake, 
+  Search, 
+  Copy, 
+  Check, 
+  ChevronDown, 
+  ChevronUp, 
+  ChevronRight,
+  Zap, 
+  AlertTriangle, 
+  Coins, 
+  Server, 
+  Globe, 
+  Users2, 
+  CheckCircle2, 
+  ExternalLink, 
+  Brain, 
+  Award, 
   FileSpreadsheet, 
   Compass, 
-  MessageCircle, 
-  ArrowRight, 
-  Sparkles, 
   ShieldCheck, 
-  Users2,
-  AlertTriangle
+  Layers, 
+  Lock, 
+  Activity, 
+  PhoneCall,
+  Heart,
+  HelpCircle,
+  Clock,
+  Building2,
+  FileCode
 } from 'lucide-react';
 import fatherAndChildHero from '../assets/images/father_and_child_hero_1783886957826.jpg';
 import { Partner } from '../types';
+import { HUB_CATEGORIES, HUB_JUDGMENTS, HUB_STUDIES } from '../data/contentHub';
 
 interface HeroSectionProps {
   onNavigate: (tabId: string) => void;
@@ -28,190 +54,603 @@ interface HeroSectionProps {
 }
 
 export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn, partners = [] }: HeroSectionProps) {
-  const steps = [
-    { title: '1. Dohoda rodičů', desc: 'Nejšetrnější řešení pro obě strany a hlavně dítě.', status: 'Klíčový krok' },
-    { title: '2. Podání návrhu', desc: 'Sepsání a odeslání návrhu k příslušnému okresnímu soudu.', status: 'Právní zahájení' },
-    { title: '3. Jednání s OSPOD', desc: 'Sociální šetření, rozhovor o zázemí a zájmech dítěte.', status: 'Opatrovník' },
-    { title: '4. Soudní slyšení', desc: 'Dokazování, slyšení rodičů a vynesení samotného rozsudku.', status: 'Finální rozhodnutí' }
+  // Category search & expansion state
+  const [categorySearch, setCategorySearch] = useState('');
+  const [showAllCategories, setShowAllCategories] = useState(false);
+
+  // Copy legal sentence feedback state
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  // Featured categories for quick access
+  const featuredCategorySlugs = [
+    'pravni-rad',
+    'stridava-pece',
+    'nocni-pece',
+    'rodicovska-alienace',
+    'jednani-ospod',
+    'judikatura'
   ];
 
-  return (
-    <div className="space-y-12">
-      
-      {/* Hero Banner Section */}
-      <section className="bg-white rounded-3xl border border-slate-100 p-6 md:p-8 lg:p-10 relative overflow-hidden shadow-2xs" id="home-hero-banner">
-        {/* Background visual abstract graphics */}
-        <div className="absolute top-0 right-0 w-80 h-80 bg-teal-50 rounded-full blur-3xl -z-10 opacity-60 translate-x-20 -translate-y-20"></div>
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-slate-50 rounded-full blur-3xl -z-10 opacity-60 -translate-x-20 translate-y-20"></div>
+  const featuredCategories = HUB_CATEGORIES.filter(c => featuredCategorySlugs.includes(c.slug));
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+  // Filtered categories based on user search query
+  const filteredCategories = HUB_CATEGORIES.filter(cat => 
+    cat.name.toLowerCase().includes(categorySearch.toLowerCase()) ||
+    cat.description.toLowerCase().includes(categorySearch.toLowerCase())
+  );
+
+  // Handle copying judgment quotes
+  const handleCopyQuote = (id: string, quote: string) => {
+    navigator.clipboard.writeText(quote);
+    setCopiedId(id);
+    setTimeout(() => {
+      setCopiedId(null);
+    }, 2000);
+  };
+
+  // Scroll smoothly to section anchor
+  const scrollToSection = (sectionId: string) => {
+    const el = document.getElementById(sectionId);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  return (
+    <div className="space-y-12 font-sans" id="homepage-root">
+      
+      {/* ========================================================================= */}
+      {/* 🚀 SEKCE 1: HERO SEKCE (Uvítání a aktuální status)                       */}
+      {/* ========================================================================= */}
+      <section 
+        className="relative bg-gradient-to-br from-slate-900 via-slate-850 to-emerald-950 text-white rounded-3xl p-6 sm:p-8 md:p-10 lg:p-12 overflow-hidden border border-emerald-800/30 shadow-xl"
+        id="home-hero-banner"
+      >
+        {/* Background visual abstract accents */}
+        <div className="absolute -top-24 -right-24 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(#10b981_1px,transparent_1px)] [background-size:24px_24px] opacity-[0.04] pointer-events-none"></div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
+          
           <div className="lg:col-span-7 space-y-6">
+            
+            {/* Status Announcement Badge */}
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4 }}
-              className="inline-flex items-center gap-1.5 px-3 py-1 bg-teal-50 text-teal-700 rounded-full text-xs font-semibold border border-teal-100/50"
+              className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-amber-400/10 border border-amber-400/30 text-amber-300 rounded-full text-xs font-semibold backdrop-blur-sm shadow-inner"
             >
-              <Sparkles className="w-3.5 h-3.5 text-teal-600" />
-              <span>Opatrovnický průvodce a komunitní portál</span>
+              <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+              <span className="font-mono text-[11px] uppercase tracking-wider text-amber-300">Alfa verze 0.0.1.2</span>
+              <span className="text-amber-400/60">•</span>
+              <span className="text-slate-300">Portál Táta má právo</span>
             </motion.div>
 
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-slate-800 tracking-tight font-display leading-tight" id="hero-title">
-              Když jako táta bojuješ o své dítě, <span className="text-teal-600 block sm:inline">neměl bys být sám.</span>
+            {/* Main Headline */}
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight font-display leading-[1.15]" id="hero-title">
+              Průvodce opatrovnictvím, <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-teal-200 to-amber-200">právem a psychologií pro otce</span>
             </h1>
 
-            <p className="text-slate-600 text-sm md:text-base leading-relaxed max-w-2xl" id="hero-description">
-              Stojíme pevně na straně aktivních tátů. Opatrovnický systém v ČR (soudy a OSPOD) často podléhá zažitým mateřským stereotypům, které otce odsouvají na vedlejší kolej jako víkendové návštěvníky. Nabízíme vám věcné návody, prověřené právní vzory a judikaturu, které vám pomohou uhájit právo vašeho dítěte na oba milující rodiče a vybojovat spravedlivou střídavou péči.
+            {/* Description Subtext */}
+            <p className="text-slate-300 text-sm sm:text-base leading-relaxed max-w-2xl" id="hero-description">
+              Pevná opora pro táty v opatrovnickém sporu. Přinášíme ověřené právní rozbory, judikaturu Ústavního soudu, vědecké metaanalýzy a AI asistenta pro rovnocennou péči o vaše děti.
             </p>
 
+            {/* Action Buttons */}
             <div className="flex flex-wrap items-center gap-3 pt-2">
               <button
-                id="hero-cta-advice"
-                onClick={() => onNavigate('soudni-rizeni')}
-                className="px-5 py-2.5 bg-gradient-to-r from-teal-600 to-slate-800 text-white font-semibold text-xs rounded-xl shadow-md hover:from-teal-700 hover:to-slate-900 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                id="hero-cta-ai"
+                onClick={() => onNavigate('ai-guide')}
+                className="px-5 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-extrabold text-xs rounded-xl shadow-lg hover:shadow-emerald-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer transform hover:-translate-y-0.5 active:translate-y-0"
               >
-                Začít číst
-                <ArrowRight className="w-3.5 h-3.5 text-teal-300" />
+                <Sparkles className="w-4 h-4 text-slate-950" />
+                <span>Otevřít AI Asistenta</span>
               </button>
+
               <button
-                id="hero-cta-story"
-                onClick={() => onNavigate('stories')}
-                className="px-5 py-2.5 bg-white border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700 font-semibold text-xs rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-3xs"
+                id="hero-cta-sos"
+                onClick={() => onNavigate('crisis')}
+                className="px-5 py-3 bg-rose-500/20 hover:bg-rose-500/30 text-rose-200 border border-rose-500/40 font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer backdrop-blur-sm"
               >
-                Můj příběh
-                <Users2 className="w-3.5 h-3.5 text-slate-400" />
+                <ShieldAlert className="w-4 h-4 text-rose-400" />
+                <span>Potřebuji krizovou pomoc (SOS)</span>
               </button>
+
               <button
-                id="hero-cta-docs"
-                onClick={() => onNavigate('ke-stazeni')}
-                className="px-5 py-2.5 bg-teal-50 border border-teal-100/50 text-teal-800 hover:bg-teal-100/40 font-semibold text-xs rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-3xs"
+                id="hero-cta-categories"
+                onClick={() => scrollToSection('section-21-categories')}
+                className="px-5 py-3 bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 border border-slate-700/80 font-semibold text-xs rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-3xs"
               >
-                Vzory dokumentů
-                <FileSpreadsheet className="w-3.5 h-3.5 text-teal-600" />
+                <Layers className="w-4 h-4 text-emerald-400" />
+                <span>Prozkoumat 21 kategorií</span>
               </button>
             </div>
-          </div>
 
-          <div className="lg:col-span-5 relative">
-            <div className="absolute inset-0 bg-gradient-to-tr from-teal-600/10 to-slate-800/10 rounded-2xl -rotate-1 scale-[1.02] -z-10 blur-xs"></div>
-            <img
-              src={fatherAndChildHero}
-              alt="Otec se svým malým synem"
-              className="w-full h-64 md:h-80 object-cover rounded-2xl shadow-md border border-slate-100"
-              referrerPolicy="no-referrer"
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* Core Principles Grid */}
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-6" id="core-principles-section">
-        <div className="bg-white p-6 rounded-2xl border border-slate-100 hover:border-teal-200 shadow-2xs transition-all flex flex-col justify-between">
-          <div>
-            <div className="w-12 h-12 bg-teal-50 rounded-xl flex items-center justify-center text-teal-600 mb-4">
-              <Heart className="w-6 h-6" />
-            </div>
-            <h3 className="font-bold text-slate-800 font-display mb-2">Péče o dítě a střídání</h3>
-            <p className="text-slate-500 text-xs leading-relaxed">
-              Dítě potřebuje pro zdravý vývoj oba rodiče. Pomáháme vám prozkoumat rotační modely (7-7, 2-2-3) a naplánovat bezkonfliktní předávání dětí.
-            </p>
-          </div>
-          <button onClick={() => onNavigate('pece-o-dite')} className="text-teal-600 hover:text-teal-700 text-xs font-semibold flex items-center gap-1 mt-4 group">
-            Plánovač střídavých cyklů <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
-          </button>
-        </div>
-
-        <div className="bg-white p-6 rounded-2xl border border-slate-100 hover:border-teal-200 shadow-2xs transition-all flex flex-col justify-between">
-          <div>
-            <div className="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center text-slate-700 mb-4">
-              <FileSpreadsheet className="w-6 h-6" />
-            </div>
-            <h3 className="font-bold text-slate-800 font-display mb-2">Bezplatné vzory podání</h3>
-            <p className="text-slate-500 text-xs leading-relaxed">
-              Připravte si mimosoudní dohodu, návrh na střídavou péči k okresnímu soudu nebo naléhavé předběžné opatření díky našim vzorům.
-            </p>
-          </div>
-          <button onClick={() => onNavigate('ke-stazeni')} className="text-teal-600 hover:text-teal-700 text-xs font-semibold flex items-center gap-1 mt-4 group">
-            Prohlížet vzory podání <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
-          </button>
-        </div>
-
-        <div className="bg-white p-6 rounded-2xl border border-slate-100 hover:border-teal-200 shadow-2xs transition-all flex flex-col justify-between">
-          <div>
-            <div className="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center text-slate-700 mb-4">
-              <Compass className="w-6 h-6" />
-            </div>
-            <h3 className="font-bold text-slate-800 font-display mb-2">Desatero jednání s OSPOD</h3>
-            <p className="text-slate-500 text-xs leading-relaxed">
-              Jak se chovat při místním šetření u vás doma, na co si dát pozor při rozhovoru se sociální pracovnicí a jaká jsou vaše zákonná práva.
-            </p>
-          </div>
-          <button onClick={() => onNavigate('ospod')} className="text-teal-600 hover:text-teal-700 text-xs font-semibold flex items-center gap-1 mt-4 group">
-            Příprava na OSPOD <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
-          </button>
-        </div>
-      </section>
-
-      {/* Process Timeline Checklist */}
-      <section className="bg-white rounded-2xl border border-slate-100 p-6 md:p-8 shadow-2xs" id="proceedings-timeline">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
-          <div>
-            <span className="text-[10px] uppercase font-bold text-teal-600 tracking-wider">Metodika řízení</span>
-            <h3 className="text-xl font-bold text-slate-800 font-display">Standardní cesta opatrovnického procesu</h3>
-          </div>
-          <div className="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-100">
-            <ShieldCheck className="w-4 h-4 text-teal-600" />
-            <span className="text-xs font-medium text-slate-600">Garance odborného a nestranného obsahu</span>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 relative">
-          {/* Timeline Connector Line */}
-          <div className="hidden lg:block absolute top-[26px] left-[15%] right-[15%] h-0.5 bg-slate-100 -z-10"></div>
-
-          {steps.map((step, idx) => (
-            <div key={idx} className="bg-slate-50/50 p-4 rounded-xl border border-slate-100 relative hover:bg-slate-50 transition-colors">
-              <div className="w-8 h-8 rounded-full bg-teal-600 text-white flex items-center justify-center font-bold text-sm mb-3 shadow-sm">
-                {idx + 1}
+            {/* Metrics Ticker bar */}
+            <div className="pt-4 border-t border-slate-800/80 grid grid-cols-3 gap-4 text-left max-w-xl">
+              <div>
+                <span className="block text-lg font-extrabold text-amber-300 font-display">21</span>
+                <span className="text-[11px] text-slate-400 leading-none">Odborných okruhů</span>
               </div>
-              <h4 className="font-bold text-slate-800 text-sm mb-1">{step.title}</h4>
-              <p className="text-slate-500 text-xs leading-relaxed mb-2">{step.desc}</p>
-              <span className="inline-block text-[9px] font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-md uppercase">
-                {step.status}
-              </span>
+              <div>
+                <span className="block text-lg font-extrabold text-emerald-400 font-display">110+</span>
+                <span className="text-[11px] text-slate-400 leading-none">Soudních nálezů & studií</span>
+              </div>
+              <div>
+                <span className="block text-lg font-extrabold text-teal-300 font-display">100%</span>
+                <span className="text-[11px] text-slate-400 leading-none">Nestrannost & fakta</span>
+              </div>
+            </div>
+
+          </div>
+
+          {/* Hero Image / Visual Graphic */}
+          <div className="lg:col-span-5 relative">
+            <div className="relative rounded-2xl overflow-hidden border border-emerald-500/20 shadow-2xl group">
+              <img
+                src={fatherAndChildHero}
+                alt="Otec se svým dítětem"
+                className="w-full h-72 sm:h-80 lg:h-96 object-cover transform group-hover:scale-105 transition-transform duration-700"
+                referrerPolicy="no-referrer"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent"></div>
+              
+              <div className="absolute bottom-4 left-4 right-4 p-4 bg-slate-900/90 backdrop-blur-md rounded-xl border border-slate-800 text-xs space-y-1">
+                <div className="flex items-center justify-between text-emerald-400 font-bold font-display">
+                  <span>Právo na oba rodiče</span>
+                  <Award className="w-4 h-4 text-amber-400" />
+                </div>
+                <p className="text-slate-300 text-[11px] leading-relaxed">
+                  "Dítě potřebuje tátu i mámu. Rovnocenná péče je základem zdravého vývoje."
+                </p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* ========================================================================= */}
+      {/* 📊 SEKCE 2: INTERAKTIVNÍ ROZCESTNÍK 21 ODBORNÝCH OKRUHŮ                  */}
+      {/* ========================================================================= */}
+      <section className="bg-white rounded-3xl border border-slate-200/80 p-6 md:p-8 lg:p-10 shadow-sm space-y-8" id="section-21-categories">
+        
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-100 pb-6">
+          <div>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-800 rounded-full text-xs font-bold mb-2">
+              <Layers className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Kompletní znalostní báze</span>
+            </div>
+            <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 font-display tracking-tight">
+              21 Odborných tématických okruhů
+            </h2>
+            <p className="text-slate-500 text-xs sm:text-sm mt-1 max-w-2xl">
+              Systematicky členěná knihovna znalostí, judikatury, metodických pokynů OSPOD a praktických rad.
+            </p>
+          </div>
+
+          <button
+            onClick={() => setShowAllCategories(!showAllCategories)}
+            className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer self-start md:self-auto"
+          >
+            <span>{showAllCategories ? 'Skrýt seznam' : 'Zobrazit všech 21 kategorií'}</span>
+            {showAllCategories ? <ChevronUp className="w-4 h-4 text-amber-300" /> : <ChevronDown className="w-4 h-4 text-amber-300" />}
+          </button>
+        </div>
+
+        {/* Quick Access Top 6 Categories */}
+        {!showAllCategories && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="text-xs uppercase tracking-wider font-bold text-slate-400">Nejvyhledávanější tematické okruhy</span>
+              <span className="text-xs text-emerald-700 font-semibold">6 klíčových oblastí</span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {featuredCategories.map((cat, idx) => (
+                <div 
+                  key={cat.id}
+                  onClick={() => onNavigate(`category-${cat.slug}`)}
+                  className="p-5 bg-slate-50 hover:bg-emerald-50/40 rounded-2xl border border-slate-200/60 hover:border-emerald-300 transition-all cursor-pointer group flex flex-col justify-between shadow-2xs hover:shadow-md"
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-2xl p-2 bg-white rounded-xl shadow-2xs border border-slate-100">{cat.icon}</span>
+                      <span className="text-[10px] font-mono font-bold text-slate-400 bg-white px-2 py-0.5 rounded-full border border-slate-200">
+                        Okruh #{idx + 1}
+                      </span>
+                    </div>
+                    <div>
+                      <h3 className="font-extrabold text-slate-800 text-sm group-hover:text-emerald-800 font-display transition-colors">
+                        {cat.name}
+                      </h3>
+                      <p className="text-slate-500 text-xs leading-relaxed mt-1 line-clamp-2">
+                        {cat.description}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="pt-4 mt-4 border-t border-slate-200/50 flex items-center justify-between text-xs font-bold text-emerald-700 group-hover:text-emerald-800">
+                    <span>Otevřít kapitolu</span>
+                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Full Expandable 21 Categories Grid */}
+        {showAllCategories && (
+          <motion.div 
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="space-y-6 pt-2"
+          >
+            {/* Real-time Category Search Filter */}
+            <div className="relative max-w-md">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
+              <input
+                type="text"
+                placeholder="Hledat mezi 21 kategoriemi..."
+                value={categorySearch}
+                onChange={(e) => setCategorySearch(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:border-emerald-500 focus:outline-none transition-all"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filteredCategories.map((cat, idx) => (
+                <div 
+                  key={cat.id}
+                  onClick={() => onNavigate(`category-${cat.slug}`)}
+                  className="p-5 bg-white hover:bg-slate-50 rounded-2xl border border-slate-200 hover:border-emerald-400 transition-all cursor-pointer group flex flex-col justify-between shadow-2xs hover:shadow-md"
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-2xl">{cat.icon}</span>
+                      <span className="text-[10px] font-mono font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
+                        {cat.slug}
+                      </span>
+                    </div>
+                    <div>
+                      <h3 className="font-extrabold text-slate-800 text-sm group-hover:text-emerald-700 font-display transition-colors">
+                        {cat.name}
+                      </h3>
+                      <p className="text-slate-500 text-xs leading-relaxed mt-1">
+                        {cat.description}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-emerald-600 group-hover:text-emerald-700">
+                    <span>Detail okruhu</span>
+                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+
+      </section>
+
+      {/* ========================================================================= */}
+      {/* 🔬 SEKCE 3: VĚDECKÝ ZÁKLAD & GALERIE KRITIKY (Důvěryhodnost)             */}
+      {/* ========================================================================= */}
+      <section className="bg-gradient-to-br from-slate-900 to-slate-950 text-white rounded-3xl p-6 md:p-8 lg:p-10 border border-slate-800 shadow-xl space-y-8" id="section-scientific-base">
+        
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-800 pb-6">
+          <div>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-teal-500/10 border border-teal-500/20 text-teal-300 rounded-full text-xs font-bold mb-2">
+              <Brain className="w-3.5 h-3.5 text-teal-400" />
+              <span>Věda a fakta na 1. místě</span>
+            </div>
+            <h2 className="text-2xl md:text-3xl font-extrabold text-white font-display tracking-tight">
+              Světový vědecký konsenzus o střídavé péči
+            </h2>
+            <p className="text-slate-400 text-xs sm:text-sm mt-1 max-w-2xl">
+              Proti mýtům a předsudkům stavíme exaktní data ze 100+ mezinárodních metaanalýz (Harvard, Karolinska Institutet, Arizona State University).
+            </p>
+          </div>
+
+          <button
+            onClick={() => onNavigate('knihovna-studii')}
+            className="px-4 py-2.5 bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer self-start md:self-auto"
+          >
+            <span>Knihovna vědeckých studií</span>
+            <ExternalLink className="w-3.5 h-3.5" />
+          </button>
+        </div>
+
+        {/* Featured Key Studies Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {HUB_STUDIES.slice(0, 3).map((study) => (
+            <div 
+              key={study.id}
+              className="bg-slate-850/80 p-5 rounded-2xl border border-slate-800 space-y-3 flex flex-col justify-between hover:border-slate-700 transition-all"
+            >
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-[10px] text-teal-400 font-mono font-bold">
+                  <span>{study.authors}</span>
+                  <span>{study.year}</span>
+                </div>
+                <h3 className="font-bold text-slate-100 text-sm leading-snug font-display">
+                  {study.title}
+                </h3>
+                <p className="text-slate-400 text-xs leading-relaxed">
+                  {study.excerpt}
+                </p>
+              </div>
+
+              <div className="pt-3 border-t border-slate-800 text-[11px] text-slate-300 bg-slate-900/50 p-3 rounded-xl border border-slate-800/50">
+                <strong className="text-emerald-400 font-bold block mb-1">Závěr studie:</strong>
+                {study.conclusion}
+              </div>
             </div>
           ))}
         </div>
-      </section>
 
-      {/* Quick Statistics Section */}
-      <section className="grid grid-cols-2 lg:grid-cols-4 gap-4" id="portal-quick-stats">
-        {[
-          { value: '75%', label: 'Vyšší stabilita dohod', desc: 'oproti autoritativním rozsudkům' },
-          { value: '100%', label: 'Nestrannost', desc: 'vyvážená podpora matky i otce' },
-          { value: '8+', label: 'Právních vzorů', desc: 'připravených pro podání k soudu' },
-          { value: '24/7', label: 'AI Asistent', desc: 'připraven zodpovědět dotazy' }
-        ].map((stat, idx) => (
-          <div key={idx} className="bg-white p-5 rounded-2xl border border-slate-100 text-center">
-            <span className="block text-2xl md:text-3xl font-extrabold text-teal-600 font-display mb-1">{stat.value}</span>
-            <span className="block text-xs font-bold text-slate-800 mb-0.5">{stat.label}</span>
-            <span className="block text-[10px] text-slate-400">{stat.desc}</span>
+        {/* Special Banner: Galerie kritiky překonaných studií */}
+        <div className="bg-gradient-to-r from-rose-950/40 via-slate-900 to-amber-950/30 border border-rose-800/30 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="space-y-2 max-w-2xl">
+            <div className="inline-flex items-center gap-2 px-2.5 py-0.5 bg-rose-500/20 border border-rose-500/30 text-rose-300 rounded text-[10px] font-bold uppercase tracking-wider font-mono">
+              <AlertTriangle className="w-3 h-3 text-rose-400" />
+              <span>Demontáž metodických chyb</span>
+            </div>
+            <h3 className="text-xl font-extrabold text-white font-display">
+              Galerie kritiky překonaných studií (např. McIntosh 2010)
+            </h3>
+            <p className="text-slate-300 text-xs leading-relaxed">
+              Často čelíte argumentům odvolávajícím se na australskou studii Jennifer McIntosh (2010), která varovala před noční péčí u nemluvňat. Tato studie byla světovou vědeckou komunitou (Nielsen, Warshak, Fabricius) plně metodicky vyvrácena pro nereprezentativní, patologický vzorek.
+            </p>
           </div>
-        ))}
+
+          <button
+            onClick={() => onNavigate('category-kritika-studii')}
+            className="px-5 py-3 bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white font-bold text-xs rounded-xl shadow-lg transition-all whitespace-nowrap cursor-pointer flex items-center gap-2"
+          >
+            <span>Otevřít Galerii kritiky</span>
+            <ArrowRight className="w-4 h-4" />
+          </button>
+        </div>
+
       </section>
 
-      {/* Partners section */}
+      {/* ========================================================================= */}
+      {/* ⚖️ SEKCE 4: AKTUÁLNÍ JUDIKATURA & PRÁVNÍ PRAXE                            */}
+      {/* ========================================================================= */}
+      <section className="bg-white rounded-3xl border border-slate-200/80 p-6 md:p-8 lg:p-10 shadow-sm space-y-8" id="section-judikatura">
+        
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-100 pb-6">
+          <div>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-800 rounded-full text-xs font-bold mb-2">
+              <Scale className="w-3.5 h-3.5 text-amber-600" />
+              <span>Ústavní soud ČR & ESLP</span>
+            </div>
+            <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 font-display tracking-tight">
+              Aktuální judikatura & Právní argumenty do vašich podání
+            </h2>
+            <p className="text-slate-500 text-xs sm:text-sm mt-1 max-w-2xl">
+              Klíčové nálezy garantující rovnocennou péči. Kliknutím jednoduše zkopírujte právní větu přímo do vašeho podání k soudu.
+            </p>
+          </div>
+
+          <button
+            onClick={() => onNavigate('judikatura')}
+            className="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer self-start md:self-auto"
+          >
+            <span>Kompletní judikatura</span>
+            <ArrowRight className="w-3.5 h-3.5 text-amber-300" />
+          </button>
+        </div>
+
+        {/* Selected Key Judgments list */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {HUB_JUDGMENTS.slice(0, 4).map((jud) => (
+            <div 
+              key={jud.id}
+              className="p-5 bg-slate-50/70 rounded-2xl border border-slate-200 space-y-4 hover:border-amber-300 transition-all flex flex-col justify-between"
+            >
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-mono font-bold bg-amber-100 text-amber-900 px-2.5 py-0.5 rounded-full border border-amber-200">
+                    {jud.fileNo}
+                  </span>
+                  <span className="text-[10px] text-slate-400 font-bold uppercase">
+                    {jud.court}
+                  </span>
+                </div>
+                <h3 className="font-extrabold text-slate-800 text-sm font-display leading-snug">
+                  {jud.title}
+                </h3>
+                <p className="text-slate-600 text-xs leading-relaxed bg-white p-3 rounded-xl border border-slate-100 italic">
+                  "{jud.excerpt}"
+                </p>
+              </div>
+
+              <div className="pt-3 border-t border-slate-200/60 flex items-center justify-between">
+                <button
+                  onClick={() => handleCopyQuote(jud.id, `${jud.fileNo}: ${jud.excerpt}`)}
+                  className="px-3.5 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-900 font-bold text-[11px] rounded-lg transition-all flex items-center gap-1.5 border border-amber-300/40 cursor-pointer"
+                >
+                  {copiedId === jud.id ? (
+                    <>
+                      <Check className="w-3.5 h-3.5 text-emerald-600" />
+                      <span className="text-emerald-700">Zkopírováno!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3.5 h-3.5 text-amber-700" />
+                      <span>Kopírovat právní větu</span>
+                    </>
+                  )}
+                </button>
+
+                <button
+                  onClick={() => onNavigate('judikatura')}
+                  className="text-xs text-slate-500 hover:text-slate-800 font-bold flex items-center gap-1 cursor-pointer"
+                >
+                  <span>Detail nálezu</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+
+      </section>
+
+      {/* ========================================================================= */}
+      {/* 🛡️ SEKCE 5: KRIZOVÁ ZÓNA & SOS ROZCESTNÍK (Okamžitá pomoc)              */}
+      {/* ========================================================================= */}
+      <section className="bg-gradient-to-r from-rose-900 via-rose-950 to-slate-950 text-white rounded-3xl p-6 md:p-8 lg:p-10 border border-rose-800/50 shadow-xl space-y-6 relative overflow-hidden" id="section-sos-crisis">
+        
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative z-10">
+          <div className="space-y-3 max-w-2xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-rose-500/20 border border-rose-500/40 text-rose-200 rounded-full text-xs font-extrabold uppercase tracking-wider font-mono">
+              <ShieldAlert className="w-4 h-4 text-rose-400 animate-pulse" />
+              <span>SOS Krizová Zóna</span>
+            </div>
+
+            <h2 className="text-2xl md:text-3xl font-extrabold text-white font-display tracking-tight">
+              Jste v akutní krizové situaci?
+            </h2>
+
+            <p className="text-rose-100/90 text-xs sm:text-sm leading-relaxed">
+              Nezákonné odepření styku, policejní zásah v místě bydliště, účelové udání na OSPOD nebo náhlá izolace od dítěte. Jednejte s chladnou hlavou a podle ověřených krokových protokolu.
+            </p>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto shrink-0">
+            <button
+              onClick={() => onNavigate('crisis')}
+              className="px-6 py-3.5 bg-rose-500 hover:bg-rose-400 text-white font-extrabold text-xs rounded-xl shadow-lg hover:shadow-rose-500/30 transition-all flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <Zap className="w-4 h-4 text-amber-300" />
+              <span>Spustit SOS Průvodce</span>
+            </button>
+
+            <button
+              onClick={() => onNavigate('ke-stazeni')}
+              className="px-5 py-3.5 bg-slate-900/80 hover:bg-slate-800 text-rose-100 border border-rose-700/50 font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <FileSpreadsheet className="w-4 h-4 text-rose-300" />
+              <span>Předběžné opatření (§ 452)</span>
+            </button>
+          </div>
+        </div>
+
+        {/* 3 Quick Action Steps in Emergency */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-rose-800/40 relative z-10">
+          <div className="p-4 bg-slate-900/60 rounded-xl border border-rose-800/30 text-xs space-y-1">
+            <strong className="text-rose-300 font-bold block mb-1">1. Zachovejte klid & Neagresivitu</strong>
+            <p className="text-slate-300 text-[11px] leading-relaxed">
+              Před domem matky neprovádějte žádné násilné vstupy ani verbální konfrontace. Vše nahrávejte na audio/video.
+            </p>
+          </div>
+
+          <div className="p-4 bg-slate-900/60 rounded-xl border border-rose-800/30 text-xs space-y-1">
+            <strong className="text-rose-300 font-bold block mb-1">2. Písemná výzva & Záznam</strong>
+            <p className="text-slate-300 text-[11px] leading-relaxed">
+              Odešlete matce SMS / e-mail s přesnou výzvou k předání dítěte dle dohody nebo rozhodnutí soudu.
+            </p>
+          </div>
+
+          <div className="p-4 bg-slate-900/60 rounded-xl border border-rose-800/30 text-xs space-y-1">
+            <strong className="text-rose-300 font-bold block mb-1">3. Okamžité oznámení OSPOD & Soudu</strong>
+            <p className="text-slate-300 text-[11px] leading-relaxed">
+              Podávejte bezodkladně podnět OSPODu a návrh na předběžné opatření na okresní soud.
+            </p>
+          </div>
+        </div>
+
+      </section>
+
+      {/* ========================================================================= */}
+      {/* 🤝 SEKCE 6: TRANSPARENTNÍ PODPORA A FINANCOVÁNÍ PROJEKTU                 */}
+      {/* ========================================================================= */}
+      <section className="bg-white rounded-3xl border border-slate-200/80 p-6 md:p-8 lg:p-10 shadow-sm space-y-8" id="section-support-transparency">
+        
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-100 pb-6">
+          <div>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-800 rounded-full text-xs font-bold mb-2">
+              <Coins className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Nezávislý komunitní projekt</span>
+            </div>
+            <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 font-display tracking-tight">
+              Transparentní financování a vývoj portálu
+            </h2>
+            <p className="text-slate-500 text-xs sm:text-sm mt-1 max-w-2xl">
+              Vývoj probíhá nezávisle pod záštitou studia <strong>Synthesis Jiřího Šár</strong> bez státních dotací či zájmových dotací.
+            </p>
+          </div>
+
+          <button
+            onClick={() => onNavigate('support')}
+            className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer self-start md:self-auto"
+          >
+            <Heart className="w-4 h-4 text-amber-300 fill-amber-300" />
+            <span>Podpořit chod portálu</span>
+          </button>
+        </div>
+
+        {/* Development & Hosting Overview Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
+            <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center mb-3">
+              <Server className="w-5 h-5" />
+            </div>
+            <h3 className="font-extrabold text-slate-800 text-sm font-display">
+              Cloud Infrastructure & Server
+            </h3>
+            <p className="text-slate-500 text-xs leading-relaxed">
+              Běh AI modelů, Cloud Run kontejnerů, Supabase/Firebase databází a záloh pod dohledem Synthesis OS.
+            </p>
+          </div>
+
+          <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
+            <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center mb-3">
+              <Globe className="w-5 h-5" />
+            </div>
+            <h3 className="font-extrabold text-slate-800 text-sm font-display">
+              Oficiální Doména & Hosting
+            </h3>
+            <p className="text-slate-500 text-xs leading-relaxed">
+              Zabezpečení SSL certifikátů, příprava primární domény <strong className="text-slate-700">tatamapravo.cz</strong> a CDN distribuce.
+            </p>
+          </div>
+
+          <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
+            <div className="w-10 h-10 rounded-xl bg-teal-100 text-teal-800 flex items-center justify-center mb-3">
+              <Users2 className="w-5 h-5" />
+            </div>
+            <h3 className="font-extrabold text-slate-800 text-sm font-display">
+              Komunitní Příspěvky
+            </h3>
+            <p className="text-slate-500 text-xs leading-relaxed">
+              Veškeré finanční příspěvky od tátů směřují 100% na pokrytí API poplatků, právních revizí a provozu serverů.
+            </p>
+          </div>
+        </div>
+
+      </section>
+
+      {/* Partners Recommendation */}
       {partners && partners.filter(p => p.showOnMainPage).length > 0 && (
-        <section className="bg-white rounded-3xl border border-slate-100 p-6 md:p-8 shadow-3xs space-y-6" id="partners-recommendation">
+        <section className="bg-white rounded-3xl border border-slate-200/80 p-6 md:p-8 shadow-sm space-y-6" id="partners-recommendation">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-base">🤝</span>
-                <span className="text-[10px] uppercase font-bold text-teal-600 tracking-wider">Ověřená spolupráce s odborníky</span>
+                <span className="text-[10px] uppercase font-bold text-emerald-700 tracking-wider">Ověřená spolupráce s odborníky</span>
               </div>
-              <h3 className="text-xl font-bold text-slate-800 font-display">Doporučujeme naše partnery</h3>
+              <h3 className="text-xl font-extrabold text-slate-900 font-display">Doporučujeme naše partnery</h3>
               <p className="text-slate-500 text-xs mt-1 max-w-3xl">
-                Věříme ve spolupráci s odborníky, kteří pomáhají rodičům zvládat náročné životní situace. Pokud hledáte individuální podporu, konzultaci nebo právní zastoupení, doporučujeme se obrátit na naše prověřené partnery.
+                Odborníci, advokáti a psychologové, kteří pomáhají rodičům zvládat náročné životní situace s důrazem na zájem dítěte.
               </p>
             </div>
           </div>
@@ -225,12 +664,12 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn, partne
                   key={partner.id} 
                   className={`p-5 rounded-2xl border transition-all flex flex-col justify-between ${
                     partner.isRecommended 
-                      ? 'bg-gradient-to-br from-teal-50/20 to-white border-teal-200 shadow-3xs relative overflow-hidden' 
-                      : 'bg-slate-50/20 border-slate-100 hover:border-slate-200'
+                      ? 'bg-gradient-to-br from-emerald-50/20 to-white border-emerald-200 shadow-2xs relative overflow-hidden' 
+                      : 'bg-slate-50/40 border-slate-200 hover:border-slate-300'
                   }`}
                 >
                   {partner.isRecommended && (
-                    <div className="absolute top-0 right-0 bg-teal-600 text-white text-[9px] font-bold uppercase tracking-wider px-3 py-1 rounded-bl-xl flex items-center gap-1 font-mono">
+                    <div className="absolute top-0 right-0 bg-emerald-700 text-white text-[9px] font-bold uppercase tracking-wider px-3 py-1 rounded-bl-xl flex items-center gap-1 font-mono">
                       <span className="text-amber-300">★</span> DOPORUČUJEME
                     </div>
                   )}
@@ -241,11 +680,11 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn, partne
                         <img 
                           src={partner.logoUrl} 
                           alt={partner.name} 
-                          className="w-11 h-11 rounded-xl object-cover border border-slate-100 shadow-3xs shrink-0"
+                          className="w-11 h-11 rounded-xl object-cover border border-slate-200 shadow-3xs shrink-0"
                           referrerPolicy="no-referrer"
                         />
                       ) : (
-                        <div className="w-11 h-11 rounded-xl bg-teal-50 text-teal-700 border border-teal-100 flex items-center justify-center font-bold text-sm font-display shadow-3xs shrink-0">
+                        <div className="w-11 h-11 rounded-xl bg-emerald-100 text-emerald-800 border border-emerald-200 flex items-center justify-center font-bold text-sm font-display shrink-0">
                           {partner.name.substring(0, 2).toUpperCase()}
                         </div>
                       )}
@@ -268,15 +707,15 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn, partne
                     </p>
                   </div>
 
-                  <div className="pt-4 mt-4 border-t border-slate-100/60 flex items-center justify-between">
+                  <div className="pt-4 mt-4 border-t border-slate-100 flex items-center justify-between">
                     <a 
                       href={partner.link} 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 text-[11px] font-bold text-teal-700 hover:text-teal-800 bg-teal-50 hover:bg-teal-100/50 px-3.5 py-1.5 rounded-lg transition-all cursor-pointer border border-teal-100/30"
+                      className="inline-flex items-center gap-1.5 text-[11px] font-bold text-emerald-800 hover:text-emerald-900 bg-emerald-50 hover:bg-emerald-100 px-3.5 py-1.5 rounded-lg transition-all cursor-pointer border border-emerald-200/50"
                     >
-                      <span>Navštívit Facebook / Web</span>
-                      <span className="text-[10px]">➡</span>
+                      <span>Navštívit web / kontakt</span>
+                      <ExternalLink className="w-3 h-3 text-emerald-700" />
                     </a>
                   </div>
                 </div>
@@ -285,46 +724,17 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn, partne
         </section>
       )}
 
-      {/* Cooperative Coparenting Focus CTA */}
-      <section className="bg-gradient-to-r from-slate-800 via-slate-900 to-teal-950 text-white rounded-3xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden" id="coparenting-cta-banner">
-        <div className="absolute top-0 right-0 w-40 h-40 bg-teal-500 rounded-full blur-3xl opacity-20 -translate-y-10"></div>
-        <div className="space-y-2 max-w-xl">
-          <div className="flex items-center gap-2">
-            <Users2 className="w-5 h-5 text-teal-400" />
-            <h3 className="font-bold text-lg md:text-xl font-display">Společné rodičovství rozchodem nekončí</h3>
-          </div>
-          <p className="text-slate-300 text-xs leading-relaxed">
-            Statistiky dokazují, že děti, jejichž rodiče i po rozvodu spolupracují a respektují se, zažívají podstatně méně úzkostí a v dospělosti vykazují vyšší míru stability. Naším cílem je vybudovat komunitu spolupracujících, odpovědných rodičů.
-          </p>
-        </div>
-        <button
-          id="cta-join-community"
-          onClick={() => isLoggedIn ? onNavigate('forum') : onOpenAuth()}
-          className="px-5 py-2.5 bg-teal-600 hover:bg-teal-500 text-white text-xs font-bold rounded-xl shadow-md transition-all whitespace-nowrap cursor-pointer"
-        >
-          {isLoggedIn ? 'Přejít do diskuse' : 'Založit si účet zdarma'}
-        </button>
-      </section>
-
-      {/* Právní prohlášení, podmínky užívání & vyloučení odpovědnosti */}
-      <section className="bg-amber-50/60 border border-amber-200/60 rounded-3xl p-6 md:p-8 space-y-4" id="legal-disclaimer-home">
-        <div className="flex flex-col md:flex-row items-start gap-4">
-          <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center text-amber-700 shrink-0">
-            <AlertTriangle className="w-5 h-5" />
-          </div>
-          <div className="space-y-3">
+      {/* Právní doložka & Vyloučení odpovědnosti */}
+      <section className="bg-amber-50/80 border border-amber-200/80 rounded-3xl p-6 md:p-8 space-y-3" id="legal-disclaimer-home">
+        <div className="flex items-start gap-3">
+          <AlertTriangle className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
+          <div className="space-y-2 text-xs text-slate-700 leading-relaxed">
             <div className="flex items-center gap-2 flex-wrap">
-              <h3 className="font-bold text-slate-800 font-display text-xs">Upozornění autora, podmínky užívání & vyloučení odpovědnosti</h3>
-              <span className="text-[9px] bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded font-mono uppercase tracking-wider scale-90">Právní doložka</span>
+              <h4 className="font-extrabold text-slate-900 font-display">Právní doložka a podmínky užívání portálu</h4>
+              <span className="text-[9px] bg-amber-200 text-amber-900 font-bold px-2 py-0.5 rounded font-mono uppercase tracking-wider">Upozornění</span>
             </div>
-            <p className="text-slate-600 text-xs leading-relaxed">
-              Tento portál <strong>Táta má právo</strong> stavím jako soukromá osoba na základě svých osobních zkušeností získaných v náročném boji s opatrovnickými úřady, soudy, OSPODem a matkou mého dítěte. K analýzám a preciznímu zpracování textů, vzorů podání i judikatury využívám nejmodernější <strong>nástroje umělé inteligence (AI)</strong> a relevantní odborné, vědecké i judikatorní zdroje (např. konsenzuální zprávy Dr. Warshaka či studie prof. Fabriciuse).
-            </p>
-            <p className="text-slate-600 text-xs leading-relaxed">
-              <strong>Důležité varování: Nejsem právník, advokát, psycholog ani nemám odpovídající formální vzdělání v těchto oborech.</strong> Všechny informace, texty, vzory dokumentů, doporučení, kalkulačky a výpočty na tomto webu mají <strong>výhradně informační a podpůrný charakter</strong> a nepředstavují odbornou právní pomoc, právní poradenství ani závazné posudky.
-            </p>
-            <p className="text-slate-700 text-xs leading-relaxed font-semibold">
-              <strong>Souhlas s podmínkami užívání:</strong> Užíváním tohoto webu berete na vědomí a výslovně souhlasíte s tím, že veškeré materiály a informace používáte na vlastní nebezpečí a je nutné je vždy důkladně kontrolovat a revidovat s ohledem na možné chyby. Jako autor nenesu žádnou odpovědnost za případné věcné či právní chyby, nepřesnosti ani za jakékoliv přímé či nepřímé následky nebo škody vzniklé v důsledku použití informací, vzorů či doporučení z tohoto portálu ve vašem opatrovnickém řízení. Vždy doporučuji konzultovat vaše konkrétní podání s kvalifikovaným advokátem.
+            <p>
+              Tento portál <strong>Táta má právo</strong> slouží výhradně jako nezávislá informační, vzdělávací a komunitní platforma. Všechny uvedené informace, právní věty, rozbory judikatury, vzory podání a doporučení mají podporný charakter a <strong>nenahrazují kvalifikovanou právní pomoc licencovaného advokáta</strong> ani oficiální znalecký posudek.
             </p>
           </div>
         </div>
