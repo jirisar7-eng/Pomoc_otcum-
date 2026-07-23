@@ -89,6 +89,24 @@ export const HUB_JUDGMENTS: HubJudgment[] = [
     excerpt: 'Pouhý iracionální nesouhlas matky nebo otce se střídavou péčí nemůže být důvodem pro její vyloučení. Soudy musí zkoumat motivaci tohoto nesouhlasu.',
     fullAnalysis: 'Pokud jeden z rodičů blokuje dohodu a odmítá střídavou péči pouze z důvodu osobní animozity, finančních motivů (snaha udržet si vysoké výživné) nebo snahy o exkluzivitu, nesmí soudy tomuto vetu ustupovat. Naopak, takové chování může svědčit o snížené výchovné způsobilosti dotčeného rodiče respektovat roli druhého rodiče v životě dítěte.',
     tags: ['nesouhlas rodiče', 'vetování', 'konflikt']
+  },
+  {
+    id: 'jud-4',
+    title: 'Povinnost státu aktivně vynucovat styk a bránit maření péče',
+    court: 'Ústavní soud ČR',
+    fileNo: 'IV. ÚS 1921/17',
+    excerpt: 'Soudy a OSPOD mají povinnost přijmout veškerá dostupná opatření k obnovení a vynucení styku dítěte s druhým rodičem, pokud mu v tom druhý rodič bezdůvodně brání.',
+    fullAnalysis: 'Ústavní soud zdůraznil, že nečinnost soudů nebo orgánů OSPOD při systematickém maření styku jedním z rodičů zakládá porušení práva na rodinný život podle čl. 8 Úmluvy. Orgány veřejné moci nemohou pasivně přihlížet, jak jeden rodič odcizuje dítě, ale musí využít pokuty, předběžná opatření i uložení odborné terapie.',
+    tags: ['maření styku', 'výkon rozhodnutí', 'OSPOD nečinnost', 'článek 8']
+  },
+  {
+    id: 'jud-5',
+    title: 'Odpovědnost ČR za nefunkční výkon rozhodnutí v opatrovnických věcech',
+    court: 'Evropský soud pro lidská práva (ESLP)',
+    fileNo: 'Voleský v. Česká republika (č. 63227/00)',
+    excerpt: 'Česká republika porušila Článek 8 Úmluvy o lidských právech tím, že nedokázala zajistit včasný a účinný výkon rozhodnutí o styku otce s dítětem.',
+    fullAnalysis: 'Průlomové rozhodnutí ESLP konstatovalo, že český stát nenesl dostatečnou odpovědnost za vymáhání práv otce. Nadměrné průtahy v konání soudů a OSPOD vedly k nenapravitelnému odcizení dítěte. ESLP přiznal otci finanční zadostiučinění a uložil ČR povinnost reformovat opatrovnické soudnictví.',
+    tags: ['ESLP', 'lidská práva', 'průtahy', 'odcizení']
   }
 ];
 
@@ -105,11 +123,29 @@ export const HUB_STUDIES: HubStudy[] = [
   {
     id: 'std-2',
     title: 'Infants and Toddlers in Joint Physical Custody: Attachment Security and Sleep Quality',
-    authors: 'Warshak, R. A.',
+    authors: 'Warshak, R. A. & 110 international experts',
     year: 2014,
     excerpt: 'Konsensuální zpráva podpořená 110 předními světovými odborníky na dětský vývoj potvrzuje bezpečnost střídavé péče přes noc u dětí do 4 let.',
     conclusion: 'Studie prokazuje, že přespávání u otce od nejútlejšího věku (včetně kojenců a batolat) nenarušuje vazbu k matce, ale naopak posiluje sekundární bezpečnou vazbu k otci. Děti, které pravidelně trávily noci s oběma rodiči, byly v pozdějším věku sebevědomější, emočně stabilnější a lépe zvládaly zátěžové situace.',
     tags: ['kojenec', 'batole', 'attachment', 'přespávání', 'Warshak']
+  },
+  {
+    id: 'std-3',
+    title: 'Should Infants and Toddlers Have Frequent Overnight Parenting Time With Fathers?',
+    authors: 'Fabricius, W. V., & Suh, G. W. (Arizona State University)',
+    year: 2017,
+    excerpt: 'Longitudinální studie prokazující, že počet nocí strávených u otce do 3 let věku přímo předpovídá kvalitu vztahu s otcem v dospělosti.',
+    conclusion: 'Přespávání dětí u otce od raného věku vytváří pevné pečovatelské návyky a pocit bezpečí. Studie vyvrátila mýtus, že přesnocování u otce poškozuje vazbu k matce – matky naopak profitovaly z času pro odpočinek a seberealizaci.',
+    tags: ['batole', 'přespávání', 'Fabricius', 'dlouhodobý vývoj']
+  },
+  {
+    id: 'std-4',
+    title: 'Fifty Moves a Year: Shared Physical Custody and Children\'s Health in Sweden',
+    authors: 'Bergström, E. et al. (Karolinska Institutet & Stockholm University)',
+    year: 2015,
+    excerpt: 'Celostátní reprezentativní výzkum na vzorku 150 000 dětí ve Švédsku srovnávající zdraví dětí ve střídavé a výhradní péči.',
+    conclusion: 'Děti ve střídavé péči mají významně méně psychosomatických symptomy (bolesti hlavy, břicha, poruchy spánku) než děti žijící pouze s jedním rodičem. Dvě stabilní zázemí s přítomností obou rodičů jsou pro dítě výhodnější než jediné zázemí se ztrátou druhého rodiče.',
+    tags: ['Švédsko', 'Karolinska', 'zdraví dětí', 'střídavá péče']
   }
 ];
 
@@ -134,6 +170,20 @@ export const HUB_TEMPLATES: HubTemplate[] = [
     category: 'complaints',
     desc: 'Formální stížnost vedoucímu odboru sociálních věcí na podjatost, ignorování důkazů nebo genderově stereotypní přístup sociální pracovnice.',
     defaultText: `Městskému úřadu v [CITY]\nVedoucímu odboru sociálně-právní ochrany dětí\n\nStěžovatel: [FATHER_NAME], bytem [FATHER_ADDRESS]\nSpisová značka dítka: [CASE_NUMBER]\n\nSTÍŽNOST NA NEPROFESIONÁLNÍ A PODJATÝ POSTUP SOCIÁLNÍ PRACOVNICE [OFFICER_NAME]\n\nTímto podávám formální stížnost na postup jmenované sociální pracovnice, která vykonává funkci kolizního opatrovníka pro mé nezletilé děti: [CHILDREN_NAMES].\n\nDůvody stížnosti:\n1. Pracovnice vykazuje zjevnou podjatost vůči mé osobě, ignoruje předložené důkazy o mých rodičovských kompetencích a bezvýhradně přejímá neověřená tvrzení matky.\n2. Při domácím šetření jednala nátlakově a činila na děti sugestivní dotazy s cílem získat negativní vyjádření o otci.\n3. Odmítá zařadit mé vyjádření do spisové dokumentace.\n\nŽádám o prověření postupu jmenované pracovnice, zjednání nápravy a případné přidělení spisu jinému nezávislému pracovníkovi OSPOD.\n\nV [CITY] dne [DATE]\n\n........................................\n[FATHER_NAME]`
+  },
+  {
+    id: 'tpl-4',
+    title: 'Návrh na předběžné opatření při svévolném odnětí dítěte ze péče otce',
+    category: 'petitions',
+    desc: 'Rychlý návrh podle § 452 z.ř.s. určený pro krizové situace, kdy druhý rodič bez souhlasu odveze dítě nebo odepře jakýkoliv kontakt.',
+    defaultText: `Okresnímu soudu v [CITY]\n\nNavrhovatel (Otec): [FATHER_NAME], nar. [FATHER_BIRTH], bytem [FATHER_ADDRESS]\nApt. Matka: [MOTHER_NAME], nar. [MOTHER_BIRTH], bytem [MOTHER_ADDRESS]\n\nNezletilé dítě: [CHILD_NAME]\n\nNÁVRH NA VYDÁNÍ PŘEDBĚŽNÉHO OPATŘENÍ PODLE § 452 ZÁKONA O ZVLÁŠTNÍCH SOUDNÍCH ŘÍZENÍCH\n\nI.\nDne [DATE] došlo ke svévolnému odvedení nezletilého [CHILD_NAME] matkou ze společného bydliště. Matka od té doby odmítá sdělit místo pobytu dítěte a zcela zamezuje jakémukoliv osobnímu i telefonickému kontaktu s otcem.\n\nII.\nTímto protiprávním jednáním je vážně ohrožen psychický vývoj dítěte a dochází k násilnému přerušení rodičovské vazby k otci.\n\nProto navrhuji, aby soud bezodkladně vydal toto\n\nPŘEDBĚŽNÉ OPATŘENÍ:\n\nMatce se ukládá povinnost předávat nezletilého [CHILD_NAME] otci ke styku každou středu od 14:00 do 18:00 hod a každý sudý víkend od pátku 16:00 hod do neděle 18:00 hod.\n\nV [CITY] dne [DATE]\n\n........................................\n[FATHER_NAME]`
+  },
+  {
+    id: 'tpl-5',
+    title: 'Podnět Veřejnému ochránci práv (Ombudsmanovi) na postup OSPOD',
+    category: 'complaints',
+    desc: 'Oficiální podnět Kanceláři Veřejného ochránce práv k prověření systémových pochybení a diskriminace otce ze strany Orgánu sociálně-právní ochrany dětí.',
+    defaultText: `Kancelář Veřejného ochránce práv\nÚdolní 39, 602 00 Brno\n\nPodatel (Otec): [FATHER_NAME], bytem [FATHER_ADDRESS]\nDotčený OSPOD: [OSPOD_NAME], Městský úřad [CITY]\nSpisová značka OSPOD: [CASE_NUMBER]\n\nPODNĚT K PROVĚŘENÍ NEZÁKONNÉHO A NEPROFESIONÁLNÍHO POSTUPU OSPOD\n\nVážený pane / vážená paní ombudsmanko,\n\nobracím se na Vás s podnětem k prověření postupu OSPOD [CITY] v opatrovnické věci mého nezletilého syna/dcery [CHILD_NAME].\n\nOSPOD dlouhodobě ignoruje mé stížnosti na maření styku ze strany matky, nepředkládá soudu objektivní zprávy a uplatňuje vůči mé osobě rodové stereotypy. Ačkoliv plním veškeré povinnosti, OSPOD navrhuje omezení mých rodičovských práv bez jakéhokoliv odborného podkladu.\n\nŽádám o nezávislé šetření postupu orgánu sociálně-právní ochrany dětí.\n\nV [CITY] dne [DATE]\n\n........................................\n[FATHER_NAME]`
   }
 ];
 
@@ -153,7 +203,7 @@ Vědecká konsensuální zpráva Dr. Richarda Warshaka (2014) podpořená 110 me
 Soudy jsou povinny zkoumat individuální situaci, nikoliv uplatňovat obecné předsudky o věku dítěte.`,
     lastUpdated: '2026-06-15',
     relatedJudgments: ['jud-2'],
-    relatedStudies: ['std-2'],
+    relatedStudies: ['std-2', 'std-3'],
     relatedTemplates: ['tpl-1'],
     viewCount: 1240,
     wordCount: 185
@@ -193,11 +243,48 @@ Důležitá pravidla:
 - Buďte k pracovnici slušní, ale asertivní. Máte právo na pořízení kopie zápisu z domácího šetření a vyjádření se k němu.
 - Pokud máte podezření na podjatost, podejte písemnou stížnost vedoucímu odboru.`,
     lastUpdated: '2026-05-10',
-    relatedJudgments: ['jud-3'],
+    relatedJudgments: ['jud-3', 'jud-4'],
     relatedStudies: [],
     relatedTemplates: ['tpl-3'],
     viewCount: 1450,
     wordCount: 140
+  },
+  {
+    id: 'art-4',
+    title: 'Stanovení výživného při střídavé péči podle tabulek MSp',
+    category: 'vyzivne',
+    tags: ['výživné', 'střídavá péče', 'kalkulačka', 'Ministerstvo spravedlnosti'],
+    excerpt: 'Kompletní přehled pravidel pro výpočet výživného při střídavé péči podle doporučujících tabulek Ministerstva spravedlnosti ČR.',
+    content: `Při střídavé péči 50/50 neplatí mýtus, že se výživné automaticky nestanovuje. Soud zkoumá příjmy obou rodičů. Pokud má jeden z rodičů výrazně vyšší příjmy, soud může stanovit výživné tak, aby byla zajištěna srovnatelná životní úroveň dítěte v obou domácnostech.
+
+Doporučující tabulky Ministerstva spravedlnosti stanovují procentuální rozmezí z čistého příjmu podle věku dítěte (od 14 % u předškoláků do 20 % u dospívajících) a zohledňují míru péče vyjádřenou počtem dní v měsíci.
+
+Při podávání návrhu doložte své reálné náklady na bydlení, kroužky, ošacení a volnočasové aktivity dítěte.`,
+    lastUpdated: '2026-07-10',
+    relatedJudgments: ['jud-1'],
+    relatedStudies: ['std-1', 'std-4'],
+    relatedTemplates: ['tpl-1'],
+    viewCount: 1820,
+    wordCount: 165
+  },
+  {
+    id: 'art-5',
+    title: 'Výkon rozhodnutí a pokuty při maření styku',
+    category: 'soudni-rizeni',
+    tags: ['maření styku', 'exekuce péče', 'pokuta', 'předběžné opatření'],
+    excerpt: 'Jak postupovat, pokud druhý rodič odmítá předávat dítě podle rozsudku nebo schválené dohody. Přehled právních kroků.',
+    content: `Maření styku s dítětem je hrubým porušením rozsudku soudu a práv nezletilého. Pokud matka či otec opakovaně nekomunikuje a nepředává dítě:
+
+1. Vyžadujte písemné potvrzení nebo záznam o neuskutečněném předání (SMS, e-mail, svědectví OSPOD).
+2. Podejte u opatrovnického soudu návrh na výkon rozhodnutí uložením pokuty až do výše 50 000 Kč (opakovaně).
+3. Požadujte nařízení náhradního styku za zmařené termíny.
+4. V případě dlouhodobého maření navrhněte změnu výchovného prostředí (předání dítěte do vaší péče).`,
+    lastUpdated: '2026-07-15',
+    relatedJudgments: ['jud-4', 'jud-5'],
+    relatedStudies: ['std-1'],
+    relatedTemplates: ['tpl-4'],
+    viewCount: 2100,
+    wordCount: 170
   }
 ];
 
@@ -222,6 +309,20 @@ export const HUB_GLOSSARY: HubTerm[] = [
     definition: 'Psychologický stav, kdy dítě systematickým působením jednoho rodiče (programováním) začne bezdůvodně odmítat a nenávidět druhého rodiče, ke kterému mělo dříve vřelý vztah. Jde o závažnou formu psychického týrání dítěte.',
     tags: ['syndrom odcizení', 'psychologie', 'manipulace'],
     relatedArticles: ['art-2']
+  },
+  {
+    id: 'term-4',
+    term: 'Paralelní rodičovství (Parallel Parenting)',
+    definition: 'Model péče určený pro rodiče v trvalém vysokém konfliktu. Oba rodiče se nezávisle starají o dítě v době svého intervalu bez nutnosti přímého osobního kontaktu či přátelské dohody, čímž je dítě chráněno před sporem.',
+    tags: ['paralelní rodičovství', 'konflikt', 'co-parenting'],
+    relatedArticles: ['art-2']
+  },
+  {
+    id: 'term-5',
+    term: 'Výkon rozhodnutí (§ 501 z.ř.s.)',
+    definition: 'Právní proces vymáhání splnění povinností stanovených v rozsudku (např. předání dítěte ke styku nebo střídavé péči), a to prostřednictvím výzev, uložených pokut nebo v krajním případě odnětím dítěte.',
+    tags: ['výkon rozhodnutí', 'exekuce', 'pokuta'],
+    relatedArticles: ['art-5']
   }
 ];
 
@@ -237,6 +338,18 @@ export const HUB_FAQS: HubFaq[] = [
     question: 'Jaké jsou optimální střídavé intervaly pro dvouleté dítě?',
     answer: 'U batolat se doporučují kratší asymetrické nebo symetrické intervaly (např. 2-2-3 dny), aby dítě nebylo bez kontaktu s žádným z rodičů příliš dlouho. Klasický týdenní cyklus (7 a 7 dní) je vhodný až od cca 4-5 let věku.',
     tags: ['batole', 'střídání', 'věk dětí']
+  },
+  {
+    id: 'faq-3',
+    question: 'Co dělat, když matka opakovaně bez omluvy nepředá dítě ke styku?',
+    answer: 'Každé zmařené předání si okamžitě zdokumentujte (SMS zprávy, výpis hovorů, případně vyjádření svědka/OSPOD). Podejte soudu návrh na výkon rozhodnutí s uložením pokuty a požádejte o určení náhradního termínu styku.',
+    tags: ['maření styku', 'pokuta', 'náhradní styk']
+  },
+  {
+    id: 'faq-4',
+    question: 'Jak postupovat, pokud je sociální pracovnice OSPOD podjatá?',
+    answer: 'Podejte písemnou námitku podjatosti a stížnost vedoucímu odboru sociálních věcí příslušného městského úřadu. Všech jednání se zúčastňujte s jasnou přípravou a požadujte zapsání svých stanovisek do spisu.',
+    tags: ['OSPOD', 'podjatost', 'stížnost']
   }
 ];
 
