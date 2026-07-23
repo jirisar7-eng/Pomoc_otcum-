@@ -45,6 +45,11 @@ export interface HubStudy {
   excerpt: string;
   conclusion: string;
   tags: string[];
+  publisher?: string;
+  categoryType?: 'international' | 'domestic' | 'criticism';
+  keyContribution?: string;
+  courtArgumentation?: string;
+  opponentsAnalysis?: string;
 }
 
 export interface HubTemplate {
@@ -310,49 +315,96 @@ export const HUB_JUDGMENTS: HubJudgment[] = [
 
 export const HUB_STUDIES: HubStudy[] = [
   {
-    id: 'std-1',
+    id: 'std-fabricius-2017',
+    title: 'Should infants and toddlers have frequent overnight parenting time with fathers?',
+    authors: 'Fabricius, W. V., & Suh, G. W. (Arizona State University)',
+    year: 2017,
+    publisher: 'Psychology, Public Policy, and Law (American Psychological Association)',
+    categoryType: 'international',
+    excerpt: 'Longitudinální studie prokazující dlouhodobé výhody přespávání dětí do 2-3 let u otců pro jejich budoucí dospělé vztahy s oběma rodiči.',
+    keyContribution: 'Dlouhodobé výhody přespávání dětí do 2 let u otců pro jejich budoucí dospělé vztahy s oběma rodiči.',
+    conclusion: 'Přespávání dětí u otce od raného věku vytváří pevné pečovatelské návyky a pocit bezpečí. Počet nocí strávených u otce do 3 let věku přímou úměrou předpovídá kvalitu a hloubku vztahu s otcem v dospělosti, aniž by jakkoliv poškodil vztah k matce.',
+    courtArgumentation: 'Ze studie Fabricius & Suh (2017) vyplývá, že přespávání dítěte u otce v raném věku je nezbytnou podmínkou pro vytvoření celoživotního kvalitního vztahu s otcem, bez jakýchkoliv negativních dopadů na vztah k matce.',
+    tags: ['batole', 'přespávání', 'Fabricius', 'noční péče', 'vazba', 'dlouhodobý vývoj']
+  },
+  {
+    id: 'std-warshak-2014',
+    title: 'Social science and parenting plans for young children: A consensus report (APA)',
+    authors: 'Warshak, R. A. & 110 mezinárodních vědeckých expertů',
+    year: 2014,
+    publisher: 'Psychology, Public Policy, and Law (American Psychological Association)',
+    categoryType: 'international',
+    excerpt: 'Konsenzuální zpráva 110 předních světových odborníků odmítající paušální zákazy nocování u otců u malých dětí.',
+    keyContribution: 'Konsenzuální zpráva 110 odborníků odmítající paušální zákazy nocování u otců u malých dětí.',
+    conclusion: 'Studie prokazuje, že přespávání u otce od nejútlejšího věku (včetně kojenců a batolat) nenarušuje vazbu k matce, ale naopak posiluje sekundární bezpečnou vazbu k otci. Nulové přespávání v batolecím věku vede k trvalému oslabení otcovského vztahu.',
+    courtArgumentation: 'Podle mezinárodního konsenzu 110 expertů publikovaného APA (Warshak 2014) nemá paušální odkládání nocování u otce žádnou vědeckou oporu a vážně ohrožuje přirozený vývoj nezletilého.',
+    tags: ['Warshak', 'APA', 'konsenzus', 'kojenec', 'noční péče', 'attachment']
+  },
+  {
+    id: 'std-bauserman-2002',
+    title: 'Child adjustment in joint-custody versus sole-custody arrangements: A meta-analytic review',
+    authors: 'Bauserman, R. (Maryland Dept of Health / APA)',
+    year: 2002,
+    publisher: 'Journal of Family Psychology (American Psychological Association)',
+    categoryType: 'international',
+    excerpt: 'Metaanalýza 33 studií srovnávající přes 4 400 dětí. Děti v uspořádání se sdíleným ubytováním vykazují lepší psychické přizpůsobení.',
+    keyContribution: 'Děti v uspořádání se sdíleným ubytováním vykazují lepší psychické přizpůsobení než děti ve výhradní péči.',
+    conclusion: 'Děti ve společné a střídavé péči vykazují vyšší psychickou pohodu, lepší školní výsledky a méně poruch chování než děti ve výhradní péči jednoho rodiče, a to i když byla střídavá péče soudně nařízena.',
+    courtArgumentation: 'Metaanalýza Dr. Roberta Bausermana (2002) publikovaná v Journal of Family Psychology (APA) na vzorku přes 4 400 dětí dokazuje, že děti ve společné a střídavé péči vykazují lepší psychické přizpůsobení než ve výhradní péči.',
+    tags: ['Bauserman', 'metaanalýza', 'střídavá péče', 'psychické zdraví', 'APA']
+  },
+  {
+    id: 'std-fucik-2018',
+    title: 'Střídavá péče v České republice (Sociologický výzkum od r. 2018)',
+    authors: 'Doc. PhDr. Přemysl Fučík, Ph.D. (FSS Masarykova univerzita)',
+    year: 2018,
+    publisher: 'Fakulta sociálních studií Masarykovy univerzity v Brně',
+    categoryType: 'domestic',
+    excerpt: 'Rozsáhlý tuzemský sociologický výzkum střídavé péče v podmínkách českého soudnictví a rodinného života.',
+    keyContribution: 'Tuzemská data ukazují, že sdílená péče dětem strukturálně neškodí při minimalizaci konfliktu.',
+    conclusion: 'Výzkum potvrzuje, že české děti ve střídavé péči prospívají srovnatelně nebo lépe než ve výhradní péči matky. Klíčem je podpora fungujících rodičovských rituálů a stabilního prostředí.',
+    courtArgumentation: 'Tuzemský empirický výzkum doc. Přemysla Fučíka (FSS MU) dokazuje, že střídavá péče v českém prostředí dětem neškodí a přináší jim dlouhodobé socio-emocionální výhody.',
+    tags: ['Fučík', 'FSS MU', 'Česká republika', 'sociologický výzkum', 'střídavá péče']
+  },
+  {
+    id: 'std-lom-vupsv',
+    title: 'Trendy v otcovství v ČR – Zapojení českých mužů do péče',
+    authors: 'Liga otevřených mužů (LOM) & VÚPSV (Výzkumný ústav práce a sociálních věcí)',
+    year: 2022,
+    publisher: 'VÚPSV / Liga otevřených mužů',
+    categoryType: 'domestic',
+    excerpt: 'Reprezentativní sociologický výzkum zapojení českých otců do každodenní i noční péče o děti.',
+    keyContribution: 'Reprezentativní data o zapojení českých mužů do noční péče a rituálů s dětmi.',
+    conclusion: 'Moderní čestí otcové aktivně přebírají pečovatelské kompetence a podílejí se na noční péči, krmení i ukládání. Tvrzení o tradiční neschopnosti otců pečovat o malé děti neodpovídá realitě českých rodin.',
+    courtArgumentation: 'Data z reprezentativního výzkumu LOM a VÚPSV ukazují, že česká společnost a otcové jsou plně kompetentní a aktivně zapojeni do noční i denní péče o děti od nejranějšího věku.',
+    tags: ['LOM', 'VÚPSV', 'otcovství', 'trendy', 'ČR', 'noční péče']
+  },
+  {
+    id: 'std-mcintosh-2010',
+    title: 'Post-separation parenting arrangements and developmental outcomes (Australian Government)',
+    authors: 'McIntosh, J. E., Smyth, B., Kelaher, M., Yule, N., & Long, E.',
+    year: 2010,
+    publisher: 'Australian Government Department of Families, Housing, Community Services',
+    categoryType: 'criticism',
+    excerpt: 'Australská studie z roku 2010 varující před nocováním dětí u otců, jejíž metodologie na vysoce rizikovém vzorku byla celosvětově vyvrácena.',
+    keyContribution: 'Původní studie varující před nocováním, jejíž metodologie na vysoce rizikovém vzorku byla vyvrácena (Warshak 2014, Fabricius & Suh 2017).',
+    conclusion: 'Metodicky vadná studie zkoumající nereprezentativní vzorek 14-30 dětí z prostředí domácího násilí a závislostí. Byla celosvětovou vědeckou komunitou (APA Consensus Report) podrobena drtivé kritice a vyvrácena.',
+    courtArgumentation: 'Pokud OSPOD nebo matka argumentuje studií McIntosh et al. (2010), upozorňuji soud, že tato studie byla celosvětovou vědeckou komunitou (APA, Warshak 2014) vyvrácena pro hrubé metodické chyby a selection bias.',
+    opponentsAnalysis: 'Výběrové zkreslení (selection bias) na patologických rodinách se závislostmi a nevalidované dotazníky bez kontroly sociodemografických proměnných.',
+    tags: ['McIntosh', 'kritika studií', 'metodická chyba', 'demontáž', 'nocování']
+  },
+  {
+    id: 'std-nielsen-2018',
     title: 'Social and Academic Development in Joint Physical Custody vs. Sole Custody',
     authors: 'Dr. Linda Nielsen, Wake Forest University',
     year: 2018,
+    publisher: 'American Psychological Association (APA)',
+    categoryType: 'international',
     excerpt: 'Meta-analýza 60 vědeckých studií prokazuje, že děti ve střídavé péči dosahují lepších výsledků v oblasti psychického zdraví, chování a školních výsledků než děti ve výhradní péči.',
-    conclusion: 'Děti žijící v uspořádání střídavé péče (kde s každým rodičem tráví alespoň 35 % času) vykazují méně psychosomatických potíží, nižší míru úzkostí a depresí a zdravější sociální vazby. Výsledky platí i pro rodiny s přetrvávajícím vysokým stupněm rodičovského konfliktu, což vyvrací mýtus, že pro střídavou péči je nutná bezchybná komunikace rodičů.',
+    keyContribution: 'Metaanalýza 60 studií prokazující vyšší úroveň psychické pohody dětí ve střídavé péči.',
+    conclusion: 'Děti žijící v uspořádání střídavé péče vykazují méně psychosomatických potíží a zdravější sociální vazby, i při přetrvávajícím rodičovském konfliktu.',
+    courtArgumentation: 'Z doložené meta-analýzy Dr. Lindy Nielsen (2018) vyplývá, že střídavá péče je pro vývoj dítěte nejvhodnějším uspořádáním.',
     tags: ['psychologie', 'výzkum', 'Linda Nielsen', 'psychické zdraví']
-  },
-  {
-    id: 'std-2',
-    title: 'Infants and Toddlers in Joint Physical Custody: Attachment Security and Sleep Quality',
-    authors: 'Warshak, R. A. & 110 international experts',
-    year: 2014,
-    excerpt: 'Konsensuální zpráva podpořená 110 předními světovými odborníky na dětský vývoj potvrzuje bezpečnost střídavé péče přes noc u dětí do 4 let.',
-    conclusion: 'Studie prokazuje, že přespávání u otce od nejútlejšího věku (včetně kojenců a batolat) nenarušuje vazbu k matce, ale naopak posiluje sekundární bezpečnou vazbu k otci. Děti, které pravidelně trávily noci s oběma rodiči, byly v pozdějším věku sebevědomější, emočně stabilnější a lépe zvládaly zátěžové situace.',
-    tags: ['kojenec', 'batole', 'attachment', 'přespávání', 'Warshak']
-  },
-  {
-    id: 'std-3',
-    title: 'Should Infants and Toddlers Have Frequent Overnight Parenting Time With Fathers?',
-    authors: 'Fabricius, W. V., & Suh, G. W. (Arizona State University)',
-    year: 2017,
-    excerpt: 'Longitudinální studie prokazující, že počet nocí strávených u otce do 3 let věku přímo předpovídá kvalitu vztahu s otcem v dospělosti.',
-    conclusion: 'Přespávání dětí u otce od raného věku vytváří pevné pečovatelské návyky a pocit bezpečí. Studie vyvrátila mýtus, že přesnocování u otce poškozuje vazbu k matce – matky naopak profitovaly z času pro odpočinek a seberealizaci.',
-    tags: ['batole', 'přespávání', 'Fabricius', 'dlouhodobý vývoj']
-  },
-  {
-    id: 'std-4',
-    title: 'Fifty moves a year: Is shared physical custody in young children associated with better or worse mental health?',
-    authors: 'Bergström, M., Fransson, E., et al. (Stockholm University)',
-    year: 2021,
-    excerpt: 'Rozsáhlá švédská národní studie sledovala tisíce dětí ve střídavé péči a potvrdila, že střídání domovů nezpůsobuje žádný zvýšený stres ani poruchy spánku.',
-    conclusion: 'Švédský výzkumný tým potvrdil, že děti předškolního a mladšího školního věku ve střídavé péči (joint physical custody) mají srovnatelnou nebo lepší úroveň psychosociálního zdraví než děti ve výhradní péči matky. Obava z "neustálého stěhování a kufrů" se ukázala jako sociální mýtus bez empirického podkladu.',
-    tags: ['Švédsko', 'střídavá péče', 'stres', 'duševní zdraví', 'Bergström']
-  },
-  {
-    id: 'std-5',
-    title: 'Fifty Moves a Year: Shared Physical Custody and Children\'s Health in Sweden',
-    authors: 'Bergström, E. et al. (Karolinska Institutet & Stockholm University)',
-    year: 2015,
-    excerpt: 'Celostátní reprezentativní výzkum na vzorku 150 000 dětí ve Švédsku srovnávající zdraví dětí ve střídavé a výhradní péči.',
-    conclusion: 'Děti ve střídavé péči mají významně méně psychosomatických symptomy (bolesti hlavy, břicha, poruchy spánku) než děti žijící pouze s jedním rodičem. Dvě stabilní zázemí s přítomností obou rodičů jsou pro dítě výhodnější než jediné zázemí se ztrátou druhého rodiče.',
-    tags: ['Švédsko', 'Karolinska', 'zdraví dětí', 'střídavá péče']
   }
 ];
 
