@@ -10,7 +10,7 @@ import {
   Video, HelpCircle, ChevronRight, CornerDownRight, Landmark, Info, ExternalLink
 } from 'lucide-react';
 import { 
-  HUB_GLOSSARY as HUB_GLOSSARY_RAW, HUB_ARTICLES as HUB_ARTICLES_RAW, HUB_JUDGMENTS as HUB_JUDGMENTS_RAW, HUB_STUDIES as HUB_STUDIES_RAW, HUB_TEMPLATES as HUB_TEMPLATES_RAW, HUB_FAQS as HUB_FAQS_RAW, HubTerm 
+  HUB_GLOSSARY as HUB_GLOSSARY_RAW, HUB_ARTICLES as HUB_ARTICLES_RAW, HUB_JUDGMENTS as HUB_JUDGMENTS_RAW, HUB_STUDIES as HUB_STUDIES_RAW, HUB_TEMPLATES as HUB_TEMPLATES_RAW, HUB_FAQS as HUB_FAQS_RAW, HUB_CATEGORIES, HubTerm 
 } from '../data/contentHub';
 import { useLanguage } from '../lib/LanguageContext';
 import { getTranslatedObject } from '../data/dynamicTranslations';
@@ -402,6 +402,46 @@ export default function LegalWiki() {
 
         </div>
 
+      </div>
+
+      {/* SECTION: 21 TAXONOMY CATEGORIES OVERVIEW */}
+      <div className="bg-slate-900 text-white rounded-3xl p-6 md:p-8 space-y-6 border border-slate-800 shadow-xl">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-800 pb-4">
+          <div>
+            <span className="px-2.5 py-1 bg-indigo-500/20 text-indigo-400 font-mono font-bold text-[10px] uppercase rounded-md">
+              Master Taxonomie (21 Odborných Okruhů)
+            </span>
+            <h3 className="text-lg md:text-xl font-black font-display mt-1">
+              Kompletní mapa znalostního systému Táta má právo
+            </h3>
+            <p className="text-xs text-slate-400 mt-0.5">
+              Přehled všech 21 tematických kategorií pokrývajících právní, psychologickou, procesní a společenskou agendu opatrovnictví.
+            </p>
+          </div>
+          <span className="px-3 py-1.5 bg-indigo-600 text-white font-mono font-extrabold text-xs rounded-xl shrink-0">
+            21 Aktivních okruhů
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {HUB_CATEGORIES.map(cat => (
+            <div key={cat.id} className="p-4 bg-slate-800/80 hover:bg-slate-800 border border-slate-700/60 rounded-2xl space-y-2 transition-all group">
+              <div className="flex items-center gap-2.5">
+                <span className="text-2xl group-hover:scale-110 transition-transform">{cat.icon}</span>
+                <h4 className="font-extrabold text-xs text-white group-hover:text-indigo-400 transition-colors">
+                  {cat.name}
+                </h4>
+              </div>
+              <p className="text-[11px] text-slate-400 leading-relaxed font-sans">
+                {cat.description}
+              </p>
+              <div className="pt-1 flex items-center justify-between text-[10px] font-mono text-indigo-400 font-bold">
+                <span>Slug: #{cat.slug}</span>
+                <span className="text-slate-500">Aktivní databáze</span>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
     </div>

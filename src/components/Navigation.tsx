@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   Search, 
   Menu, 
@@ -30,12 +30,14 @@ import {
   Settings,
   ShieldAlert,
   Database,
-  FolderCheck
+  FolderCheck,
+  Layers
 } from 'lucide-react';
 import { User } from '../types';
 import { useLanguage } from '../lib/LanguageContext';
 import UniversalSearchInput from './UniversalSearchInput';
 import NotificationCenter from './NotificationCenter';
+import { HUB_CATEGORIES } from '../data/contentHub';
 import { 
   PUBLIC_TOPBAR_ITEMS, 
   LOGGED_IN_SECTIONS, 
@@ -43,6 +45,30 @@ import {
   NavItem,
   NavSection
 } from '../data/navigationData';
+
+const CATEGORY_TAB_MAP: Record<string, { tab: string; search: string }> = {
+  'pravni-rad': { tab: 'legal-wiki', search: 'Právní řád' },
+  'judikatura': { tab: 'judikatura', search: 'Judikatura' },
+  'stridava-pece': { tab: 'pece-o-dite', search: 'Střídavá péče' },
+  'nocni-pece': { tab: 'knihovna-studii', search: 'Noční péče' },
+  'psychologie-attachment': { tab: 'knihovna-studii', search: 'Attachment' },
+  'rodicovska-alienace': { tab: 'news', search: 'Rodičovská alienace' },
+  'jednani-ospod': { tab: 'ospod', search: 'OSPOD' },
+  'vzory-podani': { tab: 'ke-stazeni', search: 'Vzory' },
+  'vyzivne-majetek': { tab: 'vyzivne', search: 'Výživné' },
+  'zdravi-vyvoj': { tab: 'pece-o-dite', search: 'Zdraví' },
+  'vzdelavani-cas': { tab: 'news', search: 'Vzdělávání' },
+  'komunikace-rodice': { tab: 'coparent-hub', search: 'Komunikace' },
+  'krizova-pomoc': { tab: 'crisis', search: 'Krizová pomoc' },
+  'falesna-obvineni': { tab: 'news', search: 'Falešná obvinění' },
+  'mezinarodni-pravo': { tab: 'soudni-rizeni', search: 'Mezinárodní' },
+  'sirsi-rodina': { tab: 'news', search: 'Prarodiče' },
+  'znalecke-posudky': { tab: 'soudni-rizeni', search: 'Znalecké posudky' },
+  'kritika-studii': { tab: 'knihovna-studii', search: 'Kritika' },
+  'technologie-ai': { tab: 'ai-assistant', search: 'AI' },
+  'komunita-zkusenosti': { tab: 'forum', search: 'Diskuze' },
+  'statistiky-vyzkumy': { tab: 'knihovna-studii', search: 'Statistiky' }
+};
 
 interface NavigationProps {
   activeTab: string;
@@ -65,8 +91,18 @@ export default function Navigation({
 }: NavigationProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
-  // Default all accordions in mobile menu to CLOSED
-  const [mobileExpandedSection, setMobileExpandedSection] = useState<string | null>(null);
+  const [categoryFilter, setCategoryFilter] = useState('');
+  const [topicsAccordionOpen, setTopicsAccordionOpen] = useState(true);
+
+  const filteredCategories = useMemo(() => {
+    if (!categoryFilter.trim()) return HUB_CATEGORIES;
+    const q = categoryFilter.toLowerCase();
+    return HUB_CATEGORIES.filter(c => 
+      c.name.toLowerCase().includes(q) || 
+      c.description.toLowerCase().includes(q) || 
+      c.slug.toLowerCase().includes(q)
+    );
+  }, [categoryFilter]);
 
   const { t, language } = useLanguage();
 
@@ -78,6 +114,12 @@ export default function Navigation({
     setOpenDropdown(null);
     setMobileMenuOpen(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleCategoryClick = (categorySlug: string, categoryName: string) => {
+    const target = CATEGORY_TAB_MAP[categorySlug] || { tab: 'legal-wiki', search: categoryName };
+    setSearchQuery(target.search);
+    handleTabClick(target.tab);
   };
 
   // Close dropdown on click outside
@@ -141,7 +183,7 @@ export default function Navigation({
 
             {/* Desktop Navigation Topbar */}
             <nav className="hidden xl:flex items-center justify-center gap-1 max-w-[50%] py-1">
-              {PUBLIC_TOPBAR_ITEMS.slice(0, 6).map((item) => {
+              {PUBLIC_TOPBAR_ITEMS.slice(0, 5).map((item) => {
                 const ItemIcon = item.icon;
                 const isActive = activeTab === item.id;
                 return (
@@ -160,6 +202,86 @@ export default function Navigation({
                   </button>
                 );
               })}
+
+              {/* 21 Categories Mega-Dropdown */}
+              <div 
+                className="relative"
+                onMouseEnter={() => setOpenDropdown('categories')}
+                onMouseLeave={() => setOpenDropdown(null)}
+              >
+                <button
+                  onClick={() => setOpenDropdown(openDropdown === 'categories' ? null : 'categories')}
+                  className={`flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all border cursor-pointer ${
+                    openDropdown === 'categories'
+                      ? 'bg-indigo-50 border-indigo-200 text-indigo-900 shadow-3xs'
+                      : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100 hover:text-slate-900'
+                  }`}
+                  title="21 Odborných témat a kategorií"
+                >
+                  <Layers className="w-3.5 h-3.5 text-indigo-600" />
+                  <span>Kategorie</span>
+                  <span className="px-1.5 py-0.2 bg-indigo-100 text-indigo-800 text-[10px] font-mono font-extrabold rounded-full">
+                    21
+                  </span>
+                  <ChevronDown className="w-3 h-3 text-slate-400" />
+                </button>
+
+                {openDropdown === 'categories' && (
+                  <div className="absolute left-1/2 -translate-x-1/2 mt-1 w-[740px] bg-white border border-indigo-200 rounded-3xl shadow-2xl p-4 z-50 animate-in fade-in duration-150">
+                    <div className="flex items-center justify-between border-b border-slate-100 pb-2.5 mb-3 gap-3">
+                      <div className="flex items-center gap-2 shrink-0">
+                        <Layers className="w-4 h-4 text-indigo-600" />
+                        <span className="text-xs font-extrabold text-slate-900 font-display uppercase tracking-wider">
+                          Kategorie (21)
+                        </span>
+                      </div>
+                      <div className="relative flex-1 max-w-xs">
+                        <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
+                        <input 
+                          type="text"
+                          placeholder="Hledat v kategoriích..."
+                          value={categoryFilter}
+                          onChange={(e) => setCategoryFilter(e.target.value)}
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-8 pr-6 py-1 text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:border-indigo-500"
+                        />
+                        {categoryFilter && (
+                          <button 
+                            onClick={() => setCategoryFilter('')}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs font-bold"
+                          >
+                            ✕
+                          </button>
+                        )}
+                      </div>
+                      <span className="text-[10px] font-mono font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded-lg shrink-0">
+                        {filteredCategories.length} témata
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-1.5 max-h-[360px] overflow-y-auto pr-1">
+                      {filteredCategories.map((cat) => (
+                        <button
+                          key={cat.id}
+                          onClick={() => handleCategoryClick(cat.slug, cat.name)}
+                          className="flex items-center gap-2 p-2 rounded-xl text-left hover:bg-indigo-50/80 border border-transparent hover:border-indigo-100 transition-all cursor-pointer group"
+                        >
+                          <span className="text-lg shrink-0 group-hover:scale-110 transition-transform">{cat.icon}</span>
+                          <div className="min-w-0">
+                            <span className="text-xs font-bold text-slate-800 group-hover:text-indigo-900 block truncate leading-tight">
+                              {cat.name}
+                            </span>
+                          </div>
+                        </button>
+                      ))}
+                      {filteredCategories.length === 0 && (
+                        <div className="col-span-3 text-center py-6 text-xs text-slate-400 font-mono">
+                          Žádná kategorie neodpovídá výrazu "{categoryFilter}"
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
 
               {/* Private Zone Dropdown (for Logged In users) */}
               {isLoggedIn && (
@@ -320,176 +442,377 @@ export default function Navigation({
           </div>
         </div>
 
-        {/* Mobile Accordion Drawer (All accordions default CLOSED) */}
+        {/* Ultimate 4-Pillar Mobile Navigation Drawer v6.0 */}
         {mobileMenuOpen && (
-          <div className="xl:hidden border-t border-slate-100 bg-white shadow-2xl py-4 px-4 space-y-4 max-h-[85vh] overflow-y-auto">
-            
-            {/* Universal Search in Mobile */}
-            <UniversalSearchInput 
-              searchQuery={searchQuery}
-              setSearchQuery={setSearchQuery}
-              onNavigate={handleTabClick}
-            />
-
-            {/* Home Direct Button */}
-            <button
-              onClick={() => handleTabClick('home')}
-              className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-2xl text-xs font-bold transition-all ${
-                activeTab === 'home' ? 'bg-teal-50 text-teal-900 border-l-4 border-teal-600' : 'text-slate-700 hover:bg-slate-50'
-              }`}
-            >
-              <Home className="w-4 h-4 text-slate-400" />
-              <span>Domů</span>
-            </button>
-
-            {/* 1. Public Topbar Items */}
-            <div className="space-y-1">
-              <div className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider px-2 py-1">
-                Veřejný Portál
-              </div>
-              <div className="grid grid-cols-2 gap-1.5">
-                {PUBLIC_TOPBAR_ITEMS.map((item) => {
-                  const ItemIcon = item.icon;
-                  const isActive = activeTab === item.id;
-                  return (
-                    <button
-                      key={item.id}
-                      onClick={() => handleTabClick(item.id)}
-                      className={`flex items-center gap-2 p-2 rounded-xl text-xs font-bold text-left transition-all ${
-                        isActive ? 'bg-teal-50 text-teal-900 border border-teal-200' : 'bg-slate-50 text-slate-700 hover:bg-slate-100'
-                      }`}
-                    >
-                      <ItemIcon className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-teal-600' : 'text-slate-400'}`} />
-                      <span className="truncate">{item.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* 2. Logged In Private Sections (Accordions closed by default) */}
-            {isLoggedIn && (
-              <div className="space-y-2 border-t border-slate-100 pt-3">
-                <div className="text-[10px] font-mono font-bold text-teal-700 uppercase tracking-wider px-2">
-                  🔒 Soukromá Zóna
-                </div>
-
-                {LOGGED_IN_SECTIONS.map((sec) => {
-                  const isExpanded = mobileExpandedSection === sec.id;
-                  return (
-                    <div key={sec.id} className="border border-teal-100 rounded-2xl overflow-hidden bg-teal-50/20">
-                      <button
-                        onClick={() => setMobileExpandedSection(isExpanded ? null : sec.id)}
-                        className="w-full flex items-center justify-between px-3.5 py-2.5 text-xs font-extrabold text-teal-950 transition-colors cursor-pointer"
-                      >
-                        <div className="flex items-center gap-2">
-                          <Sparkles className="w-4 h-4 text-teal-600 animate-pulse" />
-                          <span>{sec.title}</span>
-                        </div>
-                        {isExpanded ? <ChevronDown className="w-4 h-4 text-teal-600" /> : <ChevronRight className="w-4 h-4 text-slate-400" />}
-                      </button>
-
-                      {isExpanded && (
-                        <div className="p-2 bg-white space-y-1 divide-y divide-slate-50 border-t border-teal-100">
-                          {sec.items.map((item) => {
-                            const ItemIcon = item.icon;
-                            const isSubActive = activeTab === item.id;
-                            return (
-                              <button
-                                key={item.id}
-                                onClick={() => handleTabClick(item.id)}
-                                className={`w-full flex items-start gap-2.5 p-2 rounded-xl text-left transition-colors cursor-pointer ${
-                                  isSubActive ? 'bg-teal-50 text-teal-950 font-bold' : 'text-slate-700 hover:bg-slate-50'
-                                }`}
-                              >
-                                <ItemIcon className={`w-4 h-4 shrink-0 mt-0.5 ${isSubActive ? 'text-teal-600' : 'text-slate-400'}`} />
-                                <div>
-                                  <span className="text-xs font-bold block">{item.label}</span>
-                                  <span className="text-[10px] text-slate-400 block">{item.desc}</span>
-                                </div>
-                              </button>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-
-            {/* 3. Admin Section on Mobile */}
-            {isAdmin && (
-              <div className="border border-indigo-200 rounded-2xl p-2.5 bg-indigo-50/40 space-y-1">
-                <div className="text-[10px] font-mono font-bold text-indigo-700 uppercase tracking-wider px-1">
-                  👑 Administrace
-                </div>
+          <div className="xl:hidden fixed inset-x-0 top-[115px] sm:top-[105px] bottom-0 z-50 bg-slate-900/50 backdrop-blur-xs flex flex-col justify-end">
+            <div className="bg-white w-full h-full flex flex-col shadow-2xl animate-in slide-in-from-bottom duration-200 overflow-hidden">
+              
+              {/* FIXED TOP HEADER: Instant Global Search + Close Button */}
+              <div className="p-3 bg-slate-50/90 border-b border-slate-200/80 shrink-0 flex items-center justify-between gap-2.5">
+                <UniversalSearchInput 
+                  searchQuery={searchQuery}
+                  setSearchQuery={setSearchQuery}
+                  onNavigate={handleTabClick}
+                  className="flex-1"
+                />
                 <button
-                  onClick={() => handleTabClick('admin')}
-                  className="w-full flex items-center gap-2 p-2 bg-white text-indigo-900 border border-indigo-200 text-xs font-bold rounded-xl"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="p-2.5 text-slate-500 hover:text-slate-900 bg-white border border-slate-200 hover:border-slate-300 rounded-2xl shrink-0 cursor-pointer shadow-3xs transition-all active:scale-95"
+                  aria-label="Zavřít menu"
                 >
-                  <Shield className="w-4 h-4 text-indigo-600" />
-                  <span>Admin Panel</span>
+                  <X className="w-5 h-5" />
                 </button>
               </div>
-            )}
 
-            {/* Glossary Button */}
-            <div className="border-t border-slate-100 pt-3">
-              <button
-                onClick={() => {
-                  window.dispatchEvent(new CustomEvent('open-glossary', { detail: '' }));
-                  setMobileMenuOpen(false);
-                }}
-                className="w-full flex items-center justify-center gap-2 py-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-800 font-bold text-xs rounded-xl transition-colors cursor-pointer"
-              >
-                <BookOpen className="w-4 h-4 text-teal-600" />
-                <span>Odborný slovník pojmů</span>
-              </button>
-            </div>
+              {/* SCROLLABLE DRAWER BODY (4 DISTINCT PILLARS) */}
+              <div className="flex-1 overflow-y-auto p-4 space-y-6">
+                
+                {/* 1. SECTOR: 🚀 RYCHLÝ ROZCESTNÍK (Core Navigation) */}
+                <div className="space-y-2.5">
+                  <div className="flex items-center gap-2 px-1 text-xs font-black text-slate-900 font-display uppercase tracking-wider">
+                    <span className="text-base">🚀</span>
+                    <span>Rychlý Rozcestník</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      onClick={() => handleTabClick('home')}
+                      className={`flex items-center gap-2.5 p-2.5 rounded-2xl text-xs font-bold text-left transition-all border cursor-pointer ${
+                        activeTab === 'home'
+                          ? 'bg-teal-50 text-teal-950 border-teal-300 shadow-xs'
+                          : 'bg-slate-50 hover:bg-slate-100/90 text-slate-800 border-slate-200/80'
+                      }`}
+                    >
+                      <Home className={`w-4 h-4 shrink-0 ${activeTab === 'home' ? 'text-teal-600' : 'text-slate-500'}`} />
+                      <span className="truncate">Domů</span>
+                    </button>
 
-            {/* Footer Auth Control */}
-            <div className="border-t border-slate-100 pt-3">
-              {currentUser ? (
-                <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-2">
-                  <div className="flex items-center justify-between">
+                    <button
+                      onClick={() => handleTabClick('news')}
+                      className={`flex items-center gap-2.5 p-2.5 rounded-2xl text-xs font-bold text-left transition-all border cursor-pointer ${
+                        activeTab === 'news'
+                          ? 'bg-teal-50 text-teal-950 border-teal-300 shadow-xs'
+                          : 'bg-slate-50 hover:bg-slate-100/90 text-slate-800 border-slate-200/80'
+                      }`}
+                    >
+                      <FileText className={`w-4 h-4 shrink-0 ${activeTab === 'news' ? 'text-teal-600' : 'text-slate-500'}`} />
+                      <span className="truncate">Články & Redakce</span>
+                    </button>
+
+                    <button
+                      onClick={() => handleTabClick('knihovna-studii')}
+                      className={`flex items-center gap-2.5 p-2.5 rounded-2xl text-xs font-bold text-left transition-all border cursor-pointer ${
+                        activeTab === 'knihovna-studii'
+                          ? 'bg-teal-50 text-teal-950 border-teal-300 shadow-xs'
+                          : 'bg-slate-50 hover:bg-slate-100/90 text-slate-800 border-slate-200/80'
+                      }`}
+                    >
+                      <BookOpen className={`w-4 h-4 shrink-0 ${activeTab === 'knihovna-studii' ? 'text-teal-600' : 'text-slate-500'}`} />
+                      <span className="truncate">Knihovna studií</span>
+                    </button>
+
+                    <button
+                      onClick={() => handleTabClick('videoteka')}
+                      className={`flex items-center gap-2.5 p-2.5 rounded-2xl text-xs font-bold text-left transition-all border cursor-pointer ${
+                        activeTab === 'videoteka'
+                          ? 'bg-teal-50 text-teal-950 border-teal-300 shadow-xs'
+                          : 'bg-slate-50 hover:bg-slate-100/90 text-slate-800 border-slate-200/80'
+                      }`}
+                    >
+                      <Tv className={`w-4 h-4 shrink-0 ${activeTab === 'videoteka' ? 'text-teal-600' : 'text-slate-500'}`} />
+                      <span className="truncate">Videotéka</span>
+                    </button>
+
+                    <button
+                      onClick={() => handleTabClick('judikatura')}
+                      className={`col-span-2 flex items-center justify-between p-2.5 rounded-2xl text-xs font-bold transition-all border cursor-pointer ${
+                        activeTab === 'judikatura'
+                          ? 'bg-teal-50 text-teal-950 border-teal-300 shadow-xs'
+                          : 'bg-slate-50 hover:bg-slate-100/90 text-slate-800 border-slate-200/80'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <Scale className={`w-4 h-4 shrink-0 ${activeTab === 'judikatura' ? 'text-teal-600' : 'text-slate-500'}`} />
+                        <span className="truncate">Judikatura Ústavního soudu</span>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* 2. SECTOR: 🔒 SOUKROMÁ ZÓNA & NÁSTROJE (User Space & AI) */}
+                <div className="space-y-2.5 border-t border-slate-100 pt-4">
+                  <div className="flex items-center justify-between px-1">
+                    <div className="flex items-center gap-2 text-xs font-black text-teal-900 font-display uppercase tracking-wider">
+                      <span className="text-base">🔒</span>
+                      <span>Soukromá Zóna & AI Nástroje</span>
+                    </div>
+                    {isLoggedIn && (
+                      <span className="text-[9px] font-mono bg-teal-100 text-teal-900 px-2 py-0.5 rounded-full font-bold">
+                        Aktivní účet
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-2">
+                    <button
+                      onClick={() => handleTabClick('user-portal')}
+                      className={`flex items-center justify-between p-3 rounded-2xl text-xs font-bold text-left transition-all border cursor-pointer ${
+                        activeTab === 'user-portal'
+                          ? 'bg-teal-50 text-teal-950 border-teal-300 shadow-xs'
+                          : 'bg-gradient-to-r from-teal-50/50 to-emerald-50/50 hover:from-teal-100/60 hover:to-emerald-100/60 text-slate-800 border-teal-200/70'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-8 h-8 rounded-xl bg-teal-600 text-white flex items-center justify-center shrink-0 shadow-3xs">
+                          <UserCheck className="w-4 h-4" />
+                        </div>
+                        <div className="min-w-0">
+                          <span className="text-xs font-extrabold text-slate-900 block truncate">Můj portál</span>
+                          <span className="text-[10px] text-teal-700 block truncate">Osobní kalendář, spis a data</span>
+                        </div>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-teal-500 shrink-0" />
+                    </button>
+
+                    <button
+                      onClick={() => handleTabClick('ai-assistant')}
+                      className={`flex items-center justify-between p-3 rounded-2xl text-xs font-bold text-left transition-all border cursor-pointer ${
+                        activeTab === 'ai-assistant'
+                          ? 'bg-indigo-50 text-indigo-950 border-indigo-300 shadow-xs'
+                          : 'bg-gradient-to-r from-indigo-50/50 to-purple-50/50 hover:from-indigo-100/60 hover:to-purple-100/60 text-slate-800 border-indigo-200/70'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-3xs">
+                          <Sparkles className="w-4 h-4" />
+                        </div>
+                        <div className="min-w-0">
+                          <span className="text-xs font-extrabold text-indigo-950 block truncate">AI Právní Asistent</span>
+                          <span className="text-[10px] text-indigo-700 block truncate">Sjednocené centrum generativního AI</span>
+                        </div>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-indigo-500 shrink-0" />
+                    </button>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        onClick={() => handleTabClick('forum')}
+                        className={`flex items-center gap-2.5 p-2.5 rounded-2xl text-xs font-bold text-left transition-all border cursor-pointer ${
+                          activeTab === 'forum'
+                            ? 'bg-teal-50 text-teal-950 border-teal-300 shadow-xs'
+                            : 'bg-slate-50 hover:bg-slate-100 text-slate-800 border-slate-200/80'
+                        }`}
+                      >
+                        <MessageSquare className="w-4 h-4 text-teal-600 shrink-0" />
+                        <span className="truncate">Komunita & Fórum</span>
+                      </button>
+
+                      <button
+                        onClick={() => handleTabClick('ke-stazeni')}
+                        className={`flex items-center gap-2.5 p-2.5 rounded-2xl text-xs font-bold text-left transition-all border cursor-pointer ${
+                          activeTab === 'ke-stazeni'
+                            ? 'bg-teal-50 text-teal-950 border-teal-300 shadow-xs'
+                            : 'bg-slate-50 hover:bg-slate-100 text-slate-800 border-slate-200/80'
+                        }`}
+                      >
+                        <FolderCheck className="w-4 h-4 text-teal-600 shrink-0" />
+                        <span className="truncate">Vzory podání & žalob</span>
+                      </button>
+                    </div>
+
+                    {isAdmin && (
+                      <button
+                        onClick={() => handleTabClick('admin')}
+                        className="w-full flex items-center justify-between p-2.5 bg-indigo-600 text-white font-bold text-xs rounded-2xl shadow-sm cursor-pointer mt-1"
+                      >
+                        <div className="flex items-center gap-2">
+                          <Shield className="w-4 h-4 text-indigo-200" />
+                          <span>Administrace portálu</span>
+                        </div>
+                        <ChevronRight className="w-4 h-4 text-indigo-200" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* 3. SECTOR: 🗂️ ODBORNÉ TÉMATA & OKRUHY (21 Kategorizovaných oblastí) */}
+                <div className="space-y-2.5 border-t border-slate-100 pt-4">
+                  <button
+                    onClick={() => setTopicsAccordionOpen(!topicsAccordionOpen)}
+                    className="w-full flex items-center justify-between p-3 bg-indigo-50/70 hover:bg-indigo-100/70 border border-indigo-200/80 rounded-2xl text-left transition-all cursor-pointer shadow-3xs"
+                  >
                     <div className="flex items-center gap-2.5 min-w-0">
+                      <span className="text-base shrink-0">🗂️</span>
+                      <span className="text-xs font-black text-indigo-950 font-display uppercase tracking-wider truncate">
+                        Odborné Témata & Okruhy
+                      </span>
+                      <span className="px-2 py-0.5 bg-indigo-200 text-indigo-900 text-[10px] font-mono font-black rounded-full shrink-0">
+                        21
+                      </span>
+                    </div>
+                    {topicsAccordionOpen ? <ChevronDown className="w-4 h-4 text-indigo-600 shrink-0" /> : <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />}
+                  </button>
+
+                  {topicsAccordionOpen && (
+                    <div className="space-y-2.5 animate-in fade-in duration-150 pt-1">
+                      {/* Instant Category Filter */}
+                      <div className="relative">
+                        <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                        <input 
+                          type="text"
+                          placeholder="Filtrovat např. výživné, střídavá péče..."
+                          value={categoryFilter}
+                          onChange={(e) => setCategoryFilter(e.target.value)}
+                          className="w-full bg-slate-50 border border-slate-200/90 rounded-2xl pl-9 pr-8 py-2 text-xs font-medium text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-500"
+                        />
+                        {categoryFilter && (
+                          <button
+                            onClick={() => setCategoryFilter('')}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs font-bold cursor-pointer"
+                          >
+                            ✕
+                          </button>
+                        )}
+                      </div>
+
+                      {/* 2-Column Grid of Compact Tiles */}
+                      <div className="grid grid-cols-2 gap-2">
+                        {filteredCategories.map((cat) => (
+                          <button
+                            key={cat.id}
+                            onClick={() => {
+                              handleCategoryClick(cat.slug, cat.name);
+                              setMobileMenuOpen(false);
+                            }}
+                            className="flex items-start gap-2 p-2.5 bg-white hover:bg-indigo-50/80 active:bg-indigo-100 border border-slate-200/80 hover:border-indigo-300 rounded-2xl text-left transition-all shadow-3xs cursor-pointer group"
+                          >
+                            <span className="text-lg shrink-0 group-hover:scale-110 transition-transform leading-none mt-0.5">{cat.icon}</span>
+                            <div className="min-w-0">
+                              <span className="text-xs font-bold text-slate-900 group-hover:text-indigo-950 block leading-tight line-clamp-2">
+                                {cat.name}
+                              </span>
+                            </div>
+                          </button>
+                        ))}
+                        {filteredCategories.length === 0 && (
+                          <div className="col-span-2 text-center py-6 text-xs text-slate-400 font-mono bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                            Žádná kategorie neodpovídá "{categoryFilter}"
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* 4. SECTOR: ℹ️ O PORTÁLU & PODPORA (Footer Menu) */}
+                <div className="space-y-2.5 border-t border-slate-100 pt-4 pb-2">
+                  <div className="flex items-center gap-2 px-1 text-xs font-black text-slate-900 font-display uppercase tracking-wider">
+                    <span className="text-base">ℹ️</span>
+                    <span>O portálu & Podpora</span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      onClick={() => {
+                        window.dispatchEvent(new CustomEvent('open-glossary', { detail: '' }));
+                        setMobileMenuOpen(false);
+                      }}
+                      className="col-span-2 flex items-center justify-between p-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-2xl text-left transition-all cursor-pointer"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <BookOpen className="w-4 h-4 text-teal-600 shrink-0" />
+                        <span className="text-xs font-bold text-slate-900">Odborný slovník pojmů</span>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
+                    </button>
+
+                    <button
+                      onClick={() => handleTabClick('partners')}
+                      className={`flex items-center gap-2 p-2.5 rounded-2xl text-xs font-bold text-left transition-all border cursor-pointer ${
+                        activeTab === 'partners'
+                          ? 'bg-teal-50 text-teal-950 border-teal-300 shadow-xs'
+                          : 'bg-slate-50 hover:bg-slate-100 text-slate-800 border-slate-200/80'
+                      }`}
+                    >
+                      <Users className="w-4 h-4 text-slate-600 shrink-0" />
+                      <span className="truncate">Partneři projektu</span>
+                    </button>
+
+                    <button
+                      onClick={() => handleTabClick('support')}
+                      className={`flex items-center gap-2 p-2.5 rounded-2xl text-xs font-bold text-left transition-all border cursor-pointer ${
+                        activeTab === 'support'
+                          ? 'bg-teal-50 text-teal-950 border-teal-300 shadow-xs'
+                          : 'bg-teal-50/50 hover:bg-teal-100/50 text-teal-900 border-teal-200/80'
+                      }`}
+                    >
+                      <Heart className="w-4 h-4 text-teal-600 shrink-0" />
+                      <span className="truncate">Podpora provozu</span>
+                    </button>
+
+                    <button
+                      onClick={() => handleTabClick('contacts')}
+                      className={`col-span-2 flex items-center justify-between p-2.5 rounded-2xl text-xs font-bold text-left transition-all border cursor-pointer ${
+                        activeTab === 'contacts'
+                          ? 'bg-teal-50 text-teal-950 border-teal-300 shadow-xs'
+                          : 'bg-slate-50 hover:bg-slate-100 text-slate-800 border-slate-200/80'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <PhoneCall className="w-4 h-4 text-slate-600 shrink-0" />
+                        <span className="text-xs font-bold text-slate-900">Kontakt & SOS linky</span>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
+                    </button>
+                  </div>
+                </div>
+
+              </div>
+
+              {/* STICKY FOOTER: USER PROFILE & AUTH CONTROLS */}
+              <div className="p-3 bg-slate-50 border-t border-slate-200 shrink-0">
+                {currentUser ? (
+                  <div className="flex items-center justify-between bg-white p-2.5 rounded-2xl border border-slate-200 shadow-3xs">
+                    <button
+                      onClick={() => handleTabClick('profile')}
+                      className="flex items-center gap-2.5 min-w-0 text-left cursor-pointer"
+                    >
                       <img 
                         src={currentUser.avatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(currentUser.name)}`} 
                         alt={currentUser.name} 
-                        className="w-8 h-8 rounded-full border border-teal-300"
+                        className="w-9 h-9 rounded-full border border-teal-300 shrink-0 object-cover"
                       />
                       <div className="min-w-0">
-                        <span className="text-xs font-bold text-slate-800 block truncate">{currentUser.name}</span>
+                        <span className="text-xs font-extrabold text-slate-900 block truncate">{currentUser.name}</span>
                         <span className="text-[10px] text-slate-500 block truncate">{currentUser.email}</span>
                       </div>
-                    </div>
+                    </button>
+                    <button
+                      onClick={() => {
+                        onLogout();
+                        setMobileMenuOpen(false);
+                      }}
+                      className="flex items-center gap-1.5 px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold rounded-xl transition-colors border border-rose-200 shrink-0 cursor-pointer"
+                    >
+                      <LogOut className="w-3.5 h-3.5" />
+                      <span>Odhlásit</span>
+                    </button>
                   </div>
+                ) : (
                   <button
                     onClick={() => {
-                      onLogout();
+                      onOpenAuth();
                       setMobileMenuOpen(false);
                     }}
-                    className="w-full flex items-center justify-center gap-2 py-2 bg-rose-50 text-rose-700 hover:bg-rose-100 text-xs font-bold rounded-xl transition-colors border border-rose-200 cursor-pointer"
+                    className="w-full flex items-center justify-center gap-2 py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-2xl shadow-md transition-all cursor-pointer"
                   >
-                    <LogOut className="w-3.5 h-3.5" />
-                    <span>Odhlásit se</span>
+                    <LogIn className="w-4 h-4 text-teal-300" />
+                    <span>Přihlásit se do portálu</span>
                   </button>
-                </div>
-              ) : (
-                <button
-                  onClick={() => {
-                    onOpenAuth();
-                    setMobileMenuOpen(false);
-                  }}
-                  className="w-full flex items-center justify-center gap-2 py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-md transition-all cursor-pointer"
-                >
-                  <LogIn className="w-4 h-4 text-teal-300" />
-                  <span>Přihlásit se do portálu</span>
-                </button>
-              )}
-            </div>
+                )}
+              </div>
 
+            </div>
           </div>
         )}
       </header>

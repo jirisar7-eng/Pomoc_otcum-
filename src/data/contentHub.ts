@@ -3,10 +3,19 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+export interface HubCategory {
+  id: string;
+  slug: string;
+  name: string;
+  icon: string;
+  description: string;
+  color: string;
+}
+
 export interface HubArticle {
   id: string;
   title: string;
-  category: 'pece-o-dite' | 'soudni-rizeni' | 'vyzivne' | 'ospod';
+  category: string;
   tags: string[];
   excerpt: string;
   content: string;
@@ -61,6 +70,177 @@ export interface HubFaq {
   tags: string[];
 }
 
+export const HUB_CATEGORIES: HubCategory[] = [
+  {
+    id: 'cat-1',
+    slug: 'pravni-rad',
+    name: 'Právní řád a legislativa',
+    icon: '⚖️',
+    description: 'Zákony, úmluvy, paragrafy občanského zákoníku a jejich praktický výklad pro rodinné právo.',
+    color: 'emerald'
+  },
+  {
+    id: 'cat-2',
+    slug: 'judikatura',
+    name: 'Judikatura a precedenty',
+    icon: '🏛️',
+    description: 'Klíčové nálezy a rozsudky Ústavního soudu, Nejvyššího soudu a ESLP zaručující práva otců.',
+    color: 'indigo'
+  },
+  {
+    id: 'cat-3',
+    slug: 'stridava-pece',
+    name: 'Střídavá a společná péče',
+    icon: '🤝',
+    description: 'Modely, organizace střídání, praxe, vyvracení mýtů a budování stabilního dvojího domova.',
+    color: 'teal'
+  },
+  {
+    id: 'cat-4',
+    slug: 'nocni-pece',
+    name: 'Noční péče a přespávání kojenců',
+    icon: '🌙',
+    description: 'Odborná vědecká zdůvodnění pro noclehy a noční péči otců u dětí nejranějšího věku.',
+    color: 'purple'
+  },
+  {
+    id: 'cat-5',
+    slug: 'psychologie-attachment',
+    name: 'Psychologie dítěte & Attachment',
+    icon: '🧠',
+    description: 'Citová vazba, vývoj mozku, emocionální potřeby dětí a význam otce pro zdravý vývoj.',
+    color: 'sky'
+  },
+  {
+    id: 'cat-6',
+    slug: 'rodicovska-alienace',
+    name: 'Rodičovská alienace (PAS)',
+    icon: '🧩',
+    description: 'Rozpoznání syndromu zavrženého rodiče, prevence manipulace a právní obrana.',
+    color: 'rose'
+  },
+  {
+    id: 'cat-7',
+    slug: 'jednani-ospod',
+    name: 'Jednání s OSPOD a úřady',
+    icon: '🏢',
+    description: 'Taktika jednání, práva a povinnosti sociálních pracovníků, námitky podjatosti a stížnosti.',
+    color: 'amber'
+  },
+  {
+    id: 'cat-8',
+    slug: 'vzory-podani',
+    name: 'Vzory podání a žalob',
+    icon: '📄',
+    description: 'Procesně přesné návrhy k soudu, odvolání, vyjádření, předběžná opatření a stížnosti.',
+    color: 'blue'
+  },
+  {
+    id: 'cat-9',
+    slug: 'vyzivne-majetek',
+    name: 'Výživné a majetkové vyrovnání',
+    icon: '💶',
+    description: 'Kalkulačky výživného, přiměřená alimenty, úhrada mimořádných potřeb a majetkové vyrovnání.',
+    color: 'emerald'
+  },
+  {
+    id: 'cat-10',
+    slug: 'zdravi-vyvoj',
+    name: 'Zdraví, vývoj a péče',
+    icon: '🏥',
+    description: 'Zdravotní péče o dítě, očkování, výběr lékařů a rovnocenný přístup otce k medicínským informacím.',
+    color: 'red'
+  },
+  {
+    id: 'cat-11',
+    slug: 'vzdelavani-cas',
+    name: 'Vzdělávání a volný čas',
+    icon: '🏫',
+    description: 'Výběr školky a školy, zájmové kroužky, právo otce na informace z rozvrhu a školních systémů (Bakaláři).',
+    color: 'violet'
+  },
+  {
+    id: 'cat-12',
+    slug: 'komunikace-rodice',
+    name: 'Komunikace s druhým rodičem',
+    icon: '🗣️',
+    description: 'Asertivní komunikace, písemná komunikace, rodičovské aplikace, dohody a mediace.',
+    color: 'orange'
+  },
+  {
+    id: 'cat-13',
+    slug: 'krizova-pomoc',
+    name: 'Krizová pomoc a SOS',
+    icon: '🚨',
+    description: 'Okamžitá krizová intervence, řešení akutního bezdůvodného maření styku a linky pomoci.',
+    color: 'rose'
+  },
+  {
+    id: 'cat-14',
+    slug: 'falesna-obvineni',
+    name: 'Falešná obvinění a ochrana práv',
+    icon: '🛡️',
+    description: 'Právní postupy při neopodstatněném osočení z domácího násilí či týrání na Policii ČR.',
+    color: 'slate'
+  },
+  {
+    id: 'cat-15',
+    slug: 'mezinarodni-pravo',
+    name: 'Mezinárodní právo a stěhování dětí',
+    icon: '✈️',
+    description: 'Aplikace Haagské úmluvy, přeshraniční únosy dětí a bezprávní přemístění do zahraničí.',
+    color: 'cyan'
+  },
+  {
+    id: 'cat-16',
+    slug: 'sirsi-rodina',
+    name: 'Význam širší rodiny a prarodičů',
+    icon: '👥',
+    description: 'Právo dítěte na styk s prarodiči, tetičkami, strýci a zachování sourozenecké vazby.',
+    color: 'fuchsia'
+  },
+  {
+    id: 'cat-17',
+    slug: 'znalecke-posudky',
+    name: 'Znalecké posudky a psychologové',
+    icon: '📝',
+    description: 'Průběh psychologického vyšetření rodiny, znalecké otázky, revizní posudky a námitky.',
+    color: 'indigo'
+  },
+  {
+    id: 'cat-18',
+    slug: 'kritika-studii',
+    name: 'Kritika překonaných studií',
+    icon: '🔬',
+    description: 'Demontáž zastaralých a metodicky chybných prací (McIntosh 2010) používaných proti otcům.',
+    color: 'pink'
+  },
+  {
+    id: 'cat-19',
+    slug: 'technologie-ai',
+    name: 'Technologie a AI pro táty',
+    icon: '💻',
+    description: 'Generativní AI asistenti, automatická analýza soudních protokolů a chytrá správa důkazů.',
+    color: 'teal'
+  },
+  {
+    id: 'cat-20',
+    slug: 'komunita-zkusenosti',
+    name: 'Komunita a sdílení zkušeností',
+    icon: '🤝',
+    description: 'Příběhy z praxe, vzájemná psychická i právní podpora táta tátovi a diskusní sítě.',
+    color: 'lime'
+  },
+  {
+    id: 'cat-21',
+    slug: 'statistiky-vyzkumy',
+    name: 'Statistiky a výzkumy',
+    icon: '📊',
+    description: 'Data a fakta z ČSÚ, Ministerstva spravedlnosti ČR, APA, Harvardu a mezinárodních institucí.',
+    color: 'blue'
+  }
+];
+
 // Global Single Source of Truth Database
 export const HUB_JUDGMENTS: HubJudgment[] = [
   {
@@ -107,6 +287,24 @@ export const HUB_JUDGMENTS: HubJudgment[] = [
     excerpt: 'Česká republika porušila Článek 8 Úmluvy o lidských právech tím, že nedokázala zajistit včasný a účinný výkon rozhodnutí o styku otce s dítětem.',
     fullAnalysis: 'Průlomové rozhodnutí ESLP konstatovalo, že český stát nenesl dostatečnou odpovědnost za vymáhání práv otce. Nadměrné průtahy v konání soudů a OSPOD vedly k nenapravitelnému odcizení dítěte. ESLP přiznal otci finanční zadostiučinění a uložil ČR povinnost reformovat opatrovnické soudnictví.',
     tags: ['ESLP', 'lidská práva', 'průtahy', 'odcizení']
+  },
+  {
+    id: 'jud-6',
+    title: 'Rovnost rodičovských práv a nepřípustnost věkových stereotypů',
+    court: 'Ústavní soud ČR',
+    fileNo: 'I. ÚS 2482/22',
+    excerpt: 'Apropriace dítěte jedním rodičem na základě věkového stereotypu (např. že batole potřebuje pouze matku) je ústavně nepřípustná. Soudy jsou povinny posuzovat individuální pečovatelské schopnosti otce.',
+    fullAnalysis: 'Ústavní soud ČR v tomto nálezu výslovně zdůraznil, že automatické upřednostňování matky u dětí raného věku (např. do 3 let) porušuje ústavní princip rovnosti rodičů dle čl. 32 odst. 4 Listiny základních práv a svobod. Pokud otec vykazuje plnou výchovnou způsobilost, zájem o dítě a citovou vazbu, nemohou obecné soudy a OSPOD odmítat střídavou péči nebo přespávání u otce s pouhým odkazem na nízký věk dítěte.',
+    tags: ['věkový stereotyp', 'útlý věk', 'rovnost rodičů', 'I. ÚS 2482/22']
+  },
+  {
+    id: 'jud-7',
+    title: 'Požadavky na neutralitu OSPOD a zjišťování názoru dítěte',
+    court: 'Veřejný ochránce práv (Ombudsman) & Ústavní soud',
+    fileNo: 'VOP 1284/2021/VOP',
+    excerpt: 'OSPOD má zákonnou povinnost zachovávat striktní neutralitu vůči oběma rodičům. Zprávy OSPOD nesmí přejímat nekriticky tvrzení matky ani manipulovat výpovědi dítěte.',
+    fullAnalysis: 'Veřejný ochránce práv ve svých šetřeních i metodických doporučeních pro orgány sociálně-právní ochrany dětí (OSPOD) opakovaně konstatoval, že pracovníci OSPOD se nesmí stavět do role advokáta matky. Při zjišťování názoru dítěte musí být vyloučen tlak a manipulace. Pokud OSPOD doporučí omezení styku otce bez objektivních důkazů (pouze na základě subjektivních dojmů matky), dochází k porušení právní povinnosti jednání v nejlepším zájmu dítěte.',
+    tags: ['OSPOD', 'neutralita', 'ombudsman', 'názor dítěte']
   }
 ];
 
@@ -140,6 +338,15 @@ export const HUB_STUDIES: HubStudy[] = [
   },
   {
     id: 'std-4',
+    title: 'Fifty moves a year: Is shared physical custody in young children associated with better or worse mental health?',
+    authors: 'Bergström, M., Fransson, E., et al. (Stockholm University)',
+    year: 2021,
+    excerpt: 'Rozsáhlá švédská národní studie sledovala tisíce dětí ve střídavé péči a potvrdila, že střídání domovů nezpůsobuje žádný zvýšený stres ani poruchy spánku.',
+    conclusion: 'Švédský výzkumný tým potvrdil, že děti předškolního a mladšího školního věku ve střídavé péči (joint physical custody) mají srovnatelnou nebo lepší úroveň psychosociálního zdraví než děti ve výhradní péči matky. Obava z "neustálého stěhování a kufrů" se ukázala jako sociální mýtus bez empirického podkladu.',
+    tags: ['Švédsko', 'střídavá péče', 'stres', 'duševní zdraví', 'Bergström']
+  },
+  {
+    id: 'std-5',
     title: 'Fifty Moves a Year: Shared Physical Custody and Children\'s Health in Sweden',
     authors: 'Bergström, E. et al. (Karolinska Institutet & Stockholm University)',
     year: 2015,
@@ -395,12 +602,19 @@ export function searchContentHub(query: string) {
          f.answer.toLowerCase().includes(lowercaseQuery)
   );
 
+  const categories = HUB_CATEGORIES.filter(
+    c => c.name.toLowerCase().includes(lowercaseQuery) ||
+         c.description.toLowerCase().includes(lowercaseQuery) ||
+         c.slug.toLowerCase().includes(lowercaseQuery)
+  );
+
   return {
     articles,
     judgments,
     studies,
     templates,
     terms,
-    faqs
+    faqs,
+    categories
   };
 }
