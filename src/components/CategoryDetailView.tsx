@@ -302,25 +302,29 @@ export const CATEGORY_BLUEPRINTS: Record<string, CategoryBlueprint> = {
     ]
   },
   'vzdelavani-cas': {
-    purpose: 'Aktivní zapojení otce do školního a zájmového života dítěte bez blokací ze strany druhého rodiče.',
+    purpose: 'Aktivní zapojení otce do školního a zájmového života dítěte bez blokací ze strany druhého rodiče. Cílem je poskytnout otcům exaktní argumenty pro školy, učitele a instituce, které zajišťují rovnocenný přístup k informacím o vzdělávání.',
     keyPoints: [
       {
-        title: 'Komunikace se školou a e-žákovskou knížkou',
-        detail: 'Škola je povinna zřídit otci samostatný přístup do systémů Bakaláři / Edookit a zasílat pozvánky na třídní schůzky.'
+        title: 'Právo na přístup do e-žákovské knížky (Bakaláři / Edookit)',
+        detail: 'Škola je ze zákona a v rámci rodičovské odpovědnosti povinna zřídit otci (pokud mu nebyla rodičovská odpovědnost omezena soudem) samostatné přihlašovací údaje do školních informačních systémů a zasílat veškeré zprávy o prospěchu a chování dítěte.'
       },
       {
-        title: 'Výběr školy, školky a kroužků',
-        detail: 'Výběr vzdělávací instituce je podstatnou záležitostí. Jednostranný zápis matkou bez souhlasu otce je napadnutelný u soudu.'
+        title: 'Výběr mateřské, základní a střední školy',
+        detail: 'Volba vzdělávací instituce a zaměření studia představuje podstatnou záležitost ve smyslu péče o dítě. Jednostranné přihlášení či odhlášení matkou bez souhlasu druhého rodiče (či rozhodnutí soudu při neshodě) je protiprávní.'
       },
       {
-        title: 'Vyzvedávání ze školy a zájmová činnost',
-        detail: 'Soudní úprava oprávnění vyzvedávat dítě ze školní družiny, účastnit se besídek a doprovázet ho na sportovní tréninky.'
+        title: 'Účast na třídních schůzkách a školních akcích',
+        detail: 'Otec má plné právo navštěvovat třídní schůzky, konzultace s pedagogy, besídky, besedy a doprovázet dítě na školní výlety či akce pořádané školou bez ohledu na to, u koho je dítě zrovna ubytováno.'
+      },
+      {
+        title: 'Volnočasové aktivity a kroužky',
+        detail: 'Organizace zájmových kroužků v době styku otce je v jeho plné kompetenci. Druhý rodič nesmí účelově přihlašovat dítě na aktivity kolidující s dny, kdy má dítě svěřené otec, s cílem omezit jeho styk.'
       }
     ],
     aiPrompts: [
-      'Jak získat přístup do školního systému (Bakaláři) pokud škola komunikuje jen s matkou?',
-      'Jak postupovat při neshodě rodičů o výběru základní školy nebo školky pro dítě?',
-      'Jak upravit vyzvedávání dítěte ze školní družiny v rozsudku o péči?'
+      'Jak právně vynutit na řediteli školy zřízení prístupu do Bakalářů / Edookitu pro otce?',
+      'Jak postupovat, pokud matka jednostranně přihlásila dítě do jiné školy bez mého souhlasu?',
+      'Jak řešit situaci, kdy matka přihlašuje dítě na kroužky v dnech mé péče s cílem omezit styk?'
     ]
   },
   'komunikace-rodice': {
