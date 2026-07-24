@@ -37,6 +37,8 @@ import {
 } from 'lucide-react';
 import { Donation, User } from '../types';
 import { saveDocument } from '../lib/firebase';
+import { useLanguage } from '../lib/LanguageContext';
+import { translateText } from '../data/dynamicTranslations';
 
 interface SupportSectionProps {
   currentUser: User | null;
@@ -51,6 +53,7 @@ export default function SupportSection({
   donations,
   setDonations
 }: SupportSectionProps) {
+  const { language, t } = useLanguage();
   const [selectedAmount, setSelectedAmount] = useState<number>(300);
   const [customAmount, setCustomAmount] = useState<string>('');
   const [donorName, setDonorName] = useState<string>(currentUser ? currentUser.name : '');
@@ -88,32 +91,32 @@ export default function SupportSection({
     if (amount < 150) {
       return {
         icon: Coffee,
-        title: "Káva pro autory",
-        desc: "Podpoříte bdělost našich vývojářů při nočním psaní nových judikátů a vzorů podání."
+        title: translateText("Káva pro autory", language),
+        desc: translateText("Podpoříte bdělost našich vývojářů při nočním psaní nových judikátů a vzorů podání.", language)
       };
     } else if (amount < 300) {
       return {
         icon: Server,
-        title: "Provoz infrastruktury",
-        desc: "Pokryje náklady na cloudový hosting, databázi a API rozhraní pro provoz webu na 7 dní."
+        title: translateText("Provoz infrastruktury", language),
+        desc: translateText("Pokryje náklady na cloudový hosting, databázi a API rozhraní pro provoz webu na 7 dní.", language)
       };
     } else if (amount < 500) {
       return {
         icon: Shield,
-        title: "Sponzor právní pomoci",
-        desc: "Pokryje náklady na přípravu a aktualizaci jednoho vzorového podání k soudu pro tátu v nouzi."
+        title: translateText("Sponzor právní pomoci", language),
+        desc: translateText("Pokryje náklady na přípravu a aktualizaci jednoho vzorového podání k soudu pro tátu v nouzi.", language)
       };
     } else if (amount < 1000) {
       return {
         icon: Award,
-        title: "Patron spravedlnosti",
-        desc: "Umožní nám oslovit právníky pro vypracování odborného rozboru k novým rozhodnutím Ústavního soudu."
+        title: translateText("Patron spravedlnosti", language),
+        desc: translateText("Umožní nám oslovit právníky pro vypracování odborného rozboru k novým rozhodnutím Ústavního soudu.", language)
       };
     } else {
       return {
         icon: Sparkles,
-        title: "Mecenáš Synthesis Hubu",
-        desc: "Zásadním způsobem urychlíte integraci autonomního AI Admina a udržíte web bez otravných reklam."
+        title: translateText("Mecenáš Synthesis Hubu", language),
+        desc: translateText("Zásadním způsobem urychlíte integraci autonomního AI Admina a udržíte web bez otravných reklam.", language)
       };
     }
   };
@@ -211,14 +214,13 @@ export default function SupportSection({
         
         <div className="relative z-10 max-w-3xl">
           <span className="px-3 py-1 bg-teal-500/15 border border-teal-500/30 text-teal-300 rounded-full text-[10px] font-mono uppercase tracking-widest font-bold inline-block mb-3">
-            Podpora projektu &bull; Synthesis OS
+            {translateText('Podpora projektu • Synthesis OS', language)}
           </span>
           <h1 className="text-2xl md:text-3.5xl font-extrabold font-display tracking-tight text-white leading-tight">
-            Podpořte rozvoj portálu <span className="text-teal-400">Táta má právo</span>
+            {translateText('Podpořte rozvoj portálu', language)} <span className="text-teal-400">Táta má právo</span>
           </h1>
           <p className="mt-3 text-sm text-slate-300 leading-relaxed">
-            Jsme nezávislý projekt vyvíjený pod záštitou studia <strong className="text-white">Synthesis Jiřího Š.</strong> 
-            Naším posláním je poskytovat tátům a rodinám bezplatný přístup k vědecky podloženým informacím, vzorům podání, kalkulačkám a psychologické podpoře. Vše vyvíjíme otevřeně, bez reklam a s vizí budoucí autonomní správy (AI Admin).
+            {translateText('Jsme nezávislý projekt vyvíjený pod záštitou studia Synthesis Jiřího Š. Naším posláním je poskytovat tátům a rodinám bezplatný přístup k vědecky podloženým informacím, vzorům podání, kalkulačkám a psychologické podpoře. Vše vyvíjíme otevřeně, bez reklam a s vizí budoucí autonomní správy (AI Admin).', language)}
           </p>
         </div>
       </div>
@@ -235,7 +237,7 @@ export default function SupportSection({
           }`}
         >
           <PieChart className={`w-4 h-4 ${activeTab === 'budget' ? 'text-teal-300' : 'text-slate-500'}`} />
-          📊 Karta 1: Měsíční rozpočet
+          📊 {t('tab_budget', 'Měsíční rozpočet')}
         </button>
 
         <button
@@ -248,7 +250,7 @@ export default function SupportSection({
           }`}
         >
           <CreditCard className={`w-4 h-4 ${activeTab === 'transfer' ? 'text-teal-300' : 'text-slate-500'}`} />
-          💳 Karta 2: Bankovní převod &amp; podpora
+          💳 {t('tab_transfer', 'Bankovní převod & podpora')}
         </button>
 
         <button
@@ -261,7 +263,7 @@ export default function SupportSection({
           }`}
         >
           <Building2 className={`w-4 h-4 ${activeTab === 'sponsors' ? 'text-teal-300' : 'text-slate-500'}`} />
-          🤝 Karta 3: Sponzoři &amp; partneři
+          🤝 {t('tab_sponsors', 'Sponzoři & partneři')}
         </button>
       </div>
 

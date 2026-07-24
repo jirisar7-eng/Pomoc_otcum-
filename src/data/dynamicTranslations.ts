@@ -335,6 +335,206 @@ export function translateText(text: string, lang: Language): string {
       cs: 'Typ záznamu:',
       sk: 'Typ záznamu:',
       en: 'Record type:'
+    },
+    'otevřít modul': {
+      cs: 'Otevřít modul',
+      sk: 'Otvoriť modul',
+      en: 'Open module'
+    },
+    'rychlá konzultace': {
+      cs: 'Rychlá konzultace',
+      sk: 'Rýchla konzultácia',
+      en: 'Quick consultation'
+    },
+    'ke stažení': {
+      cs: 'Ke stažení',
+      sk: 'Na stiahnutie',
+      en: 'Download'
+    },
+    'měsíční rozpočet': {
+      cs: 'Měsíční rozpočet',
+      sk: 'Mesačný rozpočet',
+      en: 'Monthly budget'
+    },
+    'otevřít kapitolu': {
+      cs: 'Otevřít kapitolu',
+      sk: 'Otvoriť kapitolu',
+      en: 'Open chapter'
+    },
+    'detail okruhu': {
+      cs: 'Detail okruhu',
+      sk: 'Detail okruhu',
+      en: 'Topic detail'
+    },
+    'inteligentní ai': {
+      cs: 'Inteligentní AI',
+      sk: 'Inteligentná AI',
+      en: 'Smart AI'
+    },
+    'formuláře': {
+      cs: 'Formuláře',
+      sk: 'Formuláre',
+      en: 'Forms'
+    },
+    'rychlá pomoc': {
+      cs: 'Rychlá pomoc',
+      sk: 'Rýchla pomoc',
+      en: 'Quick Help'
+    },
+    'vzory podání': {
+      cs: 'Vzory podání',
+      sk: 'Vzory podaní',
+      en: 'Document Templates'
+    },
+    'ai právní asistent': {
+      cs: 'AI Právní asistent',
+      sk: 'AI Právny asistent',
+      en: 'AI Legal Assistant'
+    },
+    'podpora projektu': {
+      cs: 'Podpora projektu',
+      sk: 'Podpora projektu',
+      en: 'Project Support'
+    },
+    'krizová pomoc & sos': {
+      cs: 'Krizová pomoc & SOS',
+      sk: 'Krízová pomoc & SOS',
+      en: 'Crisis Support & SOS'
+    },
+    'mohlo by vás zajímat & související materiály': {
+      cs: 'Mohlo by vás zajímat & Související materiály',
+      sk: 'Mohlo by vás zaujímať & Súvisiace materiály',
+      en: 'You Might Be Interested In & Related Materials'
+    },
+    'doporučené hlavní moduly pro váš nejlepší start v portálu.': {
+      cs: 'Doporučené hlavní moduly pro váš nejlepší start v portálu.',
+      sk: 'Odporúčané hlavné moduly pre váš najlepší štart v portáli.',
+      en: 'Recommended core modules for your best start on the portal.'
+    },
+    'doporučené navazující kroky, vzory a nástroje pro váš procesní úspěch.': {
+      cs: 'Doporučené navazující kroky, vzory a nástroje pro váš procesní úspěch.',
+      sk: 'Odporúčané nadväzujúce kroky, vzory a nástroje pre váš procesný úspech.',
+      en: 'Recommended follow-up steps, templates, and tools for your procedural success.'
+    },
+    'kontext: úvodní stránka': {
+      cs: 'Kontext: Úvodní stránka',
+      sk: 'Kontext: Úvodná stránka',
+      en: 'Context: Home Page'
+    },
+    'kontext: doporučené moduly': {
+      cs: 'Kontext: Doporučené moduly',
+      sk: 'Kontext: Odporúčané moduly',
+      en: 'Context: Recommended Modules'
+    },
+    'dynamická kontextová synchronizace v4.2': {
+      cs: 'Dynamická kontextová synchronizace v4.2',
+      sk: 'Dynamická kontextová synchronizácia v4.2',
+      en: 'Dynamic Context Sync v4.2'
+    },
+    'právní řád a legislativa': {
+      cs: 'Právní řád a legislativa',
+      sk: 'Právny poriadok a legislatíva',
+      en: 'Legal System & Legislation'
+    },
+    'judikatura a precedenty': {
+      cs: 'Judikatura a precedenty',
+      sk: 'Judikatúra a precedenty',
+      en: 'Case Law & Precedents'
+    },
+    'střídavá a společná péče': {
+      cs: 'Střídavá a společná péče',
+      sk: 'Striedavá a spoločná starostlivosť',
+      en: 'Joint & Shared Custody'
+    },
+    'noční péče a přespávání kojenců': {
+      cs: 'Noční péče a přespávání kojenců',
+      sk: 'Nočná starostlivosť a prespávanie dojčiat',
+      en: 'Overnight Care for Infants'
+    },
+    'psychologie dítěte & attachment': {
+      cs: 'Psychologie dítěte & Attachment',
+      sk: 'Psychológia dieťaťa & Attachment',
+      en: 'Child Psychology & Attachment'
+    },
+    'rodičovská alienace (pas)': {
+      cs: 'Rodičovská alienace (PAS)',
+      sk: 'Rodičovská alienácia (PAS)',
+      en: 'Parental Alienation (PAS)'
+    },
+    'jednání s ospod a úřady': {
+      cs: 'Jednání s OSPOD a úřady',
+      sk: 'Konanie s OSPOD a úradmi',
+      en: 'Interactions with Child Protection (OSPOD)'
+    },
+    'vzory podání a žalob': {
+      cs: 'Vzory podání a žalob',
+      sk: 'Vzory podaní a žalôb',
+      en: 'Templates of Motions & Lawsuits'
+    },
+    'výživné a majetkové vyrovnání': {
+      cs: 'Výživné a majetkové vyrovnání',
+      sk: 'Výživné a majetkové vyrovnanie',
+      en: 'Child Support & Asset Settlement'
+    },
+    'zdraví, vývoj a péče': {
+      cs: 'Zdraví, vývoj a péče',
+      sk: 'Zdravie, vývoj a starostlivosť',
+      en: 'Health, Development & Care'
+    },
+    'vzdělávání a volný čas': {
+      cs: 'Vzdělávání a volný čas',
+      sk: 'Vzdelávanie a voľný čas',
+      en: 'Education & Leisure'
+    },
+    'komunikace s druhým rodičem': {
+      cs: 'Komunikace s druhým rodičem',
+      sk: 'Komunikácia s druhým rodičom',
+      en: 'Communication with the Other Parent'
+    },
+    'krizová pomoc a sos': {
+      cs: 'Krizová pomoc a SOS',
+      sk: 'Krízová pomoc a SOS',
+      en: 'Crisis Support & SOS'
+    },
+    'falešná obvinění a ochrana práv': {
+      cs: 'Falešná obvinění a ochrana práv',
+      sk: 'Falošné obvinenia a ochrana práv',
+      en: 'False Accusations & Protection of Rights'
+    },
+    'mezinárodní právo a stěhování dětí': {
+      cs: 'Mezinárodní právo a stěhování dětí',
+      sk: 'Medzinárodné právo a sťahovanie detí',
+      en: 'International Law & Child Relocation'
+    },
+    'význam širší rodiny a prarodičů': {
+      cs: 'Význam širší rodiny a prarodičů',
+      sk: 'Význam širšej rodiny a starých rodičov',
+      en: 'Role of Extended Family & Grandparents'
+    },
+    'znalecké posudky a psychologové': {
+      cs: 'Znalecké posudky a psychologové',
+      sk: 'Znalecké posudky a psychológovia',
+      en: 'Expert Opinions & Psychologists'
+    },
+    'kritika překonaných studií': {
+      cs: 'Kritika překonaných studií',
+      sk: 'Kritika prekonaných štúdií',
+      en: 'Critique of Outdated Studies'
+    },
+    'technologie a ai pro táty': {
+      cs: 'Technologie a AI pro táty',
+      sk: 'Technológie a AI pre otcov',
+      en: 'Technology & AI for Fathers'
+    },
+    'komunita a sdílení zkušeností': {
+      cs: 'Komunita a sdílení zkušeností',
+      sk: 'Komunita a zdieľanie skúseností',
+      en: 'Community & Experience Sharing'
+    },
+    'statistiky a výzkumy': {
+      cs: 'Statistiky a výzkumy',
+      sk: 'Štatistiky a výskumy',
+      en: 'Statistics & Research'
     }
   };
 

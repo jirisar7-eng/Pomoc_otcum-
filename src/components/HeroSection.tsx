@@ -45,6 +45,8 @@ import {
 import fatherAndChildHero from '../assets/images/father_and_child_hero_1783886957826.jpg';
 import { Partner } from '../types';
 import { HUB_CATEGORIES, HUB_JUDGMENTS, HUB_STUDIES } from '../data/contentHub';
+import { useLanguage } from '../lib/LanguageContext';
+import { translateText, getTranslatedObject } from '../data/dynamicTranslations';
 
 interface HeroSectionProps {
   onNavigate: (tabId: string) => void;
@@ -54,6 +56,8 @@ interface HeroSectionProps {
 }
 
 export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn, partners = [] }: HeroSectionProps) {
+  const { t, language } = useLanguage();
+
   // Category search & expansion state
   const [categorySearch, setCategorySearch] = useState('');
   const [showAllCategories, setShowAllCategories] = useState(false);
@@ -74,10 +78,14 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn, partne
   const featuredCategories = HUB_CATEGORIES.filter(c => featuredCategorySlugs.includes(c.slug));
 
   // Filtered categories based on user search query
-  const filteredCategories = HUB_CATEGORIES.filter(cat => 
-    cat.name.toLowerCase().includes(categorySearch.toLowerCase()) ||
-    cat.description.toLowerCase().includes(categorySearch.toLowerCase())
-  );
+  const filteredCategories = HUB_CATEGORIES.filter(cat => {
+    const translatedCat = getTranslatedObject(cat.id, cat, language);
+    return (
+      translatedCat.name.toLowerCase().includes(categorySearch.toLowerCase()) ||
+      translatedCat.description.toLowerCase().includes(categorySearch.toLowerCase()) ||
+      cat.name.toLowerCase().includes(categorySearch.toLowerCase())
+    );
+  });
 
   // Handle copying judgment quotes
   const handleCopyQuote = (id: string, quote: string) => {
@@ -125,17 +133,17 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn, partne
               <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
               <span className="font-mono text-[11px] uppercase tracking-wider text-amber-300">Alfa verze 0.0.1.2</span>
               <span className="text-amber-400/60">•</span>
-              <span className="text-slate-300">Portál Táta má právo</span>
+              <span className="text-slate-300">{t('brand_name', 'Portál Táta má právo')}</span>
             </motion.div>
 
             {/* Main Headline */}
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight font-display leading-[1.15]" id="hero-title">
-              Průvodce opatrovnictvím, <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-teal-200 to-amber-200">právem a psychologií pro otce</span>
+              {translateText('Průvodce opatrovnictvím,', language)} <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-teal-200 to-amber-200">{translateText('právem a psychologií pro otce', language)}</span>
             </h1>
 
             {/* Description Subtext */}
             <p className="text-slate-300 text-sm sm:text-base leading-relaxed max-w-2xl" id="hero-description">
-              Pevná opora pro táty v opatrovnickém sporu. Přinášíme ověřené právní rozbory, judikaturu Ústavního soudu, vědecké metaanalýzy a AI asistenta pro rovnocennou péči o vaše děti.
+              {translateText('Pevná opora pro táty v opatrovnickém sporu. Přinášíme ověřené právní rozbory, judikaturu Ústavního soudu, vědecké metaanalýzy a AI asistenta pro rovnocennou péči o vaše děti.', language)}
             </p>
 
             {/* Action Buttons */}
@@ -146,7 +154,7 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn, partne
                 className="px-5 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-extrabold text-xs rounded-xl shadow-lg hover:shadow-emerald-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer transform hover:-translate-y-0.5 active:translate-y-0"
               >
                 <Sparkles className="w-4 h-4 text-slate-950" />
-                <span>Otevřít AI Asistenta</span>
+                <span>{t('open_ai_assistant', 'Otevřít AI Asistenta')}</span>
               </button>
 
               <button
@@ -155,7 +163,7 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn, partne
                 className="px-5 py-3 bg-rose-500/20 hover:bg-rose-500/30 text-rose-200 border border-rose-500/40 font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer backdrop-blur-sm"
               >
                 <ShieldAlert className="w-4 h-4 text-rose-400" />
-                <span>Potřebuji krizovou pomoc (SOS)</span>
+                <span>{t('need_sos_help', 'Potřebuji krizovou pomoc (SOS)')}</span>
               </button>
 
               <button
@@ -164,7 +172,7 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn, partne
                 className="px-5 py-3 bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 border border-slate-700/80 font-semibold text-xs rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-3xs"
               >
                 <Layers className="w-4 h-4 text-emerald-400" />
-                <span>Prozkoumat 21 kategorií</span>
+                <span>{t('explore_21_categories', 'Prozkoumat 21 kategorií')}</span>
               </button>
             </div>
 
@@ -172,15 +180,15 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn, partne
             <div className="pt-4 border-t border-slate-800/80 grid grid-cols-3 gap-4 text-left max-w-xl">
               <div>
                 <span className="block text-lg font-extrabold text-amber-300 font-display">21</span>
-                <span className="text-[11px] text-slate-400 leading-none">Odborných okruhů</span>
+                <span className="text-[11px] text-slate-400 leading-none">{translateText('Odborných okruhů', language)}</span>
               </div>
               <div>
                 <span className="block text-lg font-extrabold text-emerald-400 font-display">110+</span>
-                <span className="text-[11px] text-slate-400 leading-none">Soudních nálezů & studií</span>
+                <span className="text-[11px] text-slate-400 leading-none">{translateText('Soudních nálezů & studií', language)}</span>
               </div>
               <div>
                 <span className="block text-lg font-extrabold text-teal-300 font-display">100%</span>
-                <span className="text-[11px] text-slate-400 leading-none">Nestrannost & fakta</span>
+                <span className="text-[11px] text-slate-400 leading-none">{translateText('Nestrannost & fakta', language)}</span>
               </div>
             </div>
 
@@ -191,7 +199,7 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn, partne
             <div className="relative rounded-2xl overflow-hidden border border-emerald-500/20 shadow-2xl group">
               <img
                 src={fatherAndChildHero}
-                alt="Otec se svým dítětem"
+                alt={translateText('Otec se svým dítětem', language)}
                 className="w-full h-72 sm:h-80 lg:h-96 object-cover transform group-hover:scale-105 transition-transform duration-700"
                 referrerPolicy="no-referrer"
               />
@@ -199,11 +207,11 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn, partne
               
               <div className="absolute bottom-4 left-4 right-4 p-4 bg-slate-900/90 backdrop-blur-md rounded-xl border border-slate-800 text-xs space-y-1">
                 <div className="flex items-center justify-between text-emerald-400 font-bold font-display">
-                  <span>Právo na oba rodiče</span>
+                  <span>{translateText('Právo na oba rodiče', language)}</span>
                   <Award className="w-4 h-4 text-amber-400" />
                 </div>
                 <p className="text-slate-300 text-[11px] leading-relaxed">
-                  "Dítě potřebuje tátu i mámu. Rovnocenná péče je základem zdravého vývoje."
+                  "{translateText('Dítě potřebuje tátu i mámu. Rovnocenná péče je základem zdravého vývoje.', language)}"
                 </p>
               </div>
             </div>
@@ -221,13 +229,13 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn, partne
           <div>
             <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-800 rounded-full text-xs font-bold mb-2">
               <Layers className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Kompletní znalostní báze</span>
+              <span>{translateText('Kompletní znalostní báze', language)}</span>
             </div>
             <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 font-display tracking-tight">
-              21 Odborných tématických okruhů
+              {translateText('21 Odborných tématických okruhů', language)}
             </h2>
             <p className="text-slate-500 text-xs sm:text-sm mt-1 max-w-2xl">
-              Systematicky členěná knihovna znalostí, judikatury, metodických pokynů OSPOD a praktických rad.
+              {translateText('Systematicky členěná knihovna znalostí, judikatury, metodických pokynů OSPOD a praktických rad.', language)}
             </p>
           </div>
 
@@ -235,7 +243,7 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn, partne
             onClick={() => setShowAllCategories(!showAllCategories)}
             className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer self-start md:self-auto"
           >
-            <span>{showAllCategories ? 'Skrýt seznam' : 'Zobrazit všech 21 kategorií'}</span>
+            <span>{showAllCategories ? t('hide_list', 'Skrýt seznam') : t('show_all_21_categories', 'Zobrazit všech 21 kategorií')}</span>
             {showAllCategories ? <ChevronUp className="w-4 h-4 text-amber-300" /> : <ChevronDown className="w-4 h-4 text-amber-300" />}
           </button>
         </div>
@@ -244,40 +252,43 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn, partne
         {!showAllCategories && (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-xs uppercase tracking-wider font-bold text-slate-400">Nejvyhledávanější tematické okruhy</span>
-              <span className="text-xs text-emerald-700 font-semibold">6 klíčových oblastí</span>
+              <span className="text-xs uppercase tracking-wider font-bold text-slate-400">{translateText('Nejvyhledávanější tematické okruhy', language)}</span>
+              <span className="text-xs text-emerald-700 font-semibold">{translateText('6 klíčových oblastí', language)}</span>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {featuredCategories.map((cat, idx) => (
-                <div 
-                  key={cat.id}
-                  onClick={() => onNavigate(`category-${cat.slug}`)}
-                  className="p-5 bg-slate-50 hover:bg-emerald-50/40 rounded-2xl border border-slate-200/60 hover:border-emerald-300 transition-all cursor-pointer group flex flex-col justify-between shadow-2xs hover:shadow-md"
-                >
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-2xl p-2 bg-white rounded-xl shadow-2xs border border-slate-100">{cat.icon}</span>
-                      <span className="text-[10px] font-mono font-bold text-slate-400 bg-white px-2 py-0.5 rounded-full border border-slate-200">
-                        Okruh #{idx + 1}
-                      </span>
+              {featuredCategories.map((cat, idx) => {
+                const translatedCat = getTranslatedObject(cat.id, cat, language);
+                return (
+                  <div 
+                    key={cat.id}
+                    onClick={() => onNavigate(`category-${cat.slug}`)}
+                    className="p-5 bg-slate-50 hover:bg-emerald-50/40 rounded-2xl border border-slate-200/60 hover:border-emerald-300 transition-all cursor-pointer group flex flex-col justify-between shadow-2xs hover:shadow-md"
+                  >
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-2xl p-2 bg-white rounded-xl shadow-2xs border border-slate-100">{cat.icon}</span>
+                        <span className="text-[10px] font-mono font-bold text-slate-400 bg-white px-2 py-0.5 rounded-full border border-slate-200">
+                          {translateText('Okruh', language)} #{idx + 1}
+                        </span>
+                      </div>
+                      <div>
+                        <h3 className="font-extrabold text-slate-800 text-sm group-hover:text-emerald-800 font-display transition-colors">
+                          {translatedCat.name}
+                        </h3>
+                        <p className="text-slate-500 text-xs leading-relaxed mt-1 line-clamp-2">
+                          {translatedCat.description}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="font-extrabold text-slate-800 text-sm group-hover:text-emerald-800 font-display transition-colors">
-                        {cat.name}
-                      </h3>
-                      <p className="text-slate-500 text-xs leading-relaxed mt-1 line-clamp-2">
-                        {cat.description}
-                      </p>
-                    </div>
-                  </div>
 
-                  <div className="pt-4 mt-4 border-t border-slate-200/50 flex items-center justify-between text-xs font-bold text-emerald-700 group-hover:text-emerald-800">
-                    <span>Otevřít kapitolu</span>
-                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                    <div className="pt-4 mt-4 border-t border-slate-200/50 flex items-center justify-between text-xs font-bold text-emerald-700 group-hover:text-emerald-800">
+                      <span>{t('open_chapter', 'Otevřít kapitolu')}</span>
+                      <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}
@@ -295,7 +306,7 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn, partne
               <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
               <input
                 type="text"
-                placeholder="Hledat mezi 21 kategoriemi..."
+                placeholder={translateText("Hledat mezi 21 kategoriemi...", language)}
                 value={categorySearch}
                 onChange={(e) => setCategorySearch(e.target.value)}
                 className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:border-emerald-500 focus:outline-none transition-all"
@@ -303,42 +314,43 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn, partne
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {filteredCategories.map((cat, idx) => (
-                <div 
-                  key={cat.id}
-                  onClick={() => onNavigate(`category-${cat.slug}`)}
-                  className="p-5 bg-white hover:bg-slate-50 rounded-2xl border border-slate-200 hover:border-emerald-400 transition-all cursor-pointer group flex flex-col justify-between shadow-2xs hover:shadow-md"
-                >
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-2xl">{cat.icon}</span>
-                      <span className="text-[10px] font-mono font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
-                        {cat.slug}
-                      </span>
+              {filteredCategories.map((cat, idx) => {
+                const translatedCat = getTranslatedObject(cat.id, cat, language);
+                return (
+                  <div 
+                    key={cat.id}
+                    onClick={() => onNavigate(`category-${cat.slug}`)}
+                    className="p-5 bg-white hover:bg-slate-50 rounded-2xl border border-slate-200 hover:border-emerald-400 transition-all cursor-pointer group flex flex-col justify-between shadow-2xs hover:shadow-md"
+                  >
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-2xl">{cat.icon}</span>
+                        <span className="text-[10px] font-mono font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
+                          {cat.slug}
+                        </span>
+                      </div>
+                      <div>
+                        <h3 className="font-extrabold text-slate-800 text-sm group-hover:text-emerald-700 font-display transition-colors">
+                          {translatedCat.name}
+                        </h3>
+                        <p className="text-slate-500 text-xs leading-relaxed mt-1">
+                          {translatedCat.description}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="font-extrabold text-slate-800 text-sm group-hover:text-emerald-700 font-display transition-colors">
-                        {cat.name}
-                      </h3>
-                      <p className="text-slate-500 text-xs leading-relaxed mt-1">
-                        {cat.description}
-                      </p>
-                    </div>
-                  </div>
 
-                  <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-emerald-600 group-hover:text-emerald-700">
-                    <span>Detail okruhu</span>
-                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                    <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-emerald-600 group-hover:text-emerald-700">
+                      <span>{t('topic_detail', 'Detail okruhu')}</span>
+                      <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </motion.div>
         )}
 
       </section>
-
-      {/* ========================================================================= */}
       {/* 🔬 SEKCE 3: VĚDECKÝ ZÁKLAD & GALERIE KRITIKY (Důvěryhodnost)             */}
       {/* ========================================================================= */}
       <section className="bg-gradient-to-br from-slate-900 to-slate-950 text-white rounded-3xl p-6 md:p-8 lg:p-10 border border-slate-800 shadow-xl space-y-8" id="section-scientific-base">
@@ -347,13 +359,13 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn, partne
           <div>
             <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-teal-500/10 border border-teal-500/20 text-teal-300 rounded-full text-xs font-bold mb-2">
               <Brain className="w-3.5 h-3.5 text-teal-400" />
-              <span>Věda a fakta na 1. místě</span>
+              <span>{translateText('Věda a fakta na 1. místě', language)}</span>
             </div>
             <h2 className="text-2xl md:text-3xl font-extrabold text-white font-display tracking-tight">
-              Světový vědecký konsenzus o střídavé péči
+              {translateText('Světový vědecký konsenzus o střídavé péči', language)}
             </h2>
             <p className="text-slate-400 text-xs sm:text-sm mt-1 max-w-2xl">
-              Proti mýtům a předsudkům stavíme exaktní data ze 100+ mezinárodních metaanalýz (Harvard, Karolinska Institutet, Arizona State University).
+              {translateText('Proti mýtům a předsudkům stavíme exaktní data ze 100+ mezinárodních metaanalýz (Harvard, Karolinska Institutet, Arizona State University).', language)}
             </p>
           </div>
 
@@ -361,37 +373,40 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn, partne
             onClick={() => onNavigate('knihovna-studii')}
             className="px-4 py-2.5 bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer self-start md:self-auto"
           >
-            <span>Knihovna vědeckých studií</span>
+            <span>{translateText('Knihovna vědeckých studií', language)}</span>
             <ExternalLink className="w-3.5 h-3.5" />
           </button>
         </div>
 
         {/* Featured Key Studies Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {HUB_STUDIES.slice(0, 3).map((study) => (
-            <div 
-              key={study.id}
-              className="bg-slate-850/80 p-5 rounded-2xl border border-slate-800 space-y-3 flex flex-col justify-between hover:border-slate-700 transition-all"
-            >
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-[10px] text-teal-400 font-mono font-bold">
-                  <span>{study.authors}</span>
-                  <span>{study.year}</span>
+          {HUB_STUDIES.slice(0, 3).map((study) => {
+            const translatedStudy = getTranslatedObject(study.id, study, language);
+            return (
+              <div 
+                key={study.id}
+                className="bg-slate-850/80 p-5 rounded-2xl border border-slate-800 space-y-3 flex flex-col justify-between hover:border-slate-700 transition-all"
+              >
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-[10px] text-teal-400 font-mono font-bold">
+                    <span>{study.authors}</span>
+                    <span>{study.year}</span>
+                  </div>
+                  <h3 className="font-bold text-slate-100 text-sm leading-snug font-display">
+                    {translatedStudy.title}
+                  </h3>
+                  <p className="text-slate-400 text-xs leading-relaxed">
+                    {translatedStudy.excerpt}
+                  </p>
                 </div>
-                <h3 className="font-bold text-slate-100 text-sm leading-snug font-display">
-                  {study.title}
-                </h3>
-                <p className="text-slate-400 text-xs leading-relaxed">
-                  {study.excerpt}
-                </p>
-              </div>
 
-              <div className="pt-3 border-t border-slate-800 text-[11px] text-slate-300 bg-slate-900/50 p-3 rounded-xl border border-slate-800/50">
-                <strong className="text-emerald-400 font-bold block mb-1">Závěr studie:</strong>
-                {study.conclusion}
+                <div className="pt-3 border-t border-slate-800 text-[11px] text-slate-300 bg-slate-900/50 p-3 rounded-xl border border-slate-800/50">
+                  <strong className="text-emerald-400 font-bold block mb-1">{translateText('Závěr studie:', language)}</strong>
+                  {translatedStudy.conclusion}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Special Banner: Galerie kritiky překonaných studií */}
@@ -399,13 +414,13 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn, partne
           <div className="space-y-2 max-w-2xl">
             <div className="inline-flex items-center gap-2 px-2.5 py-0.5 bg-rose-500/20 border border-rose-500/30 text-rose-300 rounded text-[10px] font-bold uppercase tracking-wider font-mono">
               <AlertTriangle className="w-3 h-3 text-rose-400" />
-              <span>Demontáž metodických chyb</span>
+              <span>{translateText('Demontáž metodických chyb', language)}</span>
             </div>
             <h3 className="text-xl font-extrabold text-white font-display">
-              Galerie kritiky překonaných studií (např. McIntosh 2010)
+              {translateText('Galerie kritiky překonaných studií (např. McIntosh 2010)', language)}
             </h3>
             <p className="text-slate-300 text-xs leading-relaxed">
-              Často čelíte argumentům odvolávajícím se na australskou studii Jennifer McIntosh (2010), která varovala před noční péčí u nemluvňat. Tato studie byla světovou vědeckou komunitou (Nielsen, Warshak, Fabricius) plně metodicky vyvrácena pro nereprezentativní, patologický vzorek.
+              {translateText('Často čelíte argumentům odvolávajícím se na australskou studii Jennifer McIntosh (2010), která varovala před noční péčí u nemluvňat. Tato studie byla světovou vědeckou komunitou (Nielsen, Warshak, Fabricius) plně metodicky vyvrácena pro nereprezentativní, patologický vzorek.', language)}
             </p>
           </div>
 
@@ -413,7 +428,7 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn, partne
             onClick={() => onNavigate('category-kritika-studii')}
             className="px-5 py-3 bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white font-bold text-xs rounded-xl shadow-lg transition-all whitespace-nowrap cursor-pointer flex items-center gap-2"
           >
-            <span>Otevřít Galerii kritiky</span>
+            <span>{translateText('Otevřít Galerii kritiky', language)}</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>
@@ -429,13 +444,13 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn, partne
           <div>
             <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-800 rounded-full text-xs font-bold mb-2">
               <Scale className="w-3.5 h-3.5 text-amber-600" />
-              <span>Ústavní soud ČR & ESLP</span>
+              <span>{translateText('Ústavní soud ČR & ESLP', language)}</span>
             </div>
             <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 font-display tracking-tight">
-              Aktuální judikatura & Právní argumenty do vašich podání
+              {translateText('Aktuální judikatura & Právní argumenty do vašich podání', language)}
             </h2>
             <p className="text-slate-500 text-xs sm:text-sm mt-1 max-w-2xl">
-              Klíčové nálezy garantující rovnocennou péči. Kliknutím jednoduše zkopírujte právní větu přímo do vašeho podání k soudu.
+              {translateText('Klíčové nálezy garantující rovnocennou péči. Kliknutím jednoduše zkopírujte právní větu přímo do vašeho podání k soudu.', language)}
             </p>
           </div>
 
@@ -443,63 +458,66 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn, partne
             onClick={() => onNavigate('judikatura')}
             className="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer self-start md:self-auto"
           >
-            <span>Kompletní judikatura</span>
+            <span>{translateText('Kompletní judikatura', language)}</span>
             <ArrowRight className="w-3.5 h-3.5 text-amber-300" />
           </button>
         </div>
 
         {/* Selected Key Judgments list */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {HUB_JUDGMENTS.slice(0, 4).map((jud) => (
-            <div 
-              key={jud.id}
-              className="p-5 bg-slate-50/70 rounded-2xl border border-slate-200 space-y-4 hover:border-amber-300 transition-all flex flex-col justify-between"
-            >
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-mono font-bold bg-amber-100 text-amber-900 px-2.5 py-0.5 rounded-full border border-amber-200">
-                    {jud.fileNo}
-                  </span>
-                  <span className="text-[10px] text-slate-400 font-bold uppercase">
-                    {jud.court}
-                  </span>
+          {HUB_JUDGMENTS.slice(0, 4).map((jud) => {
+            const translatedJud = getTranslatedObject(jud.id, jud, language);
+            return (
+              <div 
+                key={jud.id}
+                className="p-5 bg-slate-50/70 rounded-2xl border border-slate-200 space-y-4 hover:border-amber-300 transition-all flex flex-col justify-between"
+              >
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-mono font-bold bg-amber-100 text-amber-900 px-2.5 py-0.5 rounded-full border border-amber-200">
+                      {jud.fileNo}
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-bold uppercase">
+                      {jud.court}
+                    </span>
+                  </div>
+                  <h3 className="font-extrabold text-slate-800 text-sm font-display leading-snug">
+                    {translatedJud.title}
+                  </h3>
+                  <p className="text-slate-600 text-xs leading-relaxed bg-white p-3 rounded-xl border border-slate-100 italic">
+                    "{translatedJud.excerpt}"
+                  </p>
                 </div>
-                <h3 className="font-extrabold text-slate-800 text-sm font-display leading-snug">
-                  {jud.title}
-                </h3>
-                <p className="text-slate-600 text-xs leading-relaxed bg-white p-3 rounded-xl border border-slate-100 italic">
-                  "{jud.excerpt}"
-                </p>
-              </div>
 
-              <div className="pt-3 border-t border-slate-200/60 flex items-center justify-between">
-                <button
-                  onClick={() => handleCopyQuote(jud.id, `${jud.fileNo}: ${jud.excerpt}`)}
-                  className="px-3.5 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-900 font-bold text-[11px] rounded-lg transition-all flex items-center gap-1.5 border border-amber-300/40 cursor-pointer"
-                >
-                  {copiedId === jud.id ? (
-                    <>
-                      <Check className="w-3.5 h-3.5 text-emerald-600" />
-                      <span className="text-emerald-700">Zkopírováno!</span>
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="w-3.5 h-3.5 text-amber-700" />
-                      <span>Kopírovat právní větu</span>
-                    </>
-                  )}
-                </button>
+                <div className="pt-3 border-t border-slate-200/60 flex items-center justify-between">
+                  <button
+                    onClick={() => handleCopyQuote(jud.id, `${jud.fileNo}: ${translatedJud.excerpt}`)}
+                    className="px-3.5 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-900 font-bold text-[11px] rounded-lg transition-all flex items-center gap-1.5 border border-amber-300/40 cursor-pointer"
+                  >
+                    {copiedId === jud.id ? (
+                      <>
+                        <Check className="w-3.5 h-3.5 text-emerald-600" />
+                        <span className="text-emerald-700">{translateText('Zkopírováno!', language)}</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5 text-amber-700" />
+                        <span>{translateText('Kopírovat právní větu', language)}</span>
+                      </>
+                    )}
+                  </button>
 
-                <button
-                  onClick={() => onNavigate('judikatura')}
-                  className="text-xs text-slate-500 hover:text-slate-800 font-bold flex items-center gap-1 cursor-pointer"
-                >
-                  <span>Detail nálezu</span>
-                  <ChevronRight className="w-3.5 h-3.5" />
-                </button>
+                  <button
+                    onClick={() => onNavigate('judikatura')}
+                    className="text-xs text-slate-500 hover:text-slate-800 font-bold flex items-center gap-1 cursor-pointer"
+                  >
+                    <span>{translateText('Detail nálezu', language)}</span>
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
       </section>
@@ -513,15 +531,15 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn, partne
           <div className="space-y-3 max-w-2xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-rose-500/20 border border-rose-500/40 text-rose-200 rounded-full text-xs font-extrabold uppercase tracking-wider font-mono">
               <ShieldAlert className="w-4 h-4 text-rose-400 animate-pulse" />
-              <span>SOS Krizová Zóna</span>
+              <span>{translateText('SOS Krizová Zóna', language)}</span>
             </div>
 
             <h2 className="text-2xl md:text-3xl font-extrabold text-white font-display tracking-tight">
-              Jste v akutní krizové situaci?
+              {translateText('Jste v akutní krizové situaci?', language)}
             </h2>
 
             <p className="text-rose-100/90 text-xs sm:text-sm leading-relaxed">
-              Nezákonné odepření styku, policejní zásah v místě bydliště, účelové udání na OSPOD nebo náhlá izolace od dítěte. Jednejte s chladnou hlavou a podle ověřených krokových protokolu.
+              {translateText('Nezákonné odepření styku, policejní zásah v místě bydliště, účelové udání na OSPOD nebo náhlá izolace od dítěte. Jednejte s chladnou hlavou a podle ověřených krokových protokolů.', language)}
             </p>
           </div>
 
@@ -531,7 +549,7 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn, partne
               className="px-6 py-3.5 bg-rose-500 hover:bg-rose-400 text-white font-extrabold text-xs rounded-xl shadow-lg hover:shadow-rose-500/30 transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
               <Zap className="w-4 h-4 text-amber-300" />
-              <span>Spustit SOS Průvodce</span>
+              <span>{translateText('Spustit SOS Průvodce', language)}</span>
             </button>
 
             <button
@@ -539,7 +557,7 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn, partne
               className="px-5 py-3.5 bg-slate-900/80 hover:bg-slate-800 text-rose-100 border border-rose-700/50 font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
               <FileSpreadsheet className="w-4 h-4 text-rose-300" />
-              <span>Předběžné opatření (§ 452)</span>
+              <span>{translateText('Předběžné opatření (§ 452)', language)}</span>
             </button>
           </div>
         </div>
@@ -547,23 +565,23 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn, partne
         {/* 3 Quick Action Steps in Emergency */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-rose-800/40 relative z-10">
           <div className="p-4 bg-slate-900/60 rounded-xl border border-rose-800/30 text-xs space-y-1">
-            <strong className="text-rose-300 font-bold block mb-1">1. Zachovejte klid & Neagresivitu</strong>
+            <strong className="text-rose-300 font-bold block mb-1">1. {translateText('Zachovejte klid & Neagresivitu', language)}</strong>
             <p className="text-slate-300 text-[11px] leading-relaxed">
-              Před domem matky neprovádějte žádné násilné vstupy ani verbální konfrontace. Vše nahrávejte na audio/video.
+              {translateText('Před domem matky neprovádějte žádné násilné vstupy ani verbální konfrontace. Vše nahrávejte na audio/video.', language)}
             </p>
           </div>
 
           <div className="p-4 bg-slate-900/60 rounded-xl border border-rose-800/30 text-xs space-y-1">
-            <strong className="text-rose-300 font-bold block mb-1">2. Písemná výzva & Záznam</strong>
+            <strong className="text-rose-300 font-bold block mb-1">2. {translateText('Písemná výzva & Záznam', language)}</strong>
             <p className="text-slate-300 text-[11px] leading-relaxed">
-              Odešlete matce SMS / e-mail s přesnou výzvou k předání dítěte dle dohody nebo rozhodnutí soudu.
+              {translateText('Odešlete matce SMS / e-mail s přesnou výzvou k předání dítěte dle dohody nebo rozhodnutí soudu.', language)}
             </p>
           </div>
 
           <div className="p-4 bg-slate-900/60 rounded-xl border border-rose-800/30 text-xs space-y-1">
-            <strong className="text-rose-300 font-bold block mb-1">3. Okamžité oznámení OSPOD & Soudu</strong>
+            <strong className="text-rose-300 font-bold block mb-1">3. {translateText('Okamžité oznámení OSPOD & Soudu', language)}</strong>
             <p className="text-slate-300 text-[11px] leading-relaxed">
-              Podávejte bezodkladně podnět OSPODu a návrh na předběžné opatření na okresní soud.
+              {translateText('Podávejte bezodkladně podnět OSPODu a návrh na předběžné opatření na okresní soud.', language)}
             </p>
           </div>
         </div>
@@ -579,13 +597,13 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn, partne
           <div>
             <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-800 rounded-full text-xs font-bold mb-2">
               <Coins className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Nezávislý komunitní projekt</span>
+              <span>{translateText('Nezávislý komunitní projekt', language)}</span>
             </div>
             <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 font-display tracking-tight">
-              Transparentní financování a vývoj portálu
+              {translateText('Transparentní financování a vývoj portálu', language)}
             </h2>
             <p className="text-slate-500 text-xs sm:text-sm mt-1 max-w-2xl">
-              Vývoj probíhá nezávisle pod záštitou studia <strong>Synthesis Jiřího Šár</strong> bez státních dotací či zájmových dotací.
+              {translateText('Vývoj probíhá nezávisle pod záštitou studia Synthesis Jiřího Šár bez státních dotací či zájmových dotací.', language)}
             </p>
           </div>
 
@@ -594,7 +612,7 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn, partne
             className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer self-start md:self-auto"
           >
             <Heart className="w-4 h-4 text-amber-300 fill-amber-300" />
-            <span>Podpořit chod portálu</span>
+            <span>{translateText('Podpořit chod portálu', language)}</span>
           </button>
         </div>
 
@@ -608,7 +626,7 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn, partne
               Cloud Infrastructure & Server
             </h3>
             <p className="text-slate-500 text-xs leading-relaxed">
-              Běh AI modelů, Cloud Run kontejnerů, Supabase/Firebase databází a záloh pod dohledem Synthesis OS.
+              {translateText('Běh AI modelů, Cloud Run kontejnerů, Supabase/Firebase databází a záloh pod dohledem Synthesis OS.', language)}
             </p>
           </div>
 
@@ -617,10 +635,10 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn, partne
               <Globe className="w-5 h-5" />
             </div>
             <h3 className="font-extrabold text-slate-800 text-sm font-display">
-              Oficiální Doména & Hosting
+              {translateText('Oficiální Doména & Hosting', language)}
             </h3>
             <p className="text-slate-500 text-xs leading-relaxed">
-              Zabezpečení SSL certifikátů, příprava primární domény <strong className="text-slate-700">tatamapravo.cz</strong> a CDN distribuce.
+              {translateText('Zabezpečení SSL certifikátů, příprava primární domény tatamapravo.cz a CDN distribuce.', language)}
             </p>
           </div>
 
@@ -629,10 +647,10 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn, partne
               <Users2 className="w-5 h-5" />
             </div>
             <h3 className="font-extrabold text-slate-800 text-sm font-display">
-              Komunitní Příspěvky
+              {translateText('Komunitní Příspěvky', language)}
             </h3>
             <p className="text-slate-500 text-xs leading-relaxed">
-              Veškeré finanční příspěvky od tátů směřují 100% na pokrytí API poplatků, právních revizí a provozu serverů.
+              {translateText('Veškeré finanční příspěvky od tátů směřují 100% na pokrytí API poplatků, právních revizí a provozu serverů.', language)}
             </p>
           </div>
         </div>
@@ -646,11 +664,11 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn, partne
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-base">🤝</span>
-                <span className="text-[10px] uppercase font-bold text-emerald-700 tracking-wider">Ověřená spolupráce s odborníky</span>
+                <span className="text-[10px] uppercase font-bold text-emerald-700 tracking-wider">{translateText('Ověřená spolupráce s odborníky', language)}</span>
               </div>
-              <h3 className="text-xl font-extrabold text-slate-900 font-display">Doporučujeme naše partnery</h3>
+              <h3 className="text-xl font-extrabold text-slate-900 font-display">{translateText('Doporučujeme naše partnery', language)}</h3>
               <p className="text-slate-500 text-xs mt-1 max-w-3xl">
-                Odborníci, advokáti a psychologové, kteří pomáhají rodičům zvládat náročné životní situace s důrazem na zájem dítěte.
+                {translateText('Odborníci, advokáti a psychologové, kteří pomáhají rodičům zvládat náročné životní situace s důrazem na zájem dítěte.', language)}
               </p>
             </div>
           </div>
@@ -670,7 +688,7 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn, partne
                 >
                   {partner.isRecommended && (
                     <div className="absolute top-0 right-0 bg-emerald-700 text-white text-[9px] font-bold uppercase tracking-wider px-3 py-1 rounded-bl-xl flex items-center gap-1 font-mono">
-                      <span className="text-amber-300">★</span> DOPORUČUJEME
+                      <span className="text-amber-300">★</span> {translateText('DOPORUČUJEME', language)}
                     </div>
                   )}
 
@@ -693,17 +711,17 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn, partne
                         <div className="flex items-center gap-2 flex-wrap">
                           <h4 className="font-extrabold text-slate-800 text-sm font-display leading-tight">{partner.name}</h4>
                           <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200/50">
-                            {partner.category}
+                            {translateText(partner.category, language)}
                           </span>
                         </div>
                         <p className="text-[10px] text-slate-400">
-                          📍 Působnost: <strong className="text-slate-600 font-semibold">{partner.region}</strong>
+                          📍 {translateText('Působnost:', language)} <strong className="text-slate-600 font-semibold">{translateText(partner.region, language)}</strong>
                         </p>
                       </div>
                     </div>
 
                     <p className="text-slate-600 text-xs leading-relaxed">
-                      {partner.description}
+                      {translateText(partner.description, language)}
                     </p>
                   </div>
 
@@ -714,7 +732,7 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn, partne
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-1.5 text-[11px] font-bold text-emerald-800 hover:text-emerald-900 bg-emerald-50 hover:bg-emerald-100 px-3.5 py-1.5 rounded-lg transition-all cursor-pointer border border-emerald-200/50"
                     >
-                      <span>Navštívit web / kontakt</span>
+                      <span>{translateText('Navštívit web / kontakt', language)}</span>
                       <ExternalLink className="w-3 h-3 text-emerald-700" />
                     </a>
                   </div>
@@ -730,11 +748,11 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn, partne
           <AlertTriangle className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
           <div className="space-y-2 text-xs text-slate-700 leading-relaxed">
             <div className="flex items-center gap-2 flex-wrap">
-              <h4 className="font-extrabold text-slate-900 font-display">Právní doložka a podmínky užívání portálu</h4>
-              <span className="text-[9px] bg-amber-200 text-amber-900 font-bold px-2 py-0.5 rounded font-mono uppercase tracking-wider">Upozornění</span>
+              <h4 className="font-extrabold text-slate-900 font-display">{t('legal_disclaimer_title', 'Právní doložka a podmínky užívání portálu')}</h4>
+              <span className="text-[9px] bg-amber-200 text-amber-900 font-bold px-2 py-0.5 rounded font-mono uppercase tracking-wider">{t('legal_disclaimer_warning', 'Upozornění')}</span>
             </div>
             <p>
-              Tento portál <strong>Táta má právo</strong> slouží výhradně jako nezávislá informační, vzdělávací a komunitní platforma. Všechny uvedené informace, právní věty, rozbory judikatury, vzory podání a doporučení mají podporný charakter a <strong>nenahrazují kvalifikovanou právní pomoc licencovaného advokáta</strong> ani oficiální znalecký posudek.
+              {translateText('Tento portál Táta má právo slouží výhradně jako nezávislá informační, vzdělávací a komunitní platforma. Všechny uvedené informace, právní věty, rozbory judikatury, vzory podání a doporučení mají podporný charakter a nenahrazují kvalifikovanou právní pomoc licencovaného advokáta ani oficiální znalecký posudek.', language)}
             </p>
           </div>
         </div>

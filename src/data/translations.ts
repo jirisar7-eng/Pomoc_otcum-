@@ -358,5 +358,87 @@ export const TRANSLATIONS: TranslationDictionary = {
     cs: "Oficiální spuštění alfa verze 0.0.1.2 portálu Táta má právo! 🚀",
     sk: "Oficiálne spustenie alfa verzie 0.0.1.2 portálu Otec má právo! 🚀",
     en: "Official launch of Alpha v0.0.1.2 of the Father Has Rights portal! 🚀"
+  },
+
+  // Modules, Cards & Buttons
+  open_module: {
+    cs: "Otevřít modul",
+    sk: "Otvoriť modul",
+    en: "Open module"
+  },
+  quick_consultation: {
+    cs: "Rychlá konzultace",
+    sk: "Rýchla konzultácia",
+    en: "Quick consultation"
+  },
+  download: {
+    cs: "Ke stažení",
+    sk: "Na stiahnutie",
+    en: "Download"
+  },
+  monthly_budget: {
+    cs: "Měsíční rozpočet",
+    sk: "Mesačný rozpočet",
+    en: "Monthly budget"
+  },
+  open_chapter: {
+    cs: "Otevřít kapitolu",
+    sk: "Otvoriť kapitolu",
+    en: "Open chapter"
+  },
+  topic_detail: {
+    cs: "Detail okruhu",
+    sk: "Detail okruhu",
+    en: "Topic detail"
+  },
+  show_all_21_categories: {
+    cs: "Zobrazit všech 21 kategorií",
+    sk: "Zobraziť všetkých 21 kategórií",
+    en: "Show all 21 categories"
+  },
+  hide_list: {
+    cs: "Skrýt seznam",
+    sk: "Skryť zoznam",
+    en: "Hide list"
+  },
+  open_ai_assistant: {
+    cs: "Otevřít AI Asistenta",
+    sk: "Otvoriť AI Asistenta",
+    en: "Open AI Assistant"
+  },
+  need_sos_help: {
+    cs: "Potřebuji krizovou pomoc (SOS)",
+    sk: "Potrebujem krízovú pomoc (SOS)",
+    en: "I need crisis help (SOS)"
+  },
+  explore_21_categories: {
+    cs: "Prozkoumat 21 kategorií",
+    sk: "Preskúmať 21 kategórií",
+    en: "Explore 21 categories"
+  },
+  tab_monthly_budget: {
+    cs: "Měsíční rozpočet",
+    sk: "Mesačný rozpočet",
+    en: "Monthly budget"
+  },
+  tab_bank_transfer: {
+    cs: "Bankovní převod & podpora",
+    sk: "Bankový prevod & podpora",
+    en: "Bank transfer & support"
+  },
+  tab_sponsors_partners: {
+    cs: "Sponzoři & partneři",
+    sk: "Sponzori & partneri",
+    en: "Sponsors & partners"
+  },
+  legal_disclaimer_title: {
+    cs: "Právní doložka a podmínky užívání portálu",
+    sk: "Právna doložka a podmienky užívania portálu",
+    en: "Legal disclaimer and terms of portal use"
+  },
+  legal_disclaimer_warning: {
+    cs: "Upozornění",
+    sk: "Upozornenie",
+    en: "Warning"
   }
 };
