@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { CategoryBlueprint } from '../../components/CategoryDetailView';
 import { HUB_JUDGMENTS, HUB_STUDIES, HUB_TEMPLATES, HubTemplate } from '../../data/contentHub';
+import { slugify } from '../../lib/navigation';
 
 export interface ExtendedCategoryPageProps {
   title: string;
@@ -178,7 +179,7 @@ export default function CategoryPageLayout({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 space-y-8">
         
         {/* BLOCK 1: Purpose Card & Legal Definition */}
-        <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-3xs space-y-4">
+        <div id="pravni-zaklad" className="bg-white p-6 rounded-3xl border border-slate-200 shadow-3xs space-y-4 scroll-mt-24">
           <div className="flex items-center gap-3 border-b border-slate-100 pb-3">
             <div className="p-2 bg-teal-50 border border-teal-200 text-teal-800 rounded-xl">
               <Compass className="w-5 h-5" />
@@ -195,57 +196,63 @@ export default function CategoryPageLayout({
 
         {/* CUSTOM WIDGET (e.g. Kalkulačka výživného) */}
         {customWidget && (
-          <div className="space-y-4">
+          <div id="kalkulacka-widget" className="space-y-4 scroll-mt-24">
             {customWidget}
           </div>
         )}
 
         {/* BLOCK 2: DETAILNÍ ODBORNÝ ROZBOR */}
-        <div className="space-y-4">
+        <div id="odborny-rozbor" className="space-y-4 scroll-mt-24">
           <h2 className="text-lg font-black text-slate-900 font-display flex items-center gap-2">
             <BookOpen className="w-5 h-5 text-indigo-600" />
             <span>Detailní odborný rozbor a klíčová témata</span>
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {legalSections.map((section, idx) => (
-              <div key={idx} className="bg-white p-5 rounded-3xl border border-slate-200 shadow-3xs space-y-2">
-                <div className="flex items-center gap-2">
-                  <span className="w-6 h-6 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-800 text-xs font-black font-mono flex items-center justify-center shrink-0">
-                    {idx + 1}
-                  </span>
-                  <h3 className="text-sm font-black text-slate-900 font-display">{section.title}</h3>
+            {legalSections.map((section, idx) => {
+              const secId = slugify(section.title);
+              return (
+                <div id={secId} key={idx} className="bg-white p-5 rounded-3xl border border-slate-200 shadow-3xs space-y-2 scroll-mt-24">
+                  <div className="flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-800 text-xs font-black font-mono flex items-center justify-center shrink-0">
+                      {idx + 1}
+                    </span>
+                    <h3 className="text-sm font-black text-slate-900 font-display">{section.title}</h3>
+                  </div>
+                  <p className="text-xs text-slate-600 leading-relaxed pt-1">
+                    {section.content}
+                  </p>
                 </div>
-                <p className="text-xs text-slate-600 leading-relaxed pt-1">
-                  {section.content}
-                </p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
         {/* Key Points & Pillars */}
-        <div className="space-y-4">
+        <div id="pilire" className="space-y-4 scroll-mt-24">
           <h2 className="text-lg font-black text-slate-900 font-display flex items-center gap-2">
             <Scale className="w-5 h-5 text-emerald-600" />
             <span>Hlavní pilíře v opatrovnické praxi</span>
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {blueprint.keyPoints.map((kp, idx) => (
-              <div key={idx} className="bg-emerald-50/40 p-5 rounded-3xl border border-emerald-200/80 shadow-3xs space-y-2">
-                <h3 className="text-xs font-black text-emerald-950 flex items-center gap-1.5 font-display">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>{kp.title}</span>
-                </h3>
-                <p className="text-xs text-slate-700 leading-relaxed">
-                  {kp.detail}
-                </p>
-              </div>
-            ))}
+            {blueprint.keyPoints.map((kp, idx) => {
+              const kpId = slugify(kp.title);
+              return (
+                <div id={kpId} key={idx} className="bg-emerald-50/40 p-5 rounded-3xl border border-emerald-200/80 shadow-3xs space-y-2 scroll-mt-24">
+                  <h3 className="text-xs font-black text-emerald-950 flex items-center gap-1.5 font-display">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>{kp.title}</span>
+                  </h3>
+                  <p className="text-xs text-slate-700 leading-relaxed">
+                    {kp.detail}
+                  </p>
+                </div>
+              );
+            })}
           </div>
         </div>
 
         {/* BLOCK 3: JUDIKATURA & ZDROJE (STRICTLY FILTERED) */}
-        <div className="space-y-4 pt-2">
+        <div id="judikatura-a-studie" className="space-y-4 pt-2 scroll-mt-24">
           <div className="flex items-center justify-between border-b border-slate-200 pb-2">
             <h2 className="text-lg font-black text-slate-900 font-display flex items-center gap-2">
               <Scale className="w-5 h-5 text-purple-600" />
@@ -317,7 +324,7 @@ export default function CategoryPageLayout({
         </div>
 
         {/* BLOCK 4: AKČNÍ KROKY & VZORY */}
-        <div className="bg-slate-900 text-white p-6 rounded-3xl border border-slate-800 shadow-md space-y-4">
+        <div id="akcni-kroky" className="bg-slate-900 text-white p-6 rounded-3xl border border-slate-800 shadow-md space-y-4 scroll-mt-24">
           <div className="flex items-center gap-3 border-b border-slate-800 pb-3">
             <div className="p-2 bg-teal-500/20 text-teal-400 border border-teal-500/30 rounded-xl">
               <ShieldAlert className="w-5 h-5" />
@@ -338,7 +345,7 @@ export default function CategoryPageLayout({
         </div>
 
         {/* Dedicated Templates for this Category */}
-        <div className="space-y-4">
+        <div id="doporucene-vzory" className="space-y-4 scroll-mt-24">
           <div className="flex items-center justify-between border-b border-slate-200 pb-2">
             <h2 className="text-lg font-black text-slate-900 font-display flex items-center gap-2">
               <FolderCheck className="w-5 h-5 text-blue-600" />

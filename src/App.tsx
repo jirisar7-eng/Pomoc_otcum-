@@ -31,6 +31,7 @@ import { SupabaseService, isSupabaseConfigured } from './lib/supabase';
 import Breadcrumbs from './components/Breadcrumbs';
 import RelatedContent from './components/RelatedContent';
 import { updatePageSeo } from './lib/seo';
+import { parseInternalLink, scrollToAnchor } from './lib/navigation';
 
 // Component imports
 import Navigation from './components/Navigation';
@@ -106,7 +107,15 @@ export default function App() {
     return user;
   });
   const [showIntro, setShowIntro] = useState<boolean>(() => localStorage.getItem('tata_ma_pravo_hide_intro') !== 'true');
-  const [activeTab, setActiveTab] = useState<string>('home');
+  const [activeTab, setActiveTab] = useState<string>(() => {
+    if (typeof window !== 'undefined') {
+      const hash = window.location.hash;
+      const path = window.location.pathname;
+      const parsed = parseInternalLink(hash || path, 'home');
+      if (parsed.targetTab) return parsed.targetTab;
+    }
+    return getStoredState<string>('active_tab', 'home');
+  });
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [authModalOpen, setAuthModalOpen] = useState<boolean>(false);
 
@@ -356,6 +365,54 @@ export default function App() {
     return () => window.removeEventListener('open-glossary', handleOpenGlossary);
   }, []);
 
+  // Listen for global navigation events (e.g. SmartLink clicks or internal routing) and hash changes
+  useEffect(() => {
+    const handleNavigateEvent = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (!detail) return;
+      const { tab, anchor } = detail;
+      if (tab) {
+        setActiveTab(tab);
+      }
+      if (anchor) {
+        [50, 150, 350, 600, 1000].forEach(delay => {
+          setTimeout(() => {
+            scrollToAnchor(anchor);
+          }, delay);
+        });
+      }
+    };
+
+    const handleHashOrPopstate = () => {
+      const hash = window.location.hash;
+      const path = window.location.pathname;
+      const parsed = parseInternalLink(hash || path, activeTab);
+      if (parsed.targetTab && parsed.targetTab !== activeTab) {
+        setActiveTab(parsed.targetTab);
+      }
+      if (parsed.anchor) {
+        [50, 150, 350, 600, 1000].forEach(delay => {
+          setTimeout(() => {
+            scrollToAnchor(parsed.anchor!);
+          }, delay);
+        });
+      }
+    };
+
+    window.addEventListener('app-navigate-tab-anchor', handleNavigateEvent);
+    window.addEventListener('hashchange', handleHashOrPopstate);
+    window.addEventListener('popstate', handleHashOrPopstate);
+
+    // Initial check on mount if hash or path contains an anchor
+    handleHashOrPopstate();
+
+    return () => {
+      window.removeEventListener('app-navigate-tab-anchor', handleNavigateEvent);
+      window.removeEventListener('hashchange', handleHashOrPopstate);
+      window.removeEventListener('popstate', handleHashOrPopstate);
+    };
+  }, []);
+
   // Synchronize States to LocalStorage
   useEffect(() => {
     setStoredState('current_user', currentUser);
@@ -365,8 +422,17 @@ export default function App() {
     setStoredState('active_tab', activeTab);
     updatePageSeo(activeTab);
     
-    // Smooth scroll to the content area or page top on tab selection
-    if (activeTab === 'home') {
+    // Check if there is an anchor hash to scroll to first
+    const hash = typeof window !== 'undefined' ? window.location.hash : '';
+    const parsed = parseInternalLink(hash, activeTab);
+
+    if (parsed.anchor) {
+      [50, 150, 350, 600].forEach(delay => {
+        setTimeout(() => {
+          scrollToAnchor(parsed.anchor!);
+        }, delay);
+      });
+    } else if (activeTab === 'home') {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
       const contentElement = document.getElementById('synthesis-main-content');

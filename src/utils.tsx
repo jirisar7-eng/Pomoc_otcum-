@@ -1,17 +1,46 @@
 import React from 'react';
+import SmartLink from './components/SmartLink';
 
 /**
- * Parses raw asterisks (**text**) and replaces them with JSX <strong> elements safely.
+ * Parses raw asterisks (**text**) and markdown links ([Label](url)) safely into JSX.
  */
 export function formatRichText(text: string): React.ReactNode {
   if (!text) return '';
-  
-  const parts = text.split('**');
+
+  // Match markdown links [Text](url) or bold **text**
+  const regex = /(\[.*?\]\(.*?\))|(\*\*.*?\*\*)/g;
+  const parts = text.split(regex);
+
   return parts.map((part, index) => {
-    if (index % 2 === 1) {
-      return <strong key={index} className="font-bold text-slate-800">{part}</strong>;
+    if (!part) return null;
+
+    // Check if link [Label](url)
+    const linkMatch = part.match(/^\[(.*?)\]\((.*?)\)$/);
+    if (linkMatch) {
+      const label = linkMatch[1];
+      const url = linkMatch[2];
+      return (
+        <SmartLink
+          key={index}
+          href={url}
+          className="text-teal-600 hover:text-teal-800 font-bold underline underline-offset-2 transition-colors"
+        >
+          {label}
+        </SmartLink>
+      );
     }
-    return part;
+
+    // Check if bold **text**
+    const boldMatch = part.match(/^\*\*(.*?)\*\*$/);
+    if (boldMatch) {
+      return (
+        <strong key={index} className="font-bold text-slate-900">
+          {boldMatch[1]}
+        </strong>
+      );
+    }
+
+    return <React.Fragment key={index}>{part}</React.Fragment>;
   });
 }
 

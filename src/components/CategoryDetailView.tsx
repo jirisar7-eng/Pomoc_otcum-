@@ -1007,7 +1007,7 @@ export default function CategoryDetailView({
                   <div className="space-y-2">
                     <div className="flex items-center justify-between gap-2">
                       <span className="text-[10px] font-mono font-bold bg-teal-50 text-teal-800 px-2 py-0.5 rounded-md border border-teal-100">
-                        {art.readTime || '5 min'} čtení
+                        {(art as any).readTime || '5 min'} čtení
                       </span>
                       <span className="text-[10px] text-slate-400 font-mono">
                         Aktualizováno {art.lastUpdated}
