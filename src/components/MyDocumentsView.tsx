@@ -20,7 +20,13 @@ import {
   AlertCircle, 
   FileSpreadsheet,
   Layers,
-  Scale
+  Scale,
+  Compass,
+  Heart,
+  Quote,
+  UserCheck,
+  Flag,
+  ArrowRight
 } from 'lucide-react';
 import { MY_ANONYMIZED_DOCUMENTS, AnonymizedDocument } from '../data/myAnonymizedDocuments';
 
@@ -93,39 +99,91 @@ export default function MyDocumentsView({ setActiveTab, setSearchQuery }: MyDocu
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8" id="my-documents-portal-view">
       
-      {/* Header & Anonymization Guarantee */}
+      {/* Header & Founder's Vision Hero */}
       <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl border border-slate-800 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
         
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-          <div className="space-y-3 max-w-3xl">
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+          <div className="space-y-4 max-w-3xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/20 border border-teal-400/30 text-teal-300 text-xs font-mono font-semibold">
-              <ShieldCheck className="w-4 h-4 text-teal-400" />
-              <span>100% ANONYMIZOVANÝ SPIS Z PRAXE • JEDEN DOKUMENT = JEDNA STRÁNKA</span>
+              <Compass className="w-4 h-4 text-teal-400" />
+              <span>CESTA ZAKLADATELE PORTÁLU • POMOC OTCŮM Z VLASTNÍ ZKUŠENOSTI</span>
             </div>
             
-            <h1 className="text-2xl sm:text-3xl font-display font-bold text-white tracking-tight">
-              Moje dokumenty – Informační spis portálu
+            <h1 className="text-2xl sm:text-4xl font-display font-bold text-white tracking-tight leading-tight">
+              Cesta zakladatele – Můj příběh & Osobní dokumenty
             </h1>
             
-            <p className="text-slate-300 text-sm leading-relaxed">
-              Autentická reálná právní podání, odvolání, usnesení soudu, stížnosti na OSPOD, podněty k MPSV, Ombudsmanovi a vyjádření sociálních služeb. Veškeré osobní údaje (jména, rodná čísla, přesné adresy, spisy a obce) byly přísně anonymizovány a nahrazeny obecnými právními zastupnými vzory.
+            <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
+              Tento portál nevznikl v kanceláři právní firmy. Vznikl z mého vlastního, těžce vybojovaného rodičovského zápasu o syna. Jako otec jsem na vlastní kůži zažil systémové překážky, odmítání noční péče u kojence, podjatost sociálních služeb i informační blokádu. Zde sdílím svůj kompletní reálný spis jako živý návod a oporu pro další táty.
             </p>
           </div>
 
-          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10 text-center shrink-0 min-w-[200px]">
-            <span className="text-[10px] font-mono text-slate-300 uppercase tracking-wider block">Celkem v databázi</span>
-            <span className="text-3xl font-display font-extrabold text-teal-400">{MY_ANONYMIZED_DOCUMENTS.length} / {MY_ANONYMIZED_DOCUMENTS.length}</span>
-            <span className="text-xs text-slate-300 block mt-1 font-sans">Anonymizovaných stránek</span>
+          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/10 text-center shrink-0 min-w-[220px] space-y-2">
+            <span className="text-[10px] font-mono text-slate-300 uppercase tracking-wider block">Osobní spis zakladatele</span>
+            <span className="text-4xl font-display font-extrabold text-teal-400">{MY_ANONYMIZED_DOCUMENTS.length} / {MY_ANONYMIZED_DOCUMENTS.length}</span>
+            <span className="text-xs text-slate-200 block font-sans">Anonymizovaných stránek spisu</span>
+            <div className="text-[10px] text-teal-300 bg-teal-500/20 py-1 px-2 rounded-lg font-mono mt-2">
+              1 DOKUMENT = 1 STRÁNKA
+            </div>
           </div>
         </div>
 
         {/* Anonymization Notice */}
         <div className="mt-6 pt-4 border-t border-white/10 flex items-start gap-3 text-xs text-teal-200/90 font-mono">
-          <AlertCircle className="w-4 h-4 text-teal-400 shrink-0 mt-0.5" />
+          <ShieldCheck className="w-4 h-4 text-teal-400 shrink-0 mt-0.5" />
           <span>
-            <strong>Bezpečnostní protokol anonymizace:</strong> Žádné osobní údaje se na tomto portálu neobjevují. Identifikátory jsou nahrazeny značkami [OTEC], [MATKA], [NEZLETILÝ SYN A], [OKRESNÍ SOUD], [KRAJSKÝ SOUD], [OBEC A], [DATUM] a [SPIS. ZN.].
+            <strong>Garantovaný protokol 100% anonymizace:</strong> Pro ochranu soukromí dětí a rodiny byly veškeré osobní údaje, rodná čísla, jména, adresy, spisy a konkrétní obce v celém spisu důsledně anonymizovány a nahrazeny obecnými právními zastupnými vzory ([OTEC], [MATKA], [NEZLETILÝ SYN A], [OKRESNÍ SOUD], atd.).
           </span>
+        </div>
+      </div>
+
+      {/* Founder's Story Detail Card */}
+      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
+        <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
+          <div className="w-10 h-10 rounded-2xl bg-teal-50 text-teal-700 flex items-center justify-center font-bold shrink-0">
+            <Quote className="w-5 h-5" />
+          </div>
+          <div>
+            <h2 className="text-lg font-bold text-slate-900 font-display">
+              Proč jsem vytvořil tento web: Osobní poselství otcům
+            </h2>
+            <p className="text-xs text-slate-500 font-sans">
+              Autentický příběh mého opatrovnického sporu a motivace k založení komunitního portálu
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 text-sm text-slate-700 leading-relaxed">
+          <div className="space-y-2 bg-slate-50 p-5 rounded-2xl border border-slate-100">
+            <div className="flex items-center gap-2 font-bold text-slate-900 text-xs font-mono uppercase tracking-wider text-teal-800">
+              <Flag className="w-4 h-4 text-teal-600" />
+              1. Boj za noční péči a brášku
+            </div>
+            <p className="text-xs text-slate-600">
+              Když měl můj syn pouhých 6 měsíců, čelil jsem argumentům, že takto malé dítě nepatří k otci na noc. Soud I. stupně rozdrobil moji péči v lichém týdnu na 3 samostatné odpolední úseky bez nocování a nakázal předávat dítě na nádraží. Současně tím zcela izoloval mladšího syna od jeho 8letého bratra, kterého mám ve výlučné péči. Odmítl jsem se vzdát a podal jsem odvolání opřené o mezinárodní vědecké studie (Dr. Warshak, Prof. Fabricius).
+            </p>
+          </div>
+
+          <div className="space-y-2 bg-slate-50 p-5 rounded-2xl border border-slate-100">
+            <div className="flex items-center gap-2 font-bold text-slate-900 text-xs font-mono uppercase tracking-wider text-teal-800">
+              <Scale className="w-4 h-4 text-teal-600" />
+              2. Střet s úřady a OSPODem
+            </div>
+            <p className="text-xs text-slate-600">
+              Setkal jsem se s neobjektivním přístupem OSPODu i terénních služeb Charity, které podmiňovaly moje rodičovská práva souhlasem matky. Když matka za asistence Charity odebrala spící nemocné dítě s neštovicemi a horečkou 37,6 °C před doručením rozsudku, využil jsem všechny právní nástroje: stížnost dle § 175 správního řádu, podněty na MPSV, exekuční návrh k soudu i podání Dětskému ombudsmanovi.
+            </p>
+          </div>
+
+          <div className="space-y-2 bg-slate-50 p-5 rounded-2xl border border-slate-100">
+            <div className="flex items-center gap-2 font-bold text-slate-900 text-xs font-mono uppercase tracking-wider text-teal-800">
+              <Heart className="w-4 h-4 text-teal-600" />
+              3. Zkušenost přetavená v pomoc
+            </div>
+            <p className="text-xs text-slate-600">
+              Celý tento náročný proces mě naučil, jak klíčová je přesná evidence, věcnost, znalost právních předpisů a odvaha. Všechny tyto reálné anonymizované dokumenty publikuji zde, aby každý otec v České republice viděl, jak přesně koncipovat podání, jak reagovat na neobjektivitu OSPODu a jak bránit nejlepší zájem svých dětí.
+            </p>
+          </div>
         </div>
       </div>
 

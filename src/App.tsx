@@ -511,7 +511,7 @@ export default function App() {
               />
             )}
 
-            {activeTab === 'moje-dokumenty' && (
+            {(activeTab === 'cesta-zakladatele' || activeTab === 'moje-dokumenty') && (
               <MyDocumentsView 
                 setActiveTab={setActiveTab} 
                 setSearchQuery={setSearchQuery} 

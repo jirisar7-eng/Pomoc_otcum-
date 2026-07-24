@@ -386,7 +386,7 @@ export default function Navigation({
                 }`}
               >
                 <Heart className={`w-3.5 h-3.5 text-teal-600 ${activeTab === 'support' ? '' : 'animate-pulse'}`} />
-                <span>Podpořit</span>
+                <span>O portálu &amp; Podpora</span>
               </button>
 
               {/* User Authentication Profile Badge */}

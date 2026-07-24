@@ -21,6 +21,7 @@ import {
   ShieldAlert, 
   Sliders, 
   FolderCheck, 
+  Compass,
   Bell, 
   Database, 
   LucideIcon
@@ -59,13 +60,13 @@ export const PUBLIC_TOPBAR_ITEMS: NavItem[] = [
   { id: 'home', label: 'Domů', path: '/', icon: Home, desc: 'Titulní strana portálu' },
   { id: 'news', label: 'Články', path: '/clanky', icon: FileText, desc: 'Odborné články a info báze' },
   { id: 'videoteka', label: 'Videotéka', path: '/videoteka', icon: Tv, desc: 'Instruktážní videa a přednášky' },
-  { id: 'moje-dokumenty', label: 'Moje dokumenty', path: '/moje-dokumenty', icon: FolderCheck, desc: 'Anonymizované reálné případy a podání (1 dokument = 1 stránka)' },
+  { id: 'cesta-zakladatele', label: 'Cesta zakladatele', path: '/cesta-zakladatele', icon: Compass, desc: 'Příběh zakladatele, motivace k založení portálu a anonymizovaný spis z mého boje za syna' },
   { id: 'judikatura', label: 'Judikatura', path: '/judikatura', icon: Scale, desc: 'Nálezy Ústavního soudu a rozsudky' },
   { id: 'knihovna-studii', label: 'Studie', path: '/studie', icon: BookOpen, desc: 'Vědecké publikace a výzkumy' },
   { id: 'ai-assistant', label: 'AI Nástroje', path: '/ai', icon: Sparkles, desc: 'Generativní AI Právní asistent' },
   { id: 'forum', label: 'Komunita', path: '/komunita', icon: MessageSquare, desc: 'Diskusní fórum a příběhy' },
   { id: 'partners', label: 'Partneři', path: '/partneri', icon: Users, desc: 'Podporující organizace a advokáti' },
-  { id: 'support', label: 'Podpora', path: '/podpora', icon: Heart, desc: 'Finanční a morální podpora vývoje' },
+  { id: 'support', label: 'O portálu & Podpora', path: '/podpora', icon: Heart, desc: 'Informace o poslání portálu, transparentní rozpočet a podpora vývoje' },
   { id: 'contacts', label: 'Kontakt', path: '/kontakt', icon: PhoneCall, desc: 'Kontaktní údaje a SOS linky' }
 ];
 
