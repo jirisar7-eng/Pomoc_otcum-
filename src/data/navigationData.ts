@@ -65,9 +65,10 @@ export const PUBLIC_TOPBAR_ITEMS: NavItem[] = [
   { id: 'knihovna-studii', label: 'Studie', path: '/studie', icon: BookOpen, desc: 'Vědecké publikace a výzkumy' },
   { id: 'ai-assistant', label: 'AI Nástroje', path: '/ai', icon: Sparkles, desc: 'Generativní AI Právní asistent' },
   { id: 'forum', label: 'Komunita', path: '/komunita', icon: MessageSquare, desc: 'Diskusní fórum a příběhy' },
+  { id: 'crisis', label: 'Krizová pomoc & SOS linky', path: '/krizova-pomoc', icon: ShieldAlert, desc: 'Externí pomáhající organizace, krizové linky, psychologická pomoc a poradny' },
   { id: 'partners', label: 'Partneři', path: '/partneri', icon: Users, desc: 'Podporující organizace a advokáti' },
   { id: 'support', label: 'O portálu & Podpora', path: '/podpora', icon: Heart, desc: 'Informace o poslání portálu, transparentní rozpočet a podpora vývoje' },
-  { id: 'contacts', label: 'Kontakt', path: '/kontakt', icon: PhoneCall, desc: 'Kontaktní údaje a SOS linky' }
+  { id: 'contacts', label: 'Kontakt na autora', path: '/kontakt-autor', icon: PhoneCall, desc: 'Přímé spojení na Jiřího Šára – Synthesis OS, technická podpora a zpětná vazba' }
 ];
 
 // 2. DYNAMICKÁ SEKCE - AŽ PO PŘIHLÁŠENÍ (if user isLoggedIn)

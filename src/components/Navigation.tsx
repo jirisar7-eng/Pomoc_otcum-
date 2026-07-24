@@ -31,7 +31,9 @@ import {
   ShieldAlert,
   Database,
   FolderCheck,
-  Layers
+  Layers,
+  Mail,
+  Compass
 } from 'lucide-react';
 import { User } from '../types';
 import { useLanguage } from '../lib/LanguageContext';
@@ -705,14 +707,31 @@ export default function Navigation({
                   )}
                 </div>
 
-                {/* 4. SECTOR: ℹ️ O PORTÁLU & PODPORA (Footer Menu) */}
+                {/* 4. SECTOR: ℹ️ O PROJEKTU & ZÁZEMÍ (Footer Menu) */}
                 <div className="space-y-2.5 border-t border-slate-100 pt-4 pb-2">
                   <div className="flex items-center gap-2 px-1 text-xs font-black text-slate-900 font-display uppercase tracking-wider">
                     <span className="text-base">ℹ️</span>
-                    <span>O portálu & Podpora</span>
+                    <span>O projektu &amp; Zázemí</span>
                   </div>
 
                   <div className="grid grid-cols-2 gap-2">
+                    {/* 1. 📖 Cesta zakladatele (Můj příběh & Spis) */}
+                    <button
+                      onClick={() => handleTabClick('cesta-zakladatele')}
+                      className={`col-span-2 flex items-center justify-between p-2.5 rounded-2xl text-xs font-bold text-left transition-all border cursor-pointer ${
+                        activeTab === 'cesta-zakladatele'
+                          ? 'bg-amber-50 text-amber-950 border-amber-300 shadow-xs font-extrabold'
+                          : 'bg-amber-50/40 hover:bg-amber-100/50 text-amber-900 border-amber-200/80'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <Compass className="w-4 h-4 text-amber-600 shrink-0" />
+                        <span className="text-xs font-extrabold text-amber-950">📖 Cesta zakladatele (Můj příběh &amp; Spis)</span>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-amber-500 shrink-0" />
+                    </button>
+
+                    {/* 2. 📚 Odborný slovník pojmů */}
                     <button
                       onClick={() => {
                         window.dispatchEvent(new CustomEvent('open-glossary', { detail: '' }));
@@ -722,11 +741,12 @@ export default function Navigation({
                     >
                       <div className="flex items-center gap-2.5">
                         <BookOpen className="w-4 h-4 text-teal-600 shrink-0" />
-                        <span className="text-xs font-bold text-slate-900">Odborný slovník pojmů</span>
+                        <span className="text-xs font-bold text-slate-900">📚 Odborný slovník pojmů</span>
                       </div>
                       <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
                     </button>
 
+                    {/* 3. 🤝 Partneři projektu */}
                     <button
                       onClick={() => handleTabClick('partners')}
                       className={`flex items-center gap-2 p-2.5 rounded-2xl text-xs font-bold text-left transition-all border cursor-pointer ${
@@ -736,9 +756,10 @@ export default function Navigation({
                       }`}
                     >
                       <Users className="w-4 h-4 text-slate-600 shrink-0" />
-                      <span className="truncate">Partneři projektu</span>
+                      <span className="truncate">🤝 Partneři projektu</span>
                     </button>
 
+                    {/* 4. 💡 Podpora provozu a financování */}
                     <button
                       onClick={() => handleTabClick('support')}
                       className={`flex items-center gap-2 p-2.5 rounded-2xl text-xs font-bold text-left transition-all border cursor-pointer ${
@@ -748,20 +769,37 @@ export default function Navigation({
                       }`}
                     >
                       <Heart className="w-4 h-4 text-teal-600 shrink-0" />
-                      <span className="truncate">Podpora provozu</span>
+                      <span className="truncate">💡 Podpora provozu</span>
                     </button>
 
+                    {/* 5. 🚨 Krizová pomoc & SOS linky */}
+                    <button
+                      onClick={() => handleTabClick('crisis')}
+                      className={`col-span-2 flex items-center justify-between p-2.5 rounded-2xl text-xs font-bold text-left transition-all border cursor-pointer ${
+                        activeTab === 'crisis'
+                          ? 'bg-rose-50 text-rose-950 border-rose-300 shadow-xs font-extrabold'
+                          : 'bg-rose-50/40 hover:bg-rose-100/50 text-rose-900 border-rose-200/80'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <ShieldAlert className="w-4 h-4 text-rose-600 shrink-0" />
+                        <span className="text-xs font-extrabold text-rose-950">🚨 Krizová pomoc &amp; SOS linky</span>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-rose-400 shrink-0" />
+                    </button>
+
+                    {/* 6. ✉️ Kontakt na autora projektu */}
                     <button
                       onClick={() => handleTabClick('contacts')}
                       className={`col-span-2 flex items-center justify-between p-2.5 rounded-2xl text-xs font-bold text-left transition-all border cursor-pointer ${
                         activeTab === 'contacts'
-                          ? 'bg-teal-50 text-teal-950 border-teal-300 shadow-xs'
+                          ? 'bg-teal-50 text-teal-950 border-teal-300 shadow-xs font-extrabold'
                           : 'bg-slate-50 hover:bg-slate-100 text-slate-800 border-slate-200/80'
                       }`}
                     >
                       <div className="flex items-center gap-2.5">
-                        <PhoneCall className="w-4 h-4 text-slate-600 shrink-0" />
-                        <span className="text-xs font-bold text-slate-900">Kontakt & SOS linky</span>
+                        <Mail className="w-4 h-4 text-teal-600 shrink-0" />
+                        <span className="text-xs font-bold text-slate-900">✉️ Kontakt na autora projektu</span>
                       </div>
                       <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
                     </button>

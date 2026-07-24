@@ -52,7 +52,11 @@ interface RegionOrg {
   focus: string;
 }
 
-export default function CrisisSection() {
+interface CrisisSectionProps {
+  setActiveTab?: (tab: string) => void;
+}
+
+export default function CrisisSection({ setActiveTab }: CrisisSectionProps = {}) {
   // --- States ---
   const [activeSubTab, setActiveSubTab] = useState<'triage' | 'generator' | 'map' | 'diary' | 'glossary'>('triage');
   
@@ -1800,6 +1804,26 @@ ${genData.fatherName || '[Jméno otce]'}`;
 
         </div>
       )}
+
+      {/* Footer Banner: Switch to Author Contact */}
+      <div className="mt-8 bg-slate-900 text-white p-6 rounded-2xl border border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-md">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2 text-teal-400 font-mono text-xs font-bold uppercase">
+            <Mail className="w-4 h-4" />
+            <span>Technická podpora &amp; Kontakt na autora</span>
+          </div>
+          <p className="text-xs text-slate-300 leading-relaxed max-w-xl">
+            Máte technický dotaz k fungování portálu, hlášení chyby v AI asistentovi nebo chcete odeslat přímou zpětnou vazbu zakladateli Jiřímu Šárovi?
+          </p>
+        </div>
+        <button
+          onClick={() => setActiveTab && setActiveTab('contacts')}
+          className="px-4 py-2.5 bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs rounded-xl transition-all cursor-pointer shadow-3xs shrink-0 flex items-center gap-1.5"
+        >
+          <span>Přejít na Kontakt na autora</span>
+          <ChevronRight className="w-4 h-4" />
+        </button>
+      </div>
 
     </div>
   );

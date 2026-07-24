@@ -41,7 +41,6 @@ import DocumentsSection from './components/DocumentsSection';
 import AdviceSection from './components/AdviceSection';
 import StoriesSection from './components/StoriesSection';
 import ForumSection from './components/ForumSection';
-import ContactsSection from './components/ContactsSection';
 import NewsSection from './components/NewsSection';
 import AdminPanel from './components/AdminPanel';
 import AiAssistant from './components/AiAssistant';
@@ -58,7 +57,7 @@ import CrisisSection from './components/CrisisSection';
 import SupportSection from './components/SupportSection';
 import CoParentHub from './components/CoParentHub';
 import GlossaryDrawer from './components/GlossaryDrawer';
-import MyDocumentsView from './components/MyDocumentsView';
+import FounderStoryView from './components/FounderStoryView';
 import AiGuideSection from './components/AiGuideSection';
 import UserPortal from './components/UserPortal';
 import UserProfile from './components/UserProfile';
@@ -511,8 +510,8 @@ export default function App() {
               />
             )}
 
-            {(activeTab === 'cesta-zakladatele' || activeTab === 'moje-dokumenty') && (
-              <MyDocumentsView 
+            {activeTab === 'cesta-zakladatele' && (
+              <FounderStoryView 
                 setActiveTab={setActiveTab} 
                 setSearchQuery={setSearchQuery} 
               />
@@ -612,11 +611,14 @@ export default function App() {
               <KontaktSection
                 currentUser={currentUser}
                 onOpenAuth={() => setAuthModalOpen(true)}
+                setActiveTab={setActiveTab}
               />
             )}
 
             {activeTab === 'crisis' && (
-              <CrisisSection />
+              <CrisisSection 
+                setActiveTab={setActiveTab}
+              />
             )}
 
             {activeTab === 'support' && (
