@@ -5,9 +5,9 @@
 
 export interface AnonymizedDocument {
   id: string;
-  pageNumber: number; // 1 to 20 ("Jeden dokument jedna stránka")
+  pageNumber: number; // 1 to 25 ("Jeden dokument jedna stránka")
   title: string;
-  category: 'soudni-podani' | 'soudni-usneseni' | 'ospod-meu' | 'mpsv-ombudsman' | 'charita-sluzby';
+  category: 'soudni-podani' | 'soudni-usneseni' | 'ospod-meu' | 'mpsv-ombudsman' | 'charita-sluzby' | 'zpravy-dokazy';
   categoryLabel: string;
   issuingBody: string;
   targetBody: string;
@@ -22,545 +22,858 @@ export const MY_ANONYMIZED_DOCUMENTS: AnonymizedDocument[] = [
   {
     id: 'doc-01',
     pageNumber: 1,
-    title: 'Odvolání otce proti usnesení o nepřihlížení k návrhu na prozatímní rozhodnutí',
-    category: 'soudni-podani',
-    categoryLabel: 'Soudní podání otce',
-    issuingBody: 'Navrhovatel (Otec)',
-    targetBody: 'Krajský soud v [KRAJSKÉ MĚSTO] (přes Okresní soud)',
+    title: 'Rozsudek Okresního soudu o péči a výživném (9. 6. 2026)',
+    category: 'soudni-usneseni',
+    categoryLabel: 'Soudní usnesení & rozsudky',
+    issuingBody: 'Okresní soud v [OKRESNÍ MĚSTO]',
+    targetBody: 'Účastníci řízení ([OTEC], [MATKA])',
     dateStr: '[DATUM]',
     caseRef: '[SPIS. ZN. 13 Nc XX/2026]',
-    summary: 'Právně argumentované odvolání proti usnesení podle § 465d odst. 2 z.ř.s. Poukazuje na vnitřní rozpor v odůvodnění soudu (rozpor s citovanými vědeckými poznatky) a na změnu poměrů spočívající v obcházení dohod a transportu nemocného dítěte.',
-    legalTakeaway: 'Pokud soud v odůvodnění cituje moderní výzkumy o potřebě kontinuity vazeb k oběma rodičům, ale výrokově rozhodne v rozporu s nimi, zakládá to vnitřní rozpor a nepřezkoumatelnost rozhodnutí.',
-    content: `KRAJSKÝ SOUD V [KRAJSKÉ MĚSTO]
-(prostřednictvím Okresního soudu v [OKRESNÍ MĚSTO])
+    summary: 'Klíčový rozsudek prvostupňového soudu, který svěřil 6měsíční kojence do společné péče rodičů, ale péči otce v lichém týdnu rozdrobil na 3 samostatné denní úseky bez přespávání s povinností předávat dítě na železniční stanici.',
+    legalTakeaway: 'Prvostupňový rozsudek sice formálně deklaruje společnou péči, ale praktickým nastavením bez nocí a s neustálým pendlováním vytváří logisticky neudržitelný stav, který je nutné napadnout odvoláním k krajskému soudu.',
+    content: `ČESKÁ REPUBLIKA
+ROZSUDEK JMÉNEM REPUBLIKY
 
-Sp. zn.: [SPIS. ZN. 13 Nc XX/2026]
-Věc: Odvolání proti usnesení o nepřihlížení k návrhu na vydání prozatímního rozhodnutí
+Okresní soud v [OKRESNÍ MĚSTO] rozhodl samosoudkyní [JUDr. SOUDCE] ve věci
+nezletilého: [NEZLETILÝ SYN A], nar. [DATUM]
+bytem [OBEC C], zastoupený opatrovníkem [MĚSTSKÝ ÚŘAD MĚSTA X]
+dítěte rodičů: [MATKA], nar. [DATUM], bytem [OBEC C]
+a [OTEC], nar. [DATUM], bytem [OBEC A], pobytem [OBEC B]
 
-Navrhovatel (Otec): [OTEC], nar. [DATUM], bytem [OBEC A], pobytem [OBEC B]
-Matka: [MATKA], nar. [DATUM], bytem [OBEC C]
-Nezletilý: [NEZLETILÝ SYN A], nar. [DATUM]
+o určení péče a výživného
+takto:
 
-I.
-Proti usnesení Okresního soudu v [OKRESNÍ MĚSTO] ze dne [DATUM], č. j. [SPIS. ZN.], kterým bylo rozhodnuto, že se k mému návrhu na vydání prozatímního rozhodnutí ze dne [DATUM] nepřihlíží, podávám v zákonné lhůtě toto odvolání.
+I. Nezletilý [NEZLETILÝ SYN A] se svěřuje do společné péče rodičů tak, že matka je povinna a oprávněna pečovat po celý kalendářní rok s výjimkou, kdy je povinen a oprávněn pečovat otec.
 
-II. DŮVODY ODVOLÁNÍ
-Napadené rozhodnutí soudu prvního stupně je věcně nesprávné, vnitřně rozporné, nepřezkoumatelné a je v přímém rozporu s nejlepším zájmem nezletilého syna [NEZLETILÝ SYN A]. V odůvodnění usnesení shledávám následující zásadní pochybení:
+II. Otec je povinen a oprávněn pečovat o nezletilého:
+- v sudém kalendářním týdnu od pondělí 8:45 hod do úterý 15:30 hodin a v pátek od 8:45 hodin do 15:30 hodin,
+- v lichém kalendářním týdnu v pondělí, středu a pátek vždy od 8:45 hod do 15:30 hod.
 
-1. Vnitřní rozpor a rozpor s vědeckými poznatky:
-Soud v odůvodnění svého rozhodnutí správně cituje moderní vědecké poznatky o potřebách nezletilého dítěte a nutnosti kontinuity vazeb. Následně však svým výrokem rozhodl v přímém rozporu s těmito citovanými závěry. Pokud soud sám konstatuje, že pro zdravý vývoj dítěte je nezbytná stabilita a vyrovnaný kontakt s oběma rodiči, pak odmítnutí projednání mého návrhu na rozšíření péče přímo popírá vědecké standardy, na které se soud sám odvolává. Toto rozhodnutí je vnitřně rozporné a nepřezkoumatelné.
+III. K předávání nezletilého bude docházet v [MĚSTO X], železniční stanici.
 
-2. Nesprávné posouzení změny poměrů a ignorování reálného stavu:
-Soud nesprávně aplikuje ustanovení § 465d odst. 2 z.ř.s. a nepřihlíží k novému návrhu, přestože od vydání původního rozhodnutí došlo k zásadnímu zhoršení situace. Dochází k aktivní sabotáži spolupráce ze strany terénní sociální služby, která spolupracuje výhradně s matkou a zatajuje mi sociální dokumentaci.
+IV. Matka a otec jsou povinni v době, kdy pečují o nezletilého, 1x denně zaslat informativní zprávu o nezletilém druhému rodiči.
 
-3. Ohrožení zdraví a psychiky nezletilého:
-V průběhu června a července byly doloženy případy rizikového transportu nezletilého v době jeho nemoci (horečky, plané neštovice), čímž matka a asistující pracovnice porušily klidový režim nutný pro zdraví dítěte. OSPOD navíc ve svém vyjádření přiznal, že při návrzích vědomě ignoruje sourozenecké vazby, čímž poškozuje psychosociální vývoj nezletilého. Přestože soud odkazoval na odbornou pomoc, matka odmítá jakoukoli komunikaci mimo rigidní rámec.
+V. Otec je povinen platit výživné na nezletilého [NEZLETILÝ SYN A] ve výši 1 500 Kč měsíčně k rukám matky.
 
-III. NÁVRH NA ÚPRAVU POMĚRŮ A SYSTÉMOVÉ ŘEŠENÍ
-Současný režim „lichého týdne“ je pro nezletilého [NEZLETILÝ SYN A] i pro mne naprosto nevyhovující. Působí jako neustálý koloběh balení a transportu, kdy dítě nemá prostor pro adaptaci a já nemám možnost plnohodnotně naplnit svou roli. Tento systém je prokazatelně nevhodný i pro matku, která v domácnosti pečuje o druhého syna [NEZLETILÝ SYN B] se speciálními potřebami (autismus), kde časté předávací cykly narušují potřebný klid.
+VI. Návrh na vydání předběžného opatření se zamítá.
+VII. Vyslovuje se předběžná vykonatelnost výroků I., II., III., IV., V.
 
-Jediným smysluplným řešením pro zajištění klidu všech dětí i rodičů je úprava na režim minimálně dvou nocí v týdnu. Tento model:
-• Eliminuje matčinu nevůli ke kooperaci v rámci společné péče a nastavuje jasná pravidla.
-• Vyřeší kritické logistické problémy a odstraní diskriminační překážky spojené s dopravou.
-• Zajistí nezbytný klid pro [NEZLETILÝ SYN A] a stabilitu pro ostatní děti v rodinách ([NEZLETILÝ SYN B] a [NEZLETILÝ SYN C]).
-• Zruší zbytečnou asistenci sociální služby, jejíž činnost vykazuje podjatost.
+Odůvodnění (stručný výtah):
+Soud dospěl k závěru, že oba rodiče jsou plně výchovně kompetentní a mají o dítě zájem. Nicméně vzhledem k nízkému věku kojence a reakcím dítěte po návratu od otce (neklid, vyšší potřeba fyzického kontaktu) stanoven zatím rozsah noční péče bez přespávání v lichém týdnu.
 
-IV. ZÁVĚR
-S ohledem na výše uvedené skutečnosti navrhuji, aby Krajský soud v [KRAJSKÉ MĚSTO] napadené usnesení Okresního soudu v [OKRESNÍ MĚSTO] zrušil a věc vrátil k dalšímu řízení, případně vydal nové prozatímní rozhodnutí, kterým se upravuje stávající režim péče dle tohoto odvolání.
+Poučení: Proti tomuto rozsudku lze podat odvolání do 15 dnů ode dne doručení ke Krajskému soudu.
 
-DŮKAZY:
-• Vyjádření OSPOD ze dne [DATUM]
-• Záznamy o komunikaci a předávání
-• Dřívější podání a fotodokumentace založené ve spisu
-
-V [OBEC B], dne [DATUM]
-__________________________
-[OTEC]`
+V [OKRESNÍ MĚSTO] dne [DATUM]
+[JUDr. SOUDCE] v.r., samosoudkyně`
   },
   {
     id: 'doc-02',
     pageNumber: 2,
-    title: 'Odvolání otce proti usnesení o zamítnutí návrhu na prozatímní rozhodnutí',
-    category: 'soudni-podani',
-    categoryLabel: 'Soudní podání otce',
-    issuingBody: 'Navrhovatel (Otec)',
-    targetBody: 'Krajský soud v [KRAJSKÉ MĚSTO]',
+    title: 'Protokol o soudním jednání u Okresního soudu (9. 6. 2026)',
+    category: 'soudni-usneseni',
+    categoryLabel: 'Soudní usnesení & rozsudky',
+    issuingBody: 'Okresní soud v [OKRESNÍ MĚSTO]',
+    targetBody: 'Soudní spis [SPIS. ZN. 13 Nc XX/2026]',
     dateStr: '[DATUM]',
     caseRef: '[SPIS. ZN. 13 Nc XX/2026]',
-    summary: 'Odvolání napadající zamítnutí prozatímní úpravy styku u kojence. Zpochybňuje argumentaci soudu prvního stupně o údajné neprokázanosti změny poměrů.',
-    legalTakeaway: 'Nové události po vyhlášení rozsudku (obstrukce při předávání, onemocnění dítěte a odmítnutí dohodnuté adaptace) představují kvalifikovanou změnu poměrů, o které je soud povinen věcně rozhodnout.',
-    content: `KRAJSKÝ SOUD V [KRAJSKÉ MĚSTO]
-(prostřednictvím Okresního soudu v [OKRESNÍ MĚSTO])
+    summary: 'Oficiální soudní zápis z ústního jednání, kde matka vznášela námitky ohledně 200 Kč dlužného výživného, OSPOD doporučoval omezení styku a otec přednášel návrh na 2 noci týdně a víkend.',
+    legalTakeaway: 'Soudní protokol zachycuje reálnou dynamiku soudní síně. Je zásadním podkladem pro odvolání, neboť dokazuje, že otec již na místě vyjádřil nesouhlas a podal odvolání přímo do zápisu.',
+    content: `PROTOKOL O JEDNÁNÍ PŘED SOUDEM I. STUPNĚ
 
 Sp. zn.: [SPIS. ZN. 13 Nc XX/2026]
-Věc: Odvolání proti usnesení o zamítnutí návrhu na vydání prozatímního rozhodnutí
+Samosoudkyně: [JUDr. SOUDCE]
+Zapisovatelka: [Mgr. ZAPISOVATELKA]
+Jednání se konalo dne: [DATUM] v 10:10 hodin.
 
-Navrhovatel (Otec): [OTEC], nar. [DATUM], bytem [OBEC A], pobytem [OBEC B]
-Matka: [MATKA], nar. [DATUM], bytem [OBEC C]
-Nezletilý: [NEZLETILÝ SYN A], nar. [DATUM]
+Přítomni:
+1. Matka: [MATKA], osobně
+2. Právní zástupkyně matky: [Mgr. ADVOKÁTKA], osobně
+3. Otec: [OTEC], osobně
+4. Opatrovník (OSPOD): [MĚSTSKÝ ÚŘAD MĚSTO X] - [Bc. SOCIÁLNÍ PRACOVNICE], osobně
+Veřejnost: Klíčová pracovnice Charity [MĚSTO X].
 
-I.
-Proti usnesení Okresního soudu v [OKRESNÍ MĚSTO] ze dne [DATUM], č. j. [SPIS. ZN.], kterým byl zamítnut můj návrh na vydání prozatímního rozhodnutí, podávám v zákonné lhůtě toto odvolání.
+Průběh jednání:
+Matka uvádí: Otec z dlužného výživného za květen zaplatil 300 Kč z 500 Kč, 200 Kč dluží. Při předání byl konfliktní. Matka si předávání nahrává.
+Otec k tomu uvádí: Není pravda vše, co uvádí matka. Strany komunikují.
 
-II. DŮVODY ODVOLÁNÍ
-Napadené rozhodnutí soudu prvního stupně je věcně nesprávné, vnitřně rozporné, nepřezkoumatelné a je v přímém rozporu s nejlepším zájmem nezletilého syna [NEZLETILÝ SYN A].
+Dokazování: Čtena zpráva z Poradny pro rodinu. Otec uvádí, že při poradně cítil zaujatost pracovníků ve prospěch matky.
 
-1. Vnitřní rozpor a rozpor s vědeckými poznatky:
-Soud v odůvodnění svého rozhodnutí správně cituje moderní vědecké poznatky o potřebách nezletilého dítěte a nutnosti kontinuity vazeb. Následně však svým výrokem rozhodl v přímém rozporu s těmito citovanými závěry. Odmítnutí mého návrhu na rozšíření péče přímo popírá vědecké standardy, na které se soud sám odvolává.
+Závěrečné návrhy:
+- PZ matky: Navrhuje péči otce v rozsahu odpoledních hodin bez přespávání.
+- Otec: Navrhuje péči v rozsahu 2 nocí v týdnu + 1 ucelený víkend v měsíci s ohledem na bratra [NEZLETILÝ SYN C].
+- Opatrovník (OSPOD): Připojuje se k návrhu na omezení přespávání u kojence.
 
-2. Nesprávné posouzení změny poměrů a ignorování reálného stavu:
-Soud v odůvodnění nesprávně uvádí, že jsem neprokázal změnu poměrů. Od vydání původního rozhodnutí přitom došlo k zásadnímu zhoršení situace, kdy dochází k aktivní sabotáži spolupráce ze strany terénní služby, která spolupracuje výhradně s matkou a zatajuje mi sociální dokumentaci.
+Vyhlášen ROZSUDEK (viz č. l. 169).
+Otec podává rovnou do protokolu odvolání proti výroku o péči.
 
-3. Ohrožení zdraví a psychiky nezletilého:
-V průběhu června a července byly doloženy případy rizikového transportu nezletilého v době jeho nemoci (horečky, plané neštovice), čímž matka a asistující pracovnice porušily klidový režim. OSPOD navíc ve svém vyjádření přiznal, že při návrzích vědomě ignoruje sourozenecké vazby.
+Jednání skončeno v 11:07 hodin.
 
-III. NÁVRH NA ÚPRAVU POMĚRŮ A SYSTÉMOVÉ ŘEŠENÍ
-Současný režim „lichého týdne“ je pro nezletilého [NEZLETILÝ SYN A] i pro mne naprosto nevyhovující. Působí jako neustálý koloběh balení a transportu. Tento systém je prokazatelně nevhodný i pro matku, která v domácnosti pečuje o druhého syna [NEZLETILÝ SYN B] se speciálními potřebami (autismus).
-
-Jediným smysluplným řešením pro zajištění klidu všech dětí i rodičů je úprava na režim minimálně dvou nocí v týdnu.
-
-IV. ZÁVĚR
-Navrhuji, aby Krajský soud v [KRAJSKÉ MĚSTO] napadené usnesení Okresního soudu v [OKRESNÍ MĚSTO] zrušil a věc vrátil k dalšímu řízení, případně vydal nové prozatímní rozhodnutí.
-
-V [OBEC B], dne [DATUM]
-__________________________
-[OTEC]`
+[JUDr. SOUDCE] v.r.
+samosoudkyně`
   },
   {
     id: 'doc-03',
     pageNumber: 3,
-    title: 'Usnesení Okresního soudu – Nepřihlížení k novému návrhu podle § 465d odst. 2 z.ř.s.',
-    category: 'soudni-usneseni',
-    categoryLabel: 'Soudní usnesení & rozsudky',
-    issuingBody: 'Okresní soud v [OKRESNÍ MĚSTO]',
-    targetBody: 'Účastníci řízení',
+    title: 'Zpráva Poradny pro rodinu o odborném sociálním poradenství (8. 6. 2026)',
+    category: 'charita-sluzby',
+    categoryLabel: 'Stanoviska sociálních služeb',
+    issuingBody: 'Poradna pro rodinu [KRAJSKÝ ÚRÁD]',
+    targetBody: 'Okresní soud v [OKRESNÍ MĚSTO]',
     dateStr: '[DATUM]',
-    caseRef: '[SPIS. ZN. 13 Nc XX/2026]',
-    summary: 'Oficiální usnesení okresního soudu, kterým soud odmítá přihlížet k opakovánému návrhu otce na prozatímní rozhodnutí z důvodu neuplynutí 3měsíční blokační lhůty dle § 465d odst. 2 z.ř.s.',
-    legalTakeaway: 'K novému návrhu na prozatímní rozhodnutí podanému do 3 měsíců od právní moci zamítnutí soud ze zákona nepřihlíží, ledaže jsou tvrditelné zcela nové podstatné skutečnosti zakládající nový nárok.',
-    content: `OKRESNÍ SOUD V [OKRESNÍ MĚSTO]
-Sp. zn.: [SPIS. ZN. 13 Nc XX/2026]
+    caseRef: '[PPR XX/2026]',
+    summary: 'Zpráva z 2 konzultací rodičů. Poradna konstatuje, že matka pociťuje úzkost ("bojím se o dítě"), zatímco otec zdůrazňuje své rodičovské kompetence a přítomnost staršího bratra.',
+    legalTakeaway: 'Poradny pro rodinu často aplikují teorii "primárního pečujícího rodiče" (matky), což může vést k potlačování role otce. Otec musí u soudu aktivně argumentovat novodobými poznatky o vícečetném attachmentu.',
+    content: `PORADNA PRO RODINU [KRAJSKÝ ÚRÁD]
+Č.j.: PPR XX/2026
+Adresát: Okresní soud v [OKRESNÍ MĚSTO]
 
-USNESENÍ
+Podání zprávy ze spolupráce s rodiči: [MATKA] a [OTEC]
 
-Okresní soud v [OKRESNÍ MĚSTO] rozhodl samosoudkyní [JUDr. SOUDCE] ve věci
+Na základě žádosti soudu sdělujeme: Rodiče se zúčastnili dvou konzultací mediačního charakteru v rámci sociální služby odborného sociálního poradenství (14. 4. 2026 a 21. 5. 2026).
 
-nezletilého: [NEZLETILÝ SYN A], nar. [DATUM], bytem [OBEC C]
-zastoupený opatrovníkem [MĚSTSKÝ ÚŘAD]
-dítěte rodičů: [MATKA], nar. [DATUM], bytem [OBEC C]
-[OTEC], nar. [DATUM], bytem [OBEC A], pobytem [OBEC B]
+1. Konzultace (14. 4. 2026):
+Matka formuluje zakázku: chce postupné navykání syna [NEZLETILÝ SYN A], snížit rozsah styku a vyřešit výživné. Vyjadřuje obavy o projevy syna po návratu (neklid, vyžadování fyzické blízkosti matky).
+Otec formuluje zakázku: zachování a rozšíření péče (ideálně 7x7 dní), zdůrazňuje, že u něj syn spí klidně, usmívá se a nepláče. Otec poukazuje na přítomnost staršího syna [NEZLETILÝ SYN C].
 
-o návrhu na vydání prozatímního rozhodnutí
+Pracovnice provedla edukační náhled k vývojové psychologii 4měsíčního kojence a významu primární pečující osoby (matky). Otec tento pohled hodnotil jako zaujatý a preferující matku.
 
-takto:
-K návrhu otce na vydání prozatímního rozhodnutí ve věci nezletilého [NEZLETILÝ SYN A] ze dne [DATUM], se nepřihlíží.
+2. Konzultace (21. 5. 2026):
+Přítomni Mgr. [PORADCE A] a PhDr. [PORADCE B] jako nezávislý pozorovatel.
+Rodiče nedošli k dohodě. Matka trvá na péči převážně u ní bez nocí. Osec ustoupil ze střídavé péče na rozšířenou péči s noclehama.
 
-Odůvodnění:
-Otec se návrhem na vydání prozatímního rozhodnutí ze dne [DATUM] domáhal změny péče o nezletilého tak, aby jej měl v péči minimálně dvě noci v každém týdnu. Stejné změny péče se však již domáhal návrhem na vydání prozatímního rozhodnutí, který byl usnesením zdejšího soudu č.j. [SPIS. ZN.] ze dne [DATUM] zamítnut (právní moc dne [DATUM]).
+Závěr: Rodičům nebylo možné zprostředkovat dohodu. Doporučujeme zohlednit vývojové potřeby kojence a kontinuitu péče.
 
-Podle § 465d odst. 2 zákona č. 292/2013 Sb., o zvláštních řízeních soudních (dále jen „z.ř.s.“): byl-li návrh na vydání prozatímního rozhodnutí odmítnut pro zjevnou bezdůvodnost nebo zamítnut, může jej navrhovatel, požaduje-li ve věci týchž účastníků z obdobných důvodů stejnou nebo obdobnou prozatímní úpravu poměrů, opakovat až po uplynutí 3 měsíců ode dne nabytí právní moci odmítavého nebo zamítavého rozhodnutí. K návrhu podaném před uplynutím této doby se nepřihlíží. O tom, že se k návrhu nepřihlíží, vyrozumí soud navrhovatele usnesením, proti němuž není opravný prostředek přípustný.
-
-Protože nový návrh se týkal týchž účastníků a byl podán ze stejného důvodu, aniž by uplynula zákonná doba k jeho podání, soud k tomuto novému návrhu nepřihlíží.
-
-Poučení:
-Proti tomuto usnesení není odvolání přípustné (§ 465d odst. 2 z.ř.s.).
-
-V [OKRESNÍ MĚSTO] dne [DATUM]
-[JUDr. SOUDCE] v.r.
-samosoudkyně`
+PhDr. [PORADCE B]
+vedoucí pracoviště Poradny pro rodinu`
   },
   {
     id: 'doc-04',
     pageNumber: 4,
-    title: 'Usnesení Okresního soudu – Zamítnutí návrhu na nařízení výkonu rozhodnutí (exekuce styku při nemoci)',
-    category: 'soudni-usneseni',
-    categoryLabel: 'Soudní usnesení & rozsudky',
-    issuingBody: 'Okresní soud v [OKRESNÍ MĚSTO]',
-    targetBody: 'Účastníci řízení',
-    dateStr: '[DATUM]',
-    caseRef: '[SPIS. ZN. 13 Nc XX/2026]',
-    summary: 'Soud zamítá návrh otce na nařízení výkonu rozhodnutí (pokutu matce) za neumožnění návštěvy u matky doma v době nemoci dítěte. Odůvodňuje tím, že mimosoudní dohoda rodičů nepředstavuje vykonatelný titul.',
-    legalTakeaway: 'Pouze dohoda schválená soudem nebo přímý výrok rozsudku je vykonatelným titulem pro exekuci styku (výkon rozhodnutí dle § 501 z.ř.s.). Mimosoudní písemné dohody nelze vymáhat soudní exekucí.',
-    content: `OKRESNÍ SOUD V [OKRESNÍ MĚSTO]
-Sp. zn.: [SPIS. ZN. 13 Nc XX/2026]
-
-USNESENÍ
-
-Okresní soud v [OKRESNÍ MĚSTO] rozhodl samosoudkyní [JUDr. SOUDCE] ve věci
-
-nezletilého: [NEZLETILÝ SYN A], nar. [DATUM], bytem [OBEC C]
-zastoupený opatrovníkem [MĚSTSKÝ ÚŘAD]
-dítěte rodičů: [MATKA], nar. [DATUM], bytem [OBEC C]
-[OTEC], nar. [DATUM], bytem [OBEC A], pobytem [OBEC B]
-
-o výkon rozhodnutí
-
-takto:
-I. Návrh otce na nařízení výkonu rozhodnutí ze dne [DATUM] se zamítá.
-II. Žádný z účastníků nemá právo na náhradu nákladů řízení.
-
-Odůvodnění:
-Otec se návrhem ze dne [DATUM] domáhal, aby matce byla uložena povinnost vyplývající z rozsudku Okresního soudu ze dne [DATUM] a dohody rodičů ze dne [DATUM] a umožnila otci řádný výkon péče o nezletilého s využitím dohodnutého mechanismu osobních návštěv v místě současného bydliště nezletilého, aby nezletilý nemusel v době nemoci cestovat.
-
-Návrh odůvodnil tím, že vedle rozsudku si rodiče péči upravili dohodou ze dne [DATUM]. V tento den byl nezletilý nemocný (plané neštovice) a otci bylo zřejmé, že převoz veřejnou dopravou není vhodný. Podle dohody otec navrhl návštěvu u matky doma, což matka odmítla.
-
-Soud zaslal OSPOD žádost o součinnost. Z vyjádření OSPOD vyplývá, že neevidují skutečnosti nasvědčující úmyslnému maření. Dohoda uzavřená rodiči dne [DATUM], která nebyla schválena soudem, nepředstavuje vykonatelný titul. Návrhem na výkon rozhodnutí se nelze domáhat výkonu povinnosti, která není vykonatelným titulem uložena. Ze strany matky nedošlo k porušení soudem stanovených povinností.
-
-Poučení:
-Proti tomuto usnesení lze podat odvolání do 15 dnů ode dne doručení písemně k Krajskému soudu v [KRAJSKÉ MĚSTO].
-
-V [OKRESNÍ MĚSTO] dne [DATUM]
-[JUDr. SOUDCE] v.r.
-samosoudkyně`
-  },
-  {
-    id: 'doc-05',
-    pageNumber: 5,
-    title: 'Vyřízení stížnosti Charitou na postup sociální pracovnice',
-    category: 'charita-sluzby',
-    categoryLabel: 'Stanoviska sociálních služeb',
-    issuingBody: 'Charita [MĚSTO X] ([Ing. ŘEDITELKA CHARITY])',
-    targetBody: '[OTEC]',
-    dateStr: '[DATUM]',
-    caseRef: 'Stížnost na postup ze dne [DATUM]',
-    summary: 'Oficiální odpověď neziskové sociální organizace zamítající stížnost otce na terénní sociální pracovnici s tím, že pochybení nebylo shledáno.',
-    legalTakeaway: 'Neziskové sociální služby často argumentují, že jejich jediným smluvním klientem je matka, což využívají k odmítání stížností druhého rodiče.',
-    content: `CHARITA [MĚSTO X]
-Pražská 14, [PSČ MĚSTO X]
-
-tel.: +420 XXX XXX XXX
-email: info@[ANONYMIZOVÁNO].cz
-web: [ANONYMIZOVÁNO].cz
-
-Vážený pan [OTEC]
-[OBEC A]
-
-V [MĚSTO X] dne [DATUM]
-
-VĚC: Vyřízení stížnosti na postup pracovnice ze dne [DATUM]
-
-Vážený pane,
-
-obdrželi jsme Vaši stížnost ze dne [DATUM] včetně jejího doplnění a provedli jsme její prošetření.
-
-V rámci šetření jsme vyhodnotili Vaši stížnost, písemné vyjádření pracovnice i vyjádření uživatelky sociální služby (matky). Na základě těchto podkladů nebyly tvrzení uvedená ve Vaší stížnosti potvrzena ani nebylo zjištěno pochybení pracovnice při poskytování sociální služby.
-
-Tímto považujeme Vaši stížnost za vyřízenou.
-
-S pozdravem
-
-__________________________
-[Ing. ŘEDITELKA CHARITY]
-ředitelka Charita [MĚSTO X]`
-  },
-  {
-    id: 'doc-06',
-    pageNumber: 6,
-    title: 'Vyřízení opakované žádosti Charitou o zpřístupnění sociální dokumentace',
+    title: 'Cenzurovaný výpis ze sociální dokumentace Charity (10. 4. 2026)',
     category: 'charita-sluzby',
     categoryLabel: 'Stanoviska sociálních služeb',
     issuingBody: 'Charita [MĚSTO X]',
     targetBody: '[OTEC]',
     dateStr: '[DATUM]',
-    caseRef: 'Žádost o dokumentaci ze dne [DATUM]',
-    summary: 'Odpověď sociální služby odmítající zpřístupnit kompletní složku rodinného poradenství s odkazem na povinnost mlčenlivosti a soukromí matky.',
-    legalTakeaway: 'Zákony o sociálních službách tvoří napětí s rodičovskou odpovědností. Otec má právo na informace o dítěti, ale poskytovatel odmítá zpřístupnit záznamy ze sezení s matkou.',
-    content: `CHARITA [MĚSTO X]
-Pražská 14, [PSČ MĚSTO X]
+    caseRef: '[Č.J. 210/2026]',
+    summary: 'Jednostránkový úřední výpis, který Charita poskytla otci až na základě souhlasu matky. Obsahuje pouze 7 banálních větiček vytržených z kontextu 20 terénních setkání.',
+    legalTakeaway: 'Klasická ukázka informační blokády: Charita provedla s matkou 20 terénních schůzek o formě péče pro soud, ale otci jako zákonnému zástupci vydala jen zcenzurovaný 1stránkový výtah.',
+    content: `VÝPIS ZE SOCIÁLNÍ DOKUMENTACE
 
-tel.: +420 XXX XXX XXX
-email: info@[ANONYMIZOVÁNO].cz
+Poskytovatel: Charita [MĚSTO X], IČO: [ANONYMIZOVÁNO]
+Identifikace nezletilého: [NEZLETILÝ SYN A], nar. [DATUM]
+Identifikace uživatelky: [MATKA]
 
-Vážený pan [OTEC]
-[OBEC A]
+Účel dokumentu: Výpis vydán na základě žádosti otce a se souhlasem uživatelky sociální služby. Obsahuje pouze faktické zmínky o nezletilém.
+
+Faktické zmínky o nezletilém dítěti zaznamenané v dokumentaci:
+
+Datum setkání | Záznam vztahující se k dítěti
+------------------------------------------------------------
+19.1.2026      | [NEZLETILÝ SYN A] celou cestu tam i zpět spí.
+2.2.2026       | Uživatelka ještě krmí [NEZLETILÝ SYN A].
+12.2.2026      | [NEZLETILÝ SYN A] se krmí a chová, je spokojený.
+19.2.2026      | [NEZLETILÝ SYN A] uživatelka krmí z lahve, vypadá spokojeně.
+24.2.2026      | [NEZLETILÝ SYN A] je klidný, usměvavý.
+11.3.2026      | [NEZLETILÝ SYN A] se také najedl, vypadá spokojeně.
+25.3.2026      | [NEZLETILÝ SYN A] je veselý, usmívá se, později usne mamince na klíně.
+
+Závěrečné ustanovení: Výpis vyhotoven v souladu s § 100 zákona č. 108/2006 Sb. Kompletní dokumentace podléhá mlčenlivosti.
 
 V [MĚSTO X] dne [DATUM]
-
-VĚC: Vyřízení opakované žádosti o zpřístupnění dokumentace
-
-Vážený pane,
-
-Vaši opakovanou žádost jsme posoudili. Neshledali jsme žádné nové skutečnosti, které by odůvodňovaly změnu našeho dosavadního postupu.
-
-Již jsme Vám poskytli informace vztahující se k nezletilému v rozsahu, který umožňují právní předpisy. Kompletní sociální dokumentace je vedena o uživatelce sociální služby a její zpřístupnění proto není možné.
-
-Na našem stanovisku nadále setrváváme.
-
-S pozdravem
-
-__________________________
-[Ing. ŘEDITELKA CHARITY]
-ředitelka Charita [MĚSTO X]`
+[Ing. ŘEDITELKA CHARITY], MBA
+ředitelka Charity [MĚSTO X]`
   },
   {
-    id: 'doc-07',
-    pageNumber: 7,
-    title: 'Doplnění návrhu na vydání předběžného opatření – Návrh čtyřtýdenního režimu péče',
-    category: 'soudni-podani',
-    categoryLabel: 'Soudní podání otce',
-    issuingBody: 'Navrhovatel (Otec)',
-    targetBody: 'Okresní soud v [OKRESNÍ MĚSTO]',
-    dateStr: '[DATUM]',
-    caseRef: '[SPIS. ZN. 13 Nc XX/2026]',
-    summary: 'Písemné doplnění návrhu na předběžné opatření doplňující důkazy o selhání komunikace a navrhující strukturovaný 4týdenní režim péče.',
-    legalTakeaway: 'Při nefunkční komunikaci rodičů je nutné navrhovat matematicky přesný, předvídatelný režim péče bez volných flexibilních dohod, které druhý rodič blokuje.',
-    content: `Doplnění návrhu na vydání předběžného opatření
-
-Věc: Doplnění návrhu na vydání předběžného opatření – sp. zn. [SPIS. ZN. 13 Nc XX/2026]
-
-Navrhovatel: [OTEC], bytem [OBEC B]
-
-Doplnění návrhu o nové skutečnosti a návrh systémového řešení
-
-Tímto doplňuji svůj návrh na vydání předběžného opatření o nové skutečnosti, které nastaly dne [DATUM] a které dokládají, že stávající model „společné péče“ je v praxi zneužíván k omezování mých práv a vytváření neúnosné zátěže pro nezletilého [NEZLETILÝ SYN A].
-
-1. Absence kooperace a zneužívání rigidního výkladu rozsudku:
-I přes deklarovanou „společnou péči“ matka odmítá jakoukoli flexibilitu při předávání. Matka striktně odmítala návrhy na zjednodušení předání, namísto zájmu dítěte upřednostňovala rigidní lpění na časových limitech.
-
-2. Důkaz o nefunkčnosti komunikace:
-Přiložená konverzace ze dne [DATUM] dokládá, že matka jednostranně určuje podmínky předávání a odmítá návrhy na zlepšení logistiky. Komunikace se opakovaně mění v osobní útoky.
-
-3. Návrh systémového řešení: Čtyřtýdenní režim:
-Jako jediné smysluplné řešení pro zajištění klidu všech dětí i rodičů navrhuji zavedení čtyřtýdenního režimu péče. Tento model:
-• Eliminuje matčinu nevůli ke skutečné kooperaci v rámci společné péče.
-• Vyřeší stávající kritické logistické problémy.
-• Zajistí nezbytný klid pro nezletilého [NEZLETILÝ SYN A].
-• Zajistí potřebnou stabilitu i pro další děti v rodinách obou rodičů ([NEZLETILÝ SYN B] a [NEZLETILÝ SYN C]).
-
-4. Závěr pro soud:
-Současný stav bez jasně nastaveného režimu je dlouhodobě neudržitelný a vytváří emočně vypjaté prostředí.
-
-Důkazy: Screenshoty konverzace z [DATUM].
-
-V [OBEC B], dne [DATUM]
-__________________________
-[OTEC]`
-  },
-  {
-    id: 'doc-08',
-    pageNumber: 8,
-    title: 'Vyřízení stížnosti Krajským úřadem na Poradnu pro rodinu (§ 175 správního řádu)',
+    id: 'doc-05',
+    pageNumber: 5,
+    title: 'Urgentní oznámení OSPODu o svévolném odebrání nemocného dítěte (24. 6. 2026)',
     category: 'ospod-meu',
     categoryLabel: 'Stížnosti & Odpovědi OSPOD / MěÚ',
-    issuingBody: 'Krajský úřad [KRAJSKÝ ÚRÁD] (Odbor sociálních věcí)',
-    targetBody: '[OTEC]',
+    issuingBody: '[OTEC]',
+    targetBody: 'OSPOD [MĚSTO X] ([Bc. SOCIÁLNÍ PRACOVNICE])',
     dateStr: '[DATUM]',
-    caseRef: '[ČÍSLO JEDNACÍ: KUPA-XXXXX/2026]',
-    summary: 'Rozsáhlé vyrozumění krajského úřadu o prošetření stížnosti na Poradnu pro rodinu. Rozlišuje poradenské služby od soudní mediace a obhajuje postup poradny.',
-    legalTakeaway: 'Při neformálním poradenství (OSP) nejde o vykonatelnou mediaci dle zákona č. 202/2012 Sb. Zajištění nezávislého pozorovatele je ze strany úřadu hodnoceno jako posílení transparentnosti.',
-    content: `Krajský úřad [KRAJSKÝ ÚRÁD]
-odbor sociálních věcí
-oddělení sociálně-právní ochrany dětí
+    caseRef: 'Urgentní incident v péči',
+    summary: 'Podání otce oznamující kritický incident: matka za doprovodu terénní pracovnice Charity vtrhla do obydlí otce a odebrala spící 6měsíční dítě s horečkou 37,6 °C a masivními planými neštovicemi.',
+    legalTakeaway: 'Kritické incidenty ohrožující zdraví dítěte (převoz v akutní infekční fázi s horečkou v rozporu s dohodou o klidovém režimu) je nutné okamžitě písemně zaevidovat na OSPOD i k soudu.',
+    content: `Vážená paní [Bc. SOCIÁLNÍ PRACOVNICE],
 
-Číslo jednací: [KUPA-XXXXX/2026]
-Vyřizuje: [Mgr. REF. KRAJSKÉHO ÚRÁDU]
-Datum: [DATUM]
+tímto Vás urgentně informuji o kritickém vývoji situace a hrubém porušení uzavřených dohod ze strany matky [MATKA], ke kterému došlo dnes, [DATUM].
 
-Vážený pan [OTEC]
-[OBEC B]
+Nezletilý [NEZLETILÝ SYN A] má v současné době prokazatelně vysoké horečky (naměřeno 37,6 °C) a prochází velmi těžkým průběhem akutního infekčního onemocnění (plané neštovice s masivním výsevem po celém těle a hlavě).
 
-Vážený pane,
+Podle platného protokolu a výslovné dohody z OSPOD ze dne [DATUM], že v případě nemoci zůstává syn v péči toho rodiče, u kterého se zrovna nachází, měl syn zůstat v klidovém režimu v mém bydlišti v [OBEC B], aby se zamezilo komplikacím a šíření nákazy.
 
-Krajský úřad obdržel Vaši „Stížnost na postup a odborné pochybení Poradny pro rodinu“. Vaše stížnost byla prošetřena v souladu s § 175 zákona č. 500/2004 Sb., správní řád.
+Matka však dnes osobním automobilem dorazila do mého bydliště za doprovodu terénní pracovnice Charity [Bc. SOCIÁLNÍ PRACOVNICE CHARITY], chovala se extrémně agresivně a vulgárně a těžce nemocné, spící dítě mi z postýlky fyzicky odebrala.
 
-1. Charakter poskytované sociální služby:
-Z vyjádření Poradny vyplývá, že Vám byla poskytnuta služba odborného sociálního poradenství podle zákona č. 108/2006 Sb. o sociálních službách, nikoliv mediace ve smyslu zákona č. 202/2012 Sb. Účast ve službě byla založena na základě Vaší vlastní žádosti a dohody.
+Tímto jednáním matka zcela ignorovala zdravotní stav syna i platná ujednání a vystavila šestiměsíčního kojence nebezpečnému transportu v akutní fázi nemoci.
 
-2. Odborná kvalifikace pracovnice:
-Pracovnice působí na pozici sociální pracovnice a splňuje kvalifikační požadavky dle zákona o sociálních službách včetně výcviku krizové intervence a mediace.
-
-3. Námitka maření výkonu soudního rozhodnutí:
-Sociální pracovnice se snažila zasadit situaci do širšího kontextu vývojové psychologie a potřeb kojence. Postup pracovnice lze hodnotit jako snahu o odbornou edukaci rodičů.
-
-4. Námitka nepřípustného zasahování do otázky výživného:
-Téma výživného bylo otevřeno matkou jako jedno z prioritních témat. Úloha pracovnice spočívala v moderaci diskuse, nikoliv v rozhodování o výživném.
-
-5. Nestrannost pracovnice a přítomnost nadřízeného:
-Skutečnost, že vedení Poradny zajistilo přítomnost [PhDr. OBSERVER] jako nezávislého pozorovatele, hodnotí krajský úřad jako krok k posílení transparentnosti.
-
-Stížnost byla vyhodnocena jako nedůvodná.
-
-S pozdravem
-
-__________________________
-[Ing. VEDOUCÍ ODBORU]
-vedoucí odboru sociálních věcí`
-  },
-  {
-    id: 'doc-09',
-    pageNumber: 9,
-    title: 'Návrh otce na prozatímní rozhodnutí – Doplnění o nové skutečnosti po 1. 6. 2026',
-    category: 'soudni-podani',
-    categoryLabel: 'Soudní podání otce',
-    issuingBody: 'Navrhovatel (Otec)',
-    targetBody: 'Okresní soud v [OKRESNÍ MĚSTO]',
-    dateStr: '[DATUM]',
-    caseRef: '[SPIS. ZN. 13 Nc XX/2026]',
-    summary: 'Detailní argumentační podání otce rozebírající logické rozpory v rozsudku prvního stupně, ignorování sourozeneckých vazeb OSPODem a zdravotní rizika transportu.',
-    legalTakeaway: 'Při sepisování návrhu je nutné explicitně bod po bodu strukturovat: Rozpor s vědeckými poznatky, Věcnou nesprávnost, Sabotáž spolupráce a Ohrožení zdraví dítěte.',
-    content: `Okresní soud v [OKRESNÍ MĚSTO]
-[ADRESA SOUDU]
-
-Věc: Návrh na vydání prozatímního rozhodnutí (Doplněný o nové skutečnosti po 1. 6. 2026)
-
-Účastníci:
-[OTEC], nar. [DATUM]
-[MATKA], nar. [DATUM]
-Nezl. [NEZLETILÝ SYN A], nar. [DATUM]
-
-I. Odůvodnění (Nové skutečnosti a logický rozpor v rozhodnutí soudu)
-Od [DATUM] došlo k zásadní změně poměrů a zároveň poukazuji na zásadní věcný a logický rozpor v odůvodnění usnesení ze dne [DATUM]:
-
-• Rozpor s vědeckými poznatky: Soudkyně v odůvodnění svému rozhodnutí cituje moderní vědecké poznatky o potřebách nezletilého dítěte a nutnosti kontinuity vazeb. Následně však svým výrokem rozhodla v přímém rozporu s těmito citovanými závěry.
-• Věcná nesprávnost skutkových zjištění: Soud uvádí, že jsem neprokázal změnu poměrů, přestože jsem doložil fakta o aktivitách terénní služby a OSPODu.
-• Aktivní sabotáž spolupráce: Dochází k systematickému vylučování otce z procesu péče prostřednictvím terénní služby, která spolupracuje výhradně s matkou.
-• Ohrožení zdraví nezletilého: Byla zaznamenána doprava nezletilého v době nemoci (horečky), čímž matka prokazatelně porušila klidový režim.
-• Zpřetrhání vazeb: OSPOD ve svém vyjádření přiznal, že při návrzích vědomě ignoruje sourozenecké vazby s [NEZLETILÝ SYN C].
-• Absence snahy o dohodu: Matka odmítá jakoukoli konstruktivní komunikaci mimo striktně daný rámec.
-
-II. Návrh na úpravu poměrů
-Navrhuji úpravu na režim minimálně dvou nocí v každém týdnu, odstranění diskriminačních překážek spojených s dopravou a zrušení asistence třetích osob.
-
-III. Návrh na provedení důkazů
-- Důkaz: Vyjádření OSPOD ze dne [DATUM]
-- Důkaz: Záznamy o komunikaci/předávání
-- Důkaz: Návrh na vypracování znaleckého posudku k výchovným postojům matky
+Žádám OSPOD o okamžitý zásah a zaevidování tohoto incidentu do spisu nezletilého.
 
 S pozdravem,
 [OTEC]`
   },
   {
-    id: 'doc-10',
-    pageNumber: 10,
-    title: 'Usnesení Okresního soudu – Zamítnutí prozatímního rozhodnutí o čtyřtýdenním cyklu',
-    category: 'soudni-usneseni',
-    categoryLabel: 'Soudní usnesení & rozsudky',
-    issuingBody: 'Okresní soud v [OKRESNÍ MĚSTO]',
-    targetBody: 'Účastníci řízení',
-    dateStr: '[DATUM]',
-    caseRef: '[SPIS. ZN. 13 Nc XX/2026]',
-    summary: 'Rozhodnutí okresního soudu zamítající návrh otce na úpravu péče ve 4týdenním cyklu s přespáváním. Soud konstatuje, že nebyly prokázány nové podstatné skutečnosti.',
-    legalTakeaway: 'Soudy posuzují prozatímní rozhodnutí dle § 465f z.ř.s. přísně. Pouhá nespokojenost jednoho rodiče s nastaveným rozsudkem nestačí – je nutné neprůstřelně prokázat změnu poměrů.',
-    content: `OKRESNÍ SOUD V [OKRESNÍ MĚSTO]
-Sp. zn.: [SPIS. ZN. 13 Nc XX/2026]
-
-USNESENÍ
-
-Okresní soud v [OKRESNÍ MĚSTO] rozhodl samosoudkyní [JUDr. SOUDCE] ve věci
-
-nezletilého: [NEZLETILÝ SYN A], nar. [DATUM], bytem [OBEC C]
-dítěte rodičů: [MATKA], nar. [DATUM] a [OTEC], nar. [DATUM]
-
-o návrhu na vydání prozatímního rozhodnutí
-
-takto:
-I. Návrh otce na vydání prozatímního rozhodnutí doručený Okresnímu soudu dne [DATUM], se zamítá.
-
-Odůvodnění:
-Otec podal návrh na vydání prozatímního rozhodnutí. Domáhal se určení péče o nezletilého v pravidelném čtyřtýdenním cyklu (středa až pátek a ucelené víkendy). Návrh odůvodnil tím, že na OSPOD došlo k dohodě o předávání v bydlišti a že režim rozvíjí sourozeneckou vazbu.
-
-Matka i opatrovník s návrhem nesouhlasili. Opatrovník uvedl, že rozsudek stanovuje jasný rámec péče a doporučil odbornou pomoc.
-
-Soud po přezkoumání dospěl k závěru, že institut prozatímního rozhodnutí by neměl být využíván v situaci, kdy účastník není spokojen s faktickou situací nastavenou rozsudkem. Otec neprokázal žádné nové skutečnosti, které nastaly po vyhlášení rozhodnutí ve věci samé. Návrh byl proto zamítnut.
-
-Poučení:
-Proti tomuto usnesení nelze podat odvolání (§ 465g odst. 4 z.ř.s.).
-
-V [OKRESNÍ MĚSTO] dne [DATUM]
-[JUDr. SOUDCE] v.r.
-samosoudkyně`
-  },
-  {
-    id: 'doc-11',
-    pageNumber: 11,
-    title: 'Souhrnné vyjádření OSPOD Městského úřadu k podáním otce',
-    category: 'ospod-meu',
-    categoryLabel: 'Stížnosti & Odpovědi OSPOD / MěÚ',
-    issuingBody: 'Městský úřad [MĚSTO X] (OSPOD)',
+    id: 'doc-06',
+    pageNumber: 6,
+    title: 'Odpověď Kanceláře Dětského ombudsmana na podnět otce (24. 6. 2026)',
+    category: 'mpsv-ombudsman',
+    categoryLabel: 'Inspekce MPSV & Ombudsman',
+    issuingBody: 'Kancelář Veřejného ochránce práv – Dětský ombudsman (Brno)',
     targetBody: '[OTEC]',
     dateStr: '[DATUM]',
-    caseRef: '[Ko XX/2026]',
-    summary: 'Oficiální sdělení OSPODu, že kolizní opatrovník není oprávněn řešit běžná nedorozumění rodičů a neformální dohody rodičů nejsou zakládány do soudního spisu.',
-    legalTakeaway: 'OSPOD odmítá vystupovat jako arbitr v průběžných sporech rodičů. Všechna zásadní pochybení druhé strany je nutné protokolovat a předkládat soudu v rámci výkonu rozhodnutí.',
-    content: `MĚSTSKÝ ÚRÁD [MĚSTO X]
-ODBOR SOCIÁLNÍ – Oddělení sociálně-právní ochrany dětí
+    caseRef: '[KVOP-XXXXX/2026]',
+    summary: 'Oficiální dopis zástupkyně Dětského ombudsmana vysvětlující postupy a podmínky pro přešetření OSPODu. Vyžaduje předložení zamítavé odpovědi tajemníka Městského úřadu.',
+    legalTakeaway: 'Dětský ombudsman nemůže zasáhnout do živého soudního sporu, dokud stěžovatel nevyčerpá řádné opravné prostředky u vedoucích úřadu (tajemníka MěÚ dle § 175 správního řádu).',
+    content: `OCHRÁNCE PRÁV DĚTÍ
+Údolní 39, 602 00 Brno
+Sp. zn.: [926/2026/DO/DS]
+Č. j.: [KVOP-XXXXX/2026]
+Datum: [DATUM]
 
-VÁŠ DOPIS ZN:
-NAŠE ZNAČKA: [Ko XX/2026]
-VYŘIZUJE: [Bc. SOCIÁLNÍ PRACOVNICE]
-DATUM: [DATUM]
+Vážený pan [OTEC]
+[OBEC A]
 
-nezl. [NEZLETILÝ SYN A], nar. [DATUM] - souhrnné vyjádření
+Vážený pane,
 
-Vážený pane [OTEC],
+odpovídám na Váš podnět dětskému ombudsmanovi týkající se postupu Městského úřadu [MĚSTO X] (OSPOD) při výkonu kolizního opatrovnictví Vašeho syna [NEZLETILÝ SYN A]. Ve stížnosti uvádíte, že OSPOD v závěrečném návrhu ignoroval sourozeneckou vazbu se starším bratrem [NEZLETILÝ SYN C] v Vaší péči.
 
-reaguji na Vaše opakovaná podání týkající se aktuální situace mezi Vámi a matkou nezletilého [NEZLETILÝ SYN A].
+Dětský ombudsman Vám v tuto chvíli nemůže účinně pomoci. Vysvětlím proč.
 
-Dne [DATUM] byl ve věci vyhlášen rozsudek, kterým byly upraveny poměry nezletilého s předběžnou vykonatelností. Z Vámi doložené komunikace je zřejmé, že jste byli s matkou po určitou dobu schopni se na péči domlouvat i odlišně od soudního rozhodnutí. Taková dohoda je možná, musí však být oboustranná. V případě, že jeden z rodičů tuto dohodu přestane akceptovat, je třeba se vrátit k úpravě stanovené soudním rozhodnutím.
+Dětský ombudsman působí k ochraně před nezákonným či nesprávným jednáním úřadů. Nezbytnou náležitostí každého podnětu je však doklad o tom, že úřad, jehož se podnět týká, byl neúspěšně vyzván k nápravě.
 
-Není v našich možnostech a kompetencích řešit jednotlivá dílčí nedorozumění mezi rodiči ani zasahovat do konkrétní realizace předávání dítěte. Oba rodiče máte plnou rodičovskou odpovědnost. Není úkolem kolizního opatrovníka rodiče kárně hodnotit.
+Součástí Vašeho podnětu je stížnost adresovaná tajemníkovi úřadu. Aby mohla kancelář postup posoudit, potřebujeme znát oficiální odpověď tajemníka MěÚ. Tajemník má na vyřízení 60 dnů.
 
-Současně uvádím, že vzájemná běžná komunikace rodičů není zakládána do spisu kolizního opatrovníka. Tento spis slouží k evidenci podstatných skutečností a stanovisek významných pro řízení.
+V případě, že nebudete spokojen s vyřízením stížnosti ze strany MěÚ, můžete se na dětského ombudsmana obrátit znovu s novým podnětem a přiložit odpověď úřadu.
 
-S pozdravem
-[Bc. SOCIÁLNÍ PRACOVNICE]          [VEDOUCÍ ODBORU]
-sociální pracovník                 vedoucí odboru`
+S pozdravem,
+[Mgr. ZÁSTUPKYNĚ OMBUDSMANA]
+zástupkyně ředitelky právní sekce pro agendy dětského ombudsmana`
   },
   {
-    id: 'doc-12',
-    pageNumber: 12,
-    title: 'Návrh Krajskému soudu na určení lhůty k provedení procesního úkonu (§ 174a z.o.s.s.)',
+    id: 'doc-07',
+    pageNumber: 7,
+    title: 'Písemný přepis Messenger komunikace – Uznání neudržitelnosti rozsudku matkou',
+    category: 'zpravy-dokazy',
+    categoryLabel: 'Důkazní konverzace & chaty',
+    issuingBody: 'Komunikace mezi rodiči ([MATKA] a [OTEC])',
+    targetBody: 'Soudní spis / OSPOD',
+    dateStr: '[DATUM]',
+    caseRef: 'Důkazní materiál k odvolání',
+    summary: 'Autentický přepis textových zpráv z Messengeru, kde matka sama výslovně označuje prvostupňový rozsudek o pendlování za "šílenost na tak malé dítě" a navrhuje změnu dojednáním.',
+    legalTakeaway: 'Písemné přiznání druhého rodiče v chatové komunikaci, že soudní rozsudek je nelogický a špatně nastavený, představuje klíčový důkaz pro odvolací soud k reformě rozhodnutí.',
+    content: `DŮKAZNÍ MATERIÁL PRO SOUDNÍ ŘÍZENÍ
+Doslovný přepis textové komunikace (aplikace Messenger)
+
+Matka: „Hele jsme rodiče ten rozsudek se mi zdá spravedlivý pro oba ale nelíbí se mi to dojíždění do Přelouče... To od soudkyně je trochu moc šílené na tak malé dítě a furt pendlovat.“
+
+Otec: „Mě ten rozsudek se nelíbí vůbec... takhle bude víc na cestách než u mě... Hlavně ten čas v 8:45 je úplně na nic. Za mě je nejlepší možnost zachovat přespávání tak jak to bylo.“
+
+Matka: „Můžeme se domluvit že klidně ti ho můžu dovézt nebo ty mě nemusí být vždy předání v Přelouči... Na odvolací soud jít nechci tam si nedělám žádné naděje... Ten lichý týden chci upravit i v časy kvůli Jiříkovi jsme rodiče. Klidně si tu zprávu ulož jako důkaz nemám s tím problém.“
+
+Otec: „Musíme to u soudu nebo na OSPODu změnit oficiálně, ať máme právní jistotu.“
+
+Matka: „Ok ale platí jen to předání že to nemusí být v Přelouči... hlavně že oba jsme se na tom shodli oba dva ho milujeme.“
+
+Předloženo soudu a OSPOD jako důkaz o oboustranné shodě na nefunkčnosti rozhodnutí I. stupně.`
+  },
+  {
+    id: 'doc-08',
+    pageNumber: 8,
+    title: 'Druhé doplnění odvolání otce – Vědecké zdůvodnění nocování u kojenců (17. 6. 2026)',
     category: 'soudni-podani',
     categoryLabel: 'Soudní podání otce',
     issuingBody: 'Navrhovatel (Otec)',
     targetBody: 'Krajský soud v [KRAJSKÉ MĚSTO]',
     dateStr: '[DATUM]',
-    caseRef: '[SPIS. ZN. 13 P a Nc XX/2026]',
-    summary: 'Stížnostní návrh vyššímu krajskému soudu na určení lhůty z důvodu nečinnosti okresního soudu při nerozhodnutí o předběžném/prozatímním opatření ve 7denní lhůtě.',
-    legalTakeaway: 'Ustanovení § 174a zákona č. 6/2002 Sb. je účinným procesním nástrojem proti průtahům soudu prvního stupně, pokud soud překročí zákonnou 7denní lhůtu pro rozhodnutí.',
-    content: `Krajskému soudu v [KRAJSKÉ MĚSTO]
+    caseRef: '[SPIS. ZN. 13 Nc XX/2026]',
+    summary: 'Argumentované doplnění odvolání opírající se o mezinárodní konsenzuální studii Dr. Warshaka (2014) a prof. Fabriciuse (2016) prokazující škodlivost odkládání nocování u otců.',
+    legalTakeaway: 'Odkaz na mezinárodní vědecké studie (110 odborníků) vyvrací mýtus, že kojenci nesmí přes noc spát u pečujícího otce. Naopak, noční péče buduje celoživotní psychickou odolnost.',
+    content: `KRAJSKÉMU SOUDU V [KRAJSKÉ MĚSTO]
 prostřednictvím Okresního soudu v [OKRESNÍ MĚSTO]
 
-Ke sp. zn.: [SPIS. ZN. 13 P a Nc XX/2026]
+Ke sp. zn.: [SPIS. ZN. 13 Nc XX/2026]
+Odvolatel (Otec): [OTEC]
+Matka: [MATKA]
+Nezletilý: [NEZLETILÝ SYN A]
 
-Navrhovatel: [OTEC], nar. [DATUM], bytem [OBEC A], pobytem [OBEC B]
-Matka: [MATKA], nar. [DATUM], bytem [OBEC C]
-Nezletilý: [NEZLETILÝ SYN A], nar. [DATUM]
+DRUHÉ DOPLNĚNÍ ODVOLÁNÍ OTCE
+– Vědecké zdůvodnění navrženého modelu péče a reakce na procesní vývoj
 
-NÁVRH NA URČENÍ LHŮTY K PROVEDENÍ PROCESNÍHO ÚKONU
-podle § 174a zákona č. 6/2002 Sb., o soudech a soudcích
+Cílem tohoto doplnění je poskytnout odvolacímu soudu exaktní vědecké zdůvodnění navrženého 4týdenního cyklu a doložit, že odkládání nocování je v rozporu s vývojovou psychologií.
 
-I.
-Dne [DATUM] podal otec u Okresního soudu v [OKRESNÍ MĚSTO] Návrh na prozatímní úpravu styku s nezletilým [NEZLETILÝ SYN A]. Důvodem podání byly zcela nové skutečnosti (dohoda rodičů a propuknutí dětského onemocnění), které prokázaly neudržitelnost stávajícího stavu.
+I. Vědecká opora pro navržený čtyřtýdenní cyklus otce:
+1. Dr. Richard A. Warshak – „Social Science and Parenting Plans for Young Children: A Consensus Report“ (2014), podepsaná 110 předními světovými odborníky:
+Výslovně uvádí, že u kojenců neexistuje žádný vědecký důvod pro odpírání přespávání u otce. Naopak, odkládání nocování do vyššího věku dítě poškozuje, neboť ho izoluje od noční rutiny s otcem (večerní ukládání, tišení, ranní vstávání), která je pro budování bezpečné vazky (attachmentu) kriticky důležitá.
 
-II.
-Podle ustanovení občanského soudního řádu / z.ř.s. je soud povinen o návrhu na předběžné / prozatímní opatření rozhodnout bezodkladně, nejpozději do 7 dnů od jeho podání. Ke dnešnímu dni uplynulo již 20 kalendářních dnů a Okresní soud o návrhu doposud nerozhodl. Postojem soudu dochází k průtahům v řízení a k poškozování zdravého vývoje sedmiměsíčního kojence.
+2. Prof. William V. Fabricius (Arizona State University, 2016):
+Prokázal na tvrdých datech, že přespávání u otce v kojeneckém věku (pod 1 rok) má přímý pozitivní vliv na kvalitu budoucího vztahu v dospělosti, aniž by jakkoliv utrpěla vazba k matce.
 
-III.
-Otec vyčerpal ostatní prostředky ochrany, když podal stížnost předsedkyni Okresního soudu, ta však stížnost odložila s poukazem na nezávislost rozhodování.
-
-IV.
-S ohledem na výše uvedené otec navrhuje, aby Krajský soud v [KRAJSKÉ MĚSTO] vydal toto
-
-U S N E S E N Í :
-Okresnímu soudu v [OKRESNÍ MĚSTO] se určuje lhůta 3 pracovních dnů od doručení tohoto usnesení k rozhodnutí o návrhu otce ze dne [DATUM].
+II. Závěr:
+Žádám Krajský soud, aby změnil výrok II. rozsudku a určil péči otce v ucelených blocích včetně nocí.
 
 V [OBEC B], dne [DATUM]
+__________________________
+[OTEC]`
+  },
+  {
+    id: 'doc-09',
+    pageNumber: 9,
+    title: 'Návrh oprávněného otce na zahájení řízení o výkonu rozhodnutí (26. 6. 2026)',
+    category: 'soudni-podani',
+    categoryLabel: 'Soudní podání otce',
+    issuingBody: 'Oprávněný (Otec)',
+    targetBody: 'Okresní soud v [OKRESNÍ MĚSTO]',
+    dateStr: '[DATUM]',
+    caseRef: '[SPIS. ZN. 13 Nc XX/2026]',
+    summary: 'Návrh na soudní exekuci styku / péče podle § 500 z.ř.s. podaný poté, co matka odmítla vydat dítě na páteční styk v době nemoci a odmítla dohodnutou návštěvu otce v jejím bydlišti.',
+    legalTakeaway: 'Pokud matka jednostranně zmaří vykonatelný styk určený předběžně vykonatelným rozsudkem, je otec povinen podat návrh na výkon rozhodnutí uložením pokuty dle § 501 z.ř.s.',
+    content: `OKRESNÍ SOUD V [OKRESNÍ MĚSTO]
+[ADRESA SOUDU]
+
+Oprávněný: [OTEC], nar. [DATUM], bytem [OBEC A], pobytem [OBEC B]
+Povinná: [MATKA], nar. [DATUM], bytem [OBEC C]
+Nezletilý: [NEZLETILÝ SYN A], nar. [DATUM]
+
+NÁVRH OPRÁVNĚNÉHO NA ZAHÁJENÍ ŘÍZENÍ O VÝKONU ROZHODNUTÍ
+podle § 500 a násl. zákona č. 292/2013 Sb., o zvláštních řízeních soudních
+
+I.
+Rozsudkem Okresního soudu ze dne [DATUM], č. j. [SPIS. ZN.], byla určena péče o nezletilého [NEZLETILÝ SYN A] s předběžnou vykonatelností. Podle tohoto rozsudku a navazující dohody z OSPOD ze dne [DATUM] byl oprávněný otec povinen a oprávněn vykonat péči o nezletilého v pátek dne [DATUM].
+
+II.
+Povinná matka však vědomě a bezdůvodně povinnost stanovenou soudním rozhodnutím nesplnila. Oprávněný nabídl, že vzhledem k nemoci dítěte (plané neštovice) vykoná návštěvu v místě bydliště matky v [OBEC C], aby dítě necestovalo. Povinná matka to však písemně odmítla se slovy „teď návštěvy nechceme“ a styk zcela zmařila.
+
+III.
+Oprávněný navrhuje, aby Okresní soud v [OKRESNÍ MĚSTO]ydal toto
+
+U S N E S E N Í :
+Soud ukládá povinné [MATKA], aby plnila povinnosti vyplývající z rozsudku ze dne [DATUM] a umožnila oprávněnému [OTEC] řádný výkon péče o nezletilého [NEZLETILÝ SYN A] v místě současného bydliště dítěte.
+
+V [OBEC B] dne [DATUM]
+__________________________
+[OTEC]`
+  },
+  {
+    id: 'doc-10',
+    pageNumber: 10,
+    title: 'Stížnost na neprofesionální a protiprávní postup terénní pracovnice Charity (25. 6. 2026)',
+    category: 'charita-sluzby',
+    categoryLabel: 'Stanoviska sociálních služeb',
+    issuingBody: '[OTEC]',
+    targetBody: 'Charita [MĚSTO X] ([Ing. ŘEDITELKA CHARITY])',
+    dateStr: '[DATUM]',
+    caseRef: 'Stížnost na incident ze dne [DATUM]',
+    summary: 'Oficiální stížnost ředitelce Charity na terénní pracovnici, která asistovala matce při neoprávněném vniknutí do obydlí otce a vytržení spícího nemocného kojence z postýlky.',
+    legalTakeaway: 'Sociální pracovník neziskové organizace nesmí sloužit jako "fyzický doprovod" k svémocnému odebrání dítěte bez vykonatelného titulu. Takové chování zakládá porušení etického kodexu a Standardu č. 1.',
+    content: `ADRESÁT: Charita [MĚSTO X], k rukám ředitelky [Ing. ŘEDITELKA CHARITY], MBA
+PODAVATEL: [OTEC], nar. [DATUM], bytem [OBEC B]
+NA VĚDOMÍ: Ministerstvo práce a sociálních věcí, OSPOD
+
+Věc: STÍŽNOST NA NEPROFESIONÁLNÍ A PROTIPRÁVNÍ POSTUP ZAMĚSTNANKYNĚ ([Bc. SOCIÁLNÍ PRACOVNICE CHARITY]) PŘI ASISTENCI U NEZLETILÉHO [NEZLETILÝ SYN A] – OHROŽENÍ ZDRAVÍ DÍTĚTE A MAŘENÍ VÝKONU ROZHODNUTÍ
+
+Vážená paní ředitelko,
+
+tímto podávám oficiální stížnost na postup Vaší zaměstnankyně [Bc. SOCIÁLNÍ PRACOVNICE CHARITY], která dne [DATUM] v dopoledních hodinách asistovala při incidentu v mém bydlišti v [OBEC B].
+
+Jmenovaná pracovnice se dostavila jako doprovod matky [MATKA] a poskytla jí krytí k následujícímu jednání:
+1. Asistence u porušení domovní svobody: Vstoupila bez mého souhlasu do mého obydlí a nečinně přihlížela vulgárnímu napadání mé osoby ze strany matky.
+2. Nečinnost při svémocném odebrání nemocného dítěte: Můj syn v klidu spal v postýlce s horečkou 37,6 °C v akutní fázi neštovic. Matka ho z postýlky hrubě vytrhla a odvezla. Pracovnice nijak nezasáhla.
+3. Absence právního titulu: V danou dobu mi nový rozsudek ještě nebyl doručen do datové schránky (doručen až ve 13:21 hod), tudíž platil původní protokol a péče otce.
+
+Žádám vyvázání [Bc. SOCIÁLNÍ PRACOVNICE CHARITY] z asistence u naší rodiny a kárné opatření.
+
+V [OBEC B] dne [DATUM]
+__________________________
+[OTEC]`
+  },
+  {
+    id: 'doc-11',
+    pageNumber: 11,
+    title: 'Druhé doplnění podnětu MPSV – Asistence u ohrožení zdraví dítěte Charitou (25. 6. 2026)',
+    category: 'mpsv-ombudsman',
+    categoryLabel: 'Inspekce MPSV & Ombudsman',
+    issuingBody: '[OTEC]',
+    targetBody: 'Ministerstvo práce a sociálních věcí ([Mgr. REDITELKA ODBORU MPSV])',
+    dateStr: '[DATUM]',
+    caseRef: '[SZ/MPSV-2026/XXXXXX]',
+    summary: 'Naléhavé doplnění podnětu ministerstvu doplňující důkazy o tom, že Charita neposkytuje neutrální službu, ale funguje jako mocenský nástroj matky při asistenci u svémocných kroků.',
+    legalTakeaway: 'Pokud terénní pracovník asistuje u odebrání nemocného kojence před doručením rozsudku, jedná se o fatální selhání poskytovatele sociální služby podléhající inspekci MPSV.',
+    content: `MINISTERSTVO PRÁCE A SOCIÁLNÍCH VĚCÍ
+Odbor inspekcí sociálních služeb
+[Mgr. REDITELKA ODBORU MPSV], ředitelka odboru
+Na Poříčním právu 376/1, 128 00 Praha 2
+
+Číslo jednací: [MPSV-2026/XXXXXX]
+Spisová značka: [SZ/MPSV-2026/XXXXXX]
+
+Podavatel: [OTEC], nar. [DATUM], bytem [OBEC B]
+
+Věc: DRUHÉ DOPLNĚNÍ PODKLADŮ A DŮKAZŮ K PODNĚTU – STRANICKOST, PORUŠOVÁNÍ STANDARDŮ KVALITY A ASISTENCE U OHROŽENÍ ZDRAVÍ DÍTĚTE POSKYTOVATELEM CHARITA [MĚSTO X]
+
+Vážená paní ředitelko,
+
+v návaznosti na můj dnešní přípis Vám předkládám další zásadní důkaz o systémovém selhání Charity [MĚSTO X].
+
+V příloze zasílám kopii stížnosti na incident ze dne [DATUM], při kterém terénní pracovnice [Bc. SOCIÁLNÍ PRACOVNICE CHARITY] asistovala matce při vniknutí do mého obydlí a svémocném vytržení spícího 6měsíčního kojence s neštovicemi a horečkou 37,6 °C.
+
+K tomuto odebrání došlo v dopoledních hodinách, kdy nový rozsudek nebyl vypraven ani doručen do mé datové schránky (k doručení došlo až ve 13:21 hod). Pracovnice charity tak asistovala u protiprávního odnětí dítěte bez vykonatelného titulu.
+
+Tento incident dokazuje, že Charita neposkytuje neutrální službu, ale funguje jako fyzický doprovod matky k provádění svémocných kroků.
+
+Opětovně žádám o neprodlené zahájení inspekce sociálních služeb.
+
+V [OBEC B] dne [DATUM]
+__________________________
+[OTEC]`
+  },
+  {
+    id: 'doc-12',
+    pageNumber: 12,
+    title: 'Žádost otce o společnou schůzku rodičů na OSPODu (10. 6. 2026)',
+    category: 'ospod-meu',
+    categoryLabel: 'Stížnosti & Odpovědi OSPOD / MěÚ',
+    issuingBody: '[OTEC]',
+    targetBody: 'OSPOD [MĚSTO X] ([Bc. SOCIÁLNÍ PRACOVNICE])',
+    dateStr: '[DATUM]',
+    caseRef: 'Žádost o zprostředkování dohody',
+    summary: 'Oficiální dopis otce na OSPOD zaslaný hned druhý den po soudním jednání s žádostí o svolání schůzky k sepsání rodičovské dohody o závozu dítěte namísto pendlování.',
+    legalTakeaway: 'Proaktivní snaha otce vyřešit logistické problémy smírnou dohodou na půdě OSPODu dokazuje jeho vysokou rodičovskou zralost a konstrukce pro soudní řízení.',
+    content: `Odesílatel: [OTEC], bytem [OBEC B]
+Adresát: OSPOD [MĚSTO X], k rukám [Bc. SOCIÁLNÍ PRACOVNICE]
+
+V [OBEC B] dne [DATUM]
+
+Věc: Žádost o společnou schůzku rodičů – nezl. [NEZLETILÝ SYN A] (nar. [DATUM])
+
+Vážená paní [Bc. SOCIÁLNÍ PRACOVNICE],
+
+obracím se na Vás jako na kolizního opatrovníka nášho syna [NEZLETILÝ SYN A]. Dne [DATUM] proběhlo u Okresního soudu jednání, které určilo rozvrh péče.
+
+Hned po jednání jsme situaci s matkou [MATKA] v klidu probírali. Oba se jednoznačně shodujeme na tom, že soudem nastavené pendlování (předávání 3x týdně na nádraží) je pro 6měsíční dítě extrémně náročné a neudržitelné. Matka sama situaci označila za „šílenou na tak malé dítě“. Shodli jsme se na zrušení předávání na nádraží a jeho nahrazení přímým závozem do bydliště.
+
+Rádi bychom Vás požádali o zprostředkování společné schůzky na OSPODu v [MĚSTO X]. Naším cílem je sepsat oficiální rodičovskou dohodu o úpravě časů a místa předávání, kterou následně předložíme odvolacímu soudu ke schválení.
+
+Moc Vás prosím o navržení nejbližšího možného termínu. Matka s tímto postupem souhlasí.
+
+S pozdravem,
 __________________________
 [OTEC]`
   },
   {
     id: 'doc-13',
     pageNumber: 13,
-    title: 'Podnět Stálé komisi pro rodinu a rovné příležitosti PS PČR',
+    title: 'Urgence vyřízení podnětu na inspekci u MPSV (13. 6. 2026)',
     category: 'mpsv-ombudsman',
     categoryLabel: 'Inspekce MPSV & Ombudsman',
     issuingBody: '[OTEC]',
-    targetBody: 'Stálá komise pro rodinu PS PČR',
+    targetBody: 'Ministerstvo práce a sociálních věcí ([Mgr. REDITELKA ODBORU MPSV])',
     dateStr: '[DATUM]',
-    caseRef: 'Podnět k systému OSPOD/MPSV',
-    summary: 'Systémový podnět poslancům Parlamentu ČR poukazující na genderovou předpojatost OSPODu, ignorování sourozeneckých vazeb u kojenců a selhání dozoru MPSV.',
-    legalTakeaway: 'Podněty parlamentním komisím a poslancům slouží k dokumentaci systémového selhání státu v ochraně práv otců a dětí pro systémové legislativní změny.',
+    caseRef: '[SZ/MPSV-2026/XXXXXX]',
+    summary: 'Písemná urgence otce adresovaná ministerstvu po marném uplynutí 30denní lhůty pro vyřízení podnětu na inspekci sociální služby Charita.',
+    legalTakeaway: 'Při průtazích státních orgánů je nutné podávat formální urgence s odkazem na marné uplynutí zákonných lhůt a doplňovat nové procesní události ze soudu.',
+    content: `ADRESÁT: Ministerstvo práce a sociálních věcí, Odbor inspekce sociálních služeb
+[Mgr. REDITELKA ODBORU MPSV], ředitelka odboru, Na Poříčním právu 1/376, 128 01 Praha 2
+PODAVATEL: [OTEC], nar. [DATUM], bytem [OBEC B]
+
+VĚC: URGENCE VYŘÍZENÍ PODNĚTU ZE DNE [DATUM] A DOPLNĚNÍ NOVÝCH SKUTEČNOSTÍ
+
+Vážení,
+
+dne [DATUM] jsem k Vašemu úřadu podal Podnět k provedení inspekce sociálních služeb a stížnost na systémové pochybení poskytovatele Charita [MĚSTO X]. Vzhledem k tomu, že zákonná lhůta pro vyřízení již marně uplynula, tímto urguji vyřízení a doplňuji nové skutečnosti:
+
+I. Doplnění podnětu – Účast zástupce poskytovatele u soudního jednání:
+Dne [DATUM] proběhlo u Okresního soudu v [OKRESNÍ MĚSTO] jednání ve věci péče. Z oficiálního soudního protokolu vyplývá, že se jednání jako veřejnost aktivně účastnila klíčová pracovnice z Charity [MĚSTO X].
+
+Tato osobní účast pouze potvrzuje nadstandardní a neobjektivní zapojení poskytovatele do rodinného sporu ve prospěch matky. Pracovníci Charity mi nadále systematicky blokují přístup k informacím o synovi a odpírají nahlížení do originálního spisu, což porušuje Standard č. 1 (Ochrana práv osob).
+
+Žádám o sdělení stavu řízení obratem do mé datové schránky.
+
+V [OBEC B] dne [DATUM]
+__________________________
+[OTEC]`
+  },
+  {
+    id: 'doc-14',
+    pageNumber: 14,
+    title: 'Podnět k inspekci sociálních služeb u Charity (20. 4. 2026)',
+    category: 'mpsv-ombudsman',
+    categoryLabel: 'Inspekce MPSV & Ombudsman',
+    issuingBody: '[OTEC]',
+    targetBody: 'Ministerstvo práce a sociálních věcí (MPSV)',
+    dateStr: '[DATUM]',
+    caseRef: 'Podnět k inspekci Charity',
+    summary: 'Původní rozsáhlý podnět otce k MPSV napadající neprofesionalitu a podjatost terénní pracovnice Charity a odmítání zpřístupnění originálního spisu syna.',
+    legalTakeaway: 'Pokud poskytovatel sociálních služeb podmiňuje přístup otce k informacím o dítěti "souhlasem matky", porušuje § 890 občanského zákoníku i zákon o sociálních službách.',
+    content: `Věc: PODNĚT K PROVEDENÍ INSPEKCE SOCIÁLNÍCH SLUŽEB A STÍŽNOST NA SYSTÉMOVÉ POCHYBENÍ POSKYTOVATELE
+
+Podavatel: [OTEC], nar. [DATUM], bytem [OBEC B]
+Proti poskytovateli: Charita [MĚSTO X] (IČO: [ANONYMIZOVÁNO]), ředitelka [Ing. ŘEDITELKA CHARITY], klíčová pracovnice [Bc. SOCIÁLNÍ PRACOVNICE CHARITY]
+
+I. Předmět podnětu
+Podávám tento podnět k prošetření postupů Charity [MĚSTO X]. Stížnost směřuje proti neprofesionálnímu vedení sociální dokumentace a porušování Standardů kvality sociálních služeb. Namítám podjatost klíčové pracovnice [Bc. SOCIÁLNÍ PRACOVNICE CHARITY] a krytí těchto postupů vedením.
+
+II. Konkrétní pochybení
+1. Neprofesionalita a podjatost: Pracovnice nepostupuje nestranně, selektivně upravuje informace předávané otci a vyvolává dojem, že jedná výhradně v zájmu matky.
+2. Odpírání nahlížení do dokumentace: Ředitelka mi protiprávně odmítá umožnit nahlédnutí do originálního spisu syna a nutí mi subjektivně upravený 1stránkový „Výpis“. Tvrdí, že přístup k dokumentaci syna je podmíněn „souhlasem matky“, což je v rozporu s § 890 o.z.
+3. Porušení Standardů kvality č. 1 (Ochrana práv) a č. 15 (Vyřizování stížností).
+
+III. Návrh na opatření
+Žádám MPSV, aby v rámci inspekce prověřilo meze dokumentace a uložilo povinnost zpřístupnit úplný originál spisu.
+
+V [OBEC B] dne [DATUM]
+__________________________
+[OTEC]`
+  },
+  {
+    id: 'doc-15',
+    pageNumber: 15,
+    title: 'Stížnost na postup OSPODu podle § 175 správního řádu (15. 6. 2026)',
+    category: 'ospod-meu',
+    categoryLabel: 'Stížnosti & Odpovědi OSPOD / MěÚ',
+    issuingBody: '[OTEC]',
+    targetBody: 'Městský úřad [MĚSTO X] (Tajemník úřadu) / Ombudsman',
+    dateStr: '[DATUM]',
+    caseRef: '[Ko XX/2026]',
+    summary: 'Oficiální stížnost tajemníkovi Městského úřadu na sociální pracovnice OSPODu, které v závěrečném návrhu navrhly setkávání s kojencem na autobusové zastávce bez zohlednění bratra.',
+    legalTakeaway: 'Stížnost dle § 175 správního řádu podaná vedení úřadu je povinným předchozím krokem pro to, aby se věcí mohl následně zabývat Veřejný ochránce práv (Ombudsman).',
+    content: `STÍŽNOST NA POSTUP OSPOD A PODNĚT K ŠETŘENÍ
+
+Adresát 1: Městský úřad [MĚSTO X] – k rukám tajemníka úřadu
+Adresát 2: Kancelář veřejného ochránce práv (ombudsman), Údolní 39, Brno
+Stěžovatel: [OTEC], nar. [DATUM], bytem [OBEC B]
+
+Spisová značka OSPOD: [Ko XX/2026]
+Soudní řízení: sp. zn. [SPIS. ZN. 13 Nc XX/2026]
+
+VĚC: Stížnost na postup OSPOD [MĚSTO X] podle § 175 správního řádu a podnět k šetření Veřejnému ochránci práv
+
+Tímto podávám oficiální stížnost na postup OSPOD [MĚSTO X], konkrétně pracovnic [Ing. SOCIÁLNÍ PRACOVNICE] a [DiS. VEDOUCÍ ODBORU], které vypracovaly závěrečný návrh opatrovníka ze dne [DATUM].
+
+I. POPIS POCHYBENÍ OSPOD
+1. Úplné ignorování sourozenecké vazby: OSPOD navrhl omezit můj kontakt se synem [NEZLETILÝ SYN A] na odpolední hodiny na ulici / autobusové zastávce v [MĚSTO X]. Tento režim zcela vylučuje kontakt se starším bratrem [NEZLETILÝ SYN C], který v té době plní školní docházku.
+2. Mechanické přebírání postojů matky: Pracovnice nepostupovaly jako neutralní orgán, ale převzaly požadavek matky bez ohledu na mé osvědčené péče o starší dítě.
+
+II. ROZPOR S VĚDECKÝMI POZNATKY
+OSPOD argumentuje dogmatem o „kojeneckém období“, což je v rozporu se studii Prof. Warshaka.
+
+Žádám tajemníka MěÚ o přešetření a nápravu.
+
+V [OBEC B] dne [DATUM]
+__________________________
+[OTEC]`
+  },
+  {
+    id: 'doc-16',
+    pageNumber: 16,
+    title: 'Doplňující odvolání otce – Důkazy o zanedbávání hygieny a citovém vydírání (22. 6. 2026)',
+    category: 'soudni-podani',
+    categoryLabel: 'Soudní podání otce',
+    issuingBody: 'Odvolatel (Otec)',
+    targetBody: 'Krajský soud v [KRAJSKÉ MĚSTO]',
+    dateStr: '[DATUM]',
+    caseRef: '[SPIS. ZN. 13 Nc XX/2026]',
+    summary: 'Rozsáhlé odvolací podání doplňující fotodokumentaci zaslanou samotnou matkou (terasa znečištěná exkrementy, s nimiž si hraje batole) a důkazy o vyhlašování informačního embarga.',
+    legalTakeaway: 'Zdokumentované nehygienické prostředí u matky v kombinaci s infekčním onemocněním druhého dítěte představuje akutní epidemiologické riziko, které odvolací soud musí posoudit.',
+    content: `KRAJSKÉMU SOUDU V [KRAJSKÉ MĚSTO]
+prostřednictvím Okresního soudu v [OKRESNÍ MĚSTO]
+
+Ke sp. zn.: [SPIS. ZN. 13 Nc XX/2026]
+Matka: [MATKA]
+Otec: [OTEC]
+Nezletilý: [NEZLETILÝ SYN A]
+
+DOPLNĚNÍ ODVOLÁNÍ OTCE – PŘEDLOŽENÍ NOVÝCH DŮKAZŮ O VÝCHOVNÉ NEZPŮSOBILOSTI MATKY, ZANEDBÁVÁNÍ HYGIENY A CITOVÉM VYDÍRÁNÍ
+
+Otec předkládá odvolacímu soudu zásadní nově vzniklé důkazy (chatovou komunikaci a fotodokumentaci ze dnů 21. a 22. 6. 2026):
+
+I. Účelové rušení dohod a výmluvy matky: Matka nejdříve souhlasila s azylem nemocného syna s neštovicemi u otce, následně dohodu zrušila s odkazem na únavu ze slunce a výměnu čerpadla u známého.
+II. Negativní dopad na staršího syna [NEZLETILÝ SYN C]: Matka odmítla součinnost při logistice školní akce staršího bratra.
+III. Záměrná sabotáž komunikace: Matka vyhlásila sankční režim „jedné zprávy denně“ jako pomstu za to, že otec konzultoval stav s dětskou lékařkou.
+IV. Zanedbávání hygienických standardů: Matka otci zaslala fotografii terasy znečištěné exkrementy s textem: „[NEZLETILÝ SYN B] teď měl srajdu... Si s tím hrál na terase“. V situaci, kdy [NEZLETILÝ SYN A] má otevřené rány po neštovicích, jde o vážné ohrožení zdraví.
+V. Otevřené citové vydírání: Matka píše: „Jestli se mě ještě jednou zkusíš někde obejít tak konec a víc pomáhat nebudu.“
+
+Navrhuji zrušení rozsudku prvního stupně a schválení pevného 4týdenního cyklu otce.
+
+V [OBEC B] dne [DATUM]
+__________________________
+[OTEC]`
+  },
+  {
+    id: 'doc-17',
+    pageNumber: 17,
+    title: 'Informace pro OSPOD o zmaření péče a podání exekučního návrhu (26. 6. 2026)',
+    category: 'ospod-meu',
+    categoryLabel: 'Stížnosti & Odpovědi OSPOD / MěÚ',
+    issuingBody: '[OTEC]',
+    targetBody: 'OSPOD [MĚSTO X] ([Bc. SOCIÁLNÍ PRACOVNICE])',
+    dateStr: '[DATUM]',
+    caseRef: 'Vyrozumění o maření péče',
+    summary: 'Sdělení OSPODu, že matka zmařila páteční péči otce a odmítla ho pustit do objektu i na dohodnutou návštěvu nemocného syna, pročež byl podán návrh na výkon rozhodnutí.',
+    legalTakeaway: 'OSPOD musí být okamžitě písemně vyrozuměn o každém podaném návrhu na výkon rozhodnutí (exekuci styku), aby tyto skutečnosti promítl do své spisové dokumentace.',
+    content: `Odesílatel: [OTEC], bytem [OBEC B]
+Adresát: OSPOD [MĚSTO X], k rukám [Bc. SOCIÁLNÍ PRACOVNICE]
+
+Věc: Informace o zmaření péče ze strany matky a podání návrhu k soudu
+Nezletilý: [NEZLETILÝ SYN A], nar. [DATUM]
+Datum: [DATUM]
+
+Vážená paní [Bc. SOCIÁLNÍ PRACOVNICE],
+
+informuji Vás, že ze strany matky došlo k úplnému zmaření mého výkonu péče o syna [NEZLETILÝ SYN A], který měl proběhnout dnes, v pátek [DATUM].
+
+Matka odmítla syna předat s odkazem na plané neštovice. Naše dohoda ze dne [DATUM] však výslovně stanoví mechanismus pro případ nemoci, že „přijede otec do bydliště matky“. Matce jsem prokazatelně nabídl, že v zájmu syna vykonám návštěvu v jejím bydlišti v [OBEC C], aby syn necestoval. Matka to však striktně odmítla se slovy „teď návštěvy nechceme“.
+
+Vzhledem k tomu, že jde o svévolné maření platné dohody i vykonatelného rozsudku, podal jsem dnes Okresnímu soudu Návrh na zahájení řízení o výkonu rozhodnutí.
+
+V příloze zasílám toto podání i screeny komunikace pro Vaši evidenci ve spisu.
+
+S pozdravem,
+__________________________
+[OTEC]`
+  },
+  {
+    id: 'doc-18',
+    pageNumber: 18,
+    title: 'Nalévavé doplnění odvolání – Incident ze dne 24. 6. 2026 a neštovice',
+    category: 'soudni-podani',
+    categoryLabel: 'Soudní podání otce',
+    issuingBody: 'Odvolatel (Otec)',
+    targetBody: 'Krajský soud v [KRAJSKÉ MĚSTO]',
+    dateStr: '[DATUM]',
+    caseRef: '[SPIS. ZN. 13 Nc XX/2026]',
+    summary: 'Urgentní odvolací podání předkládající fotografie masivního výsevu neštovic a horečky 37,6 °C a popisující fyzické odebrání dítěte matkou za asistence Charity.',
+    legalTakeaway: 'Důkazní fotografie zdravotního stavu dítěte (teploměr, výsev neštovic) přiložené k podání jednoznačně dokazují nezodpovědný přístup matky k transportu nemocného kojence.',
+    content: `KRAJSKÉMU SOUDU V [KRAJSKÉ MĚSTO]
+prostřednictvím Okresního soudu v [OKRESNÍ MĚSTO]
+
+Spisová značka: [SPIS. ZN. 13 Nc XX/2026]
+Otec: [OTEC]
+Matka: [MATKA]
+Nezletilý: [NEZLETILÝ SYN A]
+
+VĚC: NALÉHAVÉ DOPLNĚNÍ ODVOLÁNÍ OTCE – OZNÁMENÍ O MAŘENÍ DOHOD, OHROŽENÍ ZDRAVÍ NEZLETILÉHO A UPŘESNĚNÍ VÝCHOVNÉHO NÁVRHU NA ČTYŘTÝDENNÍ REŽIM PÉČE (Incident ze dne [DATUM])
+
+Otec předkládá přímé důkazy o naprostém selhání stávajícího provizorního uspořádání péče:
+
+I. Skutkový stav: Nezletilý [NEZLETILÝ SYN A] (6 měsíců) prochází velmi těžkým průběhem planých neštovic s horečkou 37,6 °C (viz přiložené fotografie teploměru a výsevu). Podle dohody mělo dítě zůstat v klidovém režimu u otce.
+
+II. Popis incidentu: Matka krizové pravidlo ignorovala. Osobně dorazila do bydliště otce v [OBEC B], kde verbálně eskalovala situaci, otci vulgárně nadávala a těžce nemocného kojence v horečkách otci fyzicky odebrala.
+
+III. Upřesněný návrh: Jakýkoliv model vyžadující neustálou operativní domluvu je kvůli agresivní reaktivitě matky dlouhodobě neudržitelný. Navrhuji zavedení pevného 4týdenního cyklu a striktní pravidlo, že při nemoci dítě zůstává u toho rodiče, u kterého onemocnělo.
+
+Důkazy: Fotografie teploměru 37,6 °C, fotografie výsevu neštovic.
+
+V [OBEC B] dne [DATUM]
+__________________________
+[OTEC]`
+  },
+  {
+    id: 'doc-19',
+    pageNumber: 19,
+    title: 'Doplnění urgentního oznámení pro OSPOD a soud – Popis incidentu z 24. 6. 2026',
+    category: 'ospod-meu',
+    categoryLabel: 'Stížnosti & Odpovědi OSPOD / MěÚ',
+    issuingBody: '[OTEC]',
+    targetBody: 'OSPOD [MĚSTO X] / Okresní soud',
+    dateStr: '[DATUM]',
+    caseRef: '[SPIS. ZN. 13 Nc XX/2026]',
+    summary: 'Podrobná rekapitulace právního stavu v době dopoledního incidentu dokazující, že rozsudek byl vypraven až ve 12:05 hod., tudíž matka neměla žádný vykonatelný titul.',
+    legalTakeaway: 'Právní argumentace časem doručení: Rozsudek podepsaný asistentkou v 12:05 nedává matce právo dopoledne vtrhnout do domu otce a odebrat dítě.',
+    content: `ADRESÁT: OSPOD [MĚSTO X] / Okresní soud v [OKRESNÍ MĚSTO]
+K rukám: [Bc. SOCIÁLNÍ PRACOVNICE]
+ODESÍLATEL: [OTEC], bytem [OBEC B]
+DATUM: [DATUM]
+
+VĚC: DOPLNĚNÍ URGENTNÍHO OZNÁMENÍ O PORUŠENÍ DOHOD A OHROŽENÍ ZDRAVÍ NEZLETILÉHO [NEZLETILÝ SYN A] ZE DNE [DATUM]
+
+Vážená paní [Bc. SOCIÁLNÍ PRACOVNICE],
+
+doplňuji popis skutkového děje, ke kterému došlo dne [DATUM] v dopoledních hodinách v mém bydlišti v [OBEC B].
+
+1. Právní stav v době incidentu (Absence právního titulu matky):
+K incidentu došlo v dopoledních hodinách dne [DATUM]. V této době byl pro oba rodiče stále plně závazný protokol z jednání ze dne [DATUM], podle kterého měla má péče trvat až do středy. Nový rozsudek Okresního soudu byl asistentkou soudkyně digitálně podepsán a vypraven až téhož dne ve 12:05 hodin. V momentě, kdy matka vtrhla do mého obydlí, neměla v ruce žádný nový vykonatelný titul. Její jednání bylo čistě svémocné.
+
+2. Skutkový děj:
+Matka přistoupila k dětské postýlce, kde nemocný [NEZLETILÝ SYN A] s horečkou 37,6 °C spal, a spící dítě z postýlky vytrhla. Z mé strany nedošlo k fyzickému odporu výhradně z důvodu ochrany zdraví kojence před zraněním a z respektu k přítomné pracovnici Charity.
+
+3. Zneužití doprovázející organizace:
+Matka zmanipulovala Charitu a použila ji jako ochranný štít.
+
+Žádám OSPOD o neprodlené zaevidování tohoto popisu do spisu nezletilého.
+
+S pozdravem,
+__________________________
+[OTEC]`
+  },
+  {
+    id: 'doc-20',
+    pageNumber: 20,
+    title: 'Odpověď tajemnice Městského úřadu na stížnost dle § 175 správního řádu',
+    category: 'ospod-meu',
+    categoryLabel: 'Stížnosti & Odpovědi OSPOD / MěÚ',
+    issuingBody: 'Městský úřad [MĚSTO X] ([Ing. TAJEMNICE])',
+    targetBody: '[OTEC]',
+    dateStr: '[DATUM]',
+    caseRef: 'Vyřízení stížnosti na OSPOD',
+    summary: 'Oficiální rozhodnutí vedení radnice odmítající stížnost otce na OSPOD. Tajemnice tvrdí, že autobusová zastávka byla uvedena jen jako příklad neutrálního místa.',
+    legalTakeaway: 'Kroky vedení městských úřadů téměř vždy stížnosti na podřízený OSPOD odmítají. Tento dokument je však nutnou prerekvizitou k podání podnětu Krajskému úřadu a Ombudsmanovi.',
+    content: `MĚSTSKÝ ÚRÁD [MĚSTO X]
+[Ing. TAJEMNICE], tajemnice
+Československé armády 1665, [MĚSTO X]
+
+Vážený pan [OTEC]
+[OBEC A]
+
+V [MĚSTO X] dne [DATUM]
+
+Věc: Odpověď na stížnost na postup OSPOD [MĚSTO X] – Vyřízení stížnosti podle § 175 správního řádu
+
+Vážený pane,
+
+dne [DATUM] obdržel Městský úřad Vaši stížnost na postup Orgánu sociálně-právní ochrany dětí Městského úřadu [MĚSTO X]. Namítáte zejména neobjektivní postup OSPOD a nedostatečné zohlednění sourozeneckých vazeb.
+
+Po přezkoumání stížnosti a vyjádření zaměstnankyň odboru sociálního bylo zjištěno:
+
+OSPOD vystupuje jako kolizní opatrovník nezletilého dítěte. Při formulaci návrhu vycházel z posouzení potřeb 6měsíčního dítěte a potřeby stability prostředí. Ze spisu nevyplývá, že by pracovnice postupovaly jednostranně.
+
+Námitka předávání na autobusové zastávce nebyla shledána důvodnou; zastávka byla uvedena pouze jako příklad neutrálního místa předání.
+
+Hodnocení sourozeneckých vazeb náleží do působnosti kolizního opatrovníka a následně soudu.
+
+Stížnost podle § 175 správního řádu byla vyhodnocena jako nedůvodná.
+
+S pozdravem,
+__________________________
+[Ing. TAJEMNICE]
+tajemnice Městského úřadu [MĚSTO X]`
+  },
+  {
+    id: 'doc-21',
+    pageNumber: 21,
+    title: 'Vyřízení stížnosti Charitou (13. 4. 2026) – WhatsApp a mlčenlivost',
+    category: 'charita-sluzby',
+    categoryLabel: 'Stanoviska sociálních služeb',
+    issuingBody: 'Charita [MĚSTO X] ([Ing. ŘEDITELKA CHARITY])',
+    targetBody: '[OTEC]',
+    dateStr: '[DATUM]',
+    caseRef: 'Vyřízení stížnosti ze dne [DATUM]',
+    summary: 'Odpověď ředitelky Charity obhajující odmítnutí komunikace přes WhatsApp a zamítající požadavek otce na změnu klíčové sociální pracovnice.',
+    legalTakeaway: 'Neziskové organizace se odvolávají na přání své primární klientky (matky). Pokud matka změnu pracovnice nechce, organizace stížnosti druhého rodiče nevyhoví.',
+    content: `CHARITA [MĚSTO X]
+Pražská 14, [PSČ MĚSTO X]
+
+Vážený pan [OTEC]
+[OBEC A]
+
+V [MĚSTO X] dne [DATUM]
+
+VĚC: Vyřízení stížnosti na postup pracovnice
+
+Vážený pane,
+
+obdrželi jsme Vaši stížnost týkající se postupu vedoucí sociální služby [Bc. SOCIÁLNÍ PRACOVNICE CHARITY] a Vaše požadavky na změnu klíčové pracovnice a zpřístupnění dokumentace.
+
+Po posouzení uvádíme:
+1. Postavení stěžovatele: Sociální služba je poskytována matce jako její uživatelce. Vy ani dítě nejste uživateli. Vaše právo na informace o dítěti bylo naplněno poskytnutím výpisu.
+2. Komunikace: Omezení neformální komunikace přes WhatsApp je v souladu s profesionálními standardy sociální práce.
+3. Změna pracovnice: Požadavek nepovažujeme za důvodný. Uživatelka si změnu nepřeje.
+4. Dokumentace: Kompletní dokumentace obsahuje informace o uživatelce a podléhá mlčenlivosti.
+
+Tímto považujeme Vaši stížnost za vyřízenou.
+
+S pozdravem,
+__________________________
+[Ing. ŘEDITELKA CHARITY]
+ředitelka Charity [MĚSTO X]`
+  },
+  {
+    id: 'doc-22',
+    pageNumber: 22,
+    title: 'Doplnění podnětu MPSV – Doložení doručenky z Datové schránky (13:21 hod)',
+    category: 'mpsv-ombudsman',
+    categoryLabel: 'Inspekce MPSV & Ombudsman',
+    issuingBody: '[OTEC]',
+    targetBody: 'Ministerstvo práce a sociálních věcí (MPSV)',
+    dateStr: '[DATUM]',
+    caseRef: '[SZ/MPSV-2026/XXXXXX]',
+    summary: 'Doplňující důkaz pro MPSV obsahující přesný časový výpis doručení rozsudku do Datové schránky otce (13:21 hod.), čímž je dokázáno, že dopolední odvoz dítěte byl bez právního titulu.',
+    legalTakeaway: 'Klíčový důkazní prvek v procesním právu: Výpis z Portálu občana / Datové schránky dokazuje přesnou sekundu doručení. Všechny předchozí úkony třetích osob jsou protiprávní.',
+    content: `MINISTERSTVO PRÁCE A SOCIÁLNÍCH VĚCÍ
+Odbor inspekcí sociálních služeb
+[Mgr. REDITELKA ODBORU MPSV], ředitelka odboru
+
+Spisová značka: [SZ/MPSV-2026/XXXXXX]
+Odesílatel: [OTEC], nar. [DATUM], bytem [OBEC B]
+
+Věc: Doplnění podnětu k výkonu inspekce – doložení doručenky z Datové schránky
+
+Vážená paní ředitelko,
+
+v návaznosti na Vaše stanovisko ze dne [DATUM] dokládám klíčový listinný důkaz:
+
+Oficiální výpis doručenky z Datové schránky stěžovatele ([ID DATOVÉ SCHRÁNKY]):
+- Rozsudek Okresního soudu v [OKRESNÍ MĚSTO], č. j. [SPIS. ZN. 13 Nc XX/2026-169], byl do datové schránky otce doručen dne [DATUM] přesně ve 13:21:05 hodin.
+
+Tento časový údaj neprůstřelně dokazuje, že v době dopoledního incidentu (přibližně v 10:30 hodin téhož dne), kdy terénní pracovnice Charity [Bc. SOCIÁLNÍ PRACOVNICE CHARITY] asistovala matce při odvozu spícího nemocného kojence, nový rozsudek vůči otci neexistoval.
+
+Pracovnice Charity tak vědomě asistovala u protiprávního odnětí dítěte bez vykonatelného právního titulu.
+
+Žádám o zahájení inspekce.
+
+Příloha: Výpis doručenky z Datové schránky.
+
+V [OBEC B] dne [DATUM]
+__________________________
+[OTEC]`
+  },
+  {
+    id: 'doc-23',
+    pageNumber: 23,
+    title: 'Vyrozumění exekutora o zápisu doložky provedení exekuce (15. 6. 2026)',
+    category: 'soudni-usneseni',
+    categoryLabel: 'Soudní usnesení & rozsudky',
+    issuingBody: 'Exekuční úřad [OKRESNÍ MĚSTO] ([Mgr. SOUDNÍ EXEKUTOR])',
+    targetBody: 'Peněžní ústav / Oprávněný ([OTEC])',
+    dateStr: '[DATUM]',
+    caseRef: '[Č.J. 211 EX XXX/25]',
+    summary: 'Oficiální vyrozumění soudního exekutora o zápisu doložky exekuce na základě exekučního titulu pro vymožení pohledávky.',
+    legalTakeaway: 'Dokument z exekučního řízení dokládá využití právních prostředků k vymožení stanovených povinností a finančních nároků spojených s výživným a náklady.',
+    content: `EXEKUTORSKÝ ÚŘAD [OKRESNÍ MĚSTO]
+[Mgr. SOUDNÍ EXEKUTOR], soudní exekutor
+[ADRESA EXEKUTORSKÉHO ÚŘADU]
+
+Č. j.: 211 EX XXX/25-35
+Datum: [DATUM]
+
+Vyrozumění o tom, že doložka provedení exekuce byla zapsána do RZE
+
+Soudní exekutor [Mgr. SOUDNÍ EXEKUTOR], Exekučního úřadu v [OKRESNÍ MĚSTO], podává vyrozumění, že ve věci exekuce vedené
+
+na návrh oprávněného: [OTEC], bytem [OBEC B], zastoupený [OTEC]
+proti
+povinnému: [DLUŽNÍK], bytem [OBEC X]
+
+byla doložka provedení exekuce zapsána do rejstříku zahájených exekucí.
+Na základě exekučního příkazu byla exekuce prováděna přikázáním pohledávky z účtu povinného.
+
+Plnění nechť je poukázáno na účet exekutorského úřadu.
+
+[Mgr. SOUDNÍ EXEKUTOR] v. r.
+soudní exekutor`
+  },
+  {
+    id: 'doc-24',
+    pageNumber: 24,
+    title: 'Podnět Stálé komisi pro rodinu a rovné příležitosti PS PČR (Systemový rozbor)',
+    category: 'mpsv-ombudsman',
+    categoryLabel: 'Inspekce MPSV & Ombudsman',
+    issuingBody: '[OTEC]',
+    targetBody: 'Stálá komise pro rodinu Poslanecké sněmovny PČR',
+    dateStr: '[DATUM]',
+    caseRef: 'Podnět k systémovému selhání OSPOD',
+    summary: 'Systémové podání poslancům ČR rozebírající selhávání OSPODů v ochraně rovnoprávného rodičovství otců, ignorování sourozeneckých vazeb u kojenců a alibismus MPSV.',
+    legalTakeaway: 'Systémová podání parlamentním výborům pomáhají vytvářet veřejný a legislativní tlak na reformu opatrovnického soudnictví a metodik OSPOD.',
     content: `[OTEC]
 [OBEC A]
 
@@ -572,70 +885,33 @@ Věc: Podnět k prošetření systémového selhávání orgánů sociálně-pr�
 
 Vážená paní předsedkyně, vážené poslankyně, vážení poslanci,
 
-obracím se na Stálou komisi pro rodinu s podnětem, který ukazuje na závažný a dlouhodobý systémový problém v postupu OSPOD a na selhání Ministerstva práce a sociálních věcí (MPSV) při jejich metodickém vedení.
+obracím se na Stálou komisi pro rodinu s podnětem ukazujícím na závažný a dlouhodobý systémový problém v postupu OSPOD a na selhání Ministerstva práce a sociálních věcí (MPSV) při jejich metodickém vedení.
 
 Jako otec narážím při jednání s lokálním úřadem na nedostatek objektivity, ignorování zájmů dítěte a diskriminaci otců. Podal jsem stížnost na OSPOD [MĚSTO X], kde jsem upozorňoval, že pracovnice postupují jednostranně a ignorují sourozenecké vazby mezi mým starším synem [NEZLETILÝ SYN C] v mé péči a mladším synem [NEZLETILÝ SYN A].
 
 Klíčové body selhání:
-1. Selhání metodického vedení MPSV: Úřednice na lokální úrovni uplatňují zastaralé stereotypy a ignorují judikaturu Ústavního soudu o budování sourozeneckých vazeb od nejútlejšího věku.
-2. Absence funkčního kontrolního mechanismu: Nadřízený úředník pouze formálně kryje své podřízené bez přezkumu objektivity.
+1. Selhání metodického vedení MPSV: Úřednice uplatňují zastaralé stereotypy a ignorují judikaturu Ústavního soudu o budování sourozeneckých vazeb.
+2. Absence kontrolního mechanismu: Nadřízený úředník pouze formálně kryje podřízené bez přezkumu objektivity.
 3. Tolerance formalismu: Návrhy na předávání dítěte „na autobusové zastávce“ v rozsahu 3 hodin odpoledne znemožňují odvézt dítě do rodinného bydliště otce.
 
 Děkuji za pozornost, kterou tomuto podnětu budete věnovat.
 
 S pozdravem,
+__________________________
 [OTEC]`
   },
   {
-    id: 'doc-14',
-    pageNumber: 14,
-    title: 'Vyjádření MPSV k podnětu k výkonu inspekce sociálních služeb',
-    category: 'mpsv-ombudsman',
-    categoryLabel: 'Inspekce MPSV & Ombudsman',
-    issuingBody: 'Ministerstvo práce a sociálních věcí (MPSV)',
-    targetBody: '[OTEC]',
-    dateStr: '[DATUM]',
-    caseRef: '[SZ/MPSV-2026/XXXXXX]',
-    summary: 'Stanovisko ředitelky odboru inspekcí MPSV odmítající provést inspekci v neziskové Charitě. Argumentuje tím, že otec není přímým klientem sociální služby.',
-    legalTakeaway: 'MPSV rozlišuje mezi klientem sociální služby (matka) a rodinným příslušníkem. Kontrolní činnost inspekce je prováděna z moci úřední a na její zahájení není subjektivní právní nárok.',
-    content: `MINISTERSTVO PRÁCE A SOCIÁLNÍCH VĚCÍ
-Na Poříčním právu 376/1, 128 00 Praha 2
-
-V Praze dne [DATUM]
-Číslo jednací: [MPSV-2026/XXXXXX]
-Spisová značka: [SZ/MPSV-2026/XXXXXX]
-
-Mgr. Bc. Emilie Kalová
-ředitelka odboru inspekcí, výkonu akreditací, financování v oblasti sociálních služeb, sociálněprávní ochrany dětí a sociální práce
-
-Vážený pan [OTEC]
-[OBEC A]
-
-Vážený pane,
-
-Ministerstvo práce a sociálních věcí obdrželo Vaše podání týkající se činnosti poskytovatele sociálních služeb Charita [MĚSTO X].
-
-Studiem obsahu Vašeho podání a jeho příloh bylo zjištěno, že v tuto chvíli není k provedení kontrolní činnosti (inspekce) ze strany ministerstva relevantní důvod. Klientkou sociální služby je matka Vašeho dítěte, nikoliv Vy. Poskytovatel je v této situaci oprávněn a zároveň povinen Vám poskytnout jen ty části spisové dokumentace, které se týkají Vašeho dítěte.
-
-Z Vašeho podání nejsou zřejmé skutečnosti, které by odůvodňovaly podezření, že se poskytovatel dopustil porušení zákona č. 108/2006 Sb. Podklady či informace můžete doplnit.
-
-Máte-li výhrady, můžete se na poskytovatele obrátit se stížností podle § 99a zákona o sociálních službách.
-
-S pozdravem
-Mgr. Bc. Emilie Kalová`
-  },
-  {
-    id: 'doc-15',
-    pageNumber: 15,
-    title: 'Podrobné doplnění námitek u Okresního soudu – Matematická analýza péče a znalecký posudek',
+    id: 'doc-25',
+    pageNumber: 25,
+    title: 'Podrobné doplnění námitek u Okresního soudu – Hodinová analýza a znalecký posudek',
     category: 'soudni-podani',
     categoryLabel: 'Soudní podání otce',
     issuingBody: 'Navrhovatel (Otec)',
     targetBody: 'Okresní soud v [OKRESNÍ MĚSTO]',
     dateStr: '[DATUM]',
     caseRef: '[SPIS. ZN. 13 Nc XX/2026]',
-    summary: 'Písemný rozbor dokazující matematickou nepřesnost rozsudku v deklarovaných dnech péče oproti hodinové skutečnosti (28,8 hodin týdně) a žádost o psychologický posudek matky.',
-    legalTakeaway: 'Při sporech o péči je nutné soudu doložit přesnou hodinovou bilanci (časovou dotaci), nikoliv jen počítat kalendářní dny, ve kterých se dítě byť na 2 hodiny potká s otcem.',
+    summary: 'Rozbor ukazující matematický klam rozsudku v deklarovaných "12 dnech v měsíci" oproti reálným 28,8 hodinám týdně a požadavek na psychologický posudek výchovných postojů matky.',
+    legalTakeaway: 'Matematický přepočet hodinové dotace péče dokazuje, že deklarovaná "společná péče" v rozsudku je ve skutečnosti jen necelých 29 hodin týdně bez nocí.',
     content: `Okresní soud v [OKRESNÍ MĚSTO]
 [ADRESA SOUDU]
 
@@ -657,236 +933,8 @@ Soud se nechal ovlivnit absencí osobního automobilu otce. Kvalita rodičovstv�
 4. Návrh na vypracování znaleckého posudku k výchovným postojům matky:
 Navrhuji, aby soud nechal vypracovat znalecký posudek z oboru psychologie se zaměřením na výchovné postoje matky a zjištění, zda její jednání nenese znaky psychické manipulace dítěte proti otci.
 
-Závěr a návrh:
-Žádám nápravu diskriminačních prvků rozsudku a vypracování znaleckého posudku.
-
 S pozdravem,
-[OTEC]`
-  },
-  {
-    id: 'doc-16',
-    pageNumber: 16,
-    title: 'Odpověď předsedkyně Okresního soudu na stížnost na postup samosoudkyně',
-    category: 'soudni-usneseni',
-    categoryLabel: 'Soudní usnesení & rozsudky',
-    issuingBody: 'Okresní soud v [OKRESNÍ MĚSTO] ([JUDr. PŘEDSEDKYNĚ SOUDU])',
-    targetBody: '[OTEC]',
-    dateStr: '[DATUM]',
-    caseRef: '[43 St X/2026]',
-    summary: 'Předsedkyně okresního soudu odkládá stížnost otce na soudkyni. Vymezuje, že předseda soudu nesmí zasahovat do nezávislé rozhodovací pravomoci soudce.',
-    legalTakeaway: 'Stížnost dle § 164 zákona o soudech a soudcích slouží pouze pro nevhodné chování nebo průtahy. Námitky proti právnímu posouzení a dokazování soudce lze uplatnit výhradně odvoláním.',
-    content: `OKRESNÍ SOUD V [OKRESNÍ MĚSTO]
-[ADRESA SOUDU]
-
-NAŠE ZNAČKA: [43 St X/2026]
-VYŘIZUJE: [JUDr. PŘEDSEDKYNĚ SOUDU]
-DATUM: [DATUM]
-
-Vážený pan [OTEC]
-[OBEC A]
-
-Věc: Stížnost na rozhodování a postup soudce
-
-Vážený pane,
-
-obdržela jsem Vaše podání označené jako stížnost na postup soudkyně v řízení vedeném pod sp. zn. [SPIS. ZN. 13 Nc XX/2026].
-
-Dle § 164 odstavever 1 zákona č. 6/2002 Sb., o soudech a soudcích, jsou fyzické osoby oprávněny obracet se na orgány státní správy soudů se stížnostmi jen, jde-li o průtahy v řízení nebo o nevhodné chování soudních osob.
-
-Dle § 164 odst. 2 zákona č. 6/2002 Sb. se stížností nelze domáhat přezkoumání postupu soudu při výkonu jeho nezávislé rozhodovací pravomoci. Předseda soudu není oprávněn komentovat nebo přezkoumávat správnost provádění důkazního řízení či rozhodnutí soudce. Takový postup by odporoval ústavnímu principu nezávislosti soudnictví (čl. 81 Ústavy).
-
-Nesouhlasíte-li s postupem soudkyně a hodnocením důkazů, formou obrany je využití řádných opravných prostředků (podání odvolání), což jste učinil.
-
-Vaši stížnost tedy odkládám jako nedůvodnou.
-
-S pozdravem
-
-__________________________
-[JUDr. PŘEDSEDKYNĚ SOUDU] v.r.
-předsedkyně okresního soudu`
-  },
-  {
-    id: 'doc-17',
-    pageNumber: 17,
-    title: 'Podnět Kanceláři Veřejného ochránce práv – Doplnění po vyjádření Městského úřadu',
-    category: 'mpsv-ombudsman',
-    categoryLabel: 'Inspekce MPSV & Ombudsman',
-    issuingBody: '[OTEC]',
-    targetBody: 'Kancelář Veřejného ochránce práv (Brno)',
-    dateStr: '[DATUM]',
-    caseRef: '[Ko XX/2026]',
-    summary: 'Doplnění podnětu Ombudsmanovi napadající alibismus Městského úřadu při obhajobě návrhu OSPOD předávat dítě na autobusové zastávce a ignorovat sourozeneckou vazbu.',
-    legalTakeaway: 'Veřejný ochránce práv (Ombudsman) zkoumá nezákonnost a neobjektivitu v postupu OSPOD. Klíčem je doložit konkrétní písemná přiznání úřadu o ignorování sourozeneckých vazeb.',
-    content: `ADRESÁT: Kancelář veřejného ochránce práv, Údolní 39, 602 00 Brno
-STĚŽOVATEL: [OTEC], nar. [DATUM], bytem [OBEC B]
-
-Podnět k prošetření postupu orgánu sociálně-právní ochrany dětí
-DOPLNĚNÍ PO VYJÁDŘENÍ ÚŘADU
-
-VĚC: Podnět k šetření postupu OSPOD [MĚSTO X] – reakce na sdělení Městského úřadu ze dne [DATUM]
-Spisová značka OSPOD: [Ko XX/2026]
-Soudní řízení: sp. zn. [SPIS. ZN. 13 Nc XX/2026]
-
-V návaznosti na můj předchozí podnět doplňuji zásadní skutečnosti. Dne [DATUM] mi bylo doručeno vyjádření tajemnice úřadu [Ing. TAJEMNICE], která stížnost označila za nedůvodnou.
-
-I. K argumentaci úřadu ohledně „autobusové zastávky“:
-Tajemnice úřadu obhajuje návrh OSPOD tvrzením, že autobusová zastávka byla uvedena pouze jako příklad neutrálního místa předání. Pokud však OSPOD navrhl styk se synem [NEZLETILÝ SYN A] v rozsahu pouhých 3 hodin v odpoledním čase (14:00–17:00), pak mě tento model nutí trávit čas s kojencem na ulici, v provizorních podmínkách, bez možnosti odvézt ho do rodinného bydliště k bratru [NEZLETILÝ SYN C].
-
-II. Oficiální přiznání úřadu k ignorování sourozenecké vazby:
-Tajemnice uvádí: „Pokud jde o námitku zohlednění sourozeneckých vazeb, OSPOD se zaměřil především na aktuální potřeby šestiměsíčního dítěte...“ Úřad tím oficiálně přiznal, že rezignoval na multikriteriální posuzování zájmů dítěte a vědomě upřednostnil izolovaný zájem matky na úkor sourozeneckých vazeb.
-
-Podle vývojové psychologie (např. studie prof. Richarda A. Warshaka) se sourozenecká vazba buduje společným prožíváním každodenních rutin. Věk dítěte (6 měsíců) nemůže být důvodem pro odříznutí sourozence.
-
-Žádám Veřejného ochránce práv o neodkladné zahájení šetření.
-
-V [OBEC B], dne [DATUM]
 __________________________
 [OTEC]`
-  },
-  {
-    id: 'doc-18',
-    pageNumber: 18,
-    title: 'Odpověď tajemnice Městského úřadu na stížnost podle § 175 správního řádu',
-    category: 'ospod-meu',
-    categoryLabel: 'Stížnosti & Odpovědi OSPOD / MěÚ',
-    issuingBody: 'Městský úřad [MĚSTO X] ([Ing. TAJEMNICE])',
-    targetBody: '[OTEC]',
-    dateStr: '[DATUM]',
-    caseRef: 'Vyřízení stížnosti dle § 175 správního řádu',
-    summary: 'Oficiální rozhodnutí vedení Městského úřadu zamítající stížnost na OSPOD. Tvrdí, že doporučení OSPODu jsou odborným hodnocením pro soud.',
-    legalTakeaway: 'Vedení Městských úřadů téměř bez výjimky stížnosti podle § 175 správního řádu odmítá. Je proto nutné současně podávat žádost o přešetření Krajskému úřadu a podnět Ombudsmanovi.',
-    content: `Město [MĚSTO X]
-[Ing. TAJEMNICE], tajemnice
-
-Československé armády 1665, [PSČ MĚSTO X]
-
-Vážený pan [OTEC]
-[OBEC A]
-
-V [MĚSTO X] dne [DATUM]
-
-Věc: Odpověď na stížnost na postup OSPOD [MĚSTO X] – Vyřízení stížnosti podle § 175 správního řádu
-
-Vážený pane,
-
-dne [DATUM] obdržel Městský úřad Vaši stížnost na postup Orgánu sociálně-právní ochrany dětí Městského úřadu [MĚSTO X]. Namítáte zejména neobjektivní postup OSPOD a nedostatečné zohlednění sourozeneckých vazeb.
-
-Po přezkoumání stížnosti, spisového materiálu a vyjádření zaměstnankyň odboru sociálního bylo zjištěno:
-
-OSPOD vystupuje jako kolizní opatrovník nezletilého dítěte, jehož povinností je hájit zájmy dítěte. Při formulaci návrhu vycházel z posouzení potřeb šestiměsíčního dítěte a potřeby stability prostředí. Ze spisu nevyplývá, že by pracovnice postupovaly jednostranně.
-
-Námitka předávání na autobusové zastávce nebyla shledána důvodnou; zastávka byla uvedena pouze jako příklad neutrálního místa předání.
-
-Hodnocení sourozeneckých vazeb náleží do působnosti kolizního opatrovníka a následně soudu. Skutečnost, že zastáváte odlišný rodičovský názor na rozsah péče, nezakládá pochybení OSPOD.
-
-Stížnost podle § 175 správního řádu byla vyhodnocena jako nedůvodná.
-
-S pozdravem
-
-__________________________
-[Ing. TAJEMNICE]
-tajemnice Městského úřadu [MĚSTO X]`
-  },
-  {
-    id: 'doc-19',
-    pageNumber: 19,
-    title: 'Vyřízení stížnosti Charitou (13. 4. 2026) – WhatsApp komunikace a mlčenlivost',
-    category: 'charita-sluzby',
-    categoryLabel: 'Stanoviska sociálních služeb',
-    issuingBody: 'Charita [MĚSTO X]',
-    targetBody: '[OTEC]',
-    dateStr: '[DATUM]',
-    caseRef: 'Vyřízení stížnosti ze dne [DATUM]',
-    summary: 'Písemná odpověl Charity vysvětlující pravidla neformální komunikace přes WhatsApp a důvody odmítnutí změny klíčové pracovnice.',
-    legalTakeaway: 'Sociální pracovnice mají právo omezit soukromé zprávy na WhatsApp a vyžadovat oficiální e-mail/telefonát. Požadavek na změnu klíčového pracovníka vyžaduje souhlas uživatelky (matky).',
-    content: `CHARITA [MĚSTO X]
-Pražská 14, [PSČ MĚSTO X]
-
-tel.: +420 XXX XXX XXX
-email: info@[ANONYMIZOVÁNO].cz
-
-Vážený pan [OTEC]
-[OBEC A]
-
-V [MĚSTO X] dne [DATUM]
-
-VĚC: Vyřízení stížnosti na postup pracovnice
-
-Vážený pane,
-
-obdrželi jsme Vaši stížnost týkající se postupu vedoucí sociální služby a Vaše požadavky na změnu klíčové pracovnice a zpřístupnění dokumentace.
-
-Po posouzení uvádíme:
-
-1. Postavení stěžovatele a rozsah informací:
-Sociální služba je poskytována matce dítěte jako její uživatelce. Vy ani dítě nejste uživateli této služby. Vaše právo na informace o dítěti jako zákonného zástupce bylo naplněno poskytnutím výpisu ze sociální dokumentace dle § 100 zákona o sociálních službách a GDPR.
-
-2. Komunikace s pracovníkem služby:
-Omezení komunikace prostřednictvím neformálních nástrojů (aplikace WhatsApp) je v souladu s profesionálními standardy sociální práce a nelze jej považovat za porušení povinností.
-
-3. Požadavek na změnu klíčové pracovnice:
-Požadavek nepovažujeme za důvodný. O personálním zajištění rozhoduje poskytovatel ve spolupráci s uživatelkou. Uživatelka vyjádřila spokojenost a změnu si nepřeje.
-
-4. Vedení a ochrana dokumentace:
-Odmítáme tvrzení o manipulaci. Sociální dokumentace je vedena řádně v souladu s právními předpisy.
-
-S pozdravem
-
-__________________________
-[Ing. ŘEDITELKA CHARITY]
-ředitelka Charita [MĚSTO X]`
-  },
-  {
-    id: 'doc-20',
-    pageNumber: 20,
-    title: 'Doplnění podnětu MPSV – Důkazy o incidentu při odvozu nemocného dítěte a zatajování spisu',
-    category: 'mpsv-ombudsman',
-    categoryLabel: 'Inspekce MPSV & Ombudsman',
-    issuingBody: '[OTEC]',
-    targetBody: 'Ministerstvo práce a sociálních věcí (MPSV)',
-    dateStr: '[DATUM]',
-    caseRef: '[SZ/MPSV-2026/XXXXXX]',
-    summary: 'Reakce otce na zamítnutí inspekce od MPSV doplňující nezvratné důkazy: oficiální doručenku z datové schránky dokazující, že rozsudek nebyl v době zásahu vykonatelný.',
-    legalTakeaway: 'Rozsudek nabývá účinků vůči účastníkovi až okamžikem doručení do jeho Datové schránky. Terénní odebrání dítěte před doručením je svémocným jednáním bez právního titulu.',
-    content: `MINISTERSTVO PRÁCE A SOCIÁLNÍCH VĚCÍ
-Odbor inspekcí, výkonu akreditací a SPOD
-Mgr. Bc. Emilie Kalová, ředitelka odboru
-Na Poříčním právu 376/1, 128 00 Praha 2
-
-ID datové schránky: [ANONYMIZOVÁNO]
-Spisová značka: [SZ/MPSV-2026/XXXXXX]
-Datum: [DATUM]
-
-ODESÍLATEL: [OTEC], nar. [DATUM], bytem [OBEC B]
-(jako otec a zákonný zástupce nezletilého [NEZLETILÝ SYN A])
-
-Věc: Doplnění podnětu k výkonu inspekce u poskytovatele sociálních služeb Charita [MĚSTO X] – doložení nových zásadních skutečností a vědomé spoluúčasti na protiprávním jednání
-
-Vážená paní ředitelko,
-
-reaguji na Vaše vyjádření ze dne [DATUM] a v souladu s Vaší výzvou zasílám klíčové důkazy:
-
-I. DŮKAZ O ZÁMĚRNÉM ZATAJOVÁNÍ DOKUMENTACE
-Rozsudek Okresního soudu ze dne [DATUM] výslovně uvádí, že podle zprávy samotné Charity bylo cílem mimosoudní dohoda s otcem a ujasnění péče o syna [NEZLETILÝ SYN A]. Charita tedy oficiálně deklarovala, že náplní práce bylo koncepční řešení péče o mého syna. Záznamy se tedy přímo týkají mého dítěte a jako zákonný zástupce mám právo do nich nahlížet.
-
-II. DŮKAZ O VĚDOMÉ SPOLUÚČASTI NA PROTIPRÁVNÍM JEDNÁNÍ (Incident ze dne [DATUM])
-Terénní pracovnice Charity doprovodila dopoledne matku do mého obydlí k odvozu nezletilého [NEZLETILÝ SYN A]. Nový rozsudek mi však byl doručen do mé datové schránky až odpoledne ve 13:21 hod. (viz přiložený oficiální výpis doručenky). V době dopoledního incidentu tak tento rozsudek z pohledu zákona vůči mně vůbec neexistoval a platil předchozí schválený soudní protokol, dle kterého mělo mít dítě v době nemoci (teplota nad 37 °C, plané neštovice) klidový režim v mé péči.
-
-Sociální pracovnice tak vědomě asistovala u protiprávního odvozu nemocného kojence bez vykonatelného právního titulu.
-
-ZÁVĚR
-Žádám MPSV o přehodnocení stanoviska a o urychlené zahájení inspekce poskytování sociálních služeb.
-
-S pozdravem,
-
-__________________________
-[OTEC]
-(vlastnoruční podpis)
-
-PŘÍLOHY:
-1. Rozsudek Okresního soudu v [OKRESNÍ MĚSTO]
-2. Výpis z portálu občana dokládající čas doručení do DS ([DATUM] ve 13:21)
-3. Kopie oficiálního soudního protokolu s pravidlem o nemoci nad 37 °C
-4. Fotodokumentace akutního zdravotního stavu nezletilého`
   }
 ];

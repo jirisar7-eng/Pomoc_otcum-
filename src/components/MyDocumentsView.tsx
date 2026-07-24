@@ -81,12 +81,13 @@ export default function MyDocumentsView({ setActiveTab, setSearchQuery }: MyDocu
   };
 
   const categories = [
-    { id: 'all', label: 'Všechny dokumenty (20)' },
+    { id: 'all', label: `Všechny dokumenty (${MY_ANONYMIZED_DOCUMENTS.length})` },
     { id: 'soudni-podani', label: 'Soudní podání otce' },
     { id: 'soudni-usneseni', label: 'Soudní usnesení & rozsudky' },
     { id: 'ospod-meu', label: 'OSPOD & Městský úřad' },
     { id: 'mpsv-ombudsman', label: 'Inspekce MPSV & Ombudsman' },
-    { id: 'charita-sluzby', label: 'Charita & sociální služby' }
+    { id: 'charita-sluzby', label: 'Charita & sociální služby' },
+    { id: 'zpravy-dokazy', label: 'Důkazní konverzace & chaty' }
   ];
 
   return (
@@ -114,7 +115,7 @@ export default function MyDocumentsView({ setActiveTab, setSearchQuery }: MyDocu
 
           <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10 text-center shrink-0 min-w-[200px]">
             <span className="text-[10px] font-mono text-slate-300 uppercase tracking-wider block">Celkem v databázi</span>
-            <span className="text-3xl font-display font-extrabold text-teal-400">20 / 20</span>
+            <span className="text-3xl font-display font-extrabold text-teal-400">{MY_ANONYMIZED_DOCUMENTS.length} / {MY_ANONYMIZED_DOCUMENTS.length}</span>
             <span className="text-xs text-slate-300 block mt-1 font-sans">Anonymizovaných stránek</span>
           </div>
         </div>
@@ -253,7 +254,7 @@ export default function MyDocumentsView({ setActiveTab, setSearchQuery }: MyDocu
                 <span>SPIS OCHRANY PRÁV • SP. ZN.: {currentDoc.caseRef}</span>
               </div>
               <span className="text-[10px] font-mono uppercase bg-amber-100 text-amber-900 px-2.5 py-1 rounded border border-amber-200 font-bold">
-                STRANA {currentDoc.pageNumber} z 20 (ANONYMIZOVÁNO)
+                STRANA {currentDoc.pageNumber} z {MY_ANONYMIZED_DOCUMENTS.length} (ANONYMIZOVÁNO)
               </span>
             </div>
 
@@ -347,7 +348,7 @@ export default function MyDocumentsView({ setActiveTab, setSearchQuery }: MyDocu
           <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-xs font-mono font-bold text-slate-400 uppercase tracking-wider">
-                Rejstřík stránek (20)
+                Rejstřík stránek ({MY_ANONYMIZED_DOCUMENTS.length})
               </span>
               <span className="text-[10px] font-mono text-teal-700 font-bold bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
                 1 spisy / 1 str.
