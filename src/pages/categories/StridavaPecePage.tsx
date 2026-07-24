@@ -14,33 +14,33 @@ export default function StridavaPecePage(props: CategoryPageProps) {
 
   const legalSections = [
     {
-      title: 'Modely uspořádání střídavé péče',
-      content: 'Přehled osvědčených modelů: týden/týden pro školáky, cyklus 2-2-3 pro batolata, dvoutýdenní střídání pro teenagery.'
+      title: '1. Modely uspořádání střídavé péče',
+      content: 'Přehled osvědčených modelů přizpůsobených věku dětí: klasický týden/týden pro školáky, flexibilnější cyklus 2-2-3 pro mladší děti, případně dvoutýdenní střídání pro starší děti a teenagerů s ohledem na jejich zájmy a sociální vazby.'
     },
     {
-      title: 'Vyvrácení mýtu o "dvoji domově a zmatení dítěte"',
-      content: 'Vědecké výzkumy (Bauserman, Fransson) jednoznačně prokazují, že děti ve střídavé péči prospívají srovnatelně s dětmi z úplných rodin.'
+      title: '2. Vyvrácení mýtu o "dvojím domově a zmatení dítěte"',
+      content: 'Vědecké výzkumy a metaanalýzy (např. R. Bauserman, F. Fransson) jednoznačně prokazují, že děti ve střídavé péči prospívají psychicky i sociálně srovnatelně s dětmi z úplných rodin a vyvracejí zastaralé mýty o negativním dopadu stěhování.'
     },
     {
-      title: 'Budování rovnocenných podmínek v obou domovech',
-      content: 'Praktický návod na zajištění vlastního pokoje, oblečení, hraček a školních potřeb bez nutnosti neustálého balení kufru.'
+      title: '3. Budování rovnocenných podmínek v obou domovech',
+      content: 'Praktický návod na zajištění plnohodnotného zázemí – vlastní pokoj nebo kout, dostatek oblečení, školních potřeb a hraček v obou domácnostech tak, aby dítě nemuselo neustále přenášet velké kufry a cítilo se doma u obou rodičů.'
     },
     {
-      title: 'Předávání dětí bez konfliktů',
-      content: 'Doporučení pro výběr neutrálních míst předávání (škola, školka, zájmové kroužky) ke snížení rodičovského napětí.'
+      title: '4. Předávání dětí bez konfliktů',
+      content: 'Pravidla pro klidné předávání dětí (převzetí ve škole/školce, eliminace konfrontací mezi rodiči z očí do očí, věcná a klidná komunikace), která chrání dítě před toxickým stresem.'
     }
   ];
 
   const actionSteps = [
-    'Sestavte si podrobný návrh harmonogramu střídavé péče odpovídající věku dítěte.',
-    'Přípravte dětský pokoj ve svém domově s veškerým vybavením.',
-    'Prokažte u soudu svou časovou flexibilitu a připravenost na péči.',
-    'Navrhněte předávání dětí primárně přes vzdělávací zařízení.'
+    'Vyberte odpovídající časový model střídání (týden/týden nebo 2-2-3) a připravte si konkrétní návrh harmonogramu.',
+    'Zařiďte pro dítě plnohodnotné osobní zázemí v obou domácnostech (oblečení, učebnice, hračky) pro eliminaci stěhovacího stresu.',
+    'Prostudujte si výzkumy Bausermana a Franssona jako odbornou argumentační zásobu pro OSPOD a soud.',
+    'Trvejte na logisticky klidném předávání dětí nejlépe skrze školu nebo školku.'
   ];
 
   const recommendedTemplates = [
-    { title: 'Rodičovská dohoda o střídavé péči', desc: 'Komplexní vzor dohody rodičů', type: 'DOCX' },
-    { title: 'Harmonogram péče 2-2-3', desc: 'Kalendářní plán pro mladší děti', type: 'PDF' }
+    { title: 'Rodičovská dohoda o střídavé péči', desc: 'Komplexní vzor dohody rodičů s podrobným harmonogramem', type: 'DOCX' },
+    { title: 'Harmonogram střídání péče 2-2-3', desc: 'Detailní kalendářní plán pro mladší děti ke stažení', type: 'PDF' }
   ];
 
   return (
@@ -48,11 +48,12 @@ export default function StridavaPecePage(props: CategoryPageProps) {
       title="Střídavá a společná péče"
       categorySlug={categorySlug}
       icon="🤝"
-      subtitle="Modely, organizace střídání, praxe, vyvracení mýtů a budování stabilního dvojího domova."
+      subtitle="Modely, organizace střídání, praxe, vyvrácení mýtů a budování stabilního dvojího domova."
       blueprint={blueprint}
       legalSections={legalSections}
       actionSteps={actionSteps}
       recommendedTemplates={recommendedTemplates}
+      aiButtonText="Položit dotaz AI Asistentovi ke střídavé péči"
       {...props}
     />
   );

@@ -15,33 +15,33 @@ export default function JednaniOspodPage(props: CategoryPageProps) {
 
   const legalSections = [
     {
-      title: 'Taktika a profesionální vystupování na OSPOD',
-      content: 'Jednejte vždy klidně, věcně, s úsměvem a bez osobních útoků na matku. Zaměřte se výhradně na potřeby a nejlepší zájem dítěte.'
+      title: '1. Taktika a profesionální vystupování na OSPOD',
+      content: 'Jednejte vždy klidně, věcně, s úsměvem a bez osobních útoků na druhého rodiče. Zaměřte se výhradně na potřeby, zájmy a nejlepší zájem dítěte. Všechny argumenty podkládejte důkazy, nikoliv pouhými emocemi.'
     },
     {
-      title: 'Zákonná práva otce při jednání s úřadem',
-      content: 'Právo na nahlížení do spisu, pořizování fotokopií, přítomnost právního zástupce a pořízení zvukového záznamu z jednání.'
+      title: '2. Zákonná práva otce při jednání s úřadem',
+      content: 'Každý otec má dle správního řádu a ZSPOD plné právo na nahlížení do spisu, pořizování fotokopií dokumentů, účast právního zástupce či advokáta na jednáních a pořizování vlastního zvukového záznamu pro doložení průběhu schůzky.'
     },
     {
-      title: 'Příprava na terénní šetření v bytě otce',
-      content: 'Čistý dětský pokoj, postel, pracovní stůl, hračky, věci na hygienu, plná lednice a stabilní, bezpečné prostředí.'
+      title: '3. Příprava na terénní šetření v bytě otce',
+      content: 'Jak připravit domácnost na návštěvu sociálních pracovnic – čistý dětský pokoj nebo vyhrazený koutek, řádná postel, psací stůl, hračky, věci na hygienu, plná lednice a stabilní, bezpečné a podnětné prostředí pro dítě.'
     },
     {
-      title: 'Obrana proti zaujatosti a podjatosti úřednice',
-      content: 'Postup při podání stížnosti vedoucímu odboru, námitka podjatosti a podnět Krajskému úřadu či Veřejnému ochránci práv (ombudsmanovi).'
+      title: '4. Obrana proti zaujatosti a podjatosti úřednice',
+      content: 'Postup při podezření na neobjektivní a zaujatý přístup sociální pracovnice – podání námitky podjatosti dle správního řádu, písemná stížnost na postup orgánu a důsledné vyžadování zápisů ze všech schůzek.'
     }
   ];
 
   const actionSteps = [
-    'Před každou schůzkou si připravte písemné body, které chcete projednat.',
-    'Pravidelně žádat o nahlédnutí do spisu a fotokopie všech písemností.',
-    'Z každého jednání si pořizujte detailní písemné zápisy nebo audiozáznam.',
-    'Při diskriminaci podejte námitku podjatosti a stížnost vedoucímu úřadu.'
+    'Před každou schůzkou na OSPOD si připravte písemný seznam bodů a věcných argumentů.',
+    'Pravidelně žádejte o nahlédnutí do spisu OSPOD a pořizujte si fotokopie všech písemností a zpráv.',
+    'Připravte domácnost na terénní šetření (postel, stůl, hračky, hygiena) a vytvořte pro dítě podnětné prostředí.',
+    'Při diskriminaci či neobjektivitě podejte písemnou námitku podjatosti a stížnost vedoucímu odboru.'
   ];
 
   const recommendedTemplates = [
-    { title: 'Žádost o nahlédnutí do spisu OSPOD', desc: 'Formální žádost dle správního řádu', type: 'DOCX' },
-    { title: 'Námitka podjatosti pracovnice OSPOD', desc: 'Stížnost na neobjektivní postup', type: 'DOCX' }
+    { title: 'Žádost o nahlédnutí do spisu OSPOD', desc: 'Formální žádost dle správního řádu a ZSPOD', type: 'DOCX' },
+    { title: 'Námitka podjatosti pracovnice OSPOD', desc: 'Stížnost na neobjektivní a zaujatý postup úřednice', type: 'DOCX' }
   ];
 
   return (
@@ -54,6 +54,7 @@ export default function JednaniOspodPage(props: CategoryPageProps) {
       legalSections={legalSections}
       actionSteps={actionSteps}
       recommendedTemplates={recommendedTemplates}
+      aiButtonText="Položit dotaz AI Asistentovi k jednání s OSPOD"
       {...props}
     />
   );

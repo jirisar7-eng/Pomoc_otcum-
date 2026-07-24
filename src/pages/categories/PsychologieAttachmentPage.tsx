@@ -14,33 +14,33 @@ export default function PsychologieAttachmentPage(props: CategoryPageProps) {
 
   const legalSections = [
     {
-      title: 'Otec jako rovnocenná citová figura',
-      content: 'Teorie citové vazby (John Bowlby, Michael Lamb) dokazuje, že dítě je od narození schopno vytvořit si stejně silnou vazbu k otci jako k matce.'
+      title: '1. Otec jako rovnocenná citová figura',
+      content: 'Teorie citové vazby (John Bowlby, Michael Lamb) jednoznačně dokazuje, že dítě je od narození schopno vytvořit si stejně silnou a bezpečnou vazbu k otci jako k matce. Otec nepředstavuje sekundární osobu, nýbrž plnohodnotný pilíř dětského attachmentu.'
     },
     {
-      title: 'Specifika otcovské hry a vývoje mozku',
-      content: 'Otcovská péče a fyzicky aktivní hra stimulují prefrontální kůru dětí, rozvíjejí odvahu, odolnost a schopnost řešit problémy.'
+      title: '2. Specifika otcovské hry a vývoje mozku',
+      content: 'Otcovská péče, fyzicky aktivní hra a specifický styl interakce stimulují prefrontální kůru dětí, rozvíjejí jejich odvahu, emocionální odolnost, schopnost riskovat v bezpečných mezích a efektivně řešit problémy.'
     },
     {
-      title: 'Dopady otcovské deprivace',
-      content: 'Absence otce v dětství zvyšuje riziko depresí, poruch chování, závislostí a školního selhávání v dospívání.'
+      title: '3. Dopady otcovské deprivace',
+      content: 'Dlouhodobá absence otce v dětství narušuje psychickou stabilitu a prokazatelně zvyšuje riziko depresí, poruch chování, závislostí a školního selhávání v pozdějším věku dospívání.'
     },
     {
-      title: 'Zvládání přechodné separační úzkosti',
-      content: 'Jak správně reagovat na pláč dítěte při předávání a vysvětlit soudu, že pláč je reakcí na napětí mezi rodiči, nikoliv odmítáním otce.'
+      title: '4. Emoční potřeby dětí v různých věkových etapách',
+      content: 'Přehled psychického vývoje od batolecího věku přes předškolní období až po pubertu s důrazem na to, jak dítě vnímá přítomnost a absenci otce v jednotlivých fázích svého života.'
     }
   ];
 
   const actionSteps = [
-    'Rozvíjejte aktivní, zapojenou péči a uklidňující večerní rituály.',
-    'Vysvětlete sociálním pracovníkům rozdíl mezi matkou a otcem jako citovými figurami.',
-    'Nenechte se znejistit dočasnými emocionálními výkyvy dítěte při přechodu.',
-    'Dopřejte dítěti čas a bezpečný prostor pro vyjádření všech emocí.'
+    'Studujte závěry Bowlbyho a Lamba o rovnocenné citové vazbě k oběma rodičům.',
+    'Zapojujte se do aktivní fyzické hry a rozvíjejte samostatnost a odolnost dítěte.',
+    'Předkládejte OSPOD a soudním znalcům argumenty o rizicích otcovské deprivace.',
+    'Přizpůsobte způsob komunikace a péče aktuální vývojové fázi dětské psychiky.'
   ];
 
   const recommendedTemplates = [
-    { title: 'Přehled výzkumů o významu otce', desc: 'Psychologický podklad k soudu', type: 'PDF' },
-    { title: 'Dotazník pro posouzení citové vazby', desc: 'Pomůcka pro přípravu na znalce', type: 'DOCX' }
+    { title: 'Přehled výzkumů o významu otcovské vazby', desc: 'Psychologický a odborný podklad pro znalce a soud', type: 'PDF' },
+    { title: 'Dotazník pro posouzení citové vazby k otci', desc: 'Pomůcka pro přípravu na znalecké vyšetřování', type: 'DOCX' }
   ];
 
   return (
@@ -53,6 +53,7 @@ export default function PsychologieAttachmentPage(props: CategoryPageProps) {
       legalSections={legalSections}
       actionSteps={actionSteps}
       recommendedTemplates={recommendedTemplates}
+      aiButtonText="Položit dotaz AI Asistentovi k psychologii attachmentu"
       {...props}
     />
   );

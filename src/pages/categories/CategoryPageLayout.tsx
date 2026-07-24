@@ -33,6 +33,8 @@ export interface ExtendedCategoryPageProps {
   legalSections: { title: string; content: string; icon?: string }[];
   actionSteps: string[];
   recommendedTemplates: { title: string; desc: string; type: string }[];
+  aiButtonText?: string;
+  customWidget?: React.ReactNode;
   setActiveTab?: (tab: string) => void;
   setSearchQuery?: (query: string) => void;
 }
@@ -46,6 +48,8 @@ export default function CategoryPageLayout({
   legalSections,
   actionSteps,
   recommendedTemplates,
+  aiButtonText,
+  customWidget,
   setActiveTab,
   setSearchQuery
 }: ExtendedCategoryPageProps) {
@@ -68,25 +72,34 @@ export default function CategoryPageLayout({
     }
   };
 
-  // Strictly filter Judikatura, Studies, and Templates for this exact categorySlug
+  // Strictly filter Judikatura, Studies, and Templates for this exact categorySlug (ZERO CROSS-CONTAMINATION)
   const categoryJudgments = React.useMemo(() => {
     const slug = categorySlug.toLowerCase();
+    const slugSpace = slug.replace(/-/g, ' ');
     return HUB_JUDGMENTS.filter(j => 
-      j.tags.some(t => t.toLowerCase() === slug || t.toLowerCase().includes(slug) || slug.includes(t.toLowerCase()))
+      j.tags.some(t => {
+        const tag = t.toLowerCase();
+        return tag === slug || tag === slugSpace || (slug === 'judikatura' && (tag.includes('judikat') || tag.includes('nález') || tag.includes('ústavní')));
+      })
     );
   }, [categorySlug]);
 
   const categoryStudies = React.useMemo(() => {
     const slug = categorySlug.toLowerCase();
+    const slugSpace = slug.replace(/-/g, ' ');
     return HUB_STUDIES.filter(s => 
-      s.tags.some(t => t.toLowerCase() === slug || t.toLowerCase().includes(slug) || slug.includes(t.toLowerCase()))
+      s.tags.some(t => {
+        const tag = t.toLowerCase();
+        return tag === slug || tag === slugSpace || (slug === 'kritika-studii' && (tag.includes('studie') || tag.includes('mcintosh') || tag.includes('warshak') || tag.includes('kritika')));
+      })
     );
   }, [categorySlug]);
 
   const categoryTemplates = React.useMemo(() => {
     const slug = categorySlug.toLowerCase();
+    const slugSpace = slug.replace(/-/g, ' ');
     return HUB_TEMPLATES.filter(t => 
-      t.categorySlug === slug || (t.tags && t.tags.some(tg => tg.toLowerCase() === slug || tg.toLowerCase().includes(slug) || slug.includes(tg.toLowerCase())))
+      t.categorySlug === slug || (t.tags && t.tags.some(tg => tg.toLowerCase() === slug || tg.toLowerCase() === slugSpace))
     );
   }, [categorySlug]);
 
@@ -147,7 +160,7 @@ export default function CategoryPageLayout({
                 className="flex items-center justify-center gap-2 px-4 py-2.5 bg-teal-500 hover:bg-teal-400 text-slate-950 font-black text-xs rounded-xl shadow-md transition-all cursor-pointer"
               >
                 <Sparkles className="w-4 h-4" />
-                <span>Položit dotaz AI Asistentovi</span>
+                <span>{aiButtonText || 'Položit dotaz AI Asistentovi'}</span>
               </button>
               <button
                 onClick={handleShare}
@@ -179,6 +192,13 @@ export default function CategoryPageLayout({
             {blueprint.purpose}
           </p>
         </div>
+
+        {/* CUSTOM WIDGET (e.g. Kalkulačka výživného) */}
+        {customWidget && (
+          <div className="space-y-4">
+            {customWidget}
+          </div>
+        )}
 
         {/* BLOCK 2: DETAILNÍ ODBORNÝ ROZBOR */}
         <div className="space-y-4">

@@ -18,33 +18,33 @@ export default function PravniRadPage(props: CategoryPageProps) {
 
   const legalSections = [
     {
-      title: 'Základní pilíře zákona a § 858 OZ',
-      content: 'Rodičovská odpovědnost dle § 858 občanského zákoníku představuje ucelený soubor práv a povinností obou rodičů při péči o dítě, jeho osobnostní vývoj, zastupování a správu jeho jmění.'
+      title: '1. Základní pilíře zákona a § 858 OZ',
+      content: 'Rodičovská odpovědnost dle § 858 občanského zákoníku představuje ucelený soubor práv a povinností obou rodičů při péči o dítě, jeho osobnostní vývoj, zastupování a správu jeho jmění. Zákon výslovně stanoví, že tato odpovědnost náleží rovnoměrně oběma rodičům bez ohledu na to, zda spolu žijí, či zda byli manželé.'
     },
     {
-      title: 'Princip rovnoprávnosti matky a otce',
-      content: 'České rodinné právo staví na rovném postavení obou rodičů. Žádný právní předpis nedává matce přednostní právo na výchovu či péči.'
+      title: '2. Princip rovnoprávnosti matky a otce',
+      content: 'České rodinné právo a Listina základních práv a svobod (čl. 32) staví na rovném postavení obou rodičů. Žádný platný právní předpis v České republice nedává matce přednostní právo na výchovu, péči nebo zastupování nezletilého dítěte. Genderová neutralita je základním stavebním kamenem moderního opatrovnického práva.'
     },
     {
-      title: 'Mezinárodní úmluvy a Článek 9 Úmluvy o právech dítěte',
-      content: 'Dítě má nezadatelné právo udržovat pravidelné osobní kontakty s oběma rodiči, ledaže je to v rozporu s jeho nejlepším zájmem.'
+      title: '3. Mezinárodní úmluvy a Článek 9 Úmluvy o právech dítěte',
+      content: 'Mezinárodní právo garantuje právo dítěte na pravidelný osobní styk a přímý kontakt s oběma rodiči. Článek 9 Úmluvy o právech dítěte zakazuje oddělit dítě od jeho rodičů proti jejich vůli, ledaže příslušné úřady rozhodnou v souladu se soudním přezkumem, že takové oddělení je nezbytné v zájmu dítěte.'
     },
     {
-      title: 'Praktické prosazování právních nároků otce',
-      content: 'Návod jak reagovat na argumentační fauly u opatrovnických soudů, které se snaží omezit roli otce pouze na "platce alimentů a víkendového návštěvníka".'
+      title: '4. Autonomie rodiny a meze státních zásahů',
+      content: 'Stát a jeho orgány (včetně OSPOD a soudů) mohou do poměrů rodiny zasahovat pouze tehdy, vyžaduje-li to zájem dítěte a selhaly-li běžné dohody rodičů. Princip minimalizace zásahů je zakotven v judikatuře Evropského soudu pro lidská práva (EÚLP).'
     }
   ];
 
   const actionSteps = [
     'Nastudujte základní paragrafy občanského zákoníku (§ 858 až § 909 OZ).',
-    'Trvejte na tom, že vaše rodičovská odpovědnost je plnohodnotná a rovnocenná.',
-    'Při jednání s úřady vždy argumentujte zájmem dítěte na péči obou rodičů.',
-    'Každý pokus o omezení Vašich práv napadněte věcným písemným podáním.'
+    'Trvejte na tom, že vaše rodičovská odpovědnost je plnohodnotná a rovnocenná dle čl. 32 Listiny.',
+    'Při jednání s úřady a OSPOD se odvolávejte na Článek 9 Úmluvy o právech dítěte.',
+    'Každý pokus o neoprávněný zásah státu do autonomie rodiny napadněte odůvodněným písemným podáním.'
   ];
 
   const recommendedTemplates = [
-    { title: 'Návrh na péči obou rodičů', desc: 'Vzor úvodního návrhu k opatrovnickému soudu', type: 'DOCX / PDF' },
-    { title: 'Žádost o nahlédnutí do spisu', desc: 'Formální žádost pro soud a OSPOD', type: 'PDF' }
+    { title: 'Návrh na péči obou rodičů (§ 858 OZ)', desc: 'Vzor úvodního návrhu k opatrovnickému soudu zaručující rovnost rodičů', type: 'DOCX / PDF' },
+    { title: 'Žádost o nahlédnutí do spisu OSPOD', desc: 'Formální žádost o uplatnění práv rodiče na informace a nahlížení do dokumentace', type: 'PDF' }
   ];
 
   return (
@@ -57,6 +57,7 @@ export default function PravniRadPage(props: CategoryPageProps) {
       legalSections={legalSections}
       actionSteps={actionSteps}
       recommendedTemplates={recommendedTemplates}
+      aiButtonText="Položit dotaz AI Asistentovi k paragrafům"
       {...props}
     />
   );

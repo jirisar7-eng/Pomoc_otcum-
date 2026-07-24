@@ -43,6 +43,7 @@ import {
 } from '../data/contentHub';
 import { INITIAL_ARTICLES } from '../initialState';
 import { User } from '../types';
+import { CATEGORY_PAGES_MAP } from '../pages/categories';
 
 interface CategoryDetailViewProps {
   categorySlug: string;
@@ -61,25 +62,29 @@ export interface CategoryBlueprint {
 // Complete SYNTHESIS AI v7.0 Content Blueprint for all 21 categories
 export const CATEGORY_BLUEPRINTS: Record<string, CategoryBlueprint> = {
   'pravni-rad': {
-    purpose: 'Srozumitelný výklad zákona o rodině, občanského zákoníku (NOZ) a mezinárodních úmluv v praxi opatrovnického soudnictví.',
+    purpose: 'Srozumitelný výklad zákona o rodině, občanského zákoníku (NOZ) a mezinárodních úmluv v praxi opatrovnického soudnictví. Cílem je poskytnout otcům exaktní přehled zákonných rámců, o které se mohou opřít při jednání s úřady a soudy.',
     keyPoints: [
       {
-        title: 'Základní práva a povinnosti rodičů',
-        detail: 'Rodičovská odpovědnost dle občanského zákoníku (§ 865 NOZ) náleží oběma rodičům stejně. Zahrnuje péči o dítě, jeho osobnostní vývoj, zastupování a správu jmění.'
+        title: 'Základní pilíře zákona a § 858 OZ',
+        detail: 'Rodičovská odpovědnost dle § 858 občanského zákoníku představuje ucelený soubor práv a povinností obou rodičů při péči o dítě, jeho osobnostní vývoj, zastupování a správu jeho jmění. Zákon výslovně stanoví, že tato odpovědnost náleží rovnoměrně oběma rodičům bez ohledu na to, zda spolu žijí, či zda byli manželé.'
       },
       {
-        title: 'Rovnost rodičů a nejlepší zájem dítěte',
-        detail: 'Princip nejlepšího zájmu dítěte (§ 888 NOZ) vyžaduje zachování rovnocenného vztahu k oběma rodičům. Žádný rodič nemá ze zákona přednostní právo na péči.'
+        title: 'Princip rovnoprávnosti matky a otce',
+        detail: 'České rodinné právo a Listina základních práv a svobod (čl. 32) staví na rovném postavení obou rodičů. Žádný platný právní předpis v České republice nedává matce přednostní právo na výchovu, péči nebo zastupování nezletilého dítěte. Genderová neutralita je základním stavebním kamenem moderního opatrovnického práva.'
       },
       {
-        title: 'Zákaz diskriminace otců v rodinném právu',
-        detail: 'Předsudky o "přirozené primární péči matky" nemají oporu v zákoně. Opatrovnický soud je povinen zkoumat reálné rodičovské předpoklady bez genderových stereotypů.'
+        title: 'Mezinárodní úmluvy a Článek 9 Úmluvy o právech dítěte',
+        detail: 'Mezinárodní právo garantuje právo dítěte na pravidelný osobní styk a přímý kontakt s oběma rodiči. Článek 9 Úmluvy o právech dítěte zakazuje oddělit dítě od jeho rodičů proti jejich vůli, ledaže příslušné úřady rozhodnou v souladu se soudním přezkumem, že takové oddělení je nezbytné v zájmu dítěte.'
+      },
+      {
+        title: 'Autonomie rodiny a meze státních zásahů',
+        detail: 'Stát a jeho orgány (včetně OSPOD a soudů) mohou do poměrů rodiny zasahovat pouze tehdy, vyžaduje-li to zájem dítěte a selhaly-li běžné dohody rodičů. Princip minimalizace zásahů je zakotven v judikatuře Evropského soudu pro lidská práva (EÚLP).'
       }
     ],
     aiPrompts: [
-      'Jaké jsou základní paragrafy občanského zákoníku upravující rodičovskou odpovědnost otce?',
-      'Jak interpretovat princip nejlepšího zájmu dítěte u opatrovnického soudu?',
-      'Jak namítnout diskriminaci otce na základě pohlaví v opatrovnickém řízení?'
+      'Jaké jsou základní paragrafy občanského zákoníku upravující rodičovskou odpovědnost otce (§ 858 OZ)?',
+      'Jak aplikovat Článek 9 Úmluvy o právech dítěte při obraně před omezováním styku?',
+      'Jak namítnout diskriminaci otce na základě pohlaví v opatrovnickém řízení dle čl. 32 Listiny?'
     ]
   },
   'judikatura': {
@@ -105,25 +110,29 @@ export const CATEGORY_BLUEPRINTS: Record<string, CategoryBlueprint> = {
     ]
   },
   'stridava-pece': {
-    purpose: 'Odborná a právní podpora pro nejlepší model uspořádání péče po rozvodu nebo rozchodu rodičů.',
+    purpose: 'Odborná a právní podpora pro nejlepší model uspořádání péče po rozvodu nebo rozchodu rodičů. Cílem je poskytnout podklady dokazující, že střídavá péče je rovnocenným a pro dítě prospěšným uspořádáním.',
     keyPoints: [
       {
-        title: 'Mýty a fakta o střídavé péči',
-        detail: 'Vyvrácení falešných tvrzení o "dvoji domově jako traumatu". Vědecké výzkumy ukazují, že děti ve střídavé péči dosahují nejlepších psychických i akademických výsledků.'
+        title: 'Modely uspořádání střídavé péče',
+        detail: 'Přehled osvědčených modelů přizpůsobených věku dětí: klasický týden/týden pro školáky, flexibilnější cyklus 2-2-3 pro mladší děti, případně dvoutýdenní střídání pro starší děti a teenagerů s ohledem na jejich zájmy a sociální vazby.'
       },
       {
-        title: 'Adaptabilní modely střídání podle věku',
-        detail: 'Harmonogramy 2-2-3 pro nejmenší děti, týden/týden pro školáky, čtrnáctidenní cykly pro dospívající a asymetrické modely uzpůsobené směnovému provozu.'
+        title: 'Vyvrácení mýtu o "dvojím domově a zmatení dítěte"',
+        detail: 'Vědecké výzkumy a metaanalýzy (např. R. Bauserman, F. Fransson) jednoznačně prokazují, že děti ve střídavé péči prospívají psychicky i sociálně srovnatelně s dětmi z úplných rodin a vyvracejí zastaralé mýty o negativním dopadu stěhování.'
       },
       {
-        title: 'Budování stabilního dvojího domova',
-        detail: 'Praktická pravidla pro paralelní rodičovství, logistiku, předávání osobních věcí, oblečení a školních potřeb bez zbytečného napětí.'
+        title: 'Budování rovnocenných podmínek v obou domovech',
+        detail: 'Praktický návod na zajištění plnohodnotného zázemí – vlastní pokoj nebo kout, dostatek oblečení, školních potřeb a hraček v obou domácnostech tak, aby dítě nemuselo neustále přenášet velké kufry a cítilo se doma u obou rodičů.'
+      },
+      {
+        title: 'Předávání dětí bez konfliktů',
+        detail: 'Pravidla pro klidné předávání dětí (převzetí ve škole/školce, eliminace konfrontací mezi rodiči z očí do očí, věcná a klidná komunikace), která chrání dítě před toxickým stresem.'
       }
     ],
     aiPrompts: [
-      'Jaké jsou podle judikatury Ústavního soudu ČR hlavní věcné argumenty pro střídavou péči?',
-      'Jak sestavit stabilní harmonogram předávání dětí při střídavé péči na vzdálenost 30 km?',
-      'Jak vyvrátit tvrzení matky u soudu, že pro střídavou péči chybí vzájemná dohoda rodičů?'
+      'Jaké jsou podle výzkumu R. Bausermana a F. Franssona hlavné věcné argumenty pro střídavou péči?',
+      'Jak sestavit stabilní harmonogram 2-2-3 pro předškolní dítě při střídavé péči?',
+      'Jak nastavit předávání dětí primárně skrze školu/školku pro eliminaci konfliktů?'
     ]
   },
   'nocni-pece': {
@@ -149,25 +158,29 @@ export const CATEGORY_BLUEPRINTS: Record<string, CategoryBlueprint> = {
     ]
   },
   'psychologie-attachment': {
-    purpose: 'Pochopení vnitřního světa dítěte, citové vazby a nutnosti obou rodičů pro zdravý vývoj mozku a osobnosti.',
+    purpose: 'Pochopení vnitřního světa dítěte, citové vazby a nutnosti obou rodičů pro zdravý vývoj mozku a osobnosti. Cílem je poskytnout argumenty podložené moderní psychologií, které vyvracejí mýtus o primární roli pouze jednoho rodiče.',
     keyPoints: [
       {
-        title: 'Otec jako rovnocenná attachmentová figura',
-        detail: 'Teorie citové vazby (Bowlby, Ainsworth, Lamb) dokazuje, že děti vytvářejí nezávislé bezpečné vazby k oběma rodičům. Otec není jen "herní společník".'
+        title: 'Otec jako rovnocenná citová figura',
+        detail: 'Teorie citové vazby (John Bowlby, Michael Lamb) jednoznačně dokazuje, že dítě je od narození schopno vytvořit si stejně silnou a bezpečnou vazbu k otci jako k matce. Otec nepředstavuje sekundární osobu, nýbrž plnohodnotný pilíř dětského attachmentu.'
       },
       {
-        title: 'Neurologické dopady odloučení od otce',
-        detail: 'Absence otce zvyšuje riziko úzkostí, depresí, poruch chování a emoční dysregulace v dospívání i dospělosti.'
+        title: 'Specifika otcovské hry a vývoje mozku',
+        detail: 'Otcovská péče, fyzicky aktivní hra a specifický styl interakce stimulují prefrontální kůru dětí, rozvíjejí jejich odvahu, emocionální odolnost, schopnost riskovat v bezpečných mezích a efektivně řešit problémy.'
       },
       {
-        title: 'Zvládání přechodů a separační úzkosti',
-        detail: 'Jak pomoci dítěti při předávání mezi domovy, vytvořit uklidňující rituály a nečíst pláč při loučení jako "odmítání otce".'
+        title: 'Dopady otcovské deprivace',
+        detail: 'Dlouhodobá absence otce v dětství narušuje psychickou stabilitu a prokazatelně zvyšuje riziko depresí, poruch chování, závislostí a školního selhávání v pozdějším věku dospívání.'
+      },
+      {
+        title: 'Emoční potřeby dětí v různých věkových etapách',
+        detail: 'Přehled psychického vývoje od batolecího věku přes předškolní období až po pubertu s důrazem na to, jak dítě vnímá přítomnost a absenci otce v jednotlivých fázích svého života.'
       }
     ],
     aiPrompts: [
-      'Jak odborně vysvětlit soudu pojem sekundární bezpečné vazby (attachment) k otci?',
-      'Jaké jsou dopady izolace od otce na neurologický a emocionální vývoj dítěte?',
-      'Jak psychologicky připravit dítě na přechod mezi dvěma domovy bez stresu?'
+      'Jak na základě výzkumů Johna Bowlbyho a Michaela Lamba vysvětlit rovnocenný attachment k otci?',
+      'Jaké jsou konkrétní neurologické a psychologické dopady absence otce u dospívajících?',
+      'Jak charakterizovat emoční potřeby dítěte v předškolním věku z pohledu otcovské péče?'
     ]
   },
   'rodicovska-alienace': {
@@ -193,25 +206,29 @@ export const CATEGORY_BLUEPRINTS: Record<string, CategoryBlueprint> = {
     ]
   },
   'jednani-ospod': {
-    purpose: 'Praktický průvodce pro úspěšnou, věcnou a bezpečnou komunikaci na orgánu sociálně-právní ochrany dětí (OSPOD).',
+    purpose: 'Praktický průvodce pro úspěšnou, věcnou a bezpečnou komunikaci na orgánu sociálně-právní ochrany dětí (OSPOD). Cílem je poskytnout otcům návod, jak efektivně hájit svá práva, vyhnout se emočně vypjatým chybám a zajistit objektivní přístup úřadu.',
     keyPoints: [
       {
-        title: 'Příprava na první schůzku na OSPOD',
-        detail: 'Pravidlo klidu a věcnosti. Zaměření výhradně na potřeby dítěte, nikoliv na spory s bývalou partnerkou. Záznamy z jednání a protokoly.'
+        title: 'Taktika a profesionální vystupování na OSPOD',
+        detail: 'Jednejte vždy klidně, věcně, s úsměvem a bez osobních útoků na druhého rodiče. Zaměřte se výhradně na potřeby, zájmy a nejlepší zájem dítěte. Všechny argumenty podkládejte důkazy, nikoliv pouhými emocemi.'
       },
       {
-        title: 'Práva otce a povinnosti sociálních pracovníků',
-        detail: 'Právo na nahlížení do spisu, pořizování kopií, audiozáznamu podle správního řádu a vyžadování objektivního přešetření poměrů.'
+        title: 'Zákonná práva otce při jednání s úřadem',
+        detail: 'Každý otec má dle správního řádu a ZSPOD plné právo na nahlížení do spisu, pořizování fotokopií dokumentů, účast právního zástupce či advokáta na jednáních a pořizování vlastního zvukového záznamu pro doložení průběhu schůzky.'
       },
       {
-        title: 'Obrana proti zaujatosti a podjatosti',
-        detail: 'Jak podat formální námitku podjatosti pracovnice OSPOD, stížnost vedoucímu odboru nebo podnět na krajský úřad a veřejného ochránce práv.'
+        title: 'Příprava na terénní šetření v bytě otce',
+        detail: 'Jak připravit domácnost na návštěvu sociálních pracovnic – čistý dětský pokoj nebo vyhrazený koutek, řádná postel, psací stůl, hračky, věci na hygienu, plná lednice a stabilní, bezpečné a podnětné prostředí pro dítě.'
+      },
+      {
+        title: 'Obrana proti zaujatosti a podjatosti úřednice',
+        detail: 'Postup při podezření na neobjektivní a zaujatý přístup sociální pracovnice – podání námitky podjatosti dle správního řádu, písemná stížnost na postup orgánu a důsledné vyžadování zápisů ze všech schůzek.'
       }
     ],
     aiPrompts: [
-      'Jak napsat námitku podjatosti vůči sociální pracovnici OSPOD, která straní matce?',
-      'Jaké mám zákonné právo na pořízení audiozáznamu či zápisu z jednání na OSPOD?',
-      'Jak dosáhnout objektivního přešetření spisu OSPOD u krajského úřadu či ombudsmana?'
+      'Jak přistupovat k jednání na OSPOD a vystupovat věcně bez osobních útoků?',
+      'Jaká jsou zákonná práva otce při nahlížení do spisu OSPOD a pořizování audiozáznamu?',
+      'Jak formulovat námitku podjatosti vůči sociální pracovnici OSPOD dle správního řádu?'
     ]
   },
   'vzory-podani': {
@@ -237,19 +254,23 @@ export const CATEGORY_BLUEPRINTS: Record<string, CategoryBlueprint> = {
     ]
   },
   'vyzivne-majetek': {
-    purpose: 'Férové, transparentní nastavení finančních podmínek bez emocí na základě dat a doporučujících tabulek MS ČR.',
+    purpose: 'Férové, transparentní nastavení finančních podmínek bez emocí na základě dat a doporučujících tabulek MS ČR. Cílem je poskytnout otcům nástroje pro objektivní posouzení výživného a ochranu majetku.',
     keyPoints: [
       {
-        title: 'Kritéria pro výpočet přiměřeného výživného',
-        detail: 'Doporučující tabulky Ministerstva spravedlnosti ČR, započtení rozsahu osobní péče, čistého příjmu a odůvodněných potřeb dítěte.'
+        title: 'Doporučující tabulky Ministerstva spravedlnosti ČR',
+        detail: 'Metodika určování výživného podle věku dítěte (procentuální podíl z čistého příjmu povinného rodiče) s povinným přihlédnutím k rozsahu osobní péče a reálným schopnostem a možnostem rodiče.'
+      },
+      {
+        title: 'Započtení osobní péče při střídavé péči',
+        detail: 'Při rovnocenné střídavé péči by výživné mělo plně reflektovat skutečnost, že otec hradí polovinu všech životních nákladů dítěte přímo ve své domácnosti. Soudy přihlížejí k rozdílům v příjmech obou rodičů.'
       },
       {
         title: 'Mimořádné náklady vs. běžné výživné',
-        detail: 'Právní posouzení nákladů na kroužky, tábory, rovnátka a lyžařské výcviky. Co spadá do stanoveného výživného a kdy je nutná dohoda.'
+        detail: 'Vymezení toho, co spadá do běžného alimentu (strava, ošacení, běžné bydlení) a kdy jsou vyžadovány zvláštní dohody či poměrné hrazení nákladů nad rámec (lyžařské výcviky, rovnátka, tábory, kroužky).'
       },
       {
-        title: 'Majetkové vyrovnání SJM a bydlení',
-        detail: 'Vypořádání společného jmění manželů, hypotéky, nájemního práva a zápočtu péče o dítě při majetkovém dělení.'
+        title: 'Vypořádání Společného jmění manželů (SJM)',
+        detail: 'Férové rozdělení majetku, hypoték a společných závazků tak, aby nedocházelo k ekonomické likvidaci jednoho z rodičů a byly zajištěny bytové potřeby dětí.'
       }
     ],
     aiPrompts: [
@@ -531,6 +552,17 @@ export default function CategoryDetailView({
   currentUser,
   onOpenAuth
 }: CategoryDetailViewProps) {
+  const CategoryComponent = CATEGORY_PAGES_MAP[categorySlug];
+
+  if (CategoryComponent) {
+    return (
+      <CategoryComponent
+        setActiveTab={setActiveTab}
+        setSearchQuery={setSearchQuery}
+      />
+    );
+  }
+
   const [activeSection, setActiveSection] = useState<'all' | 'blueprint' | 'articles' | 'studies' | 'judgments' | 'templates' | 'ai'>('all');
   const [copiedTemplateId, setCopiedTemplateId] = useState<string | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<HubTemplate | null>(null);
