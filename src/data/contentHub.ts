@@ -58,6 +58,8 @@ export interface HubTemplate {
   category: 'petitions' | 'appeals' | 'complaints';
   desc: string;
   defaultText: string;
+  categorySlug?: string;
+  tags?: string[];
 }
 
 export interface HubTerm {
@@ -413,6 +415,8 @@ export const HUB_TEMPLATES: HubTemplate[] = [
     id: 'tpl-1',
     title: 'Návrh na svěření nezletilého do střídavé péče rodičů',
     category: 'petitions',
+    categorySlug: 'stridava-pece',
+    tags: ['stridava-pece', 'pece-o-dite', 'vzory-podani', 'soudni-rizeni'],
     desc: 'Základní vzor žaloby k opatrovnickému soudu o úpravu poměrů pro střídavou péči. Obsahuje doporučenou právní argumentaci a odkaz na nález Ústavního soudu.',
     defaultText: `Okresnímu soudu v [CITY]\n[COURT_ADDRESS]\n\nŽalobce (Otec): [FATHER_NAME], nar. [FATHER_BIRTH], bytem [FATHER_ADDRESS]\nŽalovaná (Matka): [MOTHER_NAME], nar. [MOTHER_BIRTH], bytem [MOTHER_ADDRESS]\n\nNezletilé děti: [CHILDREN_NAMES]\n\nNÁVRH OTCE NA ÚPRAVU PÉČE A SVĚŘENÍ NEZLETILÝCH DO STŘÍDAVÉ PÉČE RODIČŮ\n\nI.\nRodiče nezletilých dětí uzavřeli manželství, které bylo rozvedeno / žili ve společné domácnosti. Z jejich vztahu se narodily nezletilé děti: [CHILDREN_NAMES]. Rodiče se po rozpadu vztahu nedohodli na dalším uspořádání péče o děti.\n\nII.\nOtec má plné rodičovské kompetence, doložitelnou materiální i psychologickou připravenost a zájem o rovnocenný podíl na výchově. Bytové podmínky otce jsou nadstandardní, děti mají k dispozici vlastní zařízené pokoje. Bydliště obou rodičů se nachází v rozumné vzdálenosti, což umožňuje bezproblémové pokračování školní docházky.\n\nIII.\nV souladu s konstantní judikaturou Ústavního soudu ČR je střídavá péče prioritním modelem uspořádání, pokud jsou oba rodiče způsobilí. Svěření dětí pouze do výhradní péče jednoho z rodičů by znamenalo porušení ústavního práva dětí na péči obou rodičů.\n\nProto navrhuji, aby soud po provedeném dokazování vydal tento\n\nR O Z S U D E K :\n\n1. Nezletilé děti [CHILDREN_NAMES] se svěřují do střídavé péče obou rodičů, a to v pravidelném intervalu střídání po 7 dnech, s předáváním každé pondělí v 8:00 hod v prostorách školy/školky.\n2. Výživné se stanovuje s přihlédnutím k poměrům obou rodičů.\n\nV [CITY] dne [DATE]\n\n........................................\n[FATHER_NAME] (Otec)`
   },
@@ -420,6 +424,8 @@ export const HUB_TEMPLATES: HubTemplate[] = [
     id: 'tpl-2',
     title: 'Vyjádření otce k návrhu matky na výhradní péči',
     category: 'appeals',
+    categorySlug: 'soudni-rizeni',
+    tags: ['soudni-rizeni', 'falesna-obvineni', 'vzory-podani', 'pravni-rad'],
     desc: 'Nesouhlasné stanovisko s výhradní péčí matky. Navrhuje střídavou péči jako jedinou ústavně konformní alternativu chránící zájem dítěte.',
     defaultText: `Okresnímu soudu v [CITY]\nK sp. zn.: [CASE_NUMBER]\n\nŽalobce (Otec): [FATHER_NAME], bytem [FATHER_ADDRESS]\nŽalovaná (Matka): [MOTHER_NAME], bytem [MOTHER_ADDRESS]\n\nVYJÁDŘENÍ OTCE K NÁVRHU MATKY NA SVĚŘENÍ DĚTÍ DO JEJÍ VÝHRADNÍ PÉČE\n\nK výzvě soudu se tímto vyjadřuji k návrhu matky na svěření dětí do její výhradní péče. S návrhem matky zásadně nesouhlasím.\n\nVztah dětí k otci je velmi silný a vřelý. Otec se o děti aktivně staral od jejich narození a neexistuje žádný objektivní důvod, proč by měl být jeho kontakt s dětmi degradován na pouhý víkendový styk. Návrh matky považuji za účelovou snahu o vytěsnění otce ze života dětí.\n\nNavrhuji proto, aby soud návrh matky zamítl a rozhodl o svěření nezletilých dětí [CHILDREN_NAMES] do střídavé péče obou rodičů.\n\nV [CITY] dne [DATE]\n\n........................................\n[FATHER_NAME] (Otec)`
   },
@@ -427,6 +433,8 @@ export const HUB_TEMPLATES: HubTemplate[] = [
     id: 'tpl-3',
     title: 'Stížnost na neprofesionální postup kolizního opatrovníka (OSPOD)',
     category: 'complaints',
+    categorySlug: 'jednani-ospod',
+    tags: ['jednani-ospod', 'ospod', 'vzory-podani'],
     desc: 'Formální stížnost vedoucímu odboru sociálních věcí na podjatost, ignorování důkazů nebo genderově stereotypní přístup sociální pracovnice.',
     defaultText: `Městskému úřadu v [CITY]\nVedoucímu odboru sociálně-právní ochrany dětí\n\nStěžovatel: [FATHER_NAME], bytem [FATHER_ADDRESS]\nSpisová značka dítka: [CASE_NUMBER]\n\nSTÍŽNOST NA NEPROFESIONÁLNÍ A PODJATÝ POSTUP SOCIÁLNÍ PRACOVNICE [OFFICER_NAME]\n\nTímto podávám formální stížnost na postup jmenované sociální pracovnice, která vykonává funkci kolizního opatrovníka pro mé nezletilé děti: [CHILDREN_NAMES].\n\nDůvody stížnosti:\n1. Pracovnice vykazuje zjevnou podjatost vůči mé osobě, ignoruje předložené důkazy o mých rodičovských kompetencích a bezvýhradně přejímá neověřená tvrzení matky.\n2. Při domácím šetření jednala nátlakově a činila na děti sugestivní dotazy s cílem získat negativní vyjádření o otci.\n3. Odmítá zařadit mé vyjádření do spisové dokumentace.\n\nŽádám o prověření postupu jmenované pracovnice, zjednání nápravy a případné přidělení spisu jinému nezávislému pracovníkovi OSPOD.\n\nV [CITY] dne [DATE]\n\n........................................\n[FATHER_NAME]`
   },
@@ -434,6 +442,8 @@ export const HUB_TEMPLATES: HubTemplate[] = [
     id: 'tpl-4',
     title: 'Návrh na předběžné opatření při svévolném odnětí dítěte ze péče otce',
     category: 'petitions',
+    categorySlug: 'krizova-pomoc',
+    tags: ['krizova-pomoc', 'nocni-pece', 'falesna-obvineni', 'vzory-podani'],
     desc: 'Rychlý návrh podle § 452 z.ř.s. určený pro krizové situace, kdy druhý rodič bez souhlasu odveze dítě nebo odepře jakýkoliv kontakt.',
     defaultText: `Okresnímu soudu v [CITY]\n\nNavrhovatel (Otec): [FATHER_NAME], nar. [FATHER_BIRTH], bytem [FATHER_ADDRESS]\nApt. Matka: [MOTHER_NAME], nar. [MOTHER_BIRTH], bytem [MOTHER_ADDRESS]\n\nNezletilé dítě: [CHILD_NAME]\n\nNÁVRH NA VYDÁNÍ PŘEDBĚŽNÉHO OPATŘENÍ PODLE § 452 ZÁKONA O ZVLÁŠTNÍCH SOUDNÍCH ŘÍZENÍCH\n\nI.\nDne [DATE] došlo ke svévolnému odvedení nezletilého [CHILD_NAME] matkou ze společného bydliště. Matka od té doby odmítá sdělit místo pobytu dítěte a zcela zamezuje jakémukoliv osobnímu i telefonickému kontaktu s otcem.\n\nII.\nTímto protiprávním jednáním je vážně ohrožen psychický vývoj dítěte a dochází k násilnému přerušení rodičovské vazby k otci.\n\nProto navrhuji, aby soud bezodkladně vydal toto\n\nPŘEDBĚŽNÉ OPATŘENÍ:\n\nMatce se ukládá povinnost předávat nezletilého [CHILD_NAME] otci ke styku každou středu od 14:00 do 18:00 hod a každý sudý víkend od pátku 16:00 hod do neděle 18:00 hod.\n\nV [CITY] dne [DATE]\n\n........................................\n[FATHER_NAME]`
   },
@@ -441,6 +451,8 @@ export const HUB_TEMPLATES: HubTemplate[] = [
     id: 'tpl-5',
     title: 'Podnět Veřejnému ochránci práv (Ombudsmanovi) na postup OSPOD',
     category: 'complaints',
+    categorySlug: 'jednani-ospod',
+    tags: ['jednani-ospod', 'ospod', 'vzory-podani'],
     desc: 'Oficiální podnět Kanceláři Veřejného ochránce práv k prověření systémových pochybení a diskriminace otce ze strany Orgánu sociálně-právní ochrany dětí.',
     defaultText: `Kancelář Veřejného ochránce práv\nÚdolní 39, 602 00 Brno\n\nPodatel (Otec): [FATHER_NAME], bytem [FATHER_ADDRESS]\nDotčený OSPOD: [OSPOD_NAME], Městský úřad [CITY]\nSpisová značka OSPOD: [CASE_NUMBER]\n\nPODNĚT K PROVĚŘENÍ NEZÁKONNÉHO A NEPROFESIONÁLNÍHO POSTUPU OSPOD\n\nVážený pane / vážená paní ombudsmanko,\n\nobracím se na Vás s podnětem k prověření postupu OSPOD [CITY] v opatrovnické věci mého nezletilého syna/dcery [CHILD_NAME].\n\nOSPOD dlouhodobě ignoruje mé stížnosti na maření styku ze strany matky, nepředkládá soudu objektivní zprávy a uplatňuje vůči mé osobě rodové stereotypy. Ačkoliv plním veškeré povinnosti, OSPOD navrhuje omezení mých rodičovských práv bez jakéhokoliv odborného podkladu.\n\nŽádám o nezávislé šetření postupu orgánu sociálně-právní ochrany dětí.\n\nV [CITY] dne [DATE]\n\n........................................\n[FATHER_NAME]`
   }

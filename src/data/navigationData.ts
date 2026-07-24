@@ -59,6 +59,7 @@ export const PUBLIC_TOPBAR_ITEMS: NavItem[] = [
   { id: 'home', label: 'Domů', path: '/', icon: Home, desc: 'Titulní strana portálu' },
   { id: 'news', label: 'Články', path: '/clanky', icon: FileText, desc: 'Odborné články a info báze' },
   { id: 'videoteka', label: 'Videotéka', path: '/videoteka', icon: Tv, desc: 'Instruktážní videa a přednášky' },
+  { id: 'moje-dokumenty', label: 'Moje dokumenty', path: '/moje-dokumenty', icon: FolderCheck, desc: 'Anonymizované reálné případy a podání (1 dokument = 1 stránka)' },
   { id: 'judikatura', label: 'Judikatura', path: '/judikatura', icon: Scale, desc: 'Nálezy Ústavního soudu a rozsudky' },
   { id: 'knihovna-studii', label: 'Studie', path: '/studie', icon: BookOpen, desc: 'Vědecké publikace a výzkumy' },
   { id: 'ai-assistant', label: 'AI Nástroje', path: '/ai', icon: Sparkles, desc: 'Generativní AI Právní asistent' },

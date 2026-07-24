@@ -58,6 +58,7 @@ import CrisisSection from './components/CrisisSection';
 import SupportSection from './components/SupportSection';
 import CoParentHub from './components/CoParentHub';
 import GlossaryDrawer from './components/GlossaryDrawer';
+import MyDocumentsView from './components/MyDocumentsView';
 import AiGuideSection from './components/AiGuideSection';
 import UserPortal from './components/UserPortal';
 import UserProfile from './components/UserProfile';
@@ -507,6 +508,13 @@ export default function App() {
                 setActiveTab={setActiveTab} 
                 currentUserRole={currentUser?.role} 
                 partners={partners} 
+              />
+            )}
+
+            {activeTab === 'moje-dokumenty' && (
+              <MyDocumentsView 
+                setActiveTab={setActiveTab} 
+                setSearchQuery={setSearchQuery} 
               />
             )}
 
