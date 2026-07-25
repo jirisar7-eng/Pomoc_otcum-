@@ -219,7 +219,7 @@ export default function AdminPanel({
     setEditUserForm({
       name: user.name || '',
       email: user.email || '',
-      role: user.role || 'user',
+      role: (user.role as any) || 'user',
       subRole: (user as any).subRole || (user.role === 'admin' ? 'Admin' : 'Registrovaný'),
       phone: (user as any).phone || '',
       city: (user as any).city || '',

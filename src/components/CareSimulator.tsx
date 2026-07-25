@@ -2007,8 +2007,8 @@ Tento simulační výpočet objektivně prokazuje, že navržený harmonogram je
                 <div className="mt-3 space-y-2 text-xs">
                   <p>👨 <strong>Otec:</strong> {fatherName}</p>
                   <p>👩 <strong>Matka:</strong> {motherName}</p>
-                  <p>📍 <strong>Bydliště otce:</strong> {locations.fatherCity}</p>
-                  <p>📍 <strong>Bydliště matky:</strong> {locations.motherCity}</p>
+                  <p>📍 <strong>Bydliště otce:</strong> {(locations as any).fatherCity || locations.fatherAddress}</p>
+                  <p>📍 <strong>Bydliště matky:</strong> {(locations as any).motherCity || locations.motherAddress}</p>
                   <p>🚗 <strong>Vzdálenost:</strong> {locations.distanceKm} km</p>
                 </div>
               </div>
