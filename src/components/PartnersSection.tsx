@@ -179,7 +179,38 @@ export default function PartnersSection({ partners = [] }: PartnersSectionProps)
         )}
       </div>
 
-      {/* Legal Partnership Footer */}
+      {/* Legal Partnership Footer & Assistance Box */}
+      <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-teal-950 rounded-3xl border border-slate-800 p-6 md:p-8 text-white space-y-4 shadow-xl">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div className="space-y-2 max-w-2xl">
+            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-teal-400 bg-teal-500/10 border border-teal-500/20 px-2.5 py-1 rounded-full">
+              Individuální pomoc v opatrovnické tísni
+            </span>
+            <h3 className="text-xl font-black font-display text-white">
+              Potřebujete pomoci se sepsáním konkrétního návrhu k soudu nebo vyhledáním konkrétní pobočky či služby ve vašem okrese?
+            </h3>
+            <p className="text-xs text-slate-300 leading-relaxed">
+              Využijte náš chytrý AI Generátor právních podání nebo kontaktujte naše prověřené spolkem doporučené advokáty a mediátory.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2.5 shrink-0">
+            <a
+              href="#centrum-formularu"
+              className="px-4 py-2.5 bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-xs rounded-xl transition-all shadow-md flex items-center gap-2"
+            >
+              <span>Centrum formulářů a návrhů</span>
+            </a>
+            <a
+              href="#ai-case-manager"
+              className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl border border-slate-700 transition-all flex items-center gap-2"
+            >
+              <span>AI Asistent & Generátor</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      {/* Legal Partnership Contact Footer */}
       <div className="bg-gradient-to-br from-slate-50 to-teal-50/20 rounded-2xl border border-slate-100 p-5 flex flex-col md:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-teal-100/60 flex items-center justify-center shrink-0">

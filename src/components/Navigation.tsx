@@ -185,23 +185,35 @@ export default function Navigation({
             </div>
 
             {/* Desktop Navigation Topbar */}
-            <nav className="hidden xl:flex items-center justify-center gap-1 max-w-[50%] py-1">
-              {PUBLIC_TOPBAR_ITEMS.slice(0, 5).map((item) => {
+            <nav className="hidden xl:flex items-center justify-center gap-1 max-w-[60%] py-1">
+              {PUBLIC_TOPBAR_ITEMS.slice(0, 6).map((item) => {
                 const ItemIcon = item.icon;
                 const isActive = activeTab === item.id;
+                const isSimulator = item.id === 'plan-pece';
                 return (
                   <button
                     key={item.id}
                     onClick={() => handleTabClick(item.id)}
                     className={`flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all border cursor-pointer ${
                       isActive
-                        ? 'bg-teal-50 border-teal-200 text-teal-800 shadow-3xs'
-                        : 'bg-transparent border-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                        ? isSimulator
+                          ? 'bg-teal-600 border-teal-700 text-white shadow-3xs'
+                          : 'bg-teal-50 border-teal-200 text-teal-800 shadow-3xs'
+                        : isSimulator
+                          ? 'bg-gradient-to-r from-teal-50/90 to-emerald-50/90 border-teal-300 text-teal-900 hover:bg-teal-100 hover:border-teal-400 shadow-3xs font-extrabold'
+                          : 'bg-transparent border-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                     }`}
                     title={item.desc}
                   >
-                    <ItemIcon className={`w-3.5 h-3.5 ${isActive ? 'text-teal-600' : 'text-slate-400'}`} />
+                    <ItemIcon className={`w-3.5 h-3.5 ${isActive ? (isSimulator ? 'text-white' : 'text-teal-600') : (isSimulator ? 'text-teal-700' : 'text-slate-400')}`} />
                     <span>{item.label}</span>
+                    {isSimulator && (
+                      <span className={`text-[9px] font-mono px-1.5 py-0.2 rounded-full uppercase tracking-tighter ml-0.5 font-black ${
+                        isActive ? 'bg-teal-700 text-teal-100' : 'bg-teal-200/90 text-teal-950'
+                      }`}>
+                        PÉČE
+                      </span>
+                    )}
                   </button>
                 );
               })}
@@ -477,6 +489,25 @@ export default function Navigation({
                     <span>Rychlý Rozcestník</span>
                   </div>
                   <div className="grid grid-cols-2 gap-2">
+                    <button
+                      onClick={() => handleTabClick('plan-pece')}
+                      className={`col-span-2 flex items-center justify-between p-3 rounded-2xl text-xs font-black transition-all border cursor-pointer ${
+                        activeTab === 'plan-pece'
+                          ? 'bg-teal-600 text-white border-teal-700 shadow-md'
+                          : 'bg-gradient-to-r from-teal-50 to-emerald-50 hover:from-teal-100 hover:to-emerald-100 text-teal-950 border-teal-300'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <Sliders className={`w-4.5 h-4.5 shrink-0 ${activeTab === 'plan-pece' ? 'text-white' : 'text-teal-600'}`} />
+                        <span className="truncate">Simulátor Péče & Sourozenecká Soudržnost</span>
+                      </div>
+                      <span className={`text-[9px] font-mono px-2 py-0.5 rounded-full uppercase font-black shrink-0 ${
+                        activeTab === 'plan-pece' ? 'bg-teal-700 text-teal-100' : 'bg-teal-200 text-teal-950'
+                      }`}>
+                        INTERAKTIVNÍ
+                      </span>
+                    </button>
+
                     <button
                       onClick={() => handleTabClick('home')}
                       className={`flex items-center gap-2.5 p-2.5 rounded-2xl text-xs font-bold text-left transition-all border cursor-pointer ${

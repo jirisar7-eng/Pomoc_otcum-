@@ -58,6 +58,7 @@ export interface NavSection {
 // 1. HLAVNÍ TOPBAR / VISIBLE MENU (Pro všechny / Public)
 export const PUBLIC_TOPBAR_ITEMS: NavItem[] = [
   { id: 'home', label: 'Domů', path: '/', icon: Home, desc: 'Titulní strana portálu' },
+  { id: 'plan-pece', label: 'Simulátor péče & Sourozenci', path: '/plan-pece', icon: Sliders, desc: 'Interaktivní Simulátor Péče & Sourozenecké Soudržnosti (kalkulačka a průvodce)' },
   { id: 'news', label: 'Články', path: '/clanky', icon: FileText, desc: 'Odborné články a info báze' },
   { id: 'videoteka', label: 'Videotéka', path: '/videoteka', icon: Tv, desc: 'Instruktážní videa a přednášky' },
   { id: 'cesta-zakladatele', label: 'Cesta zakladatele', path: '/cesta-zakladatele', icon: Compass, desc: 'Příběh zakladatele, motivace k založení portálu a anonymizovaný spis z mého boje za syna' },
@@ -141,6 +142,14 @@ export const LOGGED_IN_SECTIONS: NavSection[] = [
     title: '🤖 AI NÁSTROJE (Sjednocené centrum)',
     isPrivate: true,
     items: [
+      {
+        id: 'plan-pece',
+        label: 'Simulátor Péče & Sourozenecká Soudržnost',
+        path: '/plan-pece',
+        icon: Sliders,
+        desc: 'Interaktivní kalkulátor péče, modelace střídání a hodnocení sourozenecké vazby.',
+        requiresAuth: false
+      },
       {
         id: 'ai-guide',
         label: 'AI Průvodce',

@@ -15,6 +15,7 @@ import {
   MessageSquare, 
   ArrowRight,
   Sparkles,
+  Sliders,
   Command
 } from 'lucide-react';
 
@@ -43,7 +44,7 @@ const SAMPLE_SUGGESTIONS: SearchSuggestion[] = [
   { id: '3', title: 'Video: Jak na pohovor s OSPOD bez emocí', category: 'videos', categoryName: 'Videotéka', tabId: 'videoteka', icon: Tv },
   { id: '4', title: 'Studie psychologických dopadů střídavé péče', category: 'studies', categoryName: 'Studie', tabId: 'knihovna-studii', icon: BookOpen },
   { id: '5', title: 'Diskuze: Zkušenosti s předběžným opatřením', category: 'forum', categoryName: 'Fórum', tabId: 'forum', icon: MessageSquare },
-  { id: '6', title: 'Doporučený postup přípravy rodičovské dohody', category: 'articles', categoryName: 'Články', tabId: 'plan-pece', icon: FileText }
+  { id: '6', title: 'Simulátor Péče & Sourozenecká Soudržnost', category: 'articles', categoryName: 'Nástroje', tabId: 'plan-pece', icon: Sliders }
 ];
 
 export default function UniversalSearchInput({
