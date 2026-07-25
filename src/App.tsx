@@ -84,6 +84,7 @@ import AiCaseManager from './components/AiCaseManager';
 import LegalWiki from './components/LegalWiki';
 import AiAdmin from './components/AiAdmin';
 import CategoryDetailView from './components/CategoryDetailView';
+import { SynthesisAperioHub } from './components/SynthesisAperioHub';
 
 export default function App() {
   const { t } = useLanguage();
@@ -550,6 +551,10 @@ export default function App() {
                 isLoggedIn={!!currentUser}
                 partners={partners}
               />
+            )}
+
+            {activeTab === 'synthesis-hub' && (
+              <SynthesisAperioHub setActiveTab={setActiveTab} setSearchQuery={setSearchQuery} />
             )}
 
             {activeTab === 'rights' && (

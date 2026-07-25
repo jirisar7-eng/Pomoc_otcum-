@@ -59,6 +59,7 @@ export interface NavSection {
 export const PUBLIC_TOPBAR_ITEMS: NavItem[] = [
   { id: 'home', label: 'Domů', path: '/', icon: Home, desc: 'Titulní strana portálu' },
   { id: 'plan-pece', label: 'Simulátor péče & Sourozenci', path: '/plan-pece', icon: Sliders, desc: 'Interaktivní Simulátor Péče & Sourozenecké Soudržnosti (kalkulačka a průvodce)' },
+  { id: 'synthesis-hub', label: 'Synthesis Hub (Aperio Beta 1.0)', path: '/synthesis-hub', icon: Sparkles, desc: 'Syntéza obsahu Aperio, 100+ článků, AI nástroje a 200+ FAQ' },
   { id: 'news', label: 'Články', path: '/clanky', icon: FileText, desc: 'Odborné články a info báze' },
   { id: 'videoteka', label: 'Videotéka', path: '/videoteka', icon: Tv, desc: 'Instruktážní videa a přednášky' },
   { id: 'cesta-zakladatele', label: 'Cesta zakladatele', path: '/cesta-zakladatele', icon: Compass, desc: 'Příběh zakladatele, motivace k založení portálu a anonymizovaný spis z mého boje za syna' },
