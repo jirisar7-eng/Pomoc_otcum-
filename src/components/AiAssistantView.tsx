@@ -30,7 +30,15 @@ import {
   CheckCircle2,
   FileSearch,
   MessageCircle,
-  Download
+  Download,
+  BookMarked,
+  ExternalLink,
+  UploadCloud,
+  Terminal,
+  Layers,
+  FileCode,
+  FolderPlus,
+  Compass
 } from 'lucide-react';
 import { User } from '../types';
 
@@ -76,13 +84,101 @@ Vítejte v oficiálním modulu **Inteligentního AI Asistenta** platformy *Táta
 > ⚠️ **Právní upozornění:** Veškeré výstupy AI Asistenta mají informativní a doporučující charakter. Nenahrazují individuální právní služby advokáta ani oficiální rozhodnutí soudů.
 `;
 
+interface PromptTemplate {
+  id: string;
+  category: string;
+  title: string;
+  description: string;
+  promptText: string;
+  badge: string;
+}
+
+const GEMINI_PROMPT_TEMPLATES: PromptTemplate[] = [
+  {
+    id: 'p-1',
+    category: 'spis',
+    title: '1. Vytvoření chronologické časové osy spisu',
+    badge: 'Chronologie & Spis',
+    description: 'Vyhledá v nahraných dokumentech všechny události bránění ve styku, vyjádření OSPOD a soudní rozhodnutí.',
+    promptText: `Jsi zkušený právní analytik rodinného práva v ČR. Na základě všech nahraných dokumentů ze spisu vytvoř přehlednou chronologickou tabulku událostí. U každého záznamu uveď:
+1) Přesné datum
+2) Popis incidentu / události (např. předání dítěte, zpráva OSPOD, podání návrhu)
+3) Číslo listu / Název dokumentu a stranu
+4) Zda byl o události informován OSPOD nebo PČR
+5) Krátké právní zhodnocení (např. porušení předběžného opatření / bránění ve styku)`
+  },
+  {
+    id: 'p-2',
+    category: 'ospod',
+    title: '2. Analýza zpráv OSPOD a vyhledání rozporů',
+    badge: 'OSPOD Audit',
+    description: 'Porovná zprávy OSPOD v čase a odhalí nepodložená tvrzení, chybná doporučení nebo opomenutí faktů.',
+    promptText: `Prostuduj nahrané zprávy OSPOD z mého opatrovnického spisu a proveď jejich odborný rozbor:
+1) Vyhledej vnitřní rozpory mezi jednotlivými zprávami OSPOD v průběhu času.
+2) Identifikuj tvrzení OSPOD, která nejsou podložena žádným konkrétním důkazem ve spise.
+3) Zjisti, zda OSPOD zohlednil mé návrhy na rozšíření péče a zda dodržel metodické pokyny MPSV pro rovnoprávný přístup k oběma rodičům.
+4) Připrav věcné body pro mé písemné vyjádření soudu.`
+  },
+  {
+    id: 'p-3',
+    category: 'jednani',
+    title: '3. Příprava na opatrovnické jednání a výslek',
+    badge: 'Soudní Jednání',
+    description: 'Simuluje otázky soudce nebo OSPOD u jednání a navrhuje argumentačně neprůstřelné odpovědi.',
+    promptText: `Připrav se se mnou na opatrovnické jednání o úpravě péče k nezletilému dítěti. Na základě nahraných dokumentů:
+1) Sestav 10 nejčastějších nebo nejzákeřnějších otázek, které mi může položit soudce nebo opatrovník.
+2) Ke každé otázce navrhni klidnou, věcnou a argumentačně přesvědčivou odpověď zdůrazňující nejlepší zájem dítěte.
+3) Přidej odkaz na relevantní nálezy Ústavního soudu ČR (např. II. ÚS 132/24, I. ÚS 2482/13).
+4) Doporuč, jak reagovat, pokud druhá strana vznese nepravdivá obvinění.`
+  },
+  {
+    id: 'p-4',
+    category: 'biff',
+    title: '4. BIFF Přepis vyostřené SMS / e-mailu',
+    badge: 'BIFF Komunikace',
+    description: 'Přetvoří emočně nabitou či útočnou komunikaci na věcnou, stručnou a u soudu neprůstřelnou.',
+    promptText: `Převeď následující text do metodiky BIFF (Brief, Informative, Friendly, Firm):
+- Odstraň veškeré osobní útoky, ironii, emoce a retrospektivní výčitky.
+- Ponech pouze věcná fakta týkající se předání dítěte, zdravotního stavu nebo školních povinností.
+- Zachovej zdvořilý, ale pevný tón (Firm), který jasně vymezuje hranice.
+
+Text k přepisu:
+[VLOŽTE ZPRÁVU OD DRUHÉ STRANY NEBO VÁŠ KONCEPT]`
+  },
+  {
+    id: 'p-5',
+    category: 'posudek',
+    title: '5. Rozbor znaleckého posudku z psychologie',
+    badge: 'Znalecký Posudek',
+    description: 'Prověří použité psychodiagnostické testy, rovnoprávnost posouzení rodičů a logickou provázanost závěrů.',
+    promptText: `Proveď kritický rozbor nahraného znaleckého posudku z oboru dětské psychologie / psychiatrie:
+1) Zkontroluj, zda znalec použil standardizované psychodiagnostické metody a zda posuzoval oba rodiče ve stejném rozsahu.
+2) Identifikuj případné logické skoky mezi zjištěnými poznatky a konečným doporučením znalce.
+3) Prověř, zda závěry znalce neodporují judikatuře Ústavního soudu o presumpci střídavé péče.
+4) Připrav konkrétní otázky pro výslech znalce u opatrovnického soudu.`
+  },
+  {
+    id: 'p-6',
+    category: 'vyzivne',
+    title: '6. Výpočet a argumentace k výživnému',
+    badge: 'Výživné & Náklady',
+    description: 'Porovná příjmové možnosti, odůvodněné potřeby dítěte a doporučující tabulky Ministerstva spravedlnosti ČR.',
+    promptText: `Na základě nahraných podkladů o příjmech a nákladech obou rodičů:
+1) Spočítej orientační výši výživného podle doporučujících tabulek Ministerstva spravedlnosti ČR.
+2) Zohledni rozsah osobní péče každého z rodičů (počet dnů/nocí v měsíci) a přímé úhrady kroužků či potřeb.
+3) Navrhni argumentaci pro soud, proč je navržená výše výživného spravedlivá a odpovídající životní úrovni obou rodičů.`
+  }
+];
+
 export default function AiAssistantView({
   setActiveTab,
   setSearchQuery,
   currentUser,
   onOpenAuth
 }: AiAssistantViewProps) {
-  const [activeSubTab, setActiveSubTab] = useState<'chat' | 'analysis' | 'docs'>('chat');
+  const [activeSubTab, setActiveSubTab] = useState<'chat' | 'notebook' | 'analysis' | 'docs'>('chat');
+  const [selectedPromptCategory, setSelectedPromptCategory] = useState<string>('all');
+  const [promptFilterText, setPromptFilterText] = useState<string>('');
   
   // Dynamic Markdown loading & error state
   const [markdownDoc, setMarkdownDoc] = useState<string>('');
@@ -362,6 +458,18 @@ export default function AiAssistantView({
         </button>
 
         <button
+          onClick={() => setActiveSubTab('notebook')}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+            activeSubTab === 'notebook'
+              ? 'bg-indigo-600 text-white shadow-md'
+              : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'
+          }`}
+        >
+          <BookMarked className="w-4 h-4 text-amber-400" />
+          <span>📚 Návod pro Gemini & NotebookLM</span>
+        </button>
+
+        <button
           onClick={() => setActiveSubTab('analysis')}
           className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
             activeSubTab === 'analysis'
@@ -402,7 +510,347 @@ export default function AiAssistantView({
         </div>
       )}
 
-      {/* TAB 1: INTERACTIVE CHAT INTERFACE */}
+      {/* TAB 2: GEMINI & NOTEBOOKLM GUIDE & PROMPT LIBRARY */}
+      {activeSubTab === 'notebook' && (
+        <div className="space-y-8 animate-fadeIn" id="gemini-notebook-guide">
+          
+          {/* Hero Banner for NotebookLM */}
+          <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white rounded-3xl p-6 sm:p-8 md:p-10 shadow-xl border border-indigo-800/50 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-80 h-80 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+            
+            <div className="relative z-10 space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div className="inline-flex items-center gap-2 bg-indigo-900/80 border border-indigo-400/30 px-3.5 py-1.5 rounded-full text-indigo-300 text-xs font-bold uppercase tracking-wider">
+                  <BookMarked className="w-4 h-4 text-amber-400" />
+                  <span>Google Gemini & NotebookLM Metodika</span>
+                </div>
+
+                <a
+                  href="https://notebooklm.google.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-xs sm:text-sm rounded-xl transition-all shadow-md hover:shadow-lg cursor-pointer"
+                >
+                  <span>Otevřít Google NotebookLM</span>
+                  <ExternalLink className="w-4 h-4" />
+                </a>
+              </div>
+
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-black font-display tracking-tight text-white leading-tight">
+                Jak analyzovat opatrovnický spis pomocí Gemini a NotebookLM
+              </h2>
+
+              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-3xl font-sans">
+                <strong>NotebookLM (Google Gemini Notebook)</strong> je specializovaný nástroj umělé inteligence od Google, který dokáže pracovat s vašimi vlastními dokumenty (až 50 rozsáhlých PDF spisu, zpráv OSPOD, protokoly z jednání, e-maily). Na rozdíl od běžných chatů čerpá výhradně z vašich nahraných podkladů a nabízí přesné citace přímo ze stránek spisu.
+              </p>
+
+              <div className="pt-2 flex flex-wrap gap-4 text-xs text-slate-300 font-medium">
+                <div className="flex items-center gap-1.5 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                  <span>Nulové halucinace (uzavřený zdroj)</span>
+                </div>
+                <div className="flex items-center gap-1.5 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                  <span>Přímé citace listů spisu</span>
+                </div>
+                <div className="flex items-center gap-1.5 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                  <span>Kapacita až 50 dokumentů v projektu</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Step-by-Step Practical Guide Grid */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-bold font-display text-slate-900 flex items-center gap-2">
+              <Compass className="w-5 h-5 text-indigo-600" />
+              Návod krok za krokem: Od spisu k neprůstřelné argumentaci
+            </h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              
+              {/* Step 1 */}
+              <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-3 relative overflow-hidden">
+                <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-100 flex items-center justify-center font-bold font-mono text-base">
+                  01
+                </div>
+                <h4 className="font-bold text-sm sm:text-base text-slate-900 flex items-center gap-2">
+                  <UploadCloud className="w-4 h-4 text-indigo-600" />
+                  Nahrání dokumentů
+                </h4>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Exportujte vaše opatrovnické dokumenty do čitelných souborů PDF nebo DOCX. Načtěte je do vytvořeného projektu v <a href="https://notebooklm.google.com/" target="_blank" rel="noopener noreferrer" className="text-indigo-600 font-bold hover:underline">NotebookLM</a>.
+                </p>
+                <ul className="text-xs text-slate-500 space-y-1.5 pt-2 border-t border-slate-100">
+                  <li className="flex items-start gap-1.5">
+                    <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                    <span>Soudní spisy, usnesení a protokoly</span>
+                  </li>
+                  <li className="flex items-start gap-1.5">
+                    <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                    <span>Zprávy OSPOD a psychologické posudky</span>
+                  </li>
+                  <li className="flex items-start gap-1.5">
+                    <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                    <span>Exportovaná e-mailová komunikace</span>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Step 2 */}
+              <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-3 relative overflow-hidden">
+                <div className="w-10 h-10 rounded-xl bg-teal-50 text-teal-600 border border-teal-100 flex items-center justify-center font-bold font-mono text-base">
+                  02
+                </div>
+                <h4 className="font-bold text-sm sm:text-base text-slate-900 flex items-center gap-2">
+                  <Terminal className="w-4 h-4 text-teal-600" />
+                  Formulace promptů
+                </h4>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Zadejte strukturovaný dotaz s jasným vymezením role AI a požadovaného formátu výstupu. Využijte naši připravenou šablonovací knihovnu níže.
+                </p>
+                <ul className="text-xs text-slate-500 space-y-1.5 pt-2 border-t border-slate-100">
+                  <li className="flex items-start gap-1.5">
+                    <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                    <span>Role: "Jsi opatrovnický advokát ČR"</span>
+                  </li>
+                  <li className="flex items-start gap-1.5">
+                    <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                    <span>Požadujte chronologii v tabulce</span>
+                  </li>
+                  <li className="flex items-start gap-1.5">
+                    <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                    <span>Vyžádejte si seznam rozporů a opomenutí</span>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Step 3 */}
+              <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-3 relative overflow-hidden">
+                <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 border border-amber-100 flex items-center justify-center font-bold font-mono text-base">
+                  03
+                </div>
+                <h4 className="font-bold text-sm sm:text-base text-slate-900 flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4 text-amber-600" />
+                  Ověření citací a paragrafů
+                </h4>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Kliknutím na odkazovací číslo v odpovědi NotebookLM ověřte konkrétní stranu a odstavec nahraného PDF spisu.
+                </p>
+                <ul className="text-xs text-slate-500 space-y-1.5 pt-2 border-t border-slate-100">
+                  <li className="flex items-start gap-1.5">
+                    <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                    <span>Ověřte číselný údaj či citát v PDF</span>
+                  </li>
+                  <li className="flex items-start gap-1.5">
+                    <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                    <span>Dopňte odkaz na judikaturu ÚS ČR</span>
+                  </li>
+                  <li className="flex items-start gap-1.5">
+                    <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                    <span>Předložte výstup svému advokátovi</span>
+                  </li>
+                </ul>
+              </div>
+
+            </div>
+          </div>
+
+          {/* Interactive Prompt Templates Section */}
+          <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-lg space-y-6">
+            
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+              <div>
+                <h3 className="text-lg font-bold font-display text-slate-900 flex items-center gap-2">
+                  <FileCode className="w-5 h-5 text-teal-600" />
+                  Knihovna ověřených promptů pro otce
+                </h3>
+                <p className="text-xs text-slate-500 mt-1">
+                  Kopírujte šablony dotazů jedním kliknutím a vkládejte je přímo do Gemini, NotebookLM nebo vyzkoušejte v našem Chatu.
+                </p>
+              </div>
+
+              {/* Text filter for prompts */}
+              <div className="w-full md:w-72">
+                <input
+                  type="text"
+                  value={promptFilterText}
+                  onChange={(e) => setPromptFilterText(e.target.value)}
+                  placeholder="Hledat v šablonách (např. OSPOD, výživné)..."
+                  className="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 focus:border-teal-600 focus:bg-white rounded-xl outline-none font-sans"
+                />
+              </div>
+            </div>
+
+            {/* Prompt Category Filter Badges */}
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => setSelectedPromptCategory('all')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  selectedPromptCategory === 'all'
+                    ? 'bg-slate-900 text-white'
+                    : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                }`}
+              >
+                Všechny šablony ({GEMINI_PROMPT_TEMPLATES.length})
+              </button>
+              <button
+                onClick={() => setSelectedPromptCategory('spis')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  selectedPromptCategory === 'spis'
+                    ? 'bg-indigo-600 text-white'
+                    : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                }`}
+              >
+                Chronologie & Spis
+              </button>
+              <button
+                onClick={() => setSelectedPromptCategory('ospod')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  selectedPromptCategory === 'ospod'
+                    ? 'bg-indigo-600 text-white'
+                    : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                }`}
+              >
+                OSPOD Audit
+              </button>
+              <button
+                onClick={() => setSelectedPromptCategory('jednani')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  selectedPromptCategory === 'jednani'
+                    ? 'bg-indigo-600 text-white'
+                    : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                }`}
+              >
+                Soudní Jednání
+              </button>
+              <button
+                onClick={() => setSelectedPromptCategory('biff')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  selectedPromptCategory === 'biff'
+                    ? 'bg-indigo-600 text-white'
+                    : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                }`}
+              >
+                BIFF Přepis
+              </button>
+              <button
+                onClick={() => setSelectedPromptCategory('posudek')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  selectedPromptCategory === 'posudek'
+                    ? 'bg-indigo-600 text-white'
+                    : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                }`}
+              >
+                Znalecký Posudek
+              </button>
+              <button
+                onClick={() => setSelectedPromptCategory('vyzivne')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  selectedPromptCategory === 'vyzivne'
+                    ? 'bg-indigo-600 text-white'
+                    : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                }`}
+              >
+                Výživné & Náklady
+              </button>
+            </div>
+
+            {/* Prompt Cards Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {GEMINI_PROMPT_TEMPLATES
+                .filter(p => selectedPromptCategory === 'all' || p.category === selectedPromptCategory)
+                .filter(p => 
+                  !promptFilterText.trim() || 
+                  p.title.toLowerCase().includes(promptFilterText.toLowerCase()) ||
+                  p.description.toLowerCase().includes(promptFilterText.toLowerCase()) ||
+                  p.promptText.toLowerCase().includes(promptFilterText.toLowerCase())
+                )
+                .map((template) => (
+                  <div
+                    key={template.id}
+                    className="bg-slate-50 border border-slate-200/80 rounded-2xl p-5 hover:border-teal-300 hover:bg-white transition-all space-y-4 shadow-xs flex flex-col justify-between"
+                  >
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="px-2.5 py-1 bg-indigo-100 text-indigo-800 text-[10px] font-bold rounded-lg uppercase tracking-wider">
+                          {template.badge}
+                        </span>
+                        <span className="text-[10px] text-slate-400 font-mono">ID: {template.id}</span>
+                      </div>
+
+                      <h4 className="font-bold text-sm text-slate-900 font-display">
+                        {template.title}
+                      </h4>
+
+                      <p className="text-xs text-slate-600 leading-relaxed">
+                        {template.description}
+                      </p>
+
+                      {/* Code syntax box */}
+                      <div className="bg-slate-900 text-slate-200 p-4 rounded-xl text-xs font-mono leading-relaxed whitespace-pre-wrap border border-slate-800 max-h-52 overflow-y-auto font-normal">
+                        {template.promptText}
+                      </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-200/60">
+                      <button
+                        onClick={() => handleCopyText(template.id, template.promptText)}
+                        className="flex-1 min-w-[140px] px-3.5 py-2 bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer shadow-2xs"
+                      >
+                        {copiedId === template.id ? (
+                          <>
+                            <Check className="w-4 h-4 text-emerald-600" />
+                            <span className="text-emerald-600">Zkopírováno!</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-4 h-4 text-slate-600" />
+                            <span>Kopírovat prompt</span>
+                          </>
+                        )}
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          setInputText(template.promptText);
+                          setActiveSubTab('chat');
+                        }}
+                        className="flex-1 min-w-[140px] px-3.5 py-2 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer shadow-2xs"
+                        title="Vložit prompt do live AI chatu"
+                      >
+                        <MessageSquare className="w-4 h-4" />
+                        <span>Vyzkoušet v AI Chatu</span>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+            </div>
+
+          </div>
+
+          {/* Guidelines & Safety Box */}
+          <div className="bg-amber-50/80 border border-amber-200 p-6 rounded-3xl space-y-3">
+            <h4 className="font-bold text-sm text-amber-950 flex items-center gap-2 font-display">
+              <ShieldCheck className="w-5 h-5 text-amber-600" />
+              Zásady bezpečné práce a anonymizace podkladů v AI
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-amber-900/90 leading-relaxed">
+              <div className="space-y-1">
+                <strong className="block text-amber-950">🔒 Anonymizace osobních dat:</strong>
+                Před nahráváním souborů do jakéhokoliv cloudového nástroje doporučujeme nahradit rodná čísla, přesné adresy a celá jména zobecňujícími pojmy (např. <em>Otec, Matka, Nezletilý syn A.</em>).
+              </div>
+              <div className="space-y-1">
+                <strong className="block text-amber-950">⚖️ Kontrola paragrafů a výstupů:</strong>
+                AI slouží jako rychlá analytická pomůcka a rešeršní asistent. Konečné znění návrhu na opatrovnický soud nebo odvolání vždy konzultujte s advokátem.
+              </div>
+            </div>
+          </div>
+
+        </div>
+      )}
       {activeSubTab === 'chat' && (
         <div className="bg-white rounded-3xl border border-slate-200 shadow-lg overflow-hidden flex flex-col min-h-[600px]">
           
