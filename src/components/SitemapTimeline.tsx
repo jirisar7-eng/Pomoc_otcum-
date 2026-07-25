@@ -373,6 +373,16 @@ export default function SitemapTimeline({ setActiveTab, onOpenGlossary, currentU
       badgeColor: 'bg-emerald-100 text-emerald-800',
       items: [
         { 
+          name: 'AI Context & Machine Index', 
+          tab: 'ai-context', 
+          desc: 'Strojově čitelný rozcestník a kontextový index pro AI LLM crawlery, GPTBot, ClaudeBot a vývojáře.', 
+          icon: <Cpu className="w-3.5 h-3.5 text-teal-600" />, 
+          highlight: true,
+          status: 'stable',
+          statusLabel: 'Plně funkční',
+          version: 'V2.0'
+        },
+        { 
           name: 'Interaktivní Formuláře (Chytrý editor)', 
           tab: 'centrum-formularu', 
           desc: 'Průvodce sestavením bezchybného podání nebo odvolání s kontrolou náležitostí.', 

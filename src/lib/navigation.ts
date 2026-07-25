@@ -102,7 +102,10 @@ const TAB_ALIASES: Record<string, string> = {
   'sitemap': 'sitemap',
   'admin': 'admin',
   'ai-assistant': 'ai-assistant',
-  'ai-asistent': 'ai-assistant'
+  'ai-asistent': 'ai-assistant',
+  'ai-context': 'ai-context',
+  'llms': 'ai-context',
+  'llms-txt': 'ai-context'
 };
 
 export interface ParsedLink {

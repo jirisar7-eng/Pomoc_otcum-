@@ -328,9 +328,40 @@ async function callGeminiWithLocalFallback(
   return getLocalFallbackData(action, params);
 }
 
-// 1. API ROUTES FIRST
+// 1. API & MACHINE-READABLE ROUTES FIRST
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// AI & SEO Machine Readable Routes (llms.txt, robots.txt, sitemap.xml)
+app.get('/llms.txt', (req, res) => {
+  const filePath = path.join(process.cwd(), 'public', 'llms.txt');
+  if (fs.existsSync(filePath)) {
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    res.sendFile(filePath);
+  } else {
+    res.status(404).send('# llms.txt not found');
+  }
+});
+
+app.get('/robots.txt', (req, res) => {
+  const filePath = path.join(process.cwd(), 'public', 'robots.txt');
+  if (fs.existsSync(filePath)) {
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    res.sendFile(filePath);
+  } else {
+    res.status(404).send('User-agent: *\nAllow: /');
+  }
+});
+
+app.get('/sitemap.xml', (req, res) => {
+  const filePath = path.join(process.cwd(), 'public', 'sitemap.xml');
+  if (fs.existsSync(filePath)) {
+    res.setHeader('Content-Type', 'application/xml; charset=utf-8');
+    res.sendFile(filePath);
+  } else {
+    res.status(404).send('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemap.org/schemas/sitemap/0.9"></urlset>');
+  }
 });
 
 // GitHub API Integration Routes (Read, Write & Status Check)

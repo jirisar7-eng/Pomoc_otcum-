@@ -85,6 +85,7 @@ import LegalWiki from './components/LegalWiki';
 import AiAdmin from './components/AiAdmin';
 import CategoryDetailView from './components/CategoryDetailView';
 import { SynthesisAperioHub } from './components/SynthesisAperioHub';
+import AiContextView from './components/AiContextView';
 
 export default function App() {
   const { t } = useLanguage();
@@ -746,6 +747,10 @@ export default function App() {
                 onOpenGlossary={() => setGlossaryOpen(true)}
                 currentUser={currentUser}
               />
+            )}
+
+            {activeTab === 'ai-context' && (
+              <AiContextView />
             )}
 
             {activeTab === 'admin' && (

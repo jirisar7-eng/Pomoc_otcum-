@@ -1,0 +1,39 @@
+# Robots.txt for "Táta má právo" (Pomoc_otcum)
+# Explicitly allowing AI Crawlers & Indexers for maximum AI accessibility
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Cohere-ai
+Allow: /
+
+User-agent: Anthropic-ai
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: *
+Allow: /
+Disallow: /api/private/
+
+# AI Machine-Readable Summary
+# LLMs Text File: /llms.txt
+# AI Context Page: /ai-context
+
+Sitemap: https://tatamapravo.cz/sitemap.xml
