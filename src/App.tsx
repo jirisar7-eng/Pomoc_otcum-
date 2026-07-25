@@ -36,6 +36,7 @@ import { parseInternalLink, scrollToAnchor } from './lib/navigation';
 // Component imports
 import Navigation from './components/Navigation';
 import AuthModal from './components/AuthModal';
+import CookieConsentBanner, { openCookieConsentModal } from './components/CookieConsentBanner';
 import HeroSection from './components/HeroSection';
 import RightsSection from './components/RightsSection';
 import DocumentsSection from './components/DocumentsSection';
@@ -91,14 +92,29 @@ export default function App() {
   const { t } = useLanguage();
   // Global Authentication & Navigation States
   const [currentUser, setCurrentUser] = useState<User | null>(() => {
-    let user = getStoredState<User | null>('current_user', null);
-    if (!user && typeof window !== 'undefined') {
-      try {
-        const localUserStr = localStorage.getItem('synthesis_hub_local_user');
-        if (localUserStr) {
-          user = JSON.parse(localUserStr);
+    let user: User | null = null;
+    if (typeof window !== 'undefined') {
+      const rememberFlag = localStorage.getItem('synthesis_remember_me_flag');
+      if (rememberFlag === 'false') {
+        // Session-only persistence
+        try {
+          const sessionUserStr = sessionStorage.getItem('synthesis_session_user');
+          if (sessionUserStr) {
+            user = JSON.parse(sessionUserStr);
+          }
+        } catch (e) {}
+      } else {
+        // Persistent login (default)
+        user = getStoredState<User | null>('current_user', null);
+        if (!user) {
+          try {
+            const localUserStr = localStorage.getItem('synthesis_hub_local_user');
+            if (localUserStr) {
+              user = JSON.parse(localUserStr);
+            }
+          } catch (e) {}
         }
-      } catch (e) {}
+      }
     }
     if (user && user.email) {
       const lowerEmail = user.email.toLowerCase().trim();
@@ -479,16 +495,35 @@ export default function App() {
   }, [donations]);
 
   // Auth Callbacks
-  const handleLogin = (user: User) => {
+  const handleLogin = (user: User, rememberMe: boolean = true) => {
     setCurrentUser(user);
+    if (typeof window !== 'undefined') {
+      if (rememberMe) {
+        localStorage.setItem('synthesis_remember_me_flag', 'true');
+        localStorage.setItem('synthesis_hub_local_user', JSON.stringify(user));
+        setStoredState('current_user', user);
+        sessionStorage.removeItem('synthesis_session_user');
+      } else {
+        localStorage.setItem('synthesis_remember_me_flag', 'false');
+        sessionStorage.setItem('synthesis_session_user', JSON.stringify(user));
+        localStorage.removeItem('synthesis_hub_local_user');
+        setStoredState('current_user', null);
+      }
+    }
     // Redirect to personal workspace on login
     setActiveTab('user-portal');
   };
 
   const handleLogout = () => {
     logoutUser().catch(e => console.error("Error logging out from Firebase:", e));
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('synthesis_hub_local_user');
+      localStorage.removeItem('synthesis_remember_me_flag');
+      sessionStorage.removeItem('synthesis_session_user');
+      setStoredState('current_user', null);
+    }
     setCurrentUser(null);
-    if (activeTab === 'admin') {
+    if (activeTab === 'admin' || activeTab === 'user-portal') {
       setActiveTab('home');
     }
   };
@@ -768,6 +803,12 @@ export default function App() {
                 setComments={setComments}
                 setDonations={setDonations}
                 setPartners={setPartners}
+                onOpenAuth={() => setAuthModalOpen(true)}
+                onQuickSuperAdmin={(user) => handleLogin(user, true)}
+                onGoHome={() => {
+                  setActiveTab('home');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
               />
             )}
           </motion.div>
@@ -832,6 +873,13 @@ export default function App() {
               >
                 📂 {t('btn_sitemap', 'Mapa stránek & Vývoj projektu')}
               </button>
+              <button
+                onClick={() => openCookieConsentModal()}
+                className="text-slate-400 hover:text-teal-300 transition-colors font-medium flex items-center gap-1 cursor-pointer mr-2"
+                title="Upravit nastavení cookies"
+              >
+                🍪 Cookies
+              </button>
               <span className="flex items-center gap-1 text-slate-400">
                 <Shield className="w-3.5 h-3.5" />
                 {t('footer_rbac', 'RBAC aktivní')}
@@ -876,6 +924,9 @@ export default function App() {
         onLogin={handleLogin}
         initialMode={authModalInitialMode}
       />
+
+      {/* Cookie Consent Banner & Settings Modal */}
+      <CookieConsentBanner />
 
     </div>
   );

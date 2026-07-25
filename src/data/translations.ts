@@ -343,14 +343,14 @@ export const TRANSLATIONS: TranslationDictionary = {
 
   // RBAC Access Block Card (found in AdminPanel etc)
   rbac_access_denied: {
-    cs: "Přístup odepřen (RBAC Ochrana)",
-    sk: "Prístup odmietnutý (RBAC Ochrana)",
-    en: "Access Denied (RBAC Protection)"
+    cs: "Vyžadováno přihlášení administrátora",
+    sk: "Vyžadované prihlásenie administrátora",
+    en: "Administrator Login Required"
   },
   rbac_access_denied_desc: {
-    cs: "Nemáte dostatečná oprávnění ke správě jádra **Synthesis OS**. Tato vysoce zabezpečená administrace je chráněna rolí **SuperAdmin**. Pro testování se prosím přihlaste přes přihlašovací menu a vyberte předpřipravený administrátorský profil.",
-    sk: "Nemáte dostatočné oprávnenia na správu jadra **Synthesis OS**. Táto vysoko zabezpečená administrácia je chránená rolou **SuperAdmin**. Pre testovanie sa prosím prihláste cez prihlasovacie menu a vyberte predpripravený administrátorský profil.",
-    en: "You do not have sufficient permissions to manage the **Synthesis OS** core. This highly secure administration panel is protected by the **SuperAdmin** role. For testing, please sign in via the auth menu and select a pre-configured administrator profile."
+    cs: "Pro přístup do správy portálu 'Táta má právo' a administrace Synthesis OS je vyžadován účet s rolí SuperAdmin. Jako vývojář nebo testující se můžete jedním kliknutím přepnout do testovacího administrátorského profilu.",
+    sk: "Pre prístup do správy portálu 'Otec má právo' a administrácie Synthesis OS je vyžadovaný účet s rolou SuperAdmin. Ako vývojár alebo testujúci sa môžete jedným kliknutím prepnúť do testovacieho administrátorského profilu.",
+    en: "Access to the 'Táta má právo' portal management and Synthesis OS administration requires an account with the SuperAdmin role. As a developer or tester, you can switch to a test administrator profile with one click."
   },
 
   // Hero Section Header text

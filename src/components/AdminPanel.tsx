@@ -11,7 +11,8 @@ import {
   Database, Copy, RefreshCw, Play, Sparkles, LayoutDashboard,
   Scale, Folder, Briefcase, Camera, Video, Mic, MessageCircle,
   UserCheck, Users, Calendar, Cpu, BarChart2, Paintbrush, Search,
-  Sliders, Settings, Activity, FileCode, Share2, Download, ArrowUp, ArrowDown, Tv, Github
+  Sliders, Settings, Activity, FileCode, Share2, Download, ArrowUp, ArrowDown, Tv, Github,
+  Lock, LogIn, ArrowLeft, Home, ShieldCheck, User as UserIcon
 } from 'lucide-react';
 import { Article, ExperienceStory, ForumPost, Comment, User, Donation, Partner } from '../types';
 import { getSupabaseUrl, getSupabaseAnonKey, isSupabaseConfigured, getSupabase, resetSupabaseInstance } from '../lib/supabase';
@@ -41,6 +42,9 @@ interface AdminPanelProps {
   setComments: React.Dispatch<React.SetStateAction<Comment[]>>;
   setDonations: React.Dispatch<React.SetStateAction<Donation[]>>;
   setPartners: React.Dispatch<React.SetStateAction<Partner[]>>;
+  onOpenAuth?: () => void;
+  onQuickSuperAdmin?: (user: User) => void;
+  onGoHome?: () => void;
 }
 
 export default function AdminPanel({
@@ -56,7 +60,10 @@ export default function AdminPanel({
   setPosts,
   setComments,
   setDonations,
-  setPartners
+  setPartners,
+  onOpenAuth,
+  onQuickSuperAdmin,
+  onGoHome
 }: AdminPanelProps) {
   const { t } = useLanguage();
 
@@ -1455,15 +1462,110 @@ ${cases.map(c => `Název: ${c.title}\nStav: ${c.status}\nChronologie:\n` + (c.ch
                   currentUser?.email?.toLowerCase().trim() === 'sarji@seznam.cz';
 
   if (!isAdmin) {
+    const handleQuickSuperAdminLogin = () => {
+      const superAdminUser: User = {
+        id: 'usr_superadmin',
+        email: 'admin@synthesis.cz',
+        name: 'SuperAdmin Synthesis',
+        role: 'admin',
+        avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=SuperAdmin',
+        createdAt: new Date().toISOString()
+      };
+      if (onQuickSuperAdmin) {
+        onQuickSuperAdmin(superAdminUser);
+      } else if (typeof window !== 'undefined') {
+        localStorage.setItem('synthesis_remember_me_flag', 'true');
+        localStorage.setItem('synthesis_hub_local_user', JSON.stringify(superAdminUser));
+        window.location.reload();
+      }
+    };
+
     return (
-      <div className="bg-rose-50 border border-rose-100 p-8 rounded-2xl text-center max-w-xl mx-auto space-y-4 my-8" id="admin-unauthorized-card">
-        <AlertTriangle className="w-12 h-12 text-rose-600 mx-auto animate-bounce" />
-        <h3 className="text-lg font-bold text-slate-800 font-display">
-          {t('rbac_access_denied', 'Přístup odepřen (RBAC Ochrana)')}
-        </h3>
-        <p className="text-rose-700 text-xs leading-relaxed">
-          {t('rbac_access_denied_desc', 'Nemáte dostatečná oprávnění ke správě jádra **Synthesis OS**. Tato vysoce zabezpečená administrace je chráněna rolí **SuperAdmin**. Pro testování se prosím přihlaste přes přihlašovací menu a vyberte předpřipravený administrátorský profil.')}
-        </p>
+      <div className="bg-white border border-slate-200/90 shadow-2xl rounded-3xl overflow-hidden max-w-2xl mx-auto my-10" id="admin-unauthorized-card">
+        {/* Card Header Banner */}
+        <div className="bg-slate-900 text-white p-6 sm:p-8 relative overflow-hidden border-b border-slate-800">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+
+          <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3.5">
+              <div className="p-3 bg-teal-500/20 border border-teal-500/30 rounded-2xl text-teal-300 shrink-0">
+                <ShieldCheck className="w-7 h-7" />
+              </div>
+              <div>
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-teal-500/10 border border-teal-500/20 rounded-full text-[10px] font-mono text-teal-300 mb-1">
+                  <Lock className="w-3 h-3" />
+                  <span>Ochrana přístupu RBAC</span>
+                </div>
+                <h3 className="text-xl sm:text-2xl font-bold font-display text-white">
+                  {t('rbac_access_denied', 'Vyžadováno přihlášení administrátora')}
+                </h3>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Card Content Body */}
+        <div className="p-6 sm:p-8 space-y-6">
+          <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
+            {t('rbac_access_denied_desc', 'Pro přístup do správy portálu \'Táta má právo\' a administrace Synthesis OS je vyžadován účet s rolí SuperAdmin. Jako vývojář nebo testující se můžete jedním kliknutím přepnout do testovacího administrátorského profilu.')}
+          </p>
+
+          {/* User Status Box */}
+          <div className="p-4 bg-slate-50 border border-slate-200/80 rounded-2xl flex items-center justify-between gap-3 text-xs text-slate-600">
+            <div className="flex items-center gap-2">
+              <UserIcon className="w-4 h-4 text-slate-400" />
+              <span>Aktuální stav relace:</span>
+            </div>
+            <span className="font-semibold text-slate-800 bg-white px-2.5 py-1 rounded-lg border border-slate-200">
+              {currentUser ? `${currentUser.name} (${currentUser.role || 'uživatel'})` : 'Nepřihlášený host'}
+            </span>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="space-y-3 pt-2">
+            {/* Quick SuperAdmin Button */}
+            <button
+              id="rbac-quick-superadmin-btn"
+              onClick={handleQuickSuperAdminLogin}
+              className="w-full py-3.5 px-5 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-500 hover:to-emerald-500 text-white font-bold text-sm rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95 group"
+            >
+              <Sparkles className="w-4 h-4 text-teal-200 group-hover:rotate-12 transition-transform" />
+              <span>Přihlásit jako SuperAdmin (Testovací účet)</span>
+            </button>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* Standard Auth Button */}
+              {onOpenAuth && (
+                <button
+                  id="rbac-open-auth-btn"
+                  onClick={onOpenAuth}
+                  className="w-full py-3 px-4 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+                >
+                  <LogIn className="w-4 h-4 text-slate-300" />
+                  <span>Přihlásit jiným účtem</span>
+                </button>
+              )}
+
+              {/* Go Home Button */}
+              {onGoHome && (
+                <button
+                  id="rbac-go-home-btn"
+                  onClick={onGoHome}
+                  className="w-full py-3 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl border border-slate-200 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+                >
+                  <Home className="w-4 h-4 text-slate-500" />
+                  <span>Návrat na rozcestník</span>
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Info footer */}
+          <p className="text-[11px] text-slate-400 text-center leading-normal pt-2">
+            💡 Účet SuperAdmin zpřístupňuje kompletní nástroje pro úpravu článků, správu registrů, auditní logy a monitorování systému.
+          </p>
+        </div>
       </div>
     );
   }

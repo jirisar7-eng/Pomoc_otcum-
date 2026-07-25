@@ -56,7 +56,7 @@ import { normalizeUserIdentity } from '../services/identityHubService';
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onLogin: (user: User) => void;
+  onLogin: (user: User, rememberMe?: boolean) => void;
   initialMode?: AuthMode;
 }
 
@@ -88,6 +88,9 @@ export default function AuthModal({ isOpen, onClose, onLogin, initialMode = 'log
   const [name, setName] = useState('');
   const [role, setRole] = useState<UserRole>('user');
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState<boolean>(() => 
+    typeof window !== 'undefined' ? localStorage.getItem('synthesis_remember_me_pref') !== 'false' : true
+  );
 
   // Touch tracking for real-time validation
   const [touched, setTouched] = useState<{ email?: boolean; password?: boolean; name?: boolean }>({});
@@ -275,7 +278,7 @@ export default function AuthModal({ isOpen, onClose, onLogin, initialMode = 'log
   };
 
   const completeAuthentication = (user: User) => {
-    onLogin(user);
+    onLogin(user, rememberMe);
     onClose();
   };
 
@@ -1459,19 +1462,38 @@ export default function AuthModal({ isOpen, onClose, onLogin, initialMode = 'log
                       </div>
                     )}
 
-                    {mode === 'login' && (
-                      <div className="flex justify-end text-[11px] mt-1.5">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setMode('forgot_password');
-                            setResetEmail(email);
-                            setStatus({ type: 'idle', text: '' });
-                          }}
-                          className="text-slate-500 hover:text-teal-600 transition-colors font-medium cursor-pointer"
-                        >
-                          Zapomenuté heslo?
-                        </button>
+                    {/* Remember Me Checkbox & Forgot Password Link */}
+                    {(mode === 'login' || mode === 'register') && (
+                      <div className="flex items-center justify-between text-[11px] mt-2.5">
+                        <label className="flex items-center gap-1.5 cursor-pointer text-slate-600 hover:text-slate-900 select-none">
+                          <input
+                            id="auth-remember-me-checkbox"
+                            type="checkbox"
+                            checked={rememberMe}
+                            onChange={(e) => {
+                              setRememberMe(e.target.checked);
+                              if (typeof window !== 'undefined') {
+                                localStorage.setItem('synthesis_remember_me_pref', e.target.checked ? 'true' : 'false');
+                              }
+                            }}
+                            className="w-3.5 h-3.5 rounded border-slate-300 text-teal-600 focus:ring-teal-500 cursor-pointer"
+                          />
+                          <span className="font-medium">Zapamatovat si mě</span>
+                        </label>
+
+                        {mode === 'login' && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setMode('forgot_password');
+                              setResetEmail(email);
+                              setStatus({ type: 'idle', text: '' });
+                            }}
+                            className="text-slate-500 hover:text-teal-600 transition-colors font-medium cursor-pointer"
+                          >
+                            Zapomenuté heslo?
+                          </button>
+                        )}
                       </div>
                     )}
                   </div>
