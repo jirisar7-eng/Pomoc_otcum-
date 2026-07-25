@@ -116,10 +116,15 @@ export default function PeceODiteSection({
   onOpenAuth?: () => void; 
   setActiveTab?: (tab: string) => void;
 }) {
-  const [activeSubTab, setActiveSubTab] = useState<'schedules' | 'studies' | 'methodologies'>('schedules');
+  const [activeSubTab, setActiveSubTab] = useState<'plan' | 'communication' | 'schedules' | 'studies' | 'methodologies'>('plan');
   const [selectedStudy, setSelectedStudy] = useState<'fabricius' | 'warshak'>('fabricius');
   const [expandedStudyText, setExpandedStudyText] = useState<boolean>(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [checkedPlanItems, setCheckedPlanItems] = useState<Record<string, boolean>>({});
+
+  const togglePlanItem = (id: string) => {
+    setCheckedPlanItems(prev => ({ ...prev, [id]: !prev[id] }));
+  };
 
   const copyToClipboard = (text: string, id: string) => {
     navigator.clipboard.writeText(text).then(() => {
@@ -164,13 +169,41 @@ Tento globální vědecký konsenzus stanovuje:
       </div>
 
       {/* Sub-tab switcher */}
-      <div className="flex border-b border-slate-100 bg-white p-1 rounded-xl shadow-3xs max-w-xl">
+      <div className="flex flex-wrap border-b border-slate-100 bg-white p-1.5 rounded-2xl shadow-3xs gap-1">
+        <button
+          onClick={() => setActiveSubTab('plan')}
+          className={`flex-1 min-w-[140px] py-2.5 px-3 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+            activeSubTab === 'plan'
+              ? 'bg-teal-600 text-white shadow-3xs font-extrabold'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+          }`}
+        >
+          <FileCheck className="w-4 h-4" />
+          Rodičovský Plán Péče (5 Oblatí)
+          <span className={`text-[8px] px-1.5 py-0.5 rounded-full font-mono uppercase tracking-wider font-extrabold ${
+            activeSubTab === 'plan' ? 'bg-teal-700 text-teal-100' : 'bg-teal-100 text-teal-800'
+          }`}>Dohoda</span>
+        </button>
+        <button
+          onClick={() => setActiveSubTab('communication')}
+          className={`flex-1 min-w-[140px] py-2.5 px-3 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+            activeSubTab === 'communication'
+              ? 'bg-teal-600 text-white shadow-3xs font-extrabold'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+          }`}
+        >
+          <MessageSquare className="w-3.5 h-3.5" />
+          Komunikace při nesoučinnosti (BIFF)
+          <span className={`text-[8px] px-1.5 py-0.5 rounded-full font-mono uppercase tracking-wider font-extrabold ${
+            activeSubTab === 'communication' ? 'bg-teal-700 text-teal-100' : 'bg-amber-100 text-amber-800'
+          }`}>BIFF</span>
+        </button>
         <button
           onClick={() => setActiveSubTab('schedules')}
-          className={`flex-1 py-2 px-3 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+          className={`flex-1 min-w-[140px] py-2.5 px-3 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
             activeSubTab === 'schedules'
-              ? 'bg-teal-50 text-teal-700 shadow-3xs border border-teal-100/50 font-extrabold'
-              : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'
+              ? 'bg-teal-50 text-teal-800 shadow-3xs border border-teal-200/60 font-extrabold'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
           }`}
         >
           <Calendar className="w-3.5 h-3.5" />
@@ -178,10 +211,10 @@ Tento globální vědecký konsenzus stanovuje:
         </button>
         <button
           onClick={() => setActiveSubTab('studies')}
-          className={`flex-1 py-2 px-3 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+          className={`flex-1 min-w-[140px] py-2.5 px-3 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
             activeSubTab === 'studies'
-              ? 'bg-teal-50 text-teal-700 shadow-3xs border border-teal-100/50 font-extrabold'
-              : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'
+              ? 'bg-teal-50 text-teal-800 shadow-3xs border border-teal-200/60 font-extrabold'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
           }`}
         >
           <Sparkles className="w-3.5 h-3.5 text-teal-600" />
@@ -190,10 +223,10 @@ Tento globální vědecký konsenzus stanovuje:
         </button>
         <button
           onClick={() => setActiveSubTab('methodologies')}
-          className={`flex-1 py-2 px-3 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+          className={`flex-1 min-w-[140px] py-2.5 px-3 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
             activeSubTab === 'methodologies'
-              ? 'bg-teal-50 text-teal-700 shadow-3xs border border-teal-100/50 font-extrabold'
-              : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'
+              ? 'bg-teal-50 text-teal-800 shadow-3xs border border-teal-200/60 font-extrabold'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
           }`}
         >
           <Scale className="w-3.5 h-3.5 text-teal-600" />
@@ -201,6 +234,686 @@ Tento globální vědecký konsenzus stanovuje:
           <span className="bg-amber-100 text-amber-800 text-[8px] px-1.5 py-0.5 rounded-full font-mono uppercase tracking-wider font-extrabold scale-90">Obrana</span>
         </button>
       </div>
+
+      {/* PLAN TAB */}
+      {activeSubTab === 'plan' && (
+        <div className="space-y-8 animate-fadeIn" id="parenting-plan-details">
+          {/* Hero Banner for Parenting Plan */}
+          <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-teal-950 p-6 md:p-8 rounded-3xl text-white space-y-4 shadow-xl border border-slate-800 relative overflow-hidden">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative z-10">
+              <div className="space-y-2 max-w-2xl">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-teal-400 bg-teal-500/10 border border-teal-500/20 px-3 py-1 rounded-full">
+                  Kompletní Rodičovská Dohoda & Plán péče
+                </span>
+                <h3 className="text-xl md:text-2xl font-black font-display text-white">
+                  Plán péče o dítě (Rodičovský plán / Rodičovská dohoda)
+                </h3>
+                <p className="text-xs md:text-sm text-slate-300 leading-relaxed">
+                  Praktická a podrobná dohoda mezi rodiči, která detailně upravuje fungování rodiny po rozchodu. Aby byl plán plně funkční a akceptovatelný pro <strong>Soud i OSPOD</strong>, pokrývá níže uvedených <strong>5 klíčových oblastí</strong>:
+                </p>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-2 shrink-0 w-full sm:w-auto">
+                <button
+                  onClick={() => {
+                    const fullText = `RODIČOVSKÝ PLÁN PÉČE O DÍTĚ / RODIČOVSKÁ DOHODA
+(Zpracováno dle doporučení OSPOD, Ministerstva spravedlnosti a § 906 a násl. zákona č. 89/2012 Sb., občanský zákoník)
+
+1. ZÁKLADNÍ MODEL PÉČE A HARMONOGRAM
+• Forma péče: Určení, zda jde o střídavou, společnou nebo výlučnou péči s rozsáhlým stykem.
+• Běžný týdenní/čtrnáctidenní cyklus: Exact stanovení dnů a hodin předávání (např. střídání v pondělí po škole v 16:00, nebo v pátek v 17:00).
+• Místo a způsob předávání: Kde přesně k předání dochází (škola/školka, domov jednoho z rodičů) a kdo zajišťuje dopravu.
+
+2. PRÁZDNINY, SVÁTKY A VÝZNAMNÉ DNY
+• Letní prázdniny: Rozdělení týdnů (např. po 1–2 týdnech v kuse) a termín, do kterého si rodiče navzájem nahlásí plánované dovolené (např. do 30. dubna).
+• Ostatní prázdniny: Podzimní, vánoční, jarní a velikonoční prázdniny (střídání obrok – sudý / lichý rok).
+• Narozeniny a svátky: Řešení narozenin dítěte, rodičů, Dne matek, Dne otců a významných rodinných oslav.
+
+3. FINANČNÍ ZABEZPEČENÍ A NÁKLADY
+• Běžné výživné: Výše alimentů a přesné datum jejich splatnosti.
+• Mimořádné výdaje: Dělba velkých a mimořádných nákladů (kroužky, tábory, rovnátka, školy v přírodě, lyžařské kurzy) – rovným dílem (50/50) nebo v poměru dle příjmů.
+• Školní a kroužkové potřeby: Kdo nakupuje oblečení, učebnice či vybavení a zda se věci předávají nebo zdvojují.
+• Společný účet pro dítě: Zřízení zvláštního/transparentního účtu pro úhradu mimořádných výdajů dítěte.
+
+4. VÝCHOVNÉ, ZDRAVOTNÍ A VZDĚLÁVACÍ ZÁLEŽITOSTI
+• Škola a vzdělávání: Výběr školy/školky, účast na rodičovských schůzkách, dálkový přístup do elektronické žákovské knížky (Bakaláři/Edookit).
+• Zdravotní péče: Výběr lékařů a specialistů, vzájemné informování o nemocech, předávání léků a zdravotní dokumentace.
+• Volnočasové aktivity: Výběr a financování kroužků, sportů a zájmových činností zasahujících do péče.
+• Výchovné principy: Základní dohoda na denním režimu, používání elektroniky (mobily, PC), večerce a pravidlech chování.
+
+5. KOMUNIKACE A ŘEŠENÍ ZMĚN
+• Komunikace mezi rodiči: Stanovený oficiální kanál (e-mail, sdílený kalendář, specializovaná aplikace).
+• Komunikace dítěte s druhým rodičem: Pravidelný přístup k telefonu či videohovorům v době, kdy je dítě u druhého rodiče.
+• Záskok / Hlídání (Právo prvního odmítnutí): Pokud jeden rodič nemůže o dítě pečovat déle než 12 hodin (pracovní cesta, nemoc), nabídne péči nejprve druhému rodiči před využitím prarodičů či chův.
+• Aktualizace plánu a řešení sporů: Pravidelná revize plánu při přechodu na nový stupeň školy a povinné využití rodinného mediátora před podáním žaloby k soudu.`;
+                    copyToClipboard(fullText, 'full-plan-text');
+                  }}
+                  className="px-4 py-3 bg-teal-500 hover:bg-teal-400 text-slate-950 font-extrabold text-xs rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <Copy className="w-4 h-4" />
+                  <span>{copiedId === 'full-plan-text' ? 'Zkopírováno vč. všech 5 bodů!' : 'Zkopírovat kompletní vzor pro Soud'}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* 5 CATEGORIES DETAILED GRID */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+            {/* AREA 1 */}
+            <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-3xs space-y-4 hover:border-teal-300 transition-all flex flex-col justify-between">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <div className="flex items-center gap-2.5">
+                    <span className="w-7 h-7 rounded-lg bg-teal-50 text-teal-700 flex items-center justify-center font-mono font-black text-xs border border-teal-100">
+                      1
+                    </span>
+                    <h4 className="font-extrabold text-slate-800 text-sm font-display">
+                      Základní model péče a harmonogram
+                    </h4>
+                  </div>
+                  <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono font-bold">Model & Dny</span>
+                </div>
+
+                <ul className="space-y-2.5 text-xs text-slate-600">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0 mt-0.5" />
+                    <div>
+                      <strong className="text-slate-800 font-bold block">Forma péče:</strong>
+                      Určení, zda jde o střídavou péči (50/50 nebo 60/40), společnou péči nebo výlučnou péči s rozsáhlým a rovnocenným stykem.
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0 mt-0.5" />
+                    <div>
+                      <strong className="text-slate-800 font-bold block">Běžný týdenní / 14denní cyklus:</strong>
+                      Exaktní stanovení dnů a hodin předávání (např. střídání v pondělí po škole, nebo v pátek v 17:00).
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0 mt-0.5" />
+                    <div>
+                      <strong className="text-slate-800 font-bold block">Místo a způsob předávání:</strong>
+                      Přesné urční místa (škola/školka, domov jednoho z rodičů) a jasné rozdělení povinností za zajištění dopravy.
+                    </div>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 text-[11px] text-slate-500 italic">
+                💡 <strong>Doporučení:</strong> Předávání ve škole či školce v pondělí eliminuje přímý kontakt konfliktních rodičů a usnadňuje dítěti přechod mezi domovy.
+              </div>
+            </div>
+
+            {/* AREA 2 */}
+            <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-3xs space-y-4 hover:border-teal-300 transition-all flex flex-col justify-between">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <div className="flex items-center gap-2.5">
+                    <span className="w-7 h-7 rounded-lg bg-teal-50 text-teal-700 flex items-center justify-center font-mono font-black text-xs border border-teal-100">
+                      2
+                    </span>
+                    <h4 className="font-extrabold text-slate-800 text-sm font-display">
+                      Prázdniny, svátky a významné dny
+                    </h4>
+                  </div>
+                  <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono font-bold">Volno & Svátky</span>
+                </div>
+
+                <ul className="space-y-2.5 text-xs text-slate-600">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0 mt-0.5" />
+                    <div>
+                      <strong className="text-slate-800 font-bold block">Letní prázdniny:</strong>
+                      Rozdělení týdnů (např. po 1–2 týdnech v kuse) a závazný termín, do kterého si rodiče navzájem nahlásí plánované dovolené (nejčastěji do 30. dubna).
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0 mt-0.5" />
+                    <div>
+                      <strong className="text-slate-800 font-bold block">Ostatní prázdniny:</strong>
+                      Podzimní, vánoční, jarní a velikonoční prázdniny se pravidla střídají obrok (sudý vs. lichý rok).
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0 mt-0.5" />
+                    <div>
+                      <strong className="text-slate-800 font-bold block">Narozeniny a svátky:</strong>
+                      Ošetření oslav narozenin dítěte, narozenin rodičů, Dne matek, Dne otců a rodinných výročí.
+                    </div>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 text-[11px] text-slate-500 italic">
+                💡 <strong>Doporučení:</strong> Pevný termín pro hlášení letní dovolené zabraňuje dohadům na poslední chvíli a umožňuje včasný nákup letenek či ubytování.
+              </div>
+            </div>
+
+            {/* AREA 3 */}
+            <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-3xs space-y-4 hover:border-teal-300 transition-all flex flex-col justify-between">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <div className="flex items-center gap-2.5">
+                    <span className="w-7 h-7 rounded-lg bg-teal-50 text-teal-700 flex items-center justify-center font-mono font-black text-xs border border-teal-100">
+                      3
+                    </span>
+                    <h4 className="font-extrabold text-slate-800 text-sm font-display">
+                      Finanční zabezpečení a náklady
+                    </h4>
+                  </div>
+                  <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono font-bold">Finance & Účty</span>
+                </div>
+
+                <ul className="space-y-2.5 text-xs text-slate-600">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0 mt-0.5" />
+                    <div>
+                      <strong className="text-slate-800 font-bold block">Běžné výživné:</strong>
+                      Výše výživného a stanovené datum splatnosti (obvykle k 15. dni v měsíci).
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0 mt-0.5" />
+                    <div>
+                      <strong className="text-slate-800 font-bold block">Mimořádné výdaje:</strong>
+                      Dělba nadstandardních nákladů (kroužky, tábory, rovnátka, školy v přírodě, lyžařské kurzy) – zda napnapůl (50/50) nebo v poměru dle příjmů.
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0 mt-0.5" />
+                    <div>
+                      <strong className="text-slate-800 font-bold block">Školní a kroužkové potřeby & Účet:</strong>
+                      Nákup oblečení, učebnic a vybavení; případné založení zvláštního/společného podúčtu pro dítě.
+                    </div>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 text-[11px] text-slate-500 italic">
+                💡 <strong>Doporučení:</strong> Písemný souhlas druhého rodiče s mimořádným výdajem předem je nejlepší prevencí neproplacených faktur za drahé zájmové kroužky.
+              </div>
+            </div>
+
+            {/* AREA 4 */}
+            <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-3xs space-y-4 hover:border-teal-300 transition-all flex flex-col justify-between">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <div className="flex items-center gap-2.5">
+                    <span className="w-7 h-7 rounded-lg bg-teal-50 text-teal-700 flex items-center justify-center font-mono font-black text-xs border border-teal-100">
+                      4
+                    </span>
+                    <h4 className="font-extrabold text-slate-800 text-sm font-display">
+                      Výchovné, zdravotní a vzdělávací záležitosti
+                    </h4>
+                  </div>
+                  <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono font-bold">Výchova & Zdraví</span>
+                </div>
+
+                <ul className="space-y-2.5 text-xs text-slate-600">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0 mt-0.5" />
+                    <div>
+                      <strong className="text-slate-800 font-bold block">Škola a vzdělávání:</strong>
+                      Společný výběr školy/školky, účast obou rodičů na třídních schůzkách, dálkový přístup do žákovské knížky.
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0 mt-0.5" />
+                    <div>
+                      <strong className="text-slate-800 font-bold block">Zdravotní péče:</strong>
+                      Výběr lékařů, informování o nemocech, řádné předávání léků, kartičky pojišťovny a zdravotní dokumentace.
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0 mt-0.5" />
+                    <div>
+                      <strong className="text-slate-800 font-bold block">Volnočasové aktivity & Principy:</strong>
+                      Dohoda na kroužcích a sjednocení základního režimu (večerka, pravidla pro elektroniku a mobily).
+                    </div>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 text-[11px] text-slate-500 italic">
+                💡 <strong>Doporučení:</strong> Trvejte na zřízení vlastních přístupových údajů do školních systémů (Bakaláři/Edookit), abyste nebyli závislí na přeposílání zpráv druhým rodičem.
+              </div>
+            </div>
+
+            {/* AREA 5 */}
+            <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-3xs space-y-4 hover:border-teal-300 transition-all flex flex-col justify-between col-span-1 md:col-span-2 lg:col-span-2">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <div className="flex items-center gap-2.5">
+                    <span className="w-7 h-7 rounded-lg bg-teal-50 text-teal-700 flex items-center justify-center font-mono font-black text-xs border border-teal-100">
+                      5
+                    </span>
+                    <h4 className="font-extrabold text-slate-800 text-sm font-display">
+                      Komunikace a řešení změn
+                    </h4>
+                  </div>
+                  <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono font-bold">Komunikace & Změny</span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-slate-600">
+                  <ul className="space-y-2.5">
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0 mt-0.5" />
+                      <div>
+                        <strong className="text-slate-800 font-bold block">Komunikace mezi rodiči:</strong>
+                        Volba oficiálního kanálu (věcné e-maily, sdílený kalendář, specializovaná rodinná aplikace).
+                      </div>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0 mt-0.5" />
+                      <div>
+                        <strong className="text-slate-800 font-bold block">Komunikace dítěte s druhým rodičem:</strong>
+                        Právo na neomezený telefonický/videohovor s druhým rodičem v rozumné večerní době.
+                      </div>
+                    </li>
+                  </ul>
+                  <ul className="space-y-2.5">
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0 mt-0.5" />
+                      <div>
+                        <strong className="text-slate-800 font-bold block">Záskok / Hlídání (Právo prvního odmítnutí):</strong>
+                        Pokud rodič nemůže o dítě pečovat (pracovní cesta, nemoc), nabídne péči nejprve druhému rodiči.
+                      </div>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0 mt-0.5" />
+                      <div>
+                        <strong className="text-slate-800 font-bold block">Aktualizace plánu & Řešení sporů:</strong>
+                        Pravidelná revize plánu (např. při vstupu do školy) a povinná mediace před podáním žaloby.
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="bg-teal-50/50 p-3.5 rounded-xl border border-teal-100 text-xs text-teal-900 leading-relaxed flex items-center justify-between gap-4">
+                <div>
+                  <strong>Právo prvního odmítnutí (First Right of Refusal):</strong> Zabraňuje zbytečnému odkládání dítěte k chůvám či známým v době, kdy má druhý rodič zájem a možnost se o dítě plnohodnotně postarat.
+                </div>
+                <button
+                  onClick={() => setActiveTab?.('ai-case-manager')}
+                  className="px-3 py-1.5 bg-teal-600 hover:bg-teal-700 text-white font-bold text-[11px] rounded-lg transition-all shrink-0 cursor-pointer"
+                >
+                  Generovat v AI Asistentovi
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* COMMUNICATION TAB (BIFF & Low Cooperation Framework) */}
+      {activeSubTab === 'communication' && (
+        <div className="space-y-8 animate-fadeIn" id="communication-biff-framework">
+          {/* Hero Banner for Communication Framework */}
+          <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-amber-950 p-6 md:p-8 rounded-3xl text-white space-y-4 shadow-xl border border-slate-800 relative overflow-hidden">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative z-10">
+              <div className="space-y-2 max-w-3xl">
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 border border-amber-500/20 px-3 py-1 rounded-full">
+                    Krizová Komunikace & BIFF Metodika
+                  </span>
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-teal-300 bg-teal-500/10 border border-teal-500/20 px-3 py-1 rounded-full">
+                    Důkazní Stopa pro OSPOD / Soud
+                  </span>
+                </div>
+                <h3 className="text-xl md:text-2xl font-black font-display text-white">
+                  Komunikace při nízké součinnosti a nesoučinnosti druhého rodiče
+                </h3>
+                <p className="text-xs md:text-sm text-slate-300 leading-relaxed">
+                  Tento rámec stanovuje jasná pravidla pro předávání informací v situacích, kdy je přímá a vstřícná domluva ze strany druhého rodiče obtížná, emotivní nebo neexistující. Cílem je <strong>chránit zájem dítěte</strong>, minimalizovat zbytečné konflikty a vytvářet <strong>prokazatelnou důkazní stopu</strong> pro případné dokazování u OSPOD či soudu.
+                </p>
+              </div>
+              <div className="shrink-0 w-full md:w-auto">
+                <button
+                  onClick={() => {
+                    const text = `RÁMEC KOMUNIKACE PŘI NÍZKÉ SOUČINNOSTI DRUHÉHO RODIČE (METODA BIFF)
+1. Všechna komunikace probíhá výhradně písemně přes e-mail / dedikovanou aplikaci.
+2. Zprávy dodržují pravidlo BIFF: Brief (stručné), Informative (věcná fakta), Friendly/Neutral (neutrální tón), Firm (jasný termín).
+3. Presumpce souhlasu při mlčení: Pokud se druhý rodič nevyjádří ve stanovéné lhůtě (3-5 dnů), považuje se navržený postup u běžných záležitostí za odsouhlasený.
+4. Telefonáty jsou vyhrazeny výhradně pro akutní tísňové situace (úraz, hospitalizace).`;
+                    copyToClipboard(text, 'biff-summary');
+                  }}
+                  className="w-full md:w-auto px-4 py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <Copy className="w-4 h-4" />
+                  <span>{copiedId === 'biff-summary' ? 'Zkopírováno do schránky!' : 'Zkopírovat shrnutí zásad BIFF'}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* 4 CORE PRINCIPLES GRID */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            {/* A. BIFF PRINCIPLE */}
+            <div className="bg-white rounded-2xl border border-slate-200/90 p-6 shadow-3xs space-y-4 hover:border-amber-400 transition-all">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center font-black text-sm border border-amber-100">
+                    A
+                  </div>
+                  <div>
+                    <h4 className="font-extrabold text-slate-800 text-base font-display">
+                      Zásada „BIFF“ v komunikaci
+                    </h4>
+                    <span className="text-[11px] text-slate-500">Brief, Informative, Friendly/Neutral, Firm</span>
+                  </div>
+                </div>
+                <span className="text-[10px] bg-amber-100 text-amber-900 px-2.5 py-1 rounded-full font-mono font-extrabold">Základní Pravidlo</span>
+              </div>
+
+              <div className="space-y-3 text-xs text-slate-600">
+                <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 space-y-1">
+                  <div className="flex items-center justify-between">
+                    <strong className="text-slate-900 font-bold">1. Stručná (Brief):</strong>
+                    <span className="text-[10px] text-teal-700 bg-teal-50 px-2 py-0.5 rounded font-mono font-bold">Minimální text</span>
+                  </div>
+                  <p className="text-slate-600 leading-relaxed">
+                    Krátké zprávy bez zbytečného balastu. Čím méně slov použijete, tím méně prostoru dáváte pro provokace, chytání za slovo či odbíhání od tématu.
+                  </p>
+                </div>
+
+                <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 space-y-1">
+                  <div className="flex items-center justify-between">
+                    <strong className="text-slate-900 font-bold">2. Informativní (Informative):</strong>
+                    <span className="text-[10px] text-teal-700 bg-teal-50 px-2 py-0.5 rounded font-mono font-bold">Pouze fakta</span>
+                  </div>
+                  <p className="text-slate-600 leading-relaxed">
+                    Pouze fakta, přesné termíny, časové údaje a konkrétní požadavky (např. <em>„Jiřík má v úterý v 15:00 zubaře.“</em>). Žádné hodnocení, výčitky ani osobní pocity.
+                  </p>
+                </div>
+
+                <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 space-y-1">
+                  <div className="flex items-center justify-between">
+                    <strong className="text-slate-900 font-bold">3. Věcná a zdvořilá (Friendly / Neutral):</strong>
+                    <span className="text-[10px] text-teal-700 bg-teal-50 px-2 py-0.5 rounded font-mono font-bold">Bez emocí</span>
+                  </div>
+                  <p className="text-slate-600 leading-relaxed">
+                    Neutrální, profesionální tón obchodního partnera. Bez sarkasmu, ironie, pasivní agrese nebo emotivně zabarvených přídavných jmen.
+                  </p>
+                </div>
+
+                <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 space-y-1">
+                  <div className="flex items-center justify-between">
+                    <strong className="text-slate-900 font-bold">4. Pevná (Firm):</strong>
+                    <span className="text-[10px] text-teal-700 bg-teal-50 px-2 py-0.5 rounded font-mono font-bold">Jasný deadline</span>
+                  </div>
+                  <p className="text-slate-600 leading-relaxed">
+                    Jasně formulovaný požadavek s vymezeným termínem pro odpověď (např. <em>„Prosím o vyjádření do čtvrtka do 18:00. Pokud se nevyjádříš, budu počítat s tím, že souhlasíš.“</em>).
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* B. CHANNELS */}
+            <div className="bg-white rounded-2xl border border-slate-200/90 p-6 shadow-3xs space-y-4 hover:border-amber-400 transition-all flex flex-col justify-between">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center font-black text-sm border border-amber-100">
+                      B
+                    </div>
+                    <div>
+                      <h4 className="font-extrabold text-slate-800 text-base font-display">
+                        Výběr a nastavení komunikačních kanálů
+                      </h4>
+                      <span className="text-[11px] text-slate-500">Pravidla pro formu kontaktování</span>
+                    </div>
+                  </div>
+                  <span className="text-[10px] bg-slate-100 text-slate-700 px-2.5 py-1 rounded-full font-mono font-extrabold">Oficiální Kanál</span>
+                </div>
+
+                <ul className="space-y-3 text-xs text-slate-600">
+                  <li className="flex items-start gap-2.5 p-3 bg-slate-50 rounded-xl border border-slate-100">
+                    <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0 mt-0.5" />
+                    <div>
+                      <strong className="text-slate-900 font-bold block">Výhradně písemná forma:</strong>
+                      Pokud ústní domluva selhává, vyvolává hádky nebo je ignorována, veškeré dohody, požadavky a informace se předávají <strong>písemně</strong> (e-mail, Rodičovský kalendář / ParentalControl, SMS či WhatsApp).
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-2.5 p-3 bg-slate-50 rounded-xl border border-slate-100">
+                    <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0 mt-0.5" />
+                    <div>
+                      <strong className="text-slate-900 font-bold block">Omezení na jeden primární kanál:</strong>
+                      Stanovení jednoho výhradního komunikačního kanálu (např. e-mail) pro organizaci péče, aby se předešlo chaotickému posílání zpráv přes různé sítě a mazání konverzací.
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-2.5 p-3 bg-slate-50 rounded-xl border border-slate-100">
+                    <ShieldAlert className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                    <div>
+                      <strong className="text-slate-900 font-bold block">Pravidlo tísňového volání:</strong>
+                      Telefonické hovory se využívají <strong>výhradně v neodkladných tísňových situacích</strong> (úraz dítěte, náhlá hospitalizace, závažná akutní nehoda).
+                    </div>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="bg-amber-50/70 p-3.5 rounded-xl border border-amber-200/60 text-xs text-amber-950">
+                ⚠️ <strong>Upozornění pro soud:</strong> Odmítnutí telefonických hádek a trvání na e-mailové komunikaci není mařením péče, ale naopak zodpovědným krokem k eliminaci konfliktů před dítětem.
+              </div>
+            </div>
+
+            {/* C. PRESUMPTION OF CONSENT */}
+            <div className="bg-white rounded-2xl border border-slate-200/90 p-6 shadow-3xs space-y-4 hover:border-amber-400 transition-all flex flex-col justify-between">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center font-black text-sm border border-amber-100">
+                      C
+                    </div>
+                    <div>
+                      <h4 className="font-extrabold text-slate-800 text-base font-display">
+                        Presumpce souhlasu při mlčení (Informační povinnost)
+                      </h4>
+                      <span className="text-[11px] text-slate-500">Řešení pasivní obstrukce</span>
+                    </div>
+                  </div>
+                  <span className="text-[10px] bg-teal-100 text-teal-800 px-2.5 py-1 rounded-full font-mono font-extrabold">Právní Doložka</span>
+                </div>
+
+                <div className="space-y-3 text-xs text-slate-600">
+                  <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 space-y-1">
+                    <strong className="text-slate-900 font-bold block">1. Zasílání oznámení s přiměřenou lhůtou:</strong>
+                    Pokud druhý rodič na věcné dotazy či návrhy dlouhodobě neodpovídá, odesílá se jednostranné oznámení s konkrétní lhůtou na reakci (standardně <strong>3 až 5 pracovních dnů</strong>).
+                  </div>
+
+                  <div className="p-3 bg-teal-50/60 rounded-xl border border-teal-200/70 space-y-1">
+                    <strong className="text-teal-950 font-bold block">2. Závazná klauzule vyjádření:</strong>
+                    Zpráva vždy obsahuje přesnou formulaci:
+                    <div className="p-2.5 bg-white rounded-lg border border-teal-200 font-mono text-[11px] text-teal-900 my-1 font-bold">
+                      „Není-li do [datum, přesný čas] doručeno jiné stanovisko, považuje se navržený postup za odsouhlasený.“
+                    </div>
+                  </div>
+
+                  <p className="text-slate-500 leading-relaxed">
+                    Využitelné u běžných záležitostí týkajících se kroužků, návštěv běžných lékařů, nákupu vybavení či plánování předávání.
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 text-[11px] text-slate-500 italic">
+                ⚖️ Soudy i OSPOD akceptují presumpci souhlasu, pokud byla druhá strana prokazatelně a včas informována a měla reálnou možnost se vyjádřit.
+              </div>
+            </div>
+
+            {/* D. LOGGING & INSTITUTIONS */}
+            <div className="bg-white rounded-2xl border border-slate-200/90 p-6 shadow-3xs space-y-4 hover:border-amber-400 transition-all flex flex-col justify-between">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center font-black text-sm border border-amber-100">
+                      D
+                    </div>
+                    <div>
+                      <h4 className="font-extrabold text-slate-800 text-base font-display">
+                        Zvládání neodpovídání, maření & Komunikační deník
+                      </h4>
+                      <span className="text-[11px] text-slate-500">Důkazní materiál a § 38 Zákonný přístup</span>
+                    </div>
+                  </div>
+                  <span className="text-[10px] bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full font-mono font-extrabold">OSPOD & Školství</span>
+                </div>
+
+                <ul className="space-y-2.5 text-xs text-slate-600">
+                  <li className="flex items-start gap-2.5 p-2.5 bg-slate-50 rounded-xl border border-slate-100">
+                    <X className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
+                    <div>
+                      <strong className="text-slate-900 font-bold block">Žádné urgování emocemi:</strong>
+                      Nikdy neposílejte výčitky typu <em>„Proč zase neodpovídáš? Kašleš na dítě!“</em>. Zprávu po uplynutí lhůty pouze stručně zopakujte nebo konstatujte schválení.
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-2.5 p-2.5 bg-slate-50 rounded-xl border border-slate-100">
+                    <FileText className="w-4 h-4 text-teal-600 shrink-0 mt-0.5" />
+                    <div>
+                      <strong className="text-slate-900 font-bold block">Vedení Komunikačního deníku:</strong>
+                      Uchovávejte kompletní exporty e-mailů a screenshoty. Archiv slouží pro OSPOD a soud jako důkaz, že vaší stranou snaha o dohodu probíhala, ale narážela na nesoučinnost.
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-2.5 p-2.5 bg-slate-50 rounded-xl border border-slate-100">
+                    <GraduationCap className="w-4 h-4 text-teal-600 shrink-0 mt-0.5" />
+                    <div>
+                      <strong className="text-slate-900 font-bold block">Přímé získávání informací od institucí (§ 38):</strong>
+                      Při blokování ze strany druhého rodiče nečekejte. Využijte zákonné právo rovnocenného rodiče na přímý přístup k informacím (vlastní přihlašovací údaje do Bakalářů/Edookitu, přímý kontakt s pediatrem).
+                    </div>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="bg-teal-50 p-3 rounded-xl border border-teal-100 text-xs text-teal-900">
+                💬 <strong>Užitečný nástroj:</strong> Využijte náš <strong>Komunikační log v AI Asistentovi</strong> pro automatické hodnocení BIFF tónu vašich zpráv.
+              </div>
+            </div>
+
+          </div>
+
+          {/* E. TEMPLATES FOR HIGH-CONFLICT SITUATIONS */}
+          <div className="bg-white rounded-3xl border border-slate-200/90 p-6 md:p-8 shadow-sm space-y-6">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+              <div>
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-teal-600 bg-teal-50 px-2.5 py-1 rounded-full">
+                  Kopírovatelné Vzory Zpráv
+                </span>
+                <h4 className="text-xl font-black font-display text-slate-800 mt-1">
+                  Šablony zpráv pro typické situace při nesoučinnosti
+                </h4>
+                <p className="text-xs text-slate-500">
+                  Připravené texty dodržující zásadu BIFF a doložku presumpce souhlasu. Stačí zkopírovat a upravit údaje.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+              {/* TEMPLATE 1 */}
+              <div className="bg-slate-50 rounded-2xl border border-slate-200 p-4 space-y-3 flex flex-col justify-between">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                      <FileText className="w-4 h-4 text-teal-600" />
+                      1. Lékařská prohlídka & Předání léků
+                    </span>
+                    <span className="text-[10px] font-mono bg-teal-100 text-teal-800 font-bold px-2 py-0.5 rounded">Zdraví</span>
+                  </div>
+                  <div className="p-3 bg-white rounded-xl border border-slate-200/80 text-xs font-mono text-slate-700 leading-relaxed select-all">
+                    Ahoj, informuji, že Jiřík má v úterý 14. 10. v 15:00 plánovanou kontrolu u dětského lékaře Dr. Nováka. Zprávu z prohlídky a případný předpis léků ti zašlu e-mailem v úterý do 18:00. Prosím o potvrzení beru na vědomí do pondělí 13. 10. do 18:00. Děkuji.
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    copyToClipboard(`Ahoj, informuji, že Jiřík má v úterý 14. 10. v 15:00 plánovanou kontrolu u dětského lékaře Dr. Nováka. Zprávu z prohlídky a případný předpis léků ti zašlu e-mailem v úterý do 18:00. Prosím o potvrzení beru na vědomí do pondělí 13. 10. do 18:00. Děkuji.`, 'tmpl-1');
+                  }}
+                  className="w-full py-2 bg-white hover:bg-slate-100 text-slate-800 font-bold text-xs rounded-xl border border-slate-200 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <Copy className="w-3.5 h-3.5 text-teal-600" />
+                  <span>{copiedId === 'tmpl-1' ? 'Zkopírováno!' : 'Zkopírovat vzor 1'}</span>
+                </button>
+              </div>
+
+              {/* TEMPLATE 2 */}
+              <div className="bg-slate-50 rounded-2xl border border-slate-200 p-4 space-y-3 flex flex-col justify-between">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                      <FileText className="w-4 h-4 text-teal-600" />
+                      2. Návrh letních prázdnin s doložkou mlčení
+                    </span>
+                    <span className="text-[10px] font-mono bg-teal-100 text-teal-800 font-bold px-2 py-0.5 rounded">Prázdniny</span>
+                  </div>
+                  <div className="p-3 bg-white rounded-xl border border-slate-200/80 text-xs font-mono text-slate-700 leading-relaxed select-all">
+                    Ahoj, navrhuji mé termíny pro letní prázdniny 2026: 1. blok od 12. 7. do 26. 7. a 2. blok od 9. 8. do 23. 8. Prosím o tvoje stanovisko či případné protinávrhy do pátku 30. 4. do 18:00. Není-li do této lhůty doručeno jiné stanovisko, považuji navržené termíny za odsouhlasené.
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    copyToClipboard(`Ahoj, navrhuji mé termíny pro letní prázdniny 2026: 1. blok od 12. 7. do 26. 7. a 2. blok od 9. 8. do 23. 8. Prosím o tvoje stanovisko či případné protinávrhy do pátku 30. 4. do 18:00. Není-li do této lhůty doručeno jiné stanovisko, považuji navržené termíny za odsouhlasené.`, 'tmpl-2');
+                  }}
+                  className="w-full py-2 bg-white hover:bg-slate-100 text-slate-800 font-bold text-xs rounded-xl border border-slate-200 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <Copy className="w-3.5 h-3.5 text-teal-600" />
+                  <span>{copiedId === 'tmpl-2' ? 'Zkopírováno!' : 'Zkopírovat vzor 2'}</span>
+                </button>
+              </div>
+
+              {/* TEMPLATE 3 */}
+              <div className="bg-slate-50 rounded-2xl border border-slate-200 p-4 space-y-3 flex flex-col justify-between">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                      <FileText className="w-4 h-4 text-teal-600" />
+                      3. Vyžádání informací o škole / Třídní schůzka
+                    </span>
+                    <span className="text-[10px] font-mono bg-teal-100 text-teal-800 font-bold px-2 py-0.5 rounded">Škola</span>
+                  </div>
+                  <div className="p-3 bg-white rounded-xl border border-slate-200/80 text-xs font-mono text-slate-700 leading-relaxed select-all">
+                    Ahoj, prosím o zaslání podkladů ke školnímu výletu a seznamu potřebných věcí. Zároveň připomínám, že třídní schůzka se koná ve čtvrtek od 17:00, zúčastním se osobně. Pokud máš doplňující informace od třídního učitele, prosím o jejich přeposlání do středy 18:00. Děkuji.
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    copyToClipboard(`Ahoj, prosím o zaslání podkladů ke školnímu výletu a seznamu potřebných věcí. Zároveň připomínám, že třídní schůzka se koná ve čtvrtek od 17:00, zúčastním se osobně. Pokud máš doplňující informace od třídního učitele, prosím o jejich přeposlání do středy 18:00. Děkuji.`, 'tmpl-3');
+                  }}
+                  className="w-full py-2 bg-white hover:bg-slate-100 text-slate-800 font-bold text-xs rounded-xl border border-slate-200 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <Copy className="w-3.5 h-3.5 text-teal-600" />
+                  <span>{copiedId === 'tmpl-3' ? 'Zkopírováno!' : 'Zkopírovat vzor 3'}</span>
+                </button>
+              </div>
+
+              {/* TEMPLATE 4 */}
+              <div className="bg-slate-50 rounded-2xl border border-slate-200 p-4 space-y-3 flex flex-col justify-between">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                      <FileText className="w-4 h-4 text-amber-600" />
+                      4. Nabídka náhradního termínu péče (Překážka)
+                    </span>
+                    <span className="text-[10px] font-mono bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded">Náhrada</span>
+                  </div>
+                  <div className="p-3 bg-white rounded-xl border border-slate-200/80 text-xs font-mono text-slate-700 leading-relaxed select-all">
+                    Ahoj, z důvodu neodkladné pracovní cesty v pátek 20. 11. nabízím úpravu víkendové péče: převzetí Jiříka v sobotu ráno v 8:00, nebo nabízím náhradní termín péče v následujícím víkendu od 27. 11. do 29. 11. Prosím o sdělení preferované varianty do středy 18. 11. do 18:00.
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    copyToClipboard(`Ahoj, z důvodu neodkladné pracovní cesty v pátek 20. 11. nabízím úpravu víkendové péče: převzetí Jiříka v sobotu ráno v 8:00, nebo nabízím náhradní termín péče v následujícím víkendu od 27. 11. do 29. 11. Prosím o sdělení preferované varianty do středy 18. 11. do 18:00.`, 'tmpl-4');
+                  }}
+                  className="w-full py-2 bg-white hover:bg-slate-100 text-slate-800 font-bold text-xs rounded-xl border border-slate-200 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <Copy className="w-3.5 h-3.5 text-teal-600" />
+                  <span>{copiedId === 'tmpl-4' ? 'Zkopírováno!' : 'Zkopírovat vzor 4'}</span>
+                </button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      )}
 
       {activeSubTab === 'schedules' && (
         <>
