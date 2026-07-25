@@ -10,6 +10,7 @@ import fs from 'fs';
 import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI } from '@google/genai';
 import { sendEmail } from './src/services/resendServerService';
+import { checkGitHubStatus, readGitHubFile, saveGitHubFile } from './src/services/githubServerService';
 
 dotenv.config();
 
@@ -330,6 +331,63 @@ async function callGeminiWithLocalFallback(
 // 1. API ROUTES FIRST
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// GitHub API Integration Routes (Read, Write & Status Check)
+app.get('/api/github/status', async (req, res) => {
+  try {
+    const status = await checkGitHubStatus();
+    res.json(status);
+  } catch (err: any) {
+    res.status(500).json({ configured: false, error: err.message });
+  }
+});
+
+app.get('/api/github/read', async (req, res) => {
+  try {
+    const filePath = (req.query.path as string || '').trim();
+    if (!filePath) {
+      res.status(400).json({ success: false, error: 'Chybí parametr path (cesta k souboru v repozitáři).' });
+      return;
+    }
+    const result = await readGitHubFile(filePath);
+    res.json(result);
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.post('/api/github/save', async (req, res) => {
+  try {
+    const { path: filePath, content, commitMessage, sha } = req.body || {};
+    if (!filePath || content === undefined) {
+      res.status(400).json({ success: false, error: 'Chybí povinné parametry: path a content.' });
+      return;
+    }
+    const result = await saveGitHubFile(filePath, content, commitMessage, sha);
+    
+    if (result.success) {
+      writeAuditLog({
+        id: 'log-github-' + Date.now(),
+        timestamp: new Date().toISOString(),
+        action: 'GITHUB_SAVE',
+        status: 'SUCCESS',
+        details: `Soubor ${filePath} byl zapsán do GitHub repozitáře. Commit SHA: ${result.commitSha || 'N/A'}`
+      });
+    } else {
+      writeAuditLog({
+        id: 'log-github-' + Date.now(),
+        timestamp: new Date().toISOString(),
+        action: 'GITHUB_SAVE',
+        status: 'ERROR',
+        details: `Chyba při zápisu do GitHub repozitáře pro ${filePath}: ${result.error}`
+      });
+    }
+
+    res.json(result);
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
 });
 
 // Passkey / WebAuthn Biometric Verification Endpoint

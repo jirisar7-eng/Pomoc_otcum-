@@ -57,6 +57,7 @@ interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
   onLogin: (user: User) => void;
+  initialMode?: AuthMode;
 }
 
 type AuthMode = 'login' | 'register' | 'forgot_password' | 'password_setup' | 'welcome' | 'magic_link';
@@ -68,10 +69,18 @@ interface StatusState {
   details?: string;
 }
 
-export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) {
+export default function AuthModal({ isOpen, onClose, onLogin, initialMode = 'login' }: AuthModalProps) {
   // Navigation & Mode
-  const [mode, setMode] = useState<AuthMode>('login');
+  const [mode, setMode] = useState<AuthMode>(initialMode);
   const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1);
+
+  // Sync mode with initialMode when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setMode(initialMode || 'login');
+      setStatus({ type: 'idle', text: '' });
+    }
+  }, [isOpen, initialMode]);
 
   // Form Fields
   const [email, setEmail] = useState('');

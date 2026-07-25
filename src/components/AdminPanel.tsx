@@ -11,7 +11,7 @@ import {
   Database, Copy, RefreshCw, Play, Sparkles, LayoutDashboard,
   Scale, Folder, Briefcase, Camera, Video, Mic, MessageCircle,
   UserCheck, Users, Calendar, Cpu, BarChart2, Paintbrush, Search,
-  Sliders, Settings, Activity, FileCode, Share2, Download, ArrowUp, ArrowDown, Tv
+  Sliders, Settings, Activity, FileCode, Share2, Download, ArrowUp, ArrowDown, Tv, Github
 } from 'lucide-react';
 import { Article, ExperienceStory, ForumPost, Comment, User, Donation, Partner } from '../types';
 import { getSupabaseUrl, getSupabaseAnonKey, isSupabaseConfigured, getSupabase, resetSupabaseInstance } from '../lib/supabase';
@@ -23,6 +23,7 @@ import AdminAuditLogs from './AdminAuditLogs';
 import AdminVideoteka from './AdminVideoteka';
 import SystemMonitoring from './SystemMonitoring';
 import AiTesterRoot from './AiTester/AiTesterRoot';
+import GitHubManager from './GitHubManager';
 import { ElementRegistryTable } from './ElementRegistryTable';
 import { logDatabaseActivity } from '../utils';
 
@@ -583,9 +584,10 @@ export default function AdminPanel({
         const startTime = Date.now();
         let supActive = false;
         const sb = getSupabase();
+
         if (sb && isSupabaseConfigured()) {
           try {
-            // Attempt simple table checks with a 4-second timeout
+            // Attempt simple table checks with a non-blocking timeout
             const tableChecks = Promise.all([
               sb.from('articles').select('id', { count: 'exact', head: true }),
               sb.from('experience_stories').select('id', { count: 'exact', head: true }),
@@ -594,25 +596,31 @@ export default function AdminPanel({
               sb.from('donations').select('id', { count: 'exact', head: true })
             ]);
 
-            const [artCheck, storyCheck, postCheck, commCheck, donCheck] = await Promise.race([
-              tableChecks,
-              new Promise<any[]>((_, reject) => setTimeout(() => reject(new Error('Supabase timeout')), 4000))
-            ]);
+            const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 2500));
 
-            setDbTableCounts(prev => ({
-              ...prev,
-              articles: artCheck.count !== null ? artCheck.count : articles.length,
-              stories: storyCheck.count !== null ? storyCheck.count : stories.length,
-              posts: postCheck.count !== null ? postCheck.count : posts.length,
-              comments: commCheck.count !== null ? commCheck.count : comments.length,
-              donations: donCheck.count !== null ? donCheck.count : donations.length
-            }));
-            setSupabaseStatus('active');
-            supActive = true;
-            setPingLatency(Date.now() - startTime);
-          } catch (e) {
-            console.error("Supabase live tables check failed:", e);
-            setSupabaseStatus('error');
+            const result = await Promise.race([tableChecks, timeoutPromise]);
+
+            if (result && Array.isArray(result)) {
+              const [artCheck, storyCheck, postCheck, commCheck, donCheck] = result;
+              setDbTableCounts(prev => ({
+                ...prev,
+                articles: artCheck && artCheck.count !== null ? artCheck.count : articles.length,
+                stories: storyCheck && storyCheck.count !== null ? storyCheck.count : stories.length,
+                posts: postCheck && postCheck.count !== null ? postCheck.count : posts.length,
+                comments: commCheck && commCheck.count !== null ? commCheck.count : comments.length,
+                donations: donCheck && donCheck.count !== null ? donCheck.count : donations.length
+              }));
+              setSupabaseStatus('active');
+              supActive = true;
+              setPingLatency(Date.now() - startTime);
+            } else {
+              // Timeout or null response - graceful fallback
+              console.warn("Supabase live tables check timed out, using fallback datasets.");
+              setSupabaseStatus('offline');
+            }
+          } catch (e: any) {
+            console.warn("Supabase live tables check unavailable:", e?.message || e);
+            setSupabaseStatus('offline');
           }
         } else {
           setSupabaseStatus('offline');
@@ -1537,6 +1545,7 @@ ${cases.map(c => `Název: ${c.title}\nStav: ${c.status}\nChronologie:\n` + (c.ch
               {
                 category: 'IV. Uživatelé & Systém',
                 items: [
+                  { id: 'github_manager', label: 'GitHub Integrace & Sync', icon: Github, badge: 'GITHUB', highlight: true },
                   { id: 'users', label: 'Správa uživatelů & RBAC', icon: Users },
                   { id: 'simulator', label: 'Nastavení simulátoru', icon: Sliders },
                   { id: 'appearance', label: 'Vzhled & Šablony', icon: Paintbrush },
@@ -1589,6 +1598,11 @@ ${cases.map(c => `Název: ${c.title}\nStav: ${c.status}\nChronologie:\n` + (c.ch
 
         {/* CONTENT AREA - 9 Columns */}
         <div className="lg:col-span-9 space-y-6">
+
+          {/* TAB GITHUB MANAGER */}
+          {activeMenu === 'github_manager' && (
+            <GitHubManager />
+          )}
 
           {/* TAB ELEMENT REGISTRY */}
           {activeMenu === 'element_registry' && (
@@ -4343,15 +4357,22 @@ ${cases.map(c => `Název: ${c.title}\nStav: ${c.status}\nChronologie:\n` + (c.ch
                         const sb = getSupabase();
                         if (sb && isSupabaseConfigured()) {
                           try {
-                            await Promise.race([
+                            const result = await Promise.race([
                               sb.from('articles').select('id', { count: 'exact', head: true }).then(({ error }) => {
-                                if (error) throw error;
+                                if (error) return false;
+                                return true;
                               }),
-                              new Promise<void>((_, reject) => setTimeout(() => reject(new Error('Supabase timeout')), 5000))
+                              new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 3000))
                             ]);
-                            setSupabaseStatus('active');
-                            setPingLatency(Date.now() - startTime);
-                            alert(`Supabase test úspěšný! Odezva ${Date.now() - startTime}ms.`);
+
+                            if (result) {
+                              setSupabaseStatus('active');
+                              setPingLatency(Date.now() - startTime);
+                              alert(`Supabase test úspěšný! Odezva ${Date.now() - startTime}ms.`);
+                            } else {
+                              setSupabaseStatus('offline');
+                              alert("Supabase vypršela lhůta odezvy (timeout) nebo není k dispozici. Aplikace využívá lokální/Firestore vrstvu.");
+                            }
                           } catch (e) {
                             setSupabaseStatus('error');
                             alert("Supabase test selhal. Zkontrolujte připojení k PostgreSQL.");

@@ -119,6 +119,12 @@ export default function App() {
   });
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [authModalOpen, setAuthModalOpen] = useState<boolean>(false);
+  const [authModalInitialMode, setAuthModalInitialMode] = useState<'login' | 'register'>('login');
+
+  const handleOpenAuth = (mode: 'login' | 'register' = 'login') => {
+    setAuthModalInitialMode(mode);
+    setAuthModalOpen(true);
+  };
 
   // Glossary / Dictionary States
   const [glossaryOpen, setGlossaryOpen] = useState<boolean>(false);
@@ -503,7 +509,7 @@ export default function App() {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         currentUser={currentUser}
-        onOpenAuth={() => setAuthModalOpen(true)}
+        onOpenAuth={handleOpenAuth}
         onLogout={handleLogout}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
@@ -863,6 +869,7 @@ export default function App() {
         isOpen={authModalOpen}
         onClose={() => setAuthModalOpen(false)}
         onLogin={handleLogin}
+        initialMode={authModalInitialMode}
       />
 
     </div>

@@ -10,6 +10,7 @@ import {
   X, 
   LogIn, 
   LogOut, 
+  UserPlus,
   Shield, 
   Sparkles, 
   Home, 
@@ -76,7 +77,7 @@ interface NavigationProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
   currentUser: User | null;
-  onOpenAuth: () => void;
+  onOpenAuth: (mode?: 'login' | 'register') => void;
   onLogout: () => void;
   searchQuery: string;
   setSearchQuery: (query: string) => void;
@@ -432,13 +433,24 @@ export default function Navigation({
                   </button>
                 </div>
               ) : (
-                <button
-                  onClick={onOpenAuth}
-                  className="flex items-center gap-1 px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-[11px] rounded-xl shadow-xs hover:shadow-md transition-all cursor-pointer shrink-0"
-                >
-                  <LogIn className="w-3 h-3 text-teal-300" />
-                  <span>Přihlásit se</span>
-                </button>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <button
+                    onClick={() => onOpenAuth('login')}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-[11px] rounded-xl shadow-xs hover:shadow-md transition-all cursor-pointer shrink-0"
+                    title="Přihlášení uživatele"
+                  >
+                    <LogIn className="w-3.5 h-3.5 text-teal-300" />
+                    <span>Přihlásit se</span>
+                  </button>
+                  <button
+                    onClick={() => onOpenAuth('register')}
+                    className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-500 hover:to-emerald-500 text-white font-extrabold text-[11px] rounded-xl shadow-xs hover:shadow-md transition-all cursor-pointer shrink-0 border border-teal-400/30"
+                    title="Vytvořit nový účet zdarma"
+                  >
+                    <UserPlus className="w-3.5 h-3.5 text-teal-100" />
+                    <span>Registrace</span>
+                  </button>
+                </div>
               )}
             </div>
 
@@ -586,6 +598,40 @@ export default function Navigation({
                       </span>
                     )}
                   </div>
+
+                  {!isLoggedIn && (
+                    <div className="bg-gradient-to-br from-teal-50 via-slate-50 to-indigo-50/60 p-3 rounded-2xl border border-teal-200/80 space-y-2 shadow-3xs">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-black text-slate-900 font-display">Přihlášení &amp; Registrace</span>
+                        <span className="text-[9px] font-mono bg-teal-100 text-teal-900 px-2 py-0.5 rounded-full font-bold">Zdarma</span>
+                      </div>
+                      <p className="text-[10px] text-slate-600 leading-tight">
+                        Přihlaste se nebo si vytvořte bezplatný účet pro ukládání kalendáře péče, spisu a přístup k AI asistentovi.
+                      </p>
+                      <div className="grid grid-cols-2 gap-2 pt-1">
+                        <button
+                          onClick={() => {
+                            onOpenAuth('login');
+                            setMobileMenuOpen(false);
+                          }}
+                          className="flex items-center justify-center gap-1.5 py-2 px-3 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl cursor-pointer shadow-xs"
+                        >
+                          <LogIn className="w-3.5 h-3.5 text-teal-300" />
+                          <span>Přihlásit se</span>
+                        </button>
+                        <button
+                          onClick={() => {
+                            onOpenAuth('register');
+                            setMobileMenuOpen(false);
+                          }}
+                          className="flex items-center justify-center gap-1.5 py-2 px-3 bg-teal-600 hover:bg-teal-700 text-white font-extrabold text-xs rounded-xl cursor-pointer shadow-xs border border-teal-500"
+                        >
+                          <UserPlus className="w-3.5 h-3.5 text-teal-100" />
+                          <span>Registrovat</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
 
                   <div className="grid grid-cols-1 gap-2">
                     <button
@@ -869,16 +915,28 @@ export default function Navigation({
                     </button>
                   </div>
                 ) : (
-                  <button
-                    onClick={() => {
-                      onOpenAuth();
-                      setMobileMenuOpen(false);
-                    }}
-                    className="w-full flex items-center justify-center gap-2 py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-2xl shadow-md transition-all cursor-pointer"
-                  >
-                    <LogIn className="w-4 h-4 text-teal-300" />
-                    <span>Přihlásit se do portálu</span>
-                  </button>
+                  <div className="grid grid-cols-2 gap-2 w-full">
+                    <button
+                      onClick={() => {
+                        onOpenAuth('login');
+                        setMobileMenuOpen(false);
+                      }}
+                      className="flex items-center justify-center gap-1.5 py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-2xl shadow-md transition-all cursor-pointer"
+                    >
+                      <LogIn className="w-4 h-4 text-teal-300" />
+                      <span>Přihlásit se</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        onOpenAuth('register');
+                        setMobileMenuOpen(false);
+                      }}
+                      className="flex items-center justify-center gap-1.5 py-3 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-500 hover:to-emerald-500 text-white font-extrabold text-xs rounded-2xl shadow-md transition-all cursor-pointer border border-teal-400/30"
+                    >
+                      <UserPlus className="w-4 h-4 text-teal-100" />
+                      <span>Registrovat zdarma</span>
+                    </button>
+                  </div>
                 )}
               </div>
 

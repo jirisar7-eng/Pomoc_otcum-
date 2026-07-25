@@ -10,9 +10,10 @@ import {
   RefreshCw, Play, Search, Eye, FileText, Scale, Folder, Video, MessageSquare,
   Users, Sliders, Globe, Zap, HardDrive, Lock, BarChart, Code, Check, X, Info,
   Terminal, ChevronRight, Layers, Sparkles, AlertCircle, Wrench, Tv, Radio,
-  Smartphone, Share2, CheckSquare, ExternalLink, RefreshCcw
+  Smartphone, Share2, CheckSquare, ExternalLink, RefreshCcw, Github, GitBranch
 } from 'lucide-react';
 import { Article, ExperienceStory, ForumPost, Comment, User, Donation, Partner } from '../types';
+import { fetchGitHubStatus, GitHubStatus } from '../services/githubClientService';
 
 interface SystemMonitoringProps {
   currentUser: User | null;
@@ -48,6 +49,24 @@ export default function SystemMonitoring({
   const [isFixing, setIsFixing] = useState<boolean>(false);
   const [fixLog, setFixLog] = useState<string[]>([]);
   const [showFixModal, setShowFixModal] = useState<boolean>(false);
+
+  // GitHub Status State
+  const [ghStatus, setGhStatus] = useState<GitHubStatus | null>(null);
+  const [isTestingGh, setIsTestingGh] = useState<boolean>(false);
+
+  useEffect(() => {
+    fetchGitHubStatus().then(st => setGhStatus(st)).catch(() => {});
+  }, []);
+
+  const handleTestGitHub = async () => {
+    setIsTestingGh(true);
+    try {
+      const res = await fetchGitHubStatus();
+      setGhStatus(res);
+    } finally {
+      setIsTestingGh(false);
+    }
+  };
 
   // DB Connection Ping State
   const [dbPings, setDbPings] = useState<Record<string, { latency: number; status: 'online' | 'offline' | 'testing' }>>({
@@ -491,7 +510,16 @@ export default function SystemMonitoring({
               { name: 'Passkeys / WebAuthn API', desc: 'Biometrické přihlášení', purpose: 'Přihlášení otiskem / FaceID', status: '200 OK', speed: '12 ms', err: 'Žádná chyba', advice: 'Hardware ověření aktivní.' },
               { name: 'reCAPTCHA v3 / Enterprise', desc: 'Ochrana proti botům a spamu', purpose: 'Filtrace formulářových odeslání', status: '200 OK', speed: '110 ms', err: 'Žádná chyba', advice: 'Skóre bota v pořádku.' },
               { name: 'Google Maps Platform', desc: 'Geolokace a mapy poradních center', purpose: 'Zobrazení spádových soudů a poraden', status: '200 OK', speed: '140 ms', err: 'Žádná chyba', advice: 'Klíče nastaveny.' },
-              { name: 'E-mailová služba Resend API', desc: 'Oficiální integrace Resend SDK pro transakční e-maily', purpose: 'Odesílání přihlašovacích kódů a notifikací', status: '200 OK', speed: '140 ms', err: 'Žádná chyba', advice: 'Resend API klient aktivní.' }
+              { name: 'E-mailová služba Resend API', desc: 'Oficiální integrace Resend SDK pro transakční e-maily', purpose: 'Odesílání přihlašovacích kódů a notifikací', status: '200 OK', speed: '140 ms', err: 'Žádná chyba', advice: 'Resend API klient aktivní.' },
+              { 
+                name: `GitHub REST API (${ghStatus?.repo || 'Pomoc-otcum/Pomoc_otcum'})`, 
+                desc: 'Ukládání a čtení dokumentace, kategorií a spisu z GitHubu', 
+                purpose: 'Verzovaný vývoj a synchronizace repozitáře', 
+                status: ghStatus?.configured ? '200 OK' : '401 Chybí token', 
+                speed: '180 ms', 
+                err: ghStatus?.configured ? 'Žádná chyba' : (ghStatus?.error || 'GITHUB_TOKEN nebylo nalezeno'), 
+                advice: ghStatus?.configured ? `Přihlášen uživatel: ${ghStatus.user || 'OK'}` : 'Vložte GITHUB_TOKEN v Settings > Secrets.' 
+              }
             ].map((api, idx) => (
               <div key={idx} className="p-3.5 bg-slate-50 border border-slate-200/80 rounded-2xl flex flex-col justify-between space-y-2">
                 <div className="flex items-start justify-between gap-2">
