@@ -329,7 +329,7 @@ export default function AuthModal({ isOpen, onClose, onLogin, initialMode = 'log
     } catch (err: any) {
       setLoading(false);
       setCurrentStep(1);
-      console.error("Auth error:", err);
+      console.warn("Auth notice:", err);
 
       if (err.code === 'auth/email-already-in-use') {
         setErrorNotice(
@@ -408,7 +408,7 @@ export default function AuthModal({ isOpen, onClose, onLogin, initialMode = 'log
     } catch (err: any) {
       setLoading(false);
       setCurrentStep(1);
-      console.error("Google Auth error:", err);
+      console.warn("Google Auth notice:", err);
 
       if (err.code === 'auth/unauthorized-domain') {
         setErrorNotice(
@@ -460,7 +460,7 @@ export default function AuthModal({ isOpen, onClose, onLogin, initialMode = 'log
       }, 1000);
     } catch (err: any) {
       setLoading(false);
-      console.error("Linking password failed:", err);
+      console.warn("Linking password notice:", err);
       setErrorNotice(
         'Nepodařilo se propojit heslo.',
         err.message || 'Můžete pokračovat i bez záložního hesla.'
@@ -490,7 +490,7 @@ export default function AuthModal({ isOpen, onClose, onLogin, initialMode = 'log
       });
     } catch (err: any) {
       setLoading(false);
-      console.error("Forgot password error:", err);
+      console.warn("Forgot password notice:", err);
       if (err.code === 'auth/user-not-found') {
         setErrorNotice('Uživatel nenalezen.', 'Účet s touto e-mailovou adresou v databázi neexistuje.');
       } else if (err.code === 'auth/invalid-email') {
@@ -527,7 +527,7 @@ export default function AuthModal({ isOpen, onClose, onLogin, initialMode = 'log
       });
     } catch (err: any) {
       setLoading(false);
-      console.error("Magic link error:", err);
+      console.warn("Magic link notice:", err);
       setErrorNotice('Nepodařilo se odeslat kouzelný odkaz.', err.message || 'Zkontrolujte e-mailovou adresu a zkuste to znovu.');
     }
   };
@@ -683,7 +683,7 @@ export default function AuthModal({ isOpen, onClose, onLogin, initialMode = 'log
     } catch (err: any) {
       setLoading(false);
       setCurrentStep(1);
-      console.error("Demo login error:", err);
+      console.warn("Demo login notice:", err);
       setEmail(targetEmail);
       setPassword('159753');
       setName(targetName);
