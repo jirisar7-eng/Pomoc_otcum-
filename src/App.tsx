@@ -46,6 +46,7 @@ import ForumSection from './components/ForumSection';
 import NewsSection from './components/NewsSection';
 import AdminPanel from './components/AdminPanel';
 import AiAssistant from './components/AiAssistant';
+import AiAssistantView from './components/AiAssistantView';
 
 // New High-Fidelity Opatrovnický Průvodce Sections
 import JudikaturaSection from './components/JudikaturaSection';
@@ -644,6 +645,15 @@ export default function App() {
 
             {activeTab === 'centrum-formularu' && (
               <CentrumFormularu />
+            )}
+
+            {(activeTab === 'ai-assistant' || activeTab === 'ai-asistent') && (
+              <AiAssistantView
+                setActiveTab={setActiveTab}
+                setSearchQuery={setSearchQuery}
+                currentUser={currentUser}
+                onOpenAuth={() => setAuthModalOpen(true)}
+              />
             )}
 
             {activeTab === 'ai-guide' && (
