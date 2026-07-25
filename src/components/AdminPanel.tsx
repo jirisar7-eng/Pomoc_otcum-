@@ -23,6 +23,7 @@ import AdminAuditLogs from './AdminAuditLogs';
 import AdminVideoteka from './AdminVideoteka';
 import SystemMonitoring from './SystemMonitoring';
 import AiTesterRoot from './AiTester/AiTesterRoot';
+import { ElementRegistryTable } from './ElementRegistryTable';
 import { logDatabaseActivity } from '../utils';
 
 interface AdminPanelProps {
@@ -1514,6 +1515,7 @@ ${cases.map(c => `Název: ${c.title}\nStav: ${c.status}\nChronologie:\n` + (c.ch
               {
                 category: 'II. Obsah & Databáze',
                 items: [
+                  { id: 'element_registry', label: 'Registr ID prvků (21 cat)', icon: Database, badge: 'ID-SYSTEM', highlight: true },
                   { id: 'editorial', label: 'Obsah & Redakční fronta', icon: FileText, badge: 'OBSAH' },
                   { id: 'videoteka', label: 'Videotéka & Správa videí', icon: Tv, badge: 'VIDEO', highlight: true },
                   { id: 'judikatura', label: 'Judikatura & Rozhodnutí', icon: Scale },
@@ -1587,6 +1589,11 @@ ${cases.map(c => `Název: ${c.title}\nStav: ${c.status}\nChronologie:\n` + (c.ch
 
         {/* CONTENT AREA - 9 Columns */}
         <div className="lg:col-span-9 space-y-6">
+
+          {/* TAB ELEMENT REGISTRY */}
+          {activeMenu === 'element_registry' && (
+            <ElementRegistryTable />
+          )}
 
           {/* TAB AI TESTER & MONITORING */}
           {activeMenu === 'ai_tester' && (

@@ -127,7 +127,21 @@ export function parseInternalLink(href: string, currentActiveTab: string = 'home
     return { isExternal: false, targetTab: currentActiveTab, anchor: null, originalHref: href };
   }
 
-  const cleanHref = href.trim();
+  let cleanHref = href.trim();
+
+  // Strip internal domain prefixes if present
+  if (
+    cleanHref.startsWith('https://tatamapravo.cz') ||
+    cleanHref.startsWith('http://tatamapravo.cz') ||
+    cleanHref.startsWith('https://www.tatamapravo.cz') ||
+    cleanHref.startsWith('http://www.tatamapravo.cz') ||
+    cleanHref.startsWith('https://pomoc-otcum.cz') ||
+    cleanHref.startsWith('http://pomoc-otcum.cz')
+  ) {
+    cleanHref = cleanHref
+      .replace(/^https?:\/\/(www\.)?(tatamapravo\.cz|pomoc-otcum\.cz)/i, '');
+    if (!cleanHref) cleanHref = '/';
+  }
 
   // External check
   if (
