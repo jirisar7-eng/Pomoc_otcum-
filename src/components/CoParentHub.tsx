@@ -176,7 +176,7 @@ export default function CoParentHub({ currentUser, onOpenAuth }: CoParentHubProp
     try {
       const connId = connection.id;
 
-      // 1. Remove from LocalStorage
+      // 1. Remove old connection from LocalStorage
       try {
         const localList = getLocalConnections().filter(c => c.id !== connId);
         localStorage.setItem(LOCAL_STORE_KEY, JSON.stringify(localList));
@@ -184,7 +184,7 @@ export default function CoParentHub({ currentUser, onOpenAuth }: CoParentHubProp
         console.warn('LocalStorage remove error:', e);
       }
 
-      // 2. Remove from Supabase
+      // 2. Remove old connection from Supabase
       try {
         const supabase = (SupabaseService as any).getSupabase ? (SupabaseService as any).getSupabase() : null;
         if (supabase) {
@@ -194,20 +194,41 @@ export default function CoParentHub({ currentUser, onOpenAuth }: CoParentHubProp
         console.warn('Supabase delete connection error:', e);
       }
 
-      // 3. Remove from Firestore
+      // 3. Remove old connection from Firestore
       try {
         await deleteDoc(doc(db, 'coparent_connections', connId));
       } catch (e) {
         console.warn('Firestore delete connection error:', e);
       }
 
-      setConnection(null);
+      // 4. Generate new unique invite key (format SYNTH-XXXX-XXXX)
+      const newInviteCode = generateRandomKey();
+      const childrenList = connection.children && connection.children.length > 0 ? connection.children : ['Děti'];
+      const newConnectionId = `conn_${Date.now()}`;
+      const newConnection: CoparentConnection = {
+        id: newConnectionId,
+        inviteCode: newInviteCode,
+        parent1Id: currentUser.id,
+        parent1Name: currentUser.name,
+        children: childrenList,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+
+      // 5. Save new connection and update state
+      await saveConnectionToAllStores(newConnection);
+      setConnection(newConnection);
       setShowResetConfirm(false);
       setInviteInput('');
-      setConnectingSuccess('Staré propojení bylo zrušeno. Nyní můžete vygenerovat nový prostor nebo zrušit klíč.');
+
+      const msg = `Starý klíč byl zneplatněn. Nový klíč k propojení byl vytvořen: ${newInviteCode}`;
+      setConnectingSuccess(msg);
+
+      // Simple browser notification alert
+      alert(`Nový klíč k propojení byl úspěšně vytvořen!\n\nVáš nový kód: ${newInviteCode}`);
     } catch (err) {
       console.error('Error resetting connection:', err);
-      setConnectingError('Chyba při rušení spojení. Zkontrolujte síťové připojení.');
+      setConnectingError('Chyba při rušení spojení a generování nového klíče. Zkontrolujte síťové připojení.');
     } finally {
       setActionLoading(false);
     }
