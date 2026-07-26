@@ -5,6 +5,7 @@
 
 import { User, LinkedIdentity, ActiveDevice, SecurityAuditEntry, AuthProviderType } from '../types';
 import { saveDocument } from '../lib/firebase';
+import { dbSyncService } from './dbSyncService';
 
 const MAGIC_LINK_STORAGE_KEY = 'synthesis_hub_magic_links';
 
@@ -139,9 +140,9 @@ export function normalizeUserIdentity(user: User, providerUsed: AuthProviderType
     localStorage.setItem('synthesis_hub_local_user', JSON.stringify(updatedUser));
   }
 
-  // Sync to Firestore non-blockingly
+  // Sync to Supabase & Firestore dual-database layer
   try {
-    saveDocument('users', user.id, updatedUser).catch(() => {});
+    dbSyncService.dualSaveUser(updatedUser).catch(() => {});
   } catch {}
 
   return updatedUser;
@@ -193,7 +194,7 @@ export async function linkIdentityProvider(
   }
 
   try {
-    await saveDocument('users', user.id, updatedUser);
+    await dbSyncService.dualSaveUser(updatedUser);
   } catch {}
 
   return updatedUser;
@@ -225,7 +226,7 @@ export async function unlinkIdentityProvider(user: User, provider: AuthProviderT
   }
 
   try {
-    await saveDocument('users', user.id, updatedUser);
+    await dbSyncService.dualSaveUser(updatedUser);
   } catch {}
 
   return updatedUser;
@@ -246,7 +247,7 @@ export async function revokeDeviceSession(user: User, deviceId: string): Promise
   }
 
   try {
-    await saveDocument('users', user.id, updatedUser);
+    await dbSyncService.dualSaveUser(updatedUser);
   } catch {}
 
   return updatedUser;
@@ -267,7 +268,7 @@ export async function toggleTwoFactor(user: User, enabled: boolean, type: 'app' 
   }
 
   try {
-    await saveDocument('users', user.id, updatedUser);
+    await dbSyncService.dualSaveUser(updatedUser);
   } catch {}
 
   return updatedUser;

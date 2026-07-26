@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { User as UserType } from '../types';
 import { saveDocument } from '../lib/firebase';
+import { dbSyncService } from '../services/dbSyncService';
 import { useLanguage } from '../lib/LanguageContext';
 import IdentityHubSettings from './IdentityHubSettings';
 
@@ -156,8 +157,8 @@ export default function UserProfile({
     } as any;
 
     try {
-      // Save to Firebase Firestore users collection
-      await saveDocument('users', currentUser.id, updatedUser);
+      // Dual Save to Supabase (profiles) and Firebase (users)
+      await dbSyncService.dualSaveUser(updatedUser);
       
       // Update local storage so navigation & views refresh immediately
       if (typeof window !== 'undefined') {

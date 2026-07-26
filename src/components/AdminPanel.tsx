@@ -18,6 +18,7 @@ import { Article, ExperienceStory, ForumPost, Comment, User, Donation, Partner }
 import { getSupabaseUrl, getSupabaseAnonKey, isSupabaseConfigured, getSupabase, resetSupabaseInstance } from '../lib/supabase';
 import { useLanguage } from '../lib/LanguageContext';
 import { saveDocument, deleteDocument, getCollectionData } from '../lib/firebase';
+import { dbSyncService } from '../services/dbSyncService';
 import { AIAdminActions } from '../lib/ai-admin/actions';
 import { AIAdminClient } from '../lib/ai-admin/client';
 import AdminAuditLogs from './AdminAuditLogs';
@@ -257,10 +258,10 @@ export default function AdminPanel({
     (updatedUser as any).subRole = editUserForm.subRole;
 
     try {
-      await saveDocument('users', editingUser.id, updatedUser);
-      logDatabaseActivity('UPDATE_USER', 'SUCCESS', `Uživatel s ID ${editingUser.id} (${updatedUser.email}) byl úspěšně aktualizován.`);
+      await dbSyncService.dualSaveUser(updatedUser);
+      logDatabaseActivity('UPDATE_USER', 'SUCCESS', `Uživatel s ID ${editingUser.id} (${updatedUser.email}) byl úspěšně aktualizován v Supabase i Firebase.`);
     } catch (err: any) {
-      console.warn("Could not save edited user to Firestore:", err);
+      console.warn("Could not save edited user to database layer:", err);
       logDatabaseActivity('UPDATE_USER', 'ERROR', `Aktualizace uživatele s ID ${editingUser.id} selhala.`, err.message || err.toString());
     }
 
@@ -676,10 +677,10 @@ export default function AdminPanel({
     }
 
     try {
-      await saveDocument('users', newId, newUserObj);
-      logDatabaseActivity('CREATE_USER', 'SUCCESS', `Uživatel s ID ${newId} (${newUserObj.email}) byl úspěšně vytvořen.`);
+      await dbSyncService.dualSaveUser(newUserObj);
+      logDatabaseActivity('CREATE_USER', 'SUCCESS', `Uživatel s ID ${newId} (${newUserObj.email}) byl úspěšně vytvořen v Supabase i Firebase.`);
     } catch (err: any) {
-      console.warn("Could not save new user to Firestore directly:", err);
+      console.warn("Could not save new user to database layer:", err);
       logDatabaseActivity('CREATE_USER', 'ERROR', `Vytvoření uživatele s ID ${newId} selhalo.`, err.message || err.toString());
     }
 
@@ -698,9 +699,9 @@ export default function AdminPanel({
 
     setUserSyncStatus('saving');
     try {
-      await deleteDocument('users', id);
+      await dbSyncService.dualDeleteDocument('users', id);
     } catch (err) {
-      console.warn("Could not delete user from Firestore:", err);
+      console.warn("Could not delete user from database layer:", err);
     }
 
     setUsersList(prev => prev.filter(u => u.id !== id));
@@ -723,10 +724,10 @@ export default function AdminPanel({
     const targetUser = updatedUsers.find(u => u.id === id);
     if (targetUser) {
       try {
-        await saveDocument('users', id, targetUser);
+        await dbSyncService.dualSaveUser(targetUser);
         logDatabaseActivity('CHANGE_USER_ROLE', 'SUCCESS', `Uživateli s ID ${id} (${targetUser.email}) byla změněna role na ${newRole} (${newSubRole || 'bez podrole'}).`);
       } catch (err: any) {
-        console.warn("Could not update user role in Firestore:", err);
+        console.warn("Could not update user role in database layer:", err);
         logDatabaseActivity('CHANGE_USER_ROLE', 'ERROR', `Změna role pro uživatele s ID ${id} selhala.`, err.message || err.toString());
       }
     }
@@ -4567,6 +4568,63 @@ ${cases.map(c => `Název: ${c.title}\nStav: ${c.status}\nChronologie:\n` + (c.ch
                     <Check className="w-3.5 h-3.5" />
                     Uložit a otestovat spojení
                   </button>
+                </div>
+              </div>
+
+              {/* DUAL DATABASE MIRRORING STATUS CARD */}
+              <div className="bg-linear-to-r from-slate-900 via-slate-800 to-indigo-950 p-6 rounded-2xl text-white shadow-md space-y-4">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-700/60 pb-3">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+                      <h3 className="text-sm font-bold tracking-wide uppercase font-display text-white">
+                        Souběžný Dvojitý Zápis (Supabase ⚡ Firebase Sync)
+                      </h3>
+                    </div>
+                    <p className="text-xs text-slate-300 mt-1">
+                      Aplikace zapisuje každý záznam (profily, články, fórum, nastavení) souběžně do obou databází s automatickým ošetřením výpadků.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      const status = await dbSyncService.getStatus();
+                      alert(
+                        `STAV DVOJITÉHO ZÁPISU:\n` +
+                        `• Supabase: ${status.supabaseConfigured ? (status.supabaseConnected ? '🟢 Připojeno (Active)' : '🔴 Chyba spojení / Offline') : '⚪ Nenastaveno'}\n` +
+                        `• Firebase: ${status.firebaseConfigured ? (status.firebaseConnected ? '🟢 Připojeno (Active)' : '🔴 Chyba spojení / Offline') : '⚪ Nenastaveno'}\n` +
+                        `• Poslední synchronizace: ${status.lastSyncTimestamp ? new Date(status.lastSyncTimestamp).toLocaleString('cs-CZ') : 'Nebylo prováděno v této relaci'}`
+                      );
+                    }}
+                    className="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition-all cursor-pointer shadow-xs flex items-center gap-1.5 whitespace-nowrap"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5" />
+                    Diagnostika Dual-Sync
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                  <div className="bg-slate-800/80 p-3 rounded-xl border border-slate-700/50 space-y-1">
+                    <span className="text-slate-400 text-[10px] uppercase font-bold block">Primární Zápis</span>
+                    <span className="font-bold text-emerald-400 flex items-center gap-1">
+                      <Check className="w-3.5 h-3.5" /> Supabase PostgreSQL
+                    </span>
+                    <p className="text-[10px] text-slate-400">Trvalá tabulková struktura</p>
+                  </div>
+                  <div className="bg-slate-800/80 p-3 rounded-xl border border-slate-700/50 space-y-1">
+                    <span className="text-slate-400 text-[10px] uppercase font-bold block">Souběžný Zápis</span>
+                    <span className="font-bold text-amber-400 flex items-center gap-1">
+                      <Check className="w-3.5 h-3.5" /> Firebase Firestore
+                    </span>
+                    <p className="text-[10px] text-slate-400">Záložní NoSQL dokumenty</p>
+                  </div>
+                  <div className="bg-slate-800/80 p-3 rounded-xl border border-slate-700/50 space-y-1">
+                    <span className="text-slate-400 text-[10px] uppercase font-bold block">Klientská Vyrovnávací Paměť</span>
+                    <span className="font-bold text-indigo-300 flex items-center gap-1">
+                      <Check className="w-3.5 h-3.5" /> LocalStorage Fallback
+                    </span>
+                    <p className="text-[10px] text-slate-400">Rychlá offline odezva</p>
+                  </div>
                 </div>
               </div>
 

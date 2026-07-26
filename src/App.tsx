@@ -27,6 +27,7 @@ import {
   verifyMagicLink
 } from './lib/firebase';
 import { SupabaseService, isSupabaseConfigured } from './lib/supabase';
+import { dbSyncService } from './services/dbSyncService';
 
 import Breadcrumbs from './components/Breadcrumbs';
 import RelatedContent from './components/RelatedContent';
@@ -178,7 +179,7 @@ export default function App() {
   // Track if Firebase collections have been successfully loaded
   const [isFirebaseLoaded, setIsFirebaseLoaded] = useState<boolean>(false);
 
-  // Helper to create synchronized state setters
+  // Helper to create synchronized state setters (Dual Write to Supabase + Firebase)
   const createSyncedSetter = <T extends { id: string }>(
     collectionName: string,
     localSetter: React.Dispatch<React.SetStateAction<T[]>>,
@@ -190,59 +191,22 @@ export default function App() {
           ? (valueOrFunc as Function)(prev)
           : valueOrFunc;
 
-        const useSupabase = localStorage.getItem('synthesis_hub_use_supabase') === 'true' && isSupabaseConfigured();
-
-        if (useSupabase) {
-          // 1. Sync additions and updates to Supabase
+        if (canWriteCheck()) {
+          // 1. Sync additions and updates DUAL-WRITE to BOTH Supabase & Firebase
           next.forEach(item => {
             const prevItem = prev.find(p => p.id === item.id);
             if (!prevItem || JSON.stringify(prevItem) !== JSON.stringify(item)) {
-              if (collectionName === 'articles') {
-                SupabaseService.saveArticle(item as any);
-              } else if (collectionName === 'stories') {
-                SupabaseService.saveStory(item as any);
-              } else if (collectionName === 'posts') {
-                SupabaseService.saveForumPost(item as any);
-              } else if (collectionName === 'comments') {
-                SupabaseService.saveComment(item as any);
-              } else if (collectionName === 'donations') {
-                SupabaseService.saveDonation(item as any);
-              }
-            }
-          });
-
-          // 2. Sync deletions to Supabase
-          prev.forEach(prevItem => {
-            if (!next.some(n => n.id === prevItem.id)) {
-              if (collectionName === 'articles') {
-                SupabaseService.deleteArticle(prevItem.id);
-              } else if (collectionName === 'stories') {
-                SupabaseService.deleteStory(prevItem.id);
-              } else if (collectionName === 'posts') {
-                SupabaseService.deleteForumPost(prevItem.id);
-              } else if (collectionName === 'comments') {
-                SupabaseService.deleteComment(prevItem.id);
-              } else if (collectionName === 'donations') {
-                SupabaseService.deleteDonation(prevItem.id);
-              }
-            }
-          });
-        } else if (isFirebaseLoaded && canWriteCheck()) {
-          // 1. Sync additions and updates
-          next.forEach(item => {
-            const prevItem = prev.find(p => p.id === item.id);
-            if (!prevItem || JSON.stringify(prevItem) !== JSON.stringify(item)) {
-              saveDocument(collectionName, item.id, item).catch(e =>
-                console.error(`Error syncing ${collectionName} item ${item.id}:`, e)
+              dbSyncService.dualSaveDocument(collectionName, item.id, item).catch(e =>
+                console.error(`Error dual-syncing ${collectionName} item ${item.id}:`, e)
               );
             }
           });
 
-          // 2. Sync deletions
+          // 2. Sync deletions DUAL-DELETE from BOTH Supabase & Firebase
           prev.forEach(prevItem => {
             if (!next.some(n => n.id === prevItem.id)) {
-              deleteDocument(collectionName, prevItem.id).catch(e =>
-                console.error(`Error deleting ${collectionName} item ${prevItem.id}:`, e)
+              dbSyncService.dualDeleteDocument(collectionName, prevItem.id).catch(e =>
+                console.error(`Error dual-deleting ${collectionName} item ${prevItem.id}:`, e)
               );
             }
           });
@@ -299,54 +263,16 @@ export default function App() {
     }
   }, [activeTab]);
 
-  // 2. Fetch data from Firestore / Supabase on initial mount
+  // 2. Fetch data from Supabase / Firestore with resilient multi-tier fallback on initial mount
   useEffect(() => {
     async function loadInitialData() {
-      const useSupabase = localStorage.getItem('synthesis_hub_use_supabase') === 'true' && isSupabaseConfigured();
-      if (useSupabase) {
-        try {
-          console.log("Loading initial database collections from Supabase PostgreSQL...");
-          
-          const dbArticles = await SupabaseService.fetchArticles();
-          if (dbArticles && dbArticles.length > 0) setLocalArticles(dbArticles);
-
-          const dbStories = await SupabaseService.fetchStories();
-          if (dbStories && dbStories.length > 0) {
-            const seenStories = new Set<string>();
-            const uniqueStories = dbStories.filter(item => {
-              if (!item || !item.id) return false;
-              if (seenStories.has(item.id)) return false;
-              seenStories.add(item.id);
-              return true;
-            });
-            setLocalStories(uniqueStories);
-          }
-
-          const dbPosts = await SupabaseService.fetchForumPosts();
-          if (dbPosts && dbPosts.length > 0) setLocalPosts(dbPosts);
-
-          const dbComments = await SupabaseService.fetchComments();
-          if (dbComments && dbComments.length > 0) setLocalComments(dbComments);
-
-          const dbDonations = await SupabaseService.fetchDonations();
-          if (dbDonations && dbDonations.length > 0) setLocalDonations(dbDonations);
-
-          setIsFirebaseLoaded(true);
-          console.log("Supabase database loaded and active!");
-          return;
-        } catch (err) {
-          console.error("Failed to load initial collections from Supabase:", err);
-          // Fall back to Firestore if Supabase fails
-        }
-      }
-
       try {
-        console.log("Loading initial database collections from Firestore...");
+        console.log("[dbSyncService] Initializing dual database synchronization layer...");
         
-        const dbArticles = await getCollectionData<Article>('articles', INITIAL_ARTICLES);
+        const dbArticles = await dbSyncService.dualFetchCollection<Article>('articles', INITIAL_ARTICLES);
         setLocalArticles(dbArticles);
 
-        const dbStories = await getCollectionData<ExperienceStory>('stories', INITIAL_STORIES);
+        const dbStories = await dbSyncService.dualFetchCollection<ExperienceStory>('stories', INITIAL_STORIES);
         const seenStories = new Set<string>();
         const uniqueStories = dbStories.filter(item => {
           if (!item || !item.id) return false;
@@ -356,23 +282,22 @@ export default function App() {
         });
         setLocalStories(uniqueStories);
 
-        const dbPosts = await getCollectionData<ForumPost>('posts', INITIAL_FORUM_POSTS);
+        const dbPosts = await dbSyncService.dualFetchCollection<ForumPost>('posts', INITIAL_FORUM_POSTS);
         setLocalPosts(dbPosts);
 
-        const dbComments = await getCollectionData<Comment>('comments', INITIAL_COMMENTS);
+        const dbComments = await dbSyncService.dualFetchCollection<Comment>('comments', INITIAL_COMMENTS);
         setLocalComments(dbComments);
 
-        const dbDonations = await getCollectionData<Donation>('donations', INITIAL_DONATIONS);
+        const dbDonations = await dbSyncService.dualFetchCollection<Donation>('donations', INITIAL_DONATIONS);
         setLocalDonations(dbDonations);
 
-        const dbPartners = await getCollectionData<Partner>('partners', INITIAL_PARTNERS);
+        const dbPartners = await dbSyncService.dualFetchCollection<Partner>('partners', INITIAL_PARTNERS);
         setLocalPartners(dbPartners);
 
         setIsFirebaseLoaded(true);
-        console.log("Firestore database synchronized successfully!");
+        console.log("[dbSyncService] Dual database collections loaded and active!");
       } catch (err) {
-        console.error("Failed to load initial collections from Firestore:", err);
-        // Fallback: mark as loaded anyway so edits can persist
+        console.error("[dbSyncService] Failed to load initial collections:", err);
         setIsFirebaseLoaded(true);
       }
     }
