@@ -185,10 +185,10 @@ export const SEO_CONFIGS: Record<string, PageSeoConfig> = {
     parentLabel: 'Komunita'
   },
   'ai-assistant': {
-    title: 'AI Právní Asistent | Táta má právo',
-    h1: 'Inteligentní AI asistent pro opatrovnické otázky',
-    description: 'Ptejte se umělé inteligence trénované na české legislativě, judikatuře a metodikách OSPOD.',
-    keywords: 'AI právní asistent, umělá inteligence rodinné právo, dotazy na soud',
+    title: 'AI Právní Asistent & NotebookLM Návod | Táta má právo',
+    h1: 'Inteligentní AI Asistent pro opatrovnické otázky a analýzu spisu',
+    description: 'Generativní AI asistent trénovaný na české legislativě, judikatuře a metodikách OSPOD. Obsahuje návod pro Google Gemini a NotebookLM s knihovnou promptů.',
+    keywords: 'AI právní asistent, NotebookLM opatrovnický spis, Google Gemini rodinné právo, dotazy na OSPOD, šablony promptů',
     canonicalPath: '/ai-asistent',
     category: 'AI Nástroje',
     parentLabel: 'AI Nástroje'
