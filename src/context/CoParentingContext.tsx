@@ -62,8 +62,23 @@ function saveLocalConnection(conn: CoparentConnection) {
       list.push(conn);
     }
     localStorage.setItem(LOCAL_STORE_KEY, JSON.stringify(list));
+    notifyTabBroadcast('CONNECTION_SAVED');
   } catch (e) {
     console.warn('LocalStorage save failed', e);
+  }
+}
+
+const BROADCAST_CHANNEL_NAME = 'tata_ma_pravo_tab_sync';
+
+function notifyTabBroadcast(actionType: string) {
+  if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+    try {
+      const bc = new BroadcastChannel(BROADCAST_CHANNEL_NAME);
+      bc.postMessage({ type: actionType, timestamp: Date.now() });
+      bc.close();
+    } catch (e) {
+      console.warn('Broadcast notify failed:', e);
+    }
   }
 }
 
@@ -79,6 +94,7 @@ function getLocalEvents(connectionId: string): CoparentCalendarEvent[] {
 function saveLocalEvents(connectionId: string, events: CoparentCalendarEvent[]) {
   try {
     localStorage.setItem(`${LOCAL_EVENTS_KEY}_${connectionId}`, JSON.stringify(events));
+    notifyTabBroadcast('EVENTS_SAVED');
   } catch (e) {
     console.warn('LocalStorage events save failed', e);
   }
@@ -96,6 +112,7 @@ function getLocalDiary(connectionId: string): CoparentDiaryEntry[] {
 function saveLocalDiary(connectionId: string, entries: CoparentDiaryEntry[]) {
   try {
     localStorage.setItem(`${LOCAL_DIARY_KEY}_${connectionId}`, JSON.stringify(entries));
+    notifyTabBroadcast('DIARY_SAVED');
   } catch (e) {
     console.warn('LocalStorage diary save failed', e);
   }
@@ -113,6 +130,7 @@ function getLocalMessages(connectionId: string): CoparentChatMessage[] {
 function saveLocalMessages(connectionId: string, msgs: CoparentChatMessage[]) {
   try {
     localStorage.setItem(`${LOCAL_MESSAGES_KEY}_${connectionId}`, JSON.stringify(msgs));
+    notifyTabBroadcast('MESSAGES_SAVED');
   } catch (e) {
     console.warn('LocalStorage messages save failed', e);
   }
@@ -387,6 +405,55 @@ export function CoParentingProvider({ children, currentUser }: CoParentingProvid
       unsubChat();
     };
   }, [connection]);
+
+  // 3. Multi-Tab Realtime Local Synchronization (BroadcastChannel & Storage Event listener)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const reloadLocalData = () => {
+      const localList = getLocalConnections();
+      if (currentUser) {
+        const userLocal = localList.find(c => c.parent1Id === currentUser.id || c.parent2Id === currentUser.id);
+        if (userLocal) {
+          setConnection(userLocal);
+          setEvents(getLocalEvents(userLocal.id));
+          setDiaryEntries(getLocalDiary(userLocal.id));
+          setMessages(getLocalMessages(userLocal.id));
+        }
+      } else if (connection) {
+        setEvents(getLocalEvents(connection.id));
+        setDiaryEntries(getLocalDiary(connection.id));
+        setMessages(getLocalMessages(connection.id));
+      }
+    };
+
+    let channel: BroadcastChannel | null = null;
+    if ('BroadcastChannel' in window) {
+      try {
+        channel = new BroadcastChannel(BROADCAST_CHANNEL_NAME);
+        channel.onmessage = (event) => {
+          if (event.data && event.data.type) {
+            reloadLocalData();
+          }
+        };
+      } catch (e) {
+        console.warn('BroadcastChannel listener setup skipped:', e);
+      }
+    }
+
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key && e.key.includes('tata_coparent_')) {
+        reloadLocalData();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      if (channel) channel.close();
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, [currentUser, connection?.id]);
 
   // Actions
   const handleCopyKey = (codeToCopy?: string) => {

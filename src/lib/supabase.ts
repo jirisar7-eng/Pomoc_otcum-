@@ -6,21 +6,76 @@
 import { createClient } from '@supabase/supabase-js';
 import { Article, Comment, ForumPost, ExperienceStory, Donation, User, CoparentConnection } from '../types';
 
-// Fetch credentials from Vite env or local storage overrides
+// Helper to safely read environment variables across Vite, Next, React, window, and process environments
+function readEnvVariable(keys: string[], defaultVal = ''): string {
+  // 1. Check import.meta.env
+  try {
+    const metaEnv = (import.meta as any)?.env || {};
+    for (const key of keys) {
+      if (metaEnv[key] && typeof metaEnv[key] === 'string' && metaEnv[key].trim()) {
+        return metaEnv[key].trim();
+      }
+    }
+  } catch (e) {
+    // ignore
+  }
+
+  // 2. Check window.__ENV__ or window._env_ or window overrides
+  if (typeof window !== 'undefined') {
+    const win = window as any;
+    const winEnv = win.__ENV__ || win._env_ || {};
+    for (const key of keys) {
+      if (winEnv[key] && typeof winEnv[key] === 'string' && winEnv[key].trim()) {
+        return winEnv[key].trim();
+      }
+    }
+  }
+
+  // 3. Check process.env if present
+  try {
+    if (typeof process !== 'undefined' && process.env) {
+      for (const key of keys) {
+        if (process.env[key] && typeof process.env[key] === 'string' && process.env[key]!.trim()) {
+          return process.env[key]!.trim();
+        }
+      }
+    }
+  } catch (e) {
+    // ignore
+  }
+
+  return defaultVal;
+}
+
+// Fetch credentials from Vite env, fallback env names, or local storage overrides
 export function getSupabaseUrl(): string {
   if (typeof window !== 'undefined') {
     const override = localStorage.getItem('synthesis_hub_supabase_url_override');
-    if (override) return override;
+    if (override && override.trim()) return override.trim();
   }
-  return import.meta.env.VITE_SUPABASE_URL || 'https://brqqinbxpluzrkrvpfqs.supabase.co';
+  return readEnvVariable(
+    ['VITE_SUPABASE_URL', 'SUPABASE_URL', 'NEXT_PUBLIC_SUPABASE_URL', 'REACT_APP_SUPABASE_URL', 'PUBLIC_SUPABASE_URL'],
+    'https://brqqinbxpluzrkrvpfqs.supabase.co'
+  );
 }
 
 export function getSupabaseAnonKey(): string {
   if (typeof window !== 'undefined') {
     const override = localStorage.getItem('synthesis_hub_supabase_key_override');
-    if (override) return override;
+    if (override && override.trim()) return override.trim();
   }
-  return import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+  return readEnvVariable(
+    [
+      'VITE_SUPABASE_ANON_KEY',
+      'SUPABASE_ANON_KEY',
+      'VITE_SUPABASE_KEY',
+      'SUPABASE_KEY',
+      'NEXT_PUBLIC_SUPABASE_ANON_KEY',
+      'REACT_APP_SUPABASE_ANON_KEY',
+      'PUBLIC_SUPABASE_ANON_KEY'
+    ],
+    ''
+  );
 }
 
 // Check if connection is active

@@ -64,10 +64,18 @@ class DbSyncService {
       fbConnected = false;
     }
 
+    const fbConfigured = !!(
+      (import.meta as any)?.env?.VITE_FIREBASE_PROJECT_ID ||
+      (import.meta as any)?.env?.FIREBASE_PROJECT_ID ||
+      (import.meta as any)?.env?.VITE_FIREBASE_API_KEY ||
+      (import.meta as any)?.env?.FIREBASE_API_KEY ||
+      (typeof window !== 'undefined' && localStorage.getItem('synthesis_hub_firebase_api_key_override'))
+    );
+
     return {
       supabaseConfigured: supConfigured,
       supabaseConnected: supConnected,
-      firebaseConfigured: !!import.meta.env.VITE_FIREBASE_PROJECT_ID,
+      firebaseConfigured: fbConfigured,
       firebaseConnected: fbConnected,
       lastSyncTimestamp: this.lastSyncTime
     };

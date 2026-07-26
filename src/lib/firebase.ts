@@ -39,15 +39,60 @@ import {
 import { User, UserRole, Article, ExperienceStory, ForumPost, Comment } from '../types';
 import firebaseConfigJson from '../../firebase-applet-config.json';
 
+// Helper to safely read environment variables across Vite, Next, React, window, and process environments
+function readEnvVariable(keys: string[], defaultVal = ''): string {
+  if (typeof window !== 'undefined') {
+    if (keys.includes('VITE_FIREBASE_API_KEY')) {
+      const override = localStorage.getItem('synthesis_hub_firebase_api_key_override');
+      if (override && override.trim()) return override.trim();
+    }
+  }
+
+  try {
+    const metaEnv = (import.meta as any)?.env || {};
+    for (const key of keys) {
+      if (metaEnv[key] && typeof metaEnv[key] === 'string' && metaEnv[key].trim()) {
+        return metaEnv[key].trim();
+      }
+    }
+  } catch (e) {
+    // ignore
+  }
+
+  if (typeof window !== 'undefined') {
+    const win = window as any;
+    const winEnv = win.__ENV__ || win._env_ || {};
+    for (const key of keys) {
+      if (winEnv[key] && typeof winEnv[key] === 'string' && winEnv[key].trim()) {
+        return winEnv[key].trim();
+      }
+    }
+  }
+
+  try {
+    if (typeof process !== 'undefined' && process.env) {
+      for (const key of keys) {
+        if (process.env[key] && typeof process.env[key] === 'string' && process.env[key]!.trim()) {
+          return process.env[key]!.trim();
+        }
+      }
+    }
+  } catch (e) {
+    // ignore
+  }
+
+  return defaultVal;
+}
+
 // Build Firebase Config with Environment overrides or static config file
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || firebaseConfigJson.apiKey,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || firebaseConfigJson.authDomain,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || firebaseConfigJson.projectId,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || firebaseConfigJson.storageBucket,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || firebaseConfigJson.messagingSenderId,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || firebaseConfigJson.appId,
-  firestoreDatabaseId: import.meta.env.VITE_FIREBASE_DATABASE_ID || (firebaseConfigJson as any).firestoreDatabaseId,
+  apiKey: readEnvVariable(['VITE_FIREBASE_API_KEY', 'FIREBASE_API_KEY', 'NEXT_PUBLIC_FIREBASE_API_KEY', 'REACT_APP_FIREBASE_API_KEY'], firebaseConfigJson.apiKey),
+  authDomain: readEnvVariable(['VITE_FIREBASE_AUTH_DOMAIN', 'FIREBASE_AUTH_DOMAIN', 'NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN', 'REACT_APP_FIREBASE_AUTH_DOMAIN'], firebaseConfigJson.authDomain),
+  projectId: readEnvVariable(['VITE_FIREBASE_PROJECT_ID', 'FIREBASE_PROJECT_ID', 'NEXT_PUBLIC_FIREBASE_PROJECT_ID', 'REACT_APP_FIREBASE_PROJECT_ID'], firebaseConfigJson.projectId),
+  storageBucket: readEnvVariable(['VITE_FIREBASE_STORAGE_BUCKET', 'FIREBASE_STORAGE_BUCKET', 'NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET'], firebaseConfigJson.storageBucket),
+  messagingSenderId: readEnvVariable(['VITE_FIREBASE_MESSAGING_SENDER_ID', 'FIREBASE_MESSAGING_SENDER_ID'], firebaseConfigJson.messagingSenderId),
+  appId: readEnvVariable(['VITE_FIREBASE_APP_ID', 'FIREBASE_APP_ID', 'NEXT_PUBLIC_FIREBASE_APP_ID', 'REACT_APP_FIREBASE_APP_ID'], firebaseConfigJson.appId),
+  firestoreDatabaseId: readEnvVariable(['VITE_FIREBASE_DATABASE_ID', 'FIREBASE_DATABASE_ID'], (firebaseConfigJson as any).firestoreDatabaseId || ''),
   oAuthClientId: firebaseConfigJson.oAuthClientId,
   databaseURL: (firebaseConfigJson as any).databaseURL,
   measurementId: (firebaseConfigJson as any).measurementId
