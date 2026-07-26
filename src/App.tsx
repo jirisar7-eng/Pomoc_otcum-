@@ -46,7 +46,6 @@ import StoriesSection from './components/StoriesSection';
 import ForumSection from './components/ForumSection';
 import NewsSection from './components/NewsSection';
 import AdminPanel from './components/AdminPanel';
-import AiAssistant from './components/AiAssistant';
 import AiAssistantView from './components/AiAssistantView';
 
 // New High-Fidelity Opatrovnický Průvodce Sections
@@ -827,23 +826,6 @@ export default function App() {
           </div>
         </div>
       </footer>
-
-      {/* Synthesis AI Assistant floating widget */}
-      <AiAssistant />
-
-      {/* Floating Glossary Widget on the bottom left */}
-      <div className="fixed bottom-6 left-6 z-40 flex flex-col items-start font-sans" id="glossary-floating-widget">
-        <button
-          onClick={() => setGlossaryOpen(true)}
-          className="w-12 h-12 rounded-full bg-teal-600 hover:bg-teal-700 text-white flex items-center justify-center shadow-lg hover:shadow-teal-600/20 cursor-pointer group transition-all"
-          title="Otevřít odborný slovník pojmů"
-        >
-          <BookOpen className="w-5 h-5 group-hover:scale-110 transition-transform" />
-          <span className="absolute left-14 bg-slate-850 text-white font-bold text-[10px] py-1 px-2.5 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity uppercase tracking-wider border border-slate-700/50">
-            Slovník pojmů
-          </span>
-        </button>
-      </div>
 
       {/* Glossary Drawer overlay */}
       <GlossaryDrawer
