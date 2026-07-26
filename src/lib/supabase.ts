@@ -4,7 +4,7 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
-import { Article, Comment, ForumPost, ExperienceStory, Donation, User } from '../types';
+import { Article, Comment, ForumPost, ExperienceStory, Donation, User, CoparentConnection } from '../types';
 
 // Fetch credentials from Vite env or local storage overrides
 export function getSupabaseUrl(): string {
@@ -242,6 +242,63 @@ export const SupabaseService = {
       .delete()
       .eq('id', id);
     return !error;
+  },
+
+  // Coparent Connections
+  async fetchCoparentConnection(userId: string): Promise<CoparentConnection | null> {
+    const supabase = getSupabase();
+    if (!supabase) return null;
+    try {
+      const { data, error } = await supabase
+        .from('coparent_connections')
+        .select('*')
+        .or(`parent1Id.eq.${userId},parent2Id.eq.${userId}`)
+        .limit(1);
+
+      if (error || !data || data.length === 0) return null;
+      return data[0] as CoparentConnection;
+    } catch (e) {
+      console.warn('Supabase fetchCoparentConnection error:', e);
+      return null;
+    }
+  },
+
+  async findCoparentConnectionByCode(inviteCode: string): Promise<CoparentConnection | null> {
+    const supabase = getSupabase();
+    if (!supabase) return null;
+    try {
+      const cleanInput = inviteCode.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+      const { data, error } = await supabase
+        .from('coparent_connections')
+        .select('*');
+
+      if (error || !data || data.length === 0) return null;
+
+      const found = data.find((conn: any) => {
+        const storedClean = (conn.inviteCode || '').trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+        return storedClean === cleanInput;
+      });
+
+      return found ? (found as CoparentConnection) : null;
+    } catch (e) {
+      console.warn('Supabase findCoparentConnectionByCode error:', e);
+      return null;
+    }
+  },
+
+  async saveCoparentConnection(conn: CoparentConnection): Promise<boolean> {
+    const supabase = getSupabase();
+    if (!supabase) return false;
+    try {
+      const { error } = await supabase
+        .from('coparent_connections')
+        .upsert(conn);
+      if (error) console.warn('Supabase saveCoparentConnection error:', error);
+      return !error;
+    } catch (e) {
+      console.warn('Supabase saveCoparentConnection exception:', e);
+      return false;
+    }
   },
 
   // One-click Migration Seeder

@@ -44,6 +44,7 @@ import {
 import { db, auth, getCachedAccessToken, authorizeGoogleWorkspace } from '../lib/firebase';
 import { createGoogleCalendarEvent, sendGmailNotification } from '../lib/googleWorkspace';
 import { AIAdminClient } from '../lib/ai-admin/client';
+import { SupabaseService } from '../lib/supabase';
 import { formatCzechDate } from '../utils';
 import { 
   collection, 
@@ -160,6 +161,89 @@ export default function CoParentHub({ currentUser, onOpenAuth }: CoParentHubProp
   // Chat scroll container reference
   const chatEndRef = useRef<HTMLDivElement>(null);
 
+  // Local Storage & Dual-Database Helpers for Co-parent Connections
+  const LOCAL_STORE_KEY = 'tata_coparent_connections_v2';
+
+  const normalizeCode = (code: string) => {
+    return (code || '').trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+  };
+
+  const getLocalConnections = (): CoparentConnection[] => {
+    try {
+      const raw = localStorage.getItem(LOCAL_STORE_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  };
+
+  const saveLocalConnection = (conn: CoparentConnection) => {
+    try {
+      const list = getLocalConnections();
+      const idx = list.findIndex(c => c.id === conn.id);
+      if (idx >= 0) {
+        list[idx] = conn;
+      } else {
+        list.push(conn);
+      }
+      localStorage.setItem(LOCAL_STORE_KEY, JSON.stringify(list));
+    } catch (e) {
+      console.warn('LocalStorage save failed', e);
+    }
+  };
+
+  const saveConnectionToAllStores = async (conn: CoparentConnection) => {
+    saveLocalConnection(conn);
+
+    // Supabase save
+    try {
+      await SupabaseService.saveCoparentConnection(conn);
+    } catch (e) {
+      console.warn('Supabase save connection error:', e);
+    }
+
+    // Firestore save
+    try {
+      await setDoc(doc(db, 'coparent_connections', conn.id), conn);
+    } catch (e) {
+      console.warn('Firestore setDoc connection error:', e);
+    }
+  };
+
+  const findConnectionByCode = async (inviteInput: string): Promise<CoparentConnection | null> => {
+    const normInput = normalizeCode(inviteInput);
+    if (!normInput) return null;
+
+    // 1. Check Supabase persistent storage
+    try {
+      const supConn = await SupabaseService.findCoparentConnectionByCode(inviteInput);
+      if (supConn) return supConn;
+    } catch (e) {
+      console.warn('Supabase find connection error:', e);
+    }
+
+    // 2. Check Firestore
+    try {
+      const connCollection = collection(db, 'coparent_connections');
+      const snap = await getDocs(connCollection);
+      for (const docSnap of snap.docs) {
+        const data = docSnap.data() as CoparentConnection;
+        if (normalizeCode(data.inviteCode) === normInput) {
+          return { ...data, id: docSnap.id };
+        }
+      }
+    } catch (e) {
+      console.warn('Firestore find connection error:', e);
+    }
+
+    // 3. Check LocalStorage fallback
+    const localList = getLocalConnections();
+    const localFound = localList.find(c => normalizeCode(c.inviteCode) === normInput);
+    if (localFound) return localFound;
+
+    return null;
+  };
+
   // 1. Subscribe to User's Connection State
   useEffect(() => {
     if (!currentUser) {
@@ -169,9 +253,26 @@ export default function CoParentHub({ currentUser, onOpenAuth }: CoParentHubProp
     }
 
     setLoadingConnection(true);
+
+    // Immediate Local check
+    const localList = getLocalConnections();
+    const userLocal = localList.find(c => c.parent1Id === currentUser.id || c.parent2Id === currentUser.id);
+    if (userLocal) {
+      setConnection(userLocal);
+    }
+
+    // Check Supabase
+    SupabaseService.fetchCoparentConnection(currentUser.id)
+      .then(supConn => {
+        if (supConn) {
+          setConnection(supConn);
+          saveLocalConnection(supConn);
+        }
+      })
+      .catch(e => console.warn('Supabase fetch connection failed:', e));
+
+    // Listen to Firestore
     const connCollection = collection(db, 'coparent_connections');
-    
-    // Check if the current user is either parent1 or parent2
     const q1 = query(connCollection, where('parent1Id', '==', currentUser.id));
     const q2 = query(connCollection, where('parent2Id', '==', currentUser.id));
 
@@ -181,24 +282,23 @@ export default function CoParentHub({ currentUser, onOpenAuth }: CoParentHubProp
       if (!snapshot.empty) {
         const docData = snapshot.docs[0].data() as CoparentConnection;
         setConnection(docData);
+        saveLocalConnection(docData);
         setLoadingConnection(false);
       } else {
-        // If not found in parent1, listen to parent2 queries
         unsubscribe2 = onSnapshot(q2, (snapshot2) => {
           if (!snapshot2.empty) {
             const docData = snapshot2.docs[0].data() as CoparentConnection;
             setConnection(docData);
-          } else {
-            setConnection(null);
+            saveLocalConnection(docData);
           }
           setLoadingConnection(false);
         }, (error) => {
-          handleFirestoreError(error, OperationType.GET, 'coparent_connections');
+          console.warn('Firestore listener 2 error:', error);
           setLoadingConnection(false);
         });
       }
     }, (error) => {
-      handleFirestoreError(error, OperationType.GET, 'coparent_connections');
+      console.warn('Firestore listener 1 error:', error);
       setLoadingConnection(false);
     });
 
@@ -319,21 +419,22 @@ export default function CoParentHub({ currentUser, onOpenAuth }: CoParentHubProp
     };
 
     try {
-      await setDoc(doc(db, 'coparent_connections', newConnectionId), newConnection);
-      setConnectingSuccess(`Prostor úspěšně vytvořen! Váš klíč k propojení je: ${inviteCode}`);
+      await saveConnectionToAllStores(newConnection);
+      setConnection(newConnection);
+      setConnectingSuccess(`Prostor úspěšně vytvořen a uložen do databáze! Váš klíč k propojení je: ${inviteCode}`);
       setActionLoading(false);
     } catch (err) {
       setActionLoading(false);
       setConnectingError('Nepodařilo se vytvořit prostor. Zkuste to prosím znovu.');
-      handleFirestoreError(err, OperationType.WRITE, `coparent_connections/${newConnectionId}`);
     }
   };
 
   // Onboarding action: Join an existing Space using Invite Key
   const handleJoinSpace = async () => {
     if (!currentUser) return;
-    if (!inviteInput.trim()) {
-      setConnectingError('Zadejte prosím platný klíč k propojení.');
+    const rawInput = inviteInput.trim();
+    if (!rawInput) {
+      setConnectingError('Zadejte prosím platný klíč k propojení (např. SYNTH-XXXX-XXXX).');
       return;
     }
 
@@ -342,44 +443,40 @@ export default function CoParentHub({ currentUser, onOpenAuth }: CoParentHubProp
     setConnectingSuccess('');
 
     try {
-      const connCollection = collection(db, 'coparent_connections');
-      const q = query(connCollection, where('inviteCode', '==', inviteInput.trim().toUpperCase()));
-      const snap = await getDocs(q);
+      const existingConn = await findConnectionByCode(rawInput);
 
-      if (snap.empty) {
-        setConnectingError('Chybný klíč! Žádný odpovídající prostor nebyl nalezen.');
+      if (!existingConn) {
+        setConnectingError(`Klíč "${rawInput}" nebyl v databázi nalezen. Zkontrolujte prosím překlepy nebo vygenerujte nový prostor.`);
         setActionLoading(false);
         return;
       }
 
-      const connectionDoc = snap.docs[0];
-      const connectionData = connectionDoc.data() as CoparentConnection;
-
-      if (connectionData.parent1Id === currentUser.id) {
+      if (existingConn.parent1Id === currentUser.id) {
         setConnectingError('Nemůžete se propojit se svým vlastním vygenerovaným klíčem.');
         setActionLoading(false);
         return;
       }
 
-      if (connectionData.parent2Id) {
-        setConnectingError('Tento prostor k propojení je již plně obsazen.');
+      if (existingConn.parent2Id && existingConn.parent2Id !== currentUser.id) {
+        setConnectingError('Tento prostor k propojení je již plně obsazen druhým rodičem.');
         setActionLoading(false);
         return;
       }
 
-      // Propojit partnera
-      await updateDoc(doc(db, 'coparent_connections', connectionData.id), {
+      const updatedConn: CoparentConnection = {
+        ...existingConn,
         parent2Id: currentUser.id,
         parent2Name: currentUser.name,
         updatedAt: new Date().toISOString()
-      });
+      };
 
-      setConnectingSuccess('Propojení proběhlo úspěšně! Společný prostor se nyní načítá...');
+      await saveConnectionToAllStores(updatedConn);
+      setConnection(updatedConn);
+      setConnectingSuccess('Propojení účtů proběhlo úspěšně! Váš společný prostor se načítá...');
       setActionLoading(false);
     } catch (err) {
       setActionLoading(false);
-      setConnectingError('Nebylo možné se připojit. Zkontrolujte připojení.');
-      handleFirestoreError(err, OperationType.UPDATE, 'coparent_connections');
+      setConnectingError('Nebylo možné se připojit. Zkontrolujte připojení k internetu.');
     }
   };
 
@@ -786,22 +883,62 @@ export default function CoParentHub({ currentUser, onOpenAuth }: CoParentHubProp
 
         </div>
 
-        {/* Messaging Feedback bars */}
-        <div className="max-w-4xl mx-auto px-6 sm:px-10 pb-10">
+        {/* Messaging Feedback bars & Interactive Guidance */}
+        <div className="max-w-4xl mx-auto px-6 sm:px-10 pb-10 space-y-4">
           {connectingError && (
-            <div className="bg-rose-50 border border-rose-100 text-rose-700 px-4 py-3 rounded-xl text-xs font-medium flex items-center gap-2.5 animate-pulse" id="onboard-error">
-              <AlertCircle className="w-4 h-4 shrink-0" />
-              <span>{connectingError}</span>
+            <div className="bg-rose-50 border border-rose-200 text-rose-800 p-4 rounded-2xl text-xs space-y-3 shadow-sm" id="onboard-error">
+              <div className="flex items-start gap-2.5">
+                <AlertCircle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
+                <div className="space-y-1">
+                  <h4 className="font-bold text-rose-900">Nebylo možné se propojit pomocí zadaného klíče</h4>
+                  <p className="text-rose-700 leading-relaxed">{connectingError}</p>
+                </div>
+              </div>
+
+              {/* Interactive Help Box & 1-Click Action */}
+              <div className="bg-white/90 backdrop-blur-xs border border-rose-200/80 rounded-xl p-3.5 space-y-2.5">
+                <div className="flex items-center gap-2 text-[11px] font-bold text-slate-800">
+                  <Sparkles className="w-4 h-4 text-amber-500" />
+                  <span>Srozumitelná nápověda a doporučený postup:</span>
+                </div>
+                <ul className="text-[11px] text-slate-600 space-y-1.5 list-disc pl-4">
+                  <li>Ujistěte se, že klíč zkopíroval druhý rodič přesně z tabulky (včetně velikosti písmen a pomlčky, např. <code className="bg-slate-100 text-slate-900 px-1 py-0.5 rounded font-mono font-bold">SYNTH-XXXX-XXXX</code>).</li>
+                  <li>Pokud druhý rodič ještě kód nevygeneroval, můžete <strong>vytvořit nový prostor pro vaše děti jedním kliknutím</strong> níže a klíč mu poslat vy:</li>
+                </ul>
+
+                <div className="flex flex-wrap items-center gap-2 pt-1">
+                  <button
+                    type="button"
+                    onClick={handleCreateSpace}
+                    disabled={actionLoading}
+                    className="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-2 cursor-pointer"
+                  >
+                    <PlusCircle className="w-4 h-4" />
+                    <span>Vygenerovat nový prostor jedním kliknutím</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setInviteInput('');
+                      setConnectingError('');
+                    }}
+                    className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-all cursor-pointer"
+                  >
+                    Vyčistit a zkusit znovu
+                  </button>
+                </div>
+              </div>
             </div>
           )}
           {connectingSuccess && (
-            <div className="bg-teal-50 border border-teal-100 text-teal-800 px-4 py-3 rounded-xl text-xs font-medium flex flex-col gap-2 shadow-xs" id="onboard-success">
+            <div className="bg-teal-50 border border-teal-200 text-teal-800 p-4 rounded-2xl text-xs font-medium space-y-2 shadow-xs" id="onboard-success">
               <div className="flex items-center gap-2.5">
-                <CheckCircle2 className="w-4 h-4 shrink-0 text-teal-600" />
-                <span className="font-bold">{connectingSuccess}</span>
+                <CheckCircle2 className="w-5 h-5 shrink-0 text-teal-600" />
+                <span className="font-bold text-sm">{connectingSuccess}</span>
               </div>
-              <p className="text-[10px] text-teal-600 leading-normal pl-6">
-                Předejte tento kód druhému rodiči. Jakmile jej vloží ve svém prohlížeči, váš panel se automaticky v reálném čase aktualizuje a otevře se váš společný prostor.
+              <p className="text-xs text-teal-700 leading-relaxed pl-7">
+                Předejte tento kód druhému rodiči. Jakmile jej vloží ve svém prohlížeči, váš panel se v reálném čase propojí a zpřístupní vám sdílený kalendář, deník dětí i šifrovanou komunikaci.
               </p>
             </div>
           )}

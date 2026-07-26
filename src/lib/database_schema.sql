@@ -267,3 +267,23 @@ create policy "Allow all access to events" on public.events for all using (true)
 create index if not exists idx_articles_date on public.articles(date);
 create index if not exists idx_forum_posts_date on public.forum_posts(date);
 create index if not exists idx_comments_content on public.comments("contentId");
+
+-- =====================================================================
+-- 11. COPARENT_CONNECTIONS TABLE (Rodičovské prostory & Párování klíčů)
+-- =====================================================================
+create table if not exists public.coparent_connections (
+    id text primary key,
+    "inviteCode" text not null,
+    "parent1Id" text not null,
+    "parent1Name" text not null,
+    "parent2Id" text,
+    "parent2Name" text,
+    children text[] default '{}'::text[],
+    created_at text,
+    updated_at text
+);
+
+alter table public.coparent_connections enable row level security;
+
+drop policy if exists "Allow all access to coparent_connections" on public.coparent_connections;
+create policy "Allow all access to coparent_connections" on public.coparent_connections for all using (true);

@@ -58,6 +58,7 @@ export interface NavSection {
 // 1. HLAVNÍ TOPBAR / VISIBLE MENU (Pro všechny / Public)
 export const PUBLIC_TOPBAR_ITEMS: NavItem[] = [
   { id: 'home', label: 'Domů', path: '/', icon: Home, desc: 'Titulní strana portálu' },
+  { id: 'coparent-hub', label: 'Rodičovský Hub', path: '/coparent-hub', icon: Users, desc: 'Sdílený prostor pro oba rodiče: kalendář péče, výdaje a komunikace', badge: 'PROSTOR' },
   { id: 'plan-pece', label: 'Simulátor péče & Sourozenci', path: '/plan-pece', icon: Sliders, desc: 'Interaktivní Simulátor Péče & Sourozenecké Soudržnosti (kalkulačka a průvodce)' },
   { id: 'synthesis-hub', label: 'Synthesis Hub (Aperio Beta 1.0)', path: '/synthesis-hub', icon: Sparkles, desc: 'Syntéza obsahu Aperio, 100+ článků, AI nástroje a 200+ FAQ' },
   { id: 'news', label: 'Články', path: '/clanky', icon: FileText, desc: 'Odborné články a info báze' },
