@@ -47,6 +47,7 @@ import {
 } from 'lucide-react';
 import SmartVideoEmbed from './SmartVideoEmbed';
 import UserProgressTracker from './UserProgressTracker';
+import { dbSyncService } from '../services/dbSyncService';
 
 import { 
   User as UserType, 
@@ -267,41 +268,101 @@ export default function UserPortal({ currentUser, onOpenAuth }: UserPortalProps)
   });
   const [newTagInput, setNewTagInput] = useState<string>('');
 
+  // Sync state with dbSyncService (Supabase + Firebase + LocalStorage Tier Cache)
+  const userId = currentUser?.id || 'guest_local_user';
+
+  // Async load user portal data from central database on mount or user change
   useEffect(() => {
-    localStorage.setItem('sh_portal_messages', JSON.stringify(messages));
-  }, [messages]);
+    if (!currentUser) return;
+    let isMounted = true;
+
+    async function syncFromDatabase() {
+      try {
+        const [
+          remoteCase,
+          remoteEvidence,
+          remoteTimeline,
+          remoteNotifications,
+          remoteMessages,
+          remoteChecklist,
+          remoteArticles,
+          remoteJudgments,
+          remoteNotes,
+          remoteReminders
+        ] = await Promise.all([
+          dbSyncService.dualFetchUserData<CaseInfo>(userId, 'case_info', DEFAULT_CASE),
+          dbSyncService.dualFetchUserData<EvidenceFile[]>(userId, 'evidence', DEFAULT_EVIDENCE),
+          dbSyncService.dualFetchUserData<TimelineNode[]>(userId, 'timeline', DEFAULT_TIMELINE),
+          dbSyncService.dualFetchUserData<NotificationItem[]>(userId, 'notifications', DEFAULT_NOTIFICATIONS),
+          dbSyncService.dualFetchUserData<PrivateMessage[]>(userId, 'messages', DEFAULT_MESSAGES),
+          dbSyncService.dualFetchUserData<ChecklistItem[]>(userId, 'checklist', DEFAULT_CHECKLIST),
+          dbSyncService.dualFetchUserData<{ id: string; title: string; category: string }[]>(userId, 'saved_articles', []),
+          dbSyncService.dualFetchUserData<{ id: string; courtName: string; caseNumber: string; summary: string }[]>(userId, 'saved_judgments', []),
+          dbSyncService.dualFetchUserData<string>(userId, 'ai_notes', ''),
+          dbSyncService.dualFetchUserData<{ id: string; title: string; date: string; type: string }[]>(userId, 'custom_reminders', [])
+        ]);
+
+        if (isMounted) {
+          if (remoteCase) setCaseInfo(remoteCase);
+          if (remoteEvidence) setEvidenceList(remoteEvidence);
+          if (remoteTimeline) setTimelineNodes(remoteTimeline);
+          if (remoteNotifications) setNotifications(remoteNotifications);
+          if (remoteMessages) setMessages(remoteMessages);
+          if (remoteChecklist) setChecklist(remoteChecklist);
+          if (remoteArticles) setSavedArticles(remoteArticles);
+          if (remoteJudgments) setSavedJudgments(remoteJudgments);
+          if (remoteNotes !== undefined) setAiNotes(remoteNotes);
+          if (remoteReminders) setCustomReminders(remoteReminders);
+        }
+      } catch (err) {
+        console.warn('UserPortal dbSync load error:', err);
+      }
+    }
+
+    syncFromDatabase();
+
+    return () => { isMounted = false; };
+  }, [currentUser?.id]);
 
   useEffect(() => {
-    localStorage.setItem('sh_portal_case_info', JSON.stringify(caseInfo));
-  }, [caseInfo]);
+    dbSyncService.dualSaveUserData(userId, 'messages', messages);
+  }, [messages, userId]);
 
   useEffect(() => {
-    localStorage.setItem('sh_portal_evidence', JSON.stringify(evidenceList));
-  }, [evidenceList]);
+    dbSyncService.dualSaveUserData(userId, 'case_info', caseInfo);
+  }, [caseInfo, userId]);
 
   useEffect(() => {
-    localStorage.setItem('sh_portal_timeline', JSON.stringify(timelineNodes));
-  }, [timelineNodes]);
+    dbSyncService.dualSaveUserData(userId, 'evidence', evidenceList);
+  }, [evidenceList, userId]);
 
   useEffect(() => {
-    localStorage.setItem('sh_portal_notifications', JSON.stringify(notifications));
-  }, [notifications]);
+    dbSyncService.dualSaveUserData(userId, 'timeline', timelineNodes);
+  }, [timelineNodes, userId]);
 
   useEffect(() => {
-    localStorage.setItem('sh_portal_checklist', JSON.stringify(checklist));
-  }, [checklist]);
+    dbSyncService.dualSaveUserData(userId, 'notifications', notifications);
+  }, [notifications, userId]);
 
   useEffect(() => {
-    localStorage.setItem('sh_portal_saved_articles', JSON.stringify(savedArticles));
-  }, [savedArticles]);
+    dbSyncService.dualSaveUserData(userId, 'checklist', checklist);
+  }, [checklist, userId]);
 
   useEffect(() => {
-    localStorage.setItem('sh_portal_saved_judgments', JSON.stringify(savedJudgments));
-  }, [savedJudgments]);
+    dbSyncService.dualSaveUserData(userId, 'saved_articles', savedArticles);
+  }, [savedArticles, userId]);
 
   useEffect(() => {
-    localStorage.setItem('sh_portal_ai_notes', aiNotes);
-  }, [aiNotes]);
+    dbSyncService.dualSaveUserData(userId, 'saved_judgments', savedJudgments);
+  }, [savedJudgments, userId]);
+
+  useEffect(() => {
+    dbSyncService.dualSaveUserData(userId, 'ai_notes', aiNotes);
+  }, [aiNotes, userId]);
+
+  useEffect(() => {
+    dbSyncService.dualSaveUserData(userId, 'custom_reminders', customReminders);
+  }, [customReminders, userId]);
 
   useEffect(() => {
     const loadSavedVideos = () => {

@@ -364,6 +364,97 @@ class DbSyncService {
   }
 
   /**
+   * Dual save user portal data item (case_info, evidence, timeline, checklist, reminders, ai_notes, etc.)
+   */
+  async dualSaveUserData<T>(userId: string, itemKey: string, data: T): Promise<DualSyncResult> {
+    const docId = `${userId}_${itemKey}`;
+    const payload = {
+      id: docId,
+      user_id: userId,
+      item_key: itemKey,
+      data,
+      updated_at: new Date().toISOString()
+    };
+    
+    // 1. LocalStorage Cache Update (Instant UI reactivity)
+    try {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(`sh_portal_${itemKey}`, JSON.stringify(data));
+      }
+    } catch (e) {
+      console.warn(`[dbSyncService] LocalStorage save warning for portal item ${itemKey}:`, e);
+    }
+
+    // 2. Dual write to Supabase and Firestore
+    return this.dualSaveDocument('user_portal_data', docId, payload);
+  }
+
+  /**
+   * Dual fetch user portal data item with multi-tier fallback (Supabase -> Firestore -> LocalStorage -> Default)
+   */
+  async dualFetchUserData<T>(userId: string, itemKey: string, defaultData: T): Promise<T> {
+    const docId = `${userId}_${itemKey}`;
+
+    // Tier 1: Supabase
+    if (isSupabaseConfigured()) {
+      try {
+        const supabase = getSupabase();
+        if (supabase) {
+          const { data, error } = await supabase
+            .from('user_portal_data')
+            .select('*')
+            .eq('id', docId)
+            .maybeSingle();
+          if (!error && data && data.data) {
+            console.log(`[dbSyncService] Loaded user portal '${itemKey}' for user ${userId} from Supabase.`);
+            if (typeof window !== 'undefined') {
+              localStorage.setItem(`sh_portal_${itemKey}`, JSON.stringify(data.data));
+            }
+            return data.data as T;
+          }
+        }
+      } catch (supErr) {
+        console.warn(`[dbSyncService] Supabase fetch failed for user portal '${itemKey}', attempting Firebase...`, supErr);
+      }
+    }
+
+    // Tier 2: Firebase Firestore
+    try {
+      const docRef = doc(db, 'user_portal_data', docId);
+      const snap = await getDoc(docRef);
+      if (snap.exists()) {
+        const docData = snap.data();
+        if (docData && docData.data) {
+          console.log(`[dbSyncService] Loaded user portal '${itemKey}' for user ${userId} from Firebase Firestore.`);
+          if (typeof window !== 'undefined') {
+            localStorage.setItem(`sh_portal_${itemKey}`, JSON.stringify(docData.data));
+          }
+          return docData.data as T;
+        }
+      }
+    } catch (fbErr) {
+      console.warn(`[dbSyncService] Firebase fetch failed for user portal '${itemKey}', attempting LocalStorage...`, fbErr);
+    }
+
+    // Tier 3: LocalStorage Cache
+    try {
+      if (typeof window !== 'undefined') {
+        const raw = localStorage.getItem(`sh_portal_${itemKey}`);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          console.log(`[dbSyncService] Loaded user portal '${itemKey}' from LocalStorage cache.`);
+          return parsed as T;
+        }
+      }
+    } catch (localErr) {
+      console.warn(`[dbSyncService] LocalStorage fetch failed for user portal '${itemKey}':`, localErr);
+    }
+
+    // Tier 4: Default Initial Data
+    return defaultData;
+  }
+
+  /**
    * Helper to normalize objects for Supabase PostgreSQL column names if needed
    */
   private normalizePayloadForSupabase(collectionName: string, item: any): any {
