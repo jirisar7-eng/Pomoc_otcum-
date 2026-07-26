@@ -334,6 +334,9 @@ app.get('/api/health', (req, res) => {
 });
 
 // AI & SEO Machine Readable Routes (llms.txt, robots.txt, sitemap.xml)
+app.use('/docs', express.static(path.join(process.cwd(), 'docs')));
+app.use('/docs', express.static(path.join(process.cwd(), 'public', 'docs')));
+
 app.get('/llms.txt', (req, res) => {
   const filePath = path.join(process.cwd(), 'public', 'llms.txt');
   if (fs.existsSync(filePath)) {

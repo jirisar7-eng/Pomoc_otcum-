@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import ReactMarkdown from 'react-markdown';
+import { MarkdownRenderer } from './MarkdownRenderer';
 import { 
   Bot, 
   Send, 
@@ -57,31 +57,55 @@ interface ChatMessage {
 }
 
 const DEFAULT_AI_GUIDANCE_MARKDOWN = `
-# Inteligentní AI Právní Asistent - Metodický Průvodce
+# Jak pracovat s Gemini a Gemini Notebookem (NotebookLM)
 
-Vítejte v oficiálním modulu **Inteligentního AI Asistenta** platformy *Táta má právo*. Tento modul využívá generativní AI model navržený a přizpůsobený pro české opatrovnické právo, judikaturu Ústavního soudu ČR a metodické pokyny MPSV pro orgány OSPOD.
-
-## Hlavní oblasti využití AI Asistenta:
-
-1. **Příprava na jednání s OSPOD:**
-   - Jak věcně a klidně argumentovat zájmem dítěte.
-   - Jak reagovat na jednostranné nebo neobjektivní zprávy opatrovníka.
-   - Jak navrhnout konkrétní harmonogram střídavé či společné péče.
-
-2. **Rozbor judikatury Ústavního soudu ČR:**
-   - Citace klíčových nálezů o střídavé péči (např. *II. ÚS 132/24*, *I. ÚS 2482/13*, *IV. ÚS 805/14*).
-   - Právo dítěte na péči obou rodičů a zachování sourozeneckých vazeb.
-
-3. **Komunikační metoda BIFF:**
-   - Přepis emočně vyostřených zpráv od druhé strany do věcné, stručné a bezpečné podoby (*Brief, Informative, Friendly, Firm*).
-   - Ochrana před nařčením z agresivní či nekonstruktivní komunikace u soudu.
-
-4. **Příprava podkladů a návrhů pro opatrovnický soud:**
-   - Kontrola struktury návrhů na úpravu poměrů nezletilých.
-   - Návrhy předběžných opatření při bezdůvodném bránění ve styku.
+Tento metodický návod poskytuje otcům a rodičům v opatrovnických sporech praktický postup krok za krokem, jak efektivně využívat rozhraní **Google Gemini** a **NotebookLM (Gemini Notebook)** pro zpracování soudních spisů, protokolu PČR, zpráv OSPOD a přípravu neprůstřelných právních podkladů.
 
 ---
-> ⚠️ **Právní upozornění:** Veškeré výstupy AI Asistenta mají informativní a doporučující charakter. Nenahrazují individuální právní služby advokáta ani oficiální rozhodnutí soudů.
+
+## 1. Nahraní dokumentů a opatrovnického spisu do AI
+
+### Postup pro Google Gemini / Gemini Advanced:
+1. **Příprava dokumentů:** Převeďte skeny, protokoly, zprávy OSPOD nebo e-maily do formátu PDF nebo TXT/DOCX.
+2. **Přiložení k dotazu:** V rozhraní Gemini klikněte na tlačítko **+ (Přidat soubor)** nebo přetáhněte soubor přímo do okna chatu.
+3. **Anonymizace dat:** Před nahraním doporučujeme nahradit celá jména dětí a rodná čísla iniciálami (např. *nezletilý A.B.*).
+
+### Postup pro NotebookLM (Gemini Notebook):
+1. Navštivte [NotebookLM (notebooklm.google.com)](https://notebooklm.google.com/) a vytvořte nový zápisník s názvem vašemu spisu (např. *Opatrovnický spis - Péče o děti*).
+2. **Nahrání zdrojů:** Do levého panelu nahrajte všechny dostupné dokumenty:
+   - Zprávy OSPOD a protokoly z jednání.
+   - Posudky znalců a lékařské zprávy.
+   - Časové osy e-mailové a SMS komunikace.
+3. **Automatická syntéza:** NotebookLM automaticky prostuduje všechny nahrané zdroje a vytvoří přehledný průvodce s citacemi přímo ze spisu.
+
+---
+
+## 2. Správná formulace promptů (dotazů)
+
+Při formulaci dotazů se držte struktury **Role - Kontext - Úkol - Formát**:
+
+* **Příklad pro střídavou péči:**
+  > *"Jsi expertní právní poradce pro rodinné právo v ČR. Na základě nahraných dokumentů vytvoř přehlednou tabulku argumentů, které prokazují mou stabilní rodičovskou způsobilost pro střídavou péči podle nálezů Ústavního soudu ČR."*
+
+* **Příklad pro vyvrácení neobjektivní zprávy OSPOD:**
+  > *"Prostuduj nahranou zprávu OSPOD ze dne XX.YY.202X. Najdi v ní všechna tvrzení, která nejsou podložena konkrétními důkazy ve spise, a navrhni věcnou reakci v duchu metodiky MPSV."*
+
+* **Příklad pro úpravu výživného:**
+  > *"Porovnej mé reálné příjmy a rozsah péče s doporučujícími tabulkami Ministerstva spravedlnosti ČR a navrhni férovou výši výživného při rovnocenné střídavé péči."*
+
+---
+
+## 3. Ověřování výstupů a práca s citacemi
+
+1. **Vždy požadujte citace zdrojů:** V NotebookLM má každé tvrzení AI přímé číslo citace, na které můžete kliknout a ověřit si přesný odstavec ve vašem spise.
+2. **Křížová kontrola paragrafů a judikátů:** Ověřte, že citované nálezy Ústavního soudu (např. *II. ÚS 132/24*, *I. ÚS 2482/13*) odpovídají vašemu případu.
+3. **Kombinace s metodou BIFF:** Při e-mailové komunikaci vyžadujte, aby AI přepsala vaši odpověď podle pravidel *Brief, Informative, Friendly, Firm* pro zamezení emočním střetům.
+
+---
+
+## 4. Rychlé kopírovatelné prompty
+
+Níže v tomto rozhraní naleznete sekci **"Praktické šablony promptů"**. Kliknutím na tlačítko **Kopírovat prompt** můžete zkopírovat okamžitě připravené instrukce pro váš model Gemini.
 `;
 
 interface PromptTemplate {
@@ -221,7 +245,9 @@ export default function AiAssistantView({
         setDocError(null);
 
         const candidatePaths = [
+          '/docs/categories/19-technologie-ai.md',
           '/docs/categories/technologie-ai.md',
+          '/docs/categories/README.md',
           '/docs/ai-assistant.md',
           '/docs/categories/ai-assistant.md'
         ];
@@ -230,10 +256,16 @@ export default function AiAssistantView({
         for (const path of candidatePaths) {
           try {
             const res = await fetch(path);
-            if (res.ok) {
+            const contentType = res.headers.get('content-type') || '';
+            if (res.ok && !contentType.toLowerCase().includes('text/html')) {
               const text = await res.text();
-              // Validate that response is text markdown and not index.html fallback
-              if (text && !text.trim().startsWith('<!DOCTYPE') && !text.trim().startsWith('<html')) {
+              const trimmed = text.trim();
+              const isHtml = /^<!doctype/i.test(trimmed) || 
+                             /^<html/i.test(trimmed) || 
+                             /^<head/i.test(trimmed) ||
+                             trimmed.includes('<script') ||
+                             trimmed.includes('id="root"');
+              if (trimmed && !isHtml) {
                 fetchedText = text;
                 break;
               }
@@ -1139,8 +1171,8 @@ export default function AiAssistantView({
               <span className="text-xs font-semibold">Načítání metodické dokumentace...</span>
             </div>
           ) : (
-            <div className="markdown-body prose max-w-none text-slate-800 text-xs sm:text-sm leading-relaxed">
-              <ReactMarkdown>{markdownDoc}</ReactMarkdown>
+            <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-3xs">
+              <MarkdownRenderer content={markdownDoc} activeTab="ai-assistant" />
             </div>
           )}
         </div>
