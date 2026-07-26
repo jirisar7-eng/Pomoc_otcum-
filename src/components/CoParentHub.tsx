@@ -30,7 +30,11 @@ import {
   CalendarDays,
   FileText,
   HeartHandshake,
-  Shield
+  Shield,
+  Copy,
+  RotateCcw,
+  Key,
+  LogOut
 } from 'lucide-react';
 import { 
   User as AppUser, 
@@ -146,6 +150,68 @@ export default function CoParentHub({ currentUser, onOpenAuth }: CoParentHubProp
 
   const [newMessageText, setNewMessageText] = useState<string>('');
   const [googleToken, setGoogleToken] = useState<string | null>(getCachedAccessToken());
+
+  // Copy to clipboard & Reset Key states
+  const [copiedKey, setCopiedKey] = useState<boolean>(false);
+  const [showResetConfirm, setShowResetConfirm] = useState<boolean>(false);
+
+  const handleCopyKey = (codeToCopy?: string) => {
+    const code = codeToCopy || connection?.inviteCode || '';
+    if (!code) return;
+    try {
+      navigator.clipboard.writeText(code);
+      setCopiedKey(true);
+      setTimeout(() => setCopiedKey(false), 2500);
+    } catch (e) {
+      console.warn('Clipboard write failed:', e);
+    }
+  };
+
+  const handleDisconnectOrReset = async () => {
+    if (!currentUser || !connection) return;
+    setActionLoading(true);
+    setConnectingError('');
+    setConnectingSuccess('');
+
+    try {
+      const connId = connection.id;
+
+      // 1. Remove from LocalStorage
+      try {
+        const localList = getLocalConnections().filter(c => c.id !== connId);
+        localStorage.setItem(LOCAL_STORE_KEY, JSON.stringify(localList));
+      } catch (e) {
+        console.warn('LocalStorage remove error:', e);
+      }
+
+      // 2. Remove from Supabase
+      try {
+        const supabase = (SupabaseService as any).getSupabase ? (SupabaseService as any).getSupabase() : null;
+        if (supabase) {
+          await supabase.from('coparent_connections').delete().eq('id', connId);
+        }
+      } catch (e) {
+        console.warn('Supabase delete connection error:', e);
+      }
+
+      // 3. Remove from Firestore
+      try {
+        await deleteDoc(doc(db, 'coparent_connections', connId));
+      } catch (e) {
+        console.warn('Firestore delete connection error:', e);
+      }
+
+      setConnection(null);
+      setShowResetConfirm(false);
+      setInviteInput('');
+      setConnectingSuccess('Staré propojení bylo zrušeno. Nyní můžete vygenerovat nový prostor nebo zrušit klíč.');
+    } catch (err) {
+      console.error('Error resetting connection:', err);
+      setConnectingError('Chyba při rušení spojení. Zkontrolujte síťové připojení.');
+    } finally {
+      setActionLoading(false);
+    }
+  };
 
   useEffect(() => {
     // Keep the local component state in sync with the global cached Google token
@@ -973,10 +1039,32 @@ export default function CoParentHub({ currentUser, onOpenAuth }: CoParentHubProp
               {connection.children.join(', ')}
             </span>
           </h1>
-          <p className="text-slate-400 text-[11px] mt-1 flex items-center gap-1.5 font-mono">
-            <span>SDÍLENÝ KÓD:</span>
-            <strong className="text-white bg-slate-800 px-2 py-0.5 rounded text-[10px] select-all border border-slate-700 font-bold tracking-widest">{connection.inviteCode}</strong>
-          </p>
+          <div className="flex flex-wrap items-center gap-2.5 mt-2">
+            <span className="text-[10px] text-slate-400 font-mono tracking-wider uppercase font-semibold">SDÍLENÝ KÓD:</span>
+            <div className="inline-flex items-center gap-2 bg-slate-800/90 border border-slate-700/80 rounded-xl px-3 py-1 text-xs">
+              <span className="text-teal-300 font-mono font-black tracking-widest text-sm select-all">{connection.inviteCode}</span>
+              <button
+                type="button"
+                onClick={() => handleCopyKey(connection.inviteCode)}
+                className="p-1 bg-slate-700/60 hover:bg-teal-600 text-slate-300 hover:text-white rounded-lg transition-colors cursor-pointer flex items-center gap-1 text-[11px] font-bold"
+                title="Kopírovat klíč do schránky"
+                id="btn-copy-key-header"
+              >
+                {copiedKey ? <Check className="w-3.5 h-3.5 text-teal-300" /> : <Copy className="w-3.5 h-3.5" />}
+                <span className="hidden sm:inline">{copiedKey ? 'Zkopírováno' : 'Kopírovat'}</span>
+              </button>
+            </div>
+            
+            <button
+              type="button"
+              onClick={() => setShowResetConfirm(true)}
+              className="text-[11px] text-slate-400 hover:text-rose-300 font-medium underline cursor-pointer transition-colors flex items-center gap-1 ml-1"
+              id="btn-reset-key-header"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span>Zrušit / Nový klíč</span>
+            </button>
+          </div>
         </div>
 
         {/* Partner Connection status card */}
@@ -1001,6 +1089,66 @@ export default function CoParentHub({ currentUser, onOpenAuth }: CoParentHubProp
           </div>
         </div>
       </div>
+
+      {/* Prominent Pending Pairing Banner */}
+      {!isFullyPaired && (
+        <div className="bg-gradient-to-r from-slate-950 via-indigo-950 to-slate-950 border-b border-indigo-500/30 text-white px-6 py-5 shadow-inner" id="pending-pairing-banner">
+          <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
+            <div className="space-y-1.5 max-w-xl">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping"></span>
+                <span className="text-[11px] font-mono font-extrabold text-amber-300 uppercase tracking-wider">Čeká se na propojení druhého rodiče</span>
+              </div>
+              <h3 className="text-lg font-bold font-display text-white">
+                Zašlete tento unikátní klíč druhému rodiči
+              </h3>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                Předáním tohoto kódu se oba vaše účty bezpečně propojí. Druhý rodič kód vloží do pole „Možnost B: Připojit se ke klíči“.
+              </p>
+            </div>
+
+            {/* Prominent Key Box */}
+            <div className="w-full md:w-auto bg-slate-900/90 border-2 border-teal-500/60 rounded-2xl p-4 flex flex-col sm:flex-row items-center gap-3.5 shadow-xl">
+              <div className="flex items-center gap-3 text-center sm:text-left">
+                <Key className="w-6 h-6 text-teal-400 shrink-0 hidden sm:block" />
+                <div>
+                  <span className="text-[9px] font-mono uppercase tracking-widest text-slate-400 block font-semibold">Unikátní klíč pro druhého rodiče</span>
+                  <span className="text-2xl sm:text-3xl font-mono font-black tracking-widest text-teal-300 select-all drop-shadow-md">
+                    {connection.inviteCode}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 w-full sm:w-auto justify-end border-t sm:border-t-0 border-slate-800 pt-3 sm:pt-0">
+                <button
+                  type="button"
+                  onClick={() => handleCopyKey(connection.inviteCode)}
+                  className={`px-4 py-2.5 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-1.5 shadow-md cursor-pointer shrink-0 ${
+                    copiedKey
+                      ? 'bg-emerald-500 text-white scale-105'
+                      : 'bg-teal-600 hover:bg-teal-500 text-white'
+                  }`}
+                  id="btn-copy-key-banner"
+                >
+                  {copiedKey ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                  <span>{copiedKey ? 'Zkopírováno!' : 'Kopírovat klíč'}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setShowResetConfirm(true)}
+                  className="p-2.5 bg-slate-800 hover:bg-rose-950/80 hover:border-rose-500/50 text-slate-300 hover:text-rose-300 border border-slate-700 rounded-xl transition-all cursor-pointer text-xs flex items-center gap-1 shrink-0"
+                  title="Zrušit toto propojení a vygenerovat nový klíč"
+                  id="btn-reset-key-banner"
+                >
+                  <RotateCcw className="w-4 h-4" />
+                  <span className="sr-only sm:not-sr-only sm:text-[11px] font-bold">Nový klíč</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 4.2 Tab Controls (Calendar, Diary, Chat) */}
       <div className="bg-slate-50 border-b border-slate-100 px-4 sm:px-6 py-2 flex items-center justify-start overflow-x-auto gap-1">
@@ -1780,6 +1928,52 @@ export default function CoParentHub({ currentUser, onOpenAuth }: CoParentHubProp
 
       </div>
       
+      {/* Reset / Disconnect Confirmation Modal */}
+      {showResetConfirm && (
+        <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-xs z-50 flex items-center justify-center p-4 animate-in fade-in duration-200" id="reset-key-modal">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 space-y-4">
+            <div className="flex items-center gap-3 text-rose-600">
+              <div className="w-10 h-10 rounded-2xl bg-rose-50 flex items-center justify-center shrink-0">
+                <AlertCircle className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-slate-900 font-display">Zrušit propojení a vygenerovat nový klíč?</h3>
+                <p className="text-[10px] text-slate-400 font-mono">Resetování vygenerovaného prostoru</p>
+              </div>
+            </div>
+
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Tato akce zneplatní stávající kód <code className="bg-slate-100 text-slate-900 px-1.5 py-0.5 rounded font-mono font-bold">{connection?.inviteCode}</code>. Starý kód již nebude možné použít pro párování.
+            </p>
+
+            <div className="bg-amber-50 border border-amber-200 text-amber-900 p-3 rounded-xl text-[11px] leading-relaxed">
+              <strong>Kdy tuto funkci použít:</strong> Pokud došlo k překlepu, chcete zrušit zadaný kód nebo vytvořit zcela nový prostor pro vaše děti.
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setShowResetConfirm(false)}
+                className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-all cursor-pointer"
+              >
+                Ponechat stávající
+              </button>
+
+              <button
+                type="button"
+                onClick={handleDisconnectOrReset}
+                disabled={actionLoading}
+                className="px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
+                id="btn-confirm-reset-key"
+              >
+                {actionLoading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <RotateCcw className="w-4 h-4" />}
+                <span>Ano, zrušit a zneplatnit</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Footer support notice */}
       <div className="bg-slate-50 border-t border-slate-100 px-6 py-4 flex items-center gap-3 text-[10px] text-slate-400 font-medium">
         <Heart className="w-3.5 h-3.5 text-teal-500 shrink-0" />
