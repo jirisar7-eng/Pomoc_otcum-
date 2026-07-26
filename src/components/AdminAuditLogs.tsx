@@ -10,6 +10,7 @@ import {
   AlertTriangle 
 } from 'lucide-react';
 import { AuditLog } from '../types';
+import { formatCzechDate, formatCzechTime } from '../utils';
 
 export default function AdminAuditLogs() {
   const [logs, setLogs] = useState<AuditLog[]>([]);
@@ -48,31 +49,8 @@ export default function AdminAuditLogs() {
     );
   });
 
-  const formatDate = (dateStr: string) => {
-    try {
-      const d = new Date(dateStr);
-      return d.toLocaleDateString('cs-CZ', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit'
-      });
-    } catch {
-      return dateStr;
-    }
-  };
-
-  const formatTime = (dateStr: string) => {
-    try {
-      const d = new Date(dateStr);
-      return d.toLocaleTimeString('cs-CZ', {
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit'
-      });
-    } catch {
-      return '';
-    }
-  };
+  const formatDate = (dateStr: string) => formatCzechDate(dateStr, { year: 'numeric', month: '2-digit', day: '2-digit' });
+  const formatTime = (dateStr: string) => formatCzechTime(dateStr, true);
 
   return (
     <div className="space-y-6" id="admin-audit-logs">

@@ -6,6 +6,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { MarkdownRenderer } from './MarkdownRenderer';
+import { AIAdminClient } from '../lib/ai-admin/client';
 import { 
   Bot, 
   Send, 
@@ -334,38 +335,11 @@ export default function AiAssistantView({
     setChatError('');
 
     try {
-      const response = await fetch('/api/gemini/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: textToSend, message: textToSend })
-      });
-
-      let data: any = null;
-      try {
-        const rawText = await response.text();
-        try {
-          data = JSON.parse(rawText);
-        } catch {
-          data = {
-            success: false,
-            error: "Dočasná chyba při spojení s AI. Zkontrolujte API klíč nebo to zkusíte za chvíli znovu."
-          };
-        }
-      } catch {
-        data = {
-          success: false,
-          error: "Dočasná chyba při spojení s AI. Zkontrolujte API klíč nebo to zkusíte za chvíli znovu."
-        };
-      }
-
-      if (!response.ok || data.success === false) {
-        throw new Error(data.error || 'Dočasná chyba při spojení s AI. Zkontrolujte API klíč nebo to zkusíte za chvíli znovu.');
-      }
-
+      const replyText = await AIAdminClient.queryGemini(textToSend);
       const aiMsg: ChatMessage = {
         id: 'msg-' + Date.now() + '-ai',
         sender: 'ai',
-        text: data.text || 'Omlouvám se, ale nepodařilo se mi zformovat smysluplnou odpověď.',
+        text: replyText || 'Omlouvám se, ale nepodařilo se mi zformovat smysluplnou odpověď.',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
 
@@ -386,26 +360,12 @@ export default function AiAssistantView({
     setAnalysisResult(null);
 
     try {
-      const response = await fetch('/api/ai-admin/execute', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'REWRITE_BIFF',
-          params: { text: analysisText }
-        })
-      });
-
-      let data: any = null;
-      try {
-        data = await response.json();
-      } catch {
-        data = { error: 'Chyba při zpracování analýzy.' };
+      const res = await AIAdminClient.execute('REWRITE_BIFF', { text: analysisText });
+      if (!res.success) {
+        throw new Error(res.error || 'Chyba při komunikaci s AI analýzou.');
       }
 
-      if (!response.ok || data.error) {
-        throw new Error(data.error || 'Chyba při komunikaci s AI analýzou.');
-      }
-
+      const data = res.data || {};
       setAnalysisResult({
         biffAnalysis: data.biffAnalysis || 'AI zanalyzovala váš text.',
         biffRewritten: data.biffRewritten || analysisText,

@@ -9,6 +9,7 @@ import {
   Loader2, 
   HelpCircle 
 } from 'lucide-react';
+import { AIAdminClient } from '../lib/ai-admin/client';
 
 export interface ChatMessage {
   id: string;
@@ -73,42 +74,11 @@ export default function AIAssistantModal({ isOpen, onClose, initialPrompt }: AIA
     setErrorText('');
 
     try {
-      const response = await fetch('/api/gemini/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: textToSend })
-      });
-
-      // Robustní ošetření načtení JSON z odpovědi (předcházení chybám při HTML 500 odpovědích)
-      let data: any = null;
-      try {
-        const rawText = await response.text();
-        try {
-          data = JSON.parse(rawText);
-        } catch (jsonErr) {
-          console.warn("Server response was not valid JSON:", rawText);
-          data = {
-            success: false,
-            error: "Dočasná chyba při spojení s AI. Zkontrolujte API klíč nebo to zkusíte za chvíli znovu."
-          };
-        }
-      } catch (readErr) {
-        data = {
-          success: false,
-          error: "Dočasná chyba při spojení s AI. Zkontrolujte API klíč nebo to zkusíte za chvíli znovu."
-        };
-      }
-
-      if (!response.ok || data.success === false) {
-        const errorMsg = data.error || 'Dočasná chyba při spojení s AI. Zkontrolujte API klíč nebo to zkusíte za chvíli znovu.';
-        setErrorText(errorMsg);
-        return;
-      }
-
+      const replyText = await AIAdminClient.queryGemini(textToSend);
       const aiMsg: ChatMessage = {
         id: 'msg-' + Date.now() + '-ai',
         sender: 'ai',
-        text: data.text || 'Omlouvám se, ale nepodařilo se mi zformovat smysluplnou odpověď.',
+        text: replyText || 'Omlouvám se, ale nepodařilo se mi zformovat smysluplnou odpověď.',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
 

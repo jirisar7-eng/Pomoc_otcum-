@@ -43,6 +43,8 @@ import {
 } from '../types';
 import { db, auth, getCachedAccessToken, authorizeGoogleWorkspace } from '../lib/firebase';
 import { createGoogleCalendarEvent, sendGmailNotification } from '../lib/googleWorkspace';
+import { AIAdminClient } from '../lib/ai-admin/client';
+import { formatCzechDate } from '../utils';
 import { 
   collection, 
   doc, 
@@ -571,23 +573,11 @@ export default function CoParentHub({ currentUser, onOpenAuth }: CoParentHubProp
     setBiffError('');
     setBiffResult(null);
     try {
-      const response = await fetch('/api/ai-admin/execute', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          action: 'REWRITE_BIFF',
-          params: {
-            text: biffInput
-          }
-        })
-      });
-      const resJson = await response.json();
-      if (resJson.success && resJson.data) {
-        setBiffResult(resJson.data);
+      const res = await AIAdminClient.execute('REWRITE_BIFF', { text: biffInput });
+      if (res.success && res.data) {
+        setBiffResult(res.data);
       } else {
-        throw new Error(resJson.error || 'Chyba při přepisování zprávy.');
+        throw new Error(res.error || 'Chyba při přepisování zprávy.');
       }
     } catch (err: any) {
       console.error('Failed to rewrite message via BIFF:', err);
@@ -1137,16 +1127,6 @@ export default function CoParentHub({ currentUser, onOpenAuth }: CoParentHubProp
                 </div>
               ) : (
                 events.map((evt) => {
-                  const formatCzechDate = (isoStr: string) => {
-                    const date = new Date(isoStr);
-                    return date.toLocaleDateString('cs-CZ', { 
-                      day: 'numeric', 
-                      month: 'long', 
-                      hour: '2-digit', 
-                      minute: '2-digit' 
-                    });
-                  };
-
                   return (
                     <div 
                       key={evt.id} 

@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { User } from '../types';
 import { db, storage } from '../lib/firebase';
+import { AIAdminClient } from '../lib/ai-admin/client';
 import { collection, getDocs, setDoc, doc, deleteDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
@@ -181,20 +182,7 @@ export default function AiCaseManager({ currentUser, onOpenAuth }: AiCaseManager
     setIsGeneratingDescription(true);
     setNewDocNote('Generování automatického popisu a výtahu...');
     try {
-      const response = await fetch('/api/ai-admin/execute', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          action: 'DESCRIBE_FILE',
-          params: {
-            fileName,
-            type
-          }
-        })
-      });
-      const resJson = await response.json();
+      const resJson = await AIAdminClient.execute('DESCRIBE_FILE', { fileName, type });
       if (resJson.success && resJson.data) {
         const { description, extract } = resJson.data;
         setNewDocNote(`${description}\n\n${extract}`);
@@ -428,22 +416,12 @@ export default function AiCaseManager({ currentUser, onOpenAuth }: AiCaseManager
     try {
       const docContext = documents.map(d => `[Záznam: ${d.type}] ${d.name}: ${d.note}`).join('\n');
 
-      const response = await fetch('/api/ai-admin/execute', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          action: 'ANALYZE_EVIDENCE',
-          params: {
-            evidenceName: documents[0]?.name || 'Opatrovnická složka',
-            notes: docContext || 'Složka obsahuje řadu důkazů a listin.',
-            type: documents[0]?.type || 'petition'
-          }
-        })
+      const resJson = await AIAdminClient.execute('ANALYZE_EVIDENCE', {
+        evidenceName: documents[0]?.name || 'Opatrovnická složka',
+        notes: docContext || 'Složka obsahuje řadu důkazů a listin.',
+        type: documents[0]?.type || 'petition'
       });
 
-      const resJson = await response.json();
       clearInterval(progressInterval);
       setAnalysisProgress(100);
 

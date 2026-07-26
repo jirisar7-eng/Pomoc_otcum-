@@ -45,6 +45,51 @@ export function formatRichText(text: string): React.ReactNode {
 }
 
 /**
+ * Formats a date string, number, or Date object into Czech localized date.
+ */
+export function formatCzechDate(
+  dateInput?: string | number | Date | null,
+  options?: Intl.DateTimeFormatOptions
+): string {
+  if (!dateInput) return '';
+  try {
+    const d = new Date(dateInput);
+    if (isNaN(d.getTime())) return String(dateInput);
+    return d.toLocaleDateString('cs-CZ', options || { day: 'numeric', month: 'numeric', year: 'numeric' });
+  } catch {
+    return String(dateInput);
+  }
+}
+
+/**
+ * Formats a date string, number, or Date object into Czech localized time (HH:mm or with seconds).
+ */
+export function formatCzechTime(
+  dateInput?: string | number | Date | null,
+  includeSeconds: boolean = false
+): string {
+  if (!dateInput) return '';
+  try {
+    const d = new Date(dateInput);
+    if (isNaN(d.getTime())) return '';
+    return d.toLocaleTimeString('cs-CZ', {
+      hour: '2-digit',
+      minute: '2-digit',
+      ...(includeSeconds ? { second: '2-digit' } : {})
+    });
+  } catch {
+    return '';
+  }
+}
+
+/**
+ * Formats a number into Czech currency format (e.g., 15 000 Kč).
+ */
+export function formatCzechCurrency(amount: number): string {
+  return new Intl.NumberFormat('cs-CZ', { style: 'currency', currency: 'CZK', maximumFractionDigits: 0 }).format(amount);
+}
+
+/**
  * Submits a new record to the backend audit log collection.
  */
 export async function logDatabaseActivity(
