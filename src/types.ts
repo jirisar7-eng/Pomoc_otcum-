@@ -87,6 +87,7 @@ export interface Article {
   commentsCount: number;
   readTime: string;
   tags: string[];
+  imageUrl?: string;
   videoUrl?: string;
 }
 

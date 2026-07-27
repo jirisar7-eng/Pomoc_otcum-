@@ -51,11 +51,16 @@ export default function PartnersSection({ partners = [] }: PartnersSectionProps)
         <div className="absolute -top-12 -right-12 w-64 h-64 bg-teal-500/10 rounded-full blur-2xl pointer-events-none" />
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative z-10">
           <div className="flex items-start gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-white p-2.5 shadow-md border border-slate-200 shrink-0 flex items-center justify-center">
-              <div className="text-center">
-                <span className="text-slate-900 font-black text-sm tracking-tighter block font-display leading-none">WEDOS</span>
-                <span className="text-[8px] text-teal-600 font-bold uppercase tracking-widest block mt-0.5">Internet</span>
-              </div>
+            <div className="w-16 h-16 rounded-2xl bg-white p-2 shadow-md border border-slate-200 shrink-0 flex items-center justify-center overflow-hidden">
+              <img 
+                src="https://vedos.cz/wp-content/uploads/2025/03/VEDOS-Hosting-logo.svg" 
+                alt="WEDOS Logo" 
+                className="w-full h-full object-contain"
+                referrerPolicy="no-referrer"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = "https://www.wedos.cz/wp-content/uploads/2025/03/VEDOS-Hosting-logo.svg";
+                }}
+              />
             </div>
             <div className="space-y-1.5">
               <div className="flex items-center gap-2 flex-wrap">
@@ -164,8 +169,13 @@ export default function PartnersSection({ partners = [] }: PartnersSectionProps)
                     <img
                       src={partner.logoUrl}
                       alt={partner.name}
-                      className="w-12 h-12 rounded-xl object-cover border border-slate-100 shadow-3xs shrink-0"
+                      className="w-12 h-12 rounded-xl object-contain p-1 bg-white border border-slate-100 shadow-3xs shrink-0"
                       referrerPolicy="no-referrer"
+                      onError={(e) => {
+                        if (partner.link.includes('wedos')) {
+                          (e.target as HTMLImageElement).src = "https://www.wedos.cz/wp-content/uploads/2025/03/VEDOS-Hosting-logo.svg";
+                        }
+                      }}
                     />
                   ) : (
                     <div className="w-12 h-12 rounded-xl bg-teal-50 text-teal-700 border border-teal-100/50 flex items-center justify-center font-black text-sm font-display shadow-3xs shrink-0">

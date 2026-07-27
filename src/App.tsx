@@ -798,11 +798,16 @@ export default function App() {
           {/* Official Technology Partner & Webhosting Sponsor Card */}
           <div className="mt-8 bg-gradient-to-r from-slate-950 via-slate-900 to-teal-950/80 border border-teal-500/30 rounded-2xl p-4 md:p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-lg" id="wedos-footer-partner-card">
             <div className="flex items-center gap-3.5">
-              <div className="w-12 h-12 rounded-xl bg-white p-1.5 shrink-0 flex items-center justify-center border border-slate-200 shadow-xs">
-                <div className="text-center">
-                  <span className="text-slate-950 font-black text-xs tracking-tighter block font-display leading-none">WEDOS</span>
-                  <span className="text-[7px] text-teal-600 font-bold uppercase tracking-widest block">Internet</span>
-                </div>
+              <div className="w-12 h-12 rounded-xl bg-white p-1.5 shrink-0 flex items-center justify-center border border-slate-200 shadow-xs overflow-hidden">
+                <img 
+                  src="https://vedos.cz/wp-content/uploads/2025/03/VEDOS-Hosting-logo.svg" 
+                  alt="WEDOS Logo" 
+                  className="w-full h-full object-contain"
+                  referrerPolicy="no-referrer"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = "https://www.wedos.cz/wp-content/uploads/2025/03/VEDOS-Hosting-logo.svg";
+                  }}
+                />
               </div>
               <div className="space-y-0.5">
                 <div className="flex items-center gap-2 flex-wrap">

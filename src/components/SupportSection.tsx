@@ -827,11 +827,16 @@ export default function SupportSection({
           <div className="bg-gradient-to-r from-slate-900 via-teal-950 to-slate-900 border-2 border-teal-500/50 rounded-2xl p-5 md:p-6 text-white shadow-xl space-y-3 relative overflow-hidden" id="wedos-sponsors-tab-card">
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
               <div className="flex items-center gap-3.5">
-                <div className="w-12 h-12 rounded-xl bg-white p-2 shrink-0 flex items-center justify-center shadow-md">
-                  <div className="text-center">
-                    <span className="text-slate-900 font-black text-xs tracking-tighter block font-display leading-none">WEDOS</span>
-                    <span className="text-[7px] text-teal-600 font-bold uppercase tracking-widest block mt-0.5">Internet</span>
-                  </div>
+                <div className="w-12 h-12 rounded-xl bg-white p-1.5 shrink-0 flex items-center justify-center shadow-md overflow-hidden border border-slate-100">
+                  <img 
+                    src="https://vedos.cz/wp-content/uploads/2025/03/VEDOS-Hosting-logo.svg" 
+                    alt="WEDOS Logo" 
+                    className="w-full h-full object-contain"
+                    referrerPolicy="no-referrer"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = "https://www.wedos.cz/wp-content/uploads/2025/03/VEDOS-Hosting-logo.svg";
+                    }}
+                  />
                 </div>
                 <div>
                   <div className="flex items-center gap-2 flex-wrap">
