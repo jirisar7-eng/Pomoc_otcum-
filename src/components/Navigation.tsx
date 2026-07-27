@@ -139,8 +139,8 @@ export default function Navigation({
 
   return (
     <header className="sticky top-0 z-40 bg-white border-b border-slate-200/80 shadow-xs relative">
-      {/* Official Top Announcement Bar (Pevně nahoře jako první prvek - viditelné od md: výše) */}
-      <div className="hidden md:flex bg-gradient-to-r from-amber-500 via-teal-600 to-indigo-700 text-white text-[11px] font-mono py-1.5 px-3 sm:px-4 text-center items-center justify-center gap-x-2 gap-y-1 font-semibold border-b border-amber-400/20 shrink-0">
+      {/* Official Top Announcement Bar (Pevně nahoře jako první prvek - viditelné pouze na velkém desktopu xl: výše) */}
+      <div className="hidden xl:flex bg-gradient-to-r from-amber-500 via-teal-600 to-indigo-700 text-white text-[11px] font-mono py-1.5 px-3 sm:px-4 text-center items-center justify-center gap-x-2 gap-y-1 font-semibold border-b border-amber-400/20 shrink-0">
         <Sparkles className="w-3.5 h-3.5 text-amber-200 animate-pulse shrink-0" />
         <span className="truncate max-w-[95vw] md:max-w-none">
           {t('hero_welcome', 'Oficiální spuštění alfa verze 0.0.1.2 portálu Táta má právo! 🚀')}
@@ -376,7 +376,7 @@ export default function Navigation({
           </nav>
 
           {/* Right Tools: Universal Search, Notification Center, Glossary & Profile */}
-          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 flex-wrap">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             
             {/* Universal Search Bar Component */}
             <UniversalSearchInput 
@@ -476,8 +476,8 @@ export default function Navigation({
         </div>
       </div>
 
-      {/* Desktop & Tablet Quick Access Bar (Pevná lišta rychlých odkazů - skryto na mobilu) */}
-      <div className="hidden md:block bg-slate-50/95 border-t border-slate-100 py-1.5 px-3 sm:px-4 lg:px-8">
+      {/* Desktop Quick Access Bar (Pevná lišta rychlých odkazů - skryto na mobilu a tabletech md/lg) */}
+      <div className="hidden xl:block bg-slate-50/95 border-t border-slate-100 py-1.5 px-3 sm:px-4 lg:px-8">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2 text-[11px] font-bold">
           <div className="flex items-center gap-1.5 shrink-0 text-slate-500 font-mono text-[10px] uppercase tracking-wider">
             <Compass className="w-3.5 h-3.5 text-teal-600 shrink-0" />
