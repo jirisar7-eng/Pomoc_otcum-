@@ -149,9 +149,15 @@ export default function App() {
   const [selectedGlossaryTerm, setSelectedGlossaryTerm] = useState<string | null>(null);
 
   // Lifed States for full Back-Office Synchronizations
-  const [articles, setLocalArticles] = useState<Article[]>(() => 
-    getStoredState<Article[]>('articles', INITIAL_ARTICLES)
-  );
+  const [articles, setLocalArticles] = useState<Article[]>(() => {
+    const loaded = getStoredState<Article[]>('articles', INITIAL_ARTICLES);
+    const wedosArt = INITIAL_ARTICLES.find(a => a.id === 'art-wedos-milestone');
+    if (wedosArt) {
+      const rest = loaded.filter(a => a.id !== 'art-wedos-milestone');
+      return [wedosArt, ...rest];
+    }
+    return loaded;
+  });
   const [stories, setLocalStories] = useState<ExperienceStory[]>(() => {
     const loaded = getStoredState<ExperienceStory[]>('stories', INITIAL_STORIES);
     const seen = new Set<string>();

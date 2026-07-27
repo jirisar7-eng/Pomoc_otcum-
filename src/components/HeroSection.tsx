@@ -221,6 +221,76 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn, partne
       </section>
 
       {/* ========================================================================= */}
+      {/* 📰 SEKCE: HLAVNÍ ZPRÁVA A OFICIÁLNÍ OZNÁMENÍ (WEDOS MILESTONE)          */}
+      {/* ========================================================================= */}
+      <section className="bg-gradient-to-r from-slate-900 via-slate-850 to-teal-950 text-white rounded-3xl p-6 sm:p-8 border-2 border-teal-500/40 shadow-xl relative overflow-hidden space-y-5" id="home-featured-announcement">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+        
+        <div className="flex items-center justify-between flex-wrap gap-2 border-b border-slate-800 pb-3 relative z-10">
+          <div className="flex items-center gap-2">
+            <span className="flex h-2.5 w-2.5 relative">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-teal-500"></span>
+            </span>
+            <span className="text-[11px] font-mono font-bold text-teal-300 uppercase tracking-wider">
+              {translateText('Oficiální zpráva z redakce • 27. Července 2026', language)}
+            </span>
+          </div>
+          <span className="bg-amber-400/20 text-amber-300 border border-amber-400/30 text-[10px] font-mono font-bold uppercase px-2.5 py-0.5 rounded-full">
+            ★ První milník projektu
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center relative z-10">
+          <div className="lg:col-span-8 space-y-3">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-white font-display leading-tight">
+              Oslava prvního milníku: WEDOS se stává technologickým partnerem projektu „Táta má právo“
+            </h2>
+            <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
+              Každý velký příběh potřebuje silný začátek a lidi, kteří věří v jeho smysl. S obrovskou radostí a hrdostí dnes můžeme oznámit, že projekt <strong>Táta má právo</strong> získal svého první oficiálního sponzora a technologického partnera – stala se jím společnost <strong>WEDOS Internet, a.s.</strong>, která projektu věnovala sponzorovaný webhosting <strong>NoLimit</strong>.
+            </p>
+            <div className="pt-2 flex flex-wrap items-center gap-3">
+              <button
+                onClick={() => onNavigate('news')}
+                className="px-5 py-2.5 bg-teal-500 hover:bg-teal-400 text-slate-950 font-extrabold text-xs rounded-xl shadow-md transition-all flex items-center gap-2 cursor-pointer"
+              >
+                <BookOpen className="w-4 h-4 text-slate-950" />
+                <span>Přečíst si celý článek v Aktualitách</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+              <a
+                href="https://www.wedos.cz"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-bold text-xs rounded-xl transition-all flex items-center gap-1.5 cursor-pointer"
+              >
+                <span>Navštívit WEDOS.cz</span>
+                <ExternalLink className="w-3.5 h-3.5 text-teal-400" />
+              </a>
+            </div>
+          </div>
+
+          <div className="lg:col-span-4 bg-slate-900/90 border border-teal-500/30 rounded-2xl p-5 text-center space-y-3 flex flex-col items-center justify-center">
+            <div className="w-20 h-20 rounded-2xl bg-white p-2.5 shadow-md border border-slate-200 flex items-center justify-center overflow-hidden">
+              <img 
+                src="https://vedos.cz/wp-content/uploads/2025/03/VEDOS-Hosting-logo.svg" 
+                alt="WEDOS Logo" 
+                className="w-full h-full object-contain"
+                referrerPolicy="no-referrer"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = "https://www.wedos.cz/wp-content/uploads/2025/03/VEDOS-Hosting-logo.svg";
+                }}
+              />
+            </div>
+            <div className="space-y-1">
+              <span className="text-xs font-black text-white font-display block">WEDOS Internet, a.s.</span>
+              <span className="text-[10px] text-teal-300 font-mono block">Sponzor Webhostingu NoLimit</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ========================================================================= */}
       {/* 📊 SEKCE 2: INTERAKTIVNÍ ROZCESTNÍK 21 ODBORNÝCH OKRUHŮ                  */}
       {/* ========================================================================= */}
       <section className="bg-white rounded-3xl border border-slate-200/80 p-6 md:p-8 lg:p-10 shadow-sm space-y-8" id="section-21-categories">
