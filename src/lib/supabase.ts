@@ -16,17 +16,39 @@ function readEnvVariable(keys: string[], defaultVal = ''): string {
         return metaEnv[key].trim();
       }
     }
+    // Dynamic substring search fallback in import.meta.env
+    const targetSubstring = keys[0]?.replace(/^VITE_|^NEXT_PUBLIC_|^REACT_APP_|^PUBLIC_/, '');
+    if (targetSubstring) {
+      for (const [k, v] of Object.entries(metaEnv)) {
+        if (typeof v === 'string' && v.trim() && k.toUpperCase().includes(targetSubstring.toUpperCase())) {
+          return v.trim();
+        }
+      }
+    }
   } catch (e) {
     // ignore
   }
 
-  // 2. Check window.__ENV__ or window._env_ or window overrides
+  // 2. Check window.__ENV__, window._env_, window.process.env or window overrides
   if (typeof window !== 'undefined') {
     const win = window as any;
-    const winEnv = win.__ENV__ || win._env_ || {};
+    const winEnv = {
+      ...(win.__ENV__ || {}),
+      ...(win._env_ || {}),
+      ...(win.process?.env || {}),
+      ...win
+    };
     for (const key of keys) {
       if (winEnv[key] && typeof winEnv[key] === 'string' && winEnv[key].trim()) {
         return winEnv[key].trim();
+      }
+    }
+    const targetSubstring = keys[0]?.replace(/^VITE_|^NEXT_PUBLIC_|^REACT_APP_|^PUBLIC_/, '');
+    if (targetSubstring) {
+      for (const [k, v] of Object.entries(winEnv)) {
+        if (typeof v === 'string' && v.trim() && k.toUpperCase().includes(targetSubstring.toUpperCase())) {
+          return v.trim();
+        }
       }
     }
   }
@@ -37,6 +59,14 @@ function readEnvVariable(keys: string[], defaultVal = ''): string {
       for (const key of keys) {
         if (process.env[key] && typeof process.env[key] === 'string' && process.env[key]!.trim()) {
           return process.env[key]!.trim();
+        }
+      }
+      const targetSubstring = keys[0]?.replace(/^VITE_|^NEXT_PUBLIC_|^REACT_APP_|^PUBLIC_/, '');
+      if (targetSubstring) {
+        for (const [k, v] of Object.entries(process.env)) {
+          if (typeof v === 'string' && v.trim() && k.toUpperCase().includes(targetSubstring.toUpperCase())) {
+            return v.trim();
+          }
         }
       }
     }
@@ -71,11 +101,110 @@ export function getSupabaseAnonKey(): string {
       'VITE_SUPABASE_KEY',
       'SUPABASE_KEY',
       'NEXT_PUBLIC_SUPABASE_ANON_KEY',
+      'NEXT_PUBLIC_SUPABASE_KEY',
       'REACT_APP_SUPABASE_ANON_KEY',
       'PUBLIC_SUPABASE_ANON_KEY'
     ],
     ''
   );
+}
+
+// Diagnostics helper returning complete status details
+export function getSupabaseConfigDiagnostics() {
+  const url = getSupabaseUrl();
+  const key = getSupabaseAnonKey();
+  const isConfigured = isSupabaseConfigured();
+
+  let urlSource = 'Nepřímo zjištěno / Výchozí fallback';
+  let keySource = 'Nenalezeno v proměnných';
+
+  if (typeof window !== 'undefined' && localStorage.getItem('synthesis_hub_supabase_url_override')) {
+    urlSource = 'localStorage override (ruční)';
+  } else {
+    try {
+      const metaEnv = (import.meta as any)?.env || {};
+      const keys = ['VITE_SUPABASE_URL', 'SUPABASE_URL', 'NEXT_PUBLIC_SUPABASE_URL', 'REACT_APP_SUPABASE_URL', 'PUBLIC_SUPABASE_URL'];
+      for (const k of keys) {
+        if (metaEnv[k]) { urlSource = `import.meta.env.${k}`; break; }
+      }
+    } catch {}
+  }
+
+  if (typeof window !== 'undefined' && localStorage.getItem('synthesis_hub_supabase_key_override')) {
+    keySource = 'localStorage override (ruční)';
+  } else {
+    try {
+      const metaEnv = (import.meta as any)?.env || {};
+      const keys = ['VITE_SUPABASE_ANON_KEY', 'SUPABASE_ANON_KEY', 'VITE_SUPABASE_KEY', 'SUPABASE_KEY', 'NEXT_PUBLIC_SUPABASE_ANON_KEY'];
+      for (const k of keys) {
+        if (metaEnv[k]) { keySource = `import.meta.env.${k}`; break; }
+      }
+    } catch {}
+  }
+
+  return {
+    url,
+    urlSource,
+    keyConfigured: !!(key && key.length > 15),
+    keyLength: key ? key.length : 0,
+    keyMasked: key ? `${key.substring(0, 8)}...${key.substring(Math.max(0, key.length - 6))}` : 'Chybí',
+    keySource,
+    isConfigured
+  };
+}
+
+/**
+ * Executes a live query test on Supabase and returns a detailed diagnostic report with exact error messages
+ */
+export async function testSupabaseConnection(): Promise<{ success: boolean; message: string; latencyMs?: number; rawError?: any }> {
+  const diag = getSupabaseConfigDiagnostics();
+  if (!diag.keyConfigured) {
+    return {
+      success: false,
+      message: `Chybí platný Supabase Anon API Klíč. Vercel proměnná VITE_SUPABASE_ANON_KEY nebo SUPABASE_ANON_KEY nebyla nalezena (délka klíče: ${diag.keyLength}).`
+    };
+  }
+
+  const sb = getSupabase();
+  if (!sb) {
+    return {
+      success: false,
+      message: `Klient Supabase selhal při inicializaci. Zkontrolujte URL adresi (${diag.url}) a formát Anon klíče (${diag.keySource}).`
+    };
+  }
+
+  const startTime = Date.now();
+  try {
+    const { data, error } = await Promise.race([
+      sb.from('articles').select('id', { count: 'exact', head: true }),
+      new Promise<any>((_, reject) => setTimeout(() => reject(new Error('Časový limit spojení se Supabase vypršel (3000ms).')), 3000))
+    ]);
+
+    const latency = Date.now() - startTime;
+    if (error) {
+      const formattedErr = `Supabase Chyba [${error.code || 'HTTP_ERROR'}]: ${error.message}${error.hint ? ` (Nápověda: ${error.hint})` : ''}${error.details ? ` (${error.details})` : ''}`;
+      return {
+        success: false,
+        message: formattedErr,
+        latencyMs: latency,
+        rawError: error
+      };
+    }
+
+    return {
+      success: true,
+      message: `Spojení se Supabase PostgreSQL je 100% funkční! (Odezva: ${latency}ms, RLS tabulky v pořádku)`,
+      latencyMs: latency
+    };
+  } catch (err: any) {
+    const latency = Date.now() - startTime;
+    return {
+      success: false,
+      message: `Výjimka sítě / klienta: ${err?.message || String(err)}`,
+      latencyMs: latency,
+      rawError: err
+    };
+  }
 }
 
 // Check if connection is active

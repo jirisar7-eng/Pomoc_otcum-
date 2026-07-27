@@ -34,6 +34,7 @@ import {
   query,
   where,
   orderBy,
+  limit,
   enableIndexedDbPersistence
 } from 'firebase/firestore';
 import { User, UserRole, Article, ExperienceStory, ForumPost, Comment } from '../types';
@@ -42,12 +43,13 @@ import firebaseConfigJson from '../../firebase-applet-config.json';
 // Helper to safely read environment variables across Vite, Next, React, window, and process environments
 function readEnvVariable(keys: string[], defaultVal = ''): string {
   if (typeof window !== 'undefined') {
-    if (keys.includes('VITE_FIREBASE_API_KEY')) {
+    if (keys.some(k => k.includes('FIREBASE_API_KEY'))) {
       const override = localStorage.getItem('synthesis_hub_firebase_api_key_override');
       if (override && override.trim()) return override.trim();
     }
   }
 
+  // 1. Check import.meta.env
   try {
     const metaEnv = (import.meta as any)?.env || {};
     for (const key of keys) {
@@ -55,25 +57,57 @@ function readEnvVariable(keys: string[], defaultVal = ''): string {
         return metaEnv[key].trim();
       }
     }
+    // Dynamic substring fallback in import.meta.env
+    const targetSubstring = keys[0]?.replace(/^VITE_|^NEXT_PUBLIC_|^REACT_APP_|^PUBLIC_/, '');
+    if (targetSubstring) {
+      for (const [k, v] of Object.entries(metaEnv)) {
+        if (typeof v === 'string' && v.trim() && k.toUpperCase().includes(targetSubstring.toUpperCase())) {
+          return v.trim();
+        }
+      }
+    }
   } catch (e) {
     // ignore
   }
 
+  // 2. Check window.__ENV__, window._env_, window.process.env or window overrides
   if (typeof window !== 'undefined') {
     const win = window as any;
-    const winEnv = win.__ENV__ || win._env_ || {};
+    const winEnv = {
+      ...(win.__ENV__ || {}),
+      ...(win._env_ || {}),
+      ...(win.process?.env || {}),
+      ...win
+    };
     for (const key of keys) {
       if (winEnv[key] && typeof winEnv[key] === 'string' && winEnv[key].trim()) {
         return winEnv[key].trim();
       }
     }
+    const targetSubstring = keys[0]?.replace(/^VITE_|^NEXT_PUBLIC_|^REACT_APP_|^PUBLIC_/, '');
+    if (targetSubstring) {
+      for (const [k, v] of Object.entries(winEnv)) {
+        if (typeof v === 'string' && v.trim() && k.toUpperCase().includes(targetSubstring.toUpperCase())) {
+          return v.trim();
+        }
+      }
+    }
   }
 
+  // 3. Check process.env if present
   try {
     if (typeof process !== 'undefined' && process.env) {
       for (const key of keys) {
         if (process.env[key] && typeof process.env[key] === 'string' && process.env[key]!.trim()) {
           return process.env[key]!.trim();
+        }
+      }
+      const targetSubstring = keys[0]?.replace(/^VITE_|^NEXT_PUBLIC_|^REACT_APP_|^PUBLIC_/, '');
+      if (targetSubstring) {
+        for (const [k, v] of Object.entries(process.env)) {
+          if (typeof v === 'string' && v.trim() && k.toUpperCase().includes(targetSubstring.toUpperCase())) {
+            return v.trim();
+          }
         }
       }
     }
@@ -86,7 +120,7 @@ function readEnvVariable(keys: string[], defaultVal = ''): string {
 
 // Build Firebase Config with Environment overrides or static config file
 const firebaseConfig = {
-  apiKey: readEnvVariable(['VITE_FIREBASE_API_KEY', 'FIREBASE_API_KEY', 'NEXT_PUBLIC_FIREBASE_API_KEY', 'REACT_APP_FIREBASE_API_KEY'], firebaseConfigJson.apiKey),
+  apiKey: readEnvVariable(['VITE_FIREBASE_API_KEY', 'FIREBASE_API_KEY', 'NEXT_PUBLIC_FIREBASE_API_KEY', 'REACT_APP_FIREBASE_API_KEY', 'PUBLIC_FIREBASE_API_KEY'], firebaseConfigJson.apiKey),
   authDomain: readEnvVariable(['VITE_FIREBASE_AUTH_DOMAIN', 'FIREBASE_AUTH_DOMAIN', 'NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN', 'REACT_APP_FIREBASE_AUTH_DOMAIN'], firebaseConfigJson.authDomain),
   projectId: readEnvVariable(['VITE_FIREBASE_PROJECT_ID', 'FIREBASE_PROJECT_ID', 'NEXT_PUBLIC_FIREBASE_PROJECT_ID', 'REACT_APP_FIREBASE_PROJECT_ID'], firebaseConfigJson.projectId),
   storageBucket: readEnvVariable(['VITE_FIREBASE_STORAGE_BUCKET', 'FIREBASE_STORAGE_BUCKET', 'NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET'], firebaseConfigJson.storageBucket),
@@ -97,6 +131,76 @@ const firebaseConfig = {
   databaseURL: (firebaseConfigJson as any).databaseURL,
   measurementId: (firebaseConfigJson as any).measurementId
 };
+
+// Diagnostics helper for Firebase
+export function getFirebaseConfigDiagnostics() {
+  const apiKey = firebaseConfig.apiKey;
+  const projectId = firebaseConfig.projectId;
+  const authDomain = firebaseConfig.authDomain;
+
+  let apiKeySource = 'firebase-applet-config.json';
+  if (typeof window !== 'undefined' && localStorage.getItem('synthesis_hub_firebase_api_key_override')) {
+    apiKeySource = 'localStorage override (ruční)';
+  } else {
+    try {
+      const metaEnv = (import.meta as any)?.env || {};
+      const keys = ['VITE_FIREBASE_API_KEY', 'FIREBASE_API_KEY', 'NEXT_PUBLIC_FIREBASE_API_KEY', 'REACT_APP_FIREBASE_API_KEY'];
+      for (const k of keys) {
+        if (metaEnv[k]) { apiKeySource = `import.meta.env.${k}`; break; }
+      }
+    } catch {}
+  }
+
+  return {
+    projectId: projectId || 'synthesis-os-db',
+    authDomain: authDomain || 'synthesis-os-db.firebaseapp.com',
+    apiKeyConfigured: !!(apiKey && apiKey.trim().length > 10),
+    apiKeyLength: apiKey ? apiKey.length : 0,
+    apiKeyMasked: apiKey ? `${apiKey.substring(0, 8)}...${apiKey.substring(Math.max(0, apiKey.length - 4))}` : 'Chybí',
+    apiKeySource,
+    firestoreDatabaseId: firestoreDbId || '(default)'
+  };
+}
+
+/**
+ * Executes a live query test on Firebase Firestore and returns detailed error breakdown
+ */
+export async function testFirebaseConnection(): Promise<{ success: boolean; message: string; latencyMs?: number; rawError?: any }> {
+  const diag = getFirebaseConfigDiagnostics();
+  if (!diag.apiKeyConfigured) {
+    return {
+      success: false,
+      message: `Chybí platný Firebase API Klíč (VITE_FIREBASE_API_KEY). Zkontrolujte konfiguraci na Vercelu.`
+    };
+  }
+
+  const startTime = Date.now();
+  try {
+    const q = query(collection(db, 'users'), limit(1));
+    const snapshot = await Promise.race([
+      getDocs(q),
+      new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Časový limit spojení s Firebase Firestore vypršel (3500ms).')), 3500))
+    ]);
+
+    const latency = Date.now() - startTime;
+    return {
+      success: true,
+      message: `Spojení s Firebase Firestore je 100% funkční! (Odezva: ${latency}ms, Načteno ${snapshot.size} uživatelů)`,
+      latencyMs: latency
+    };
+  } catch (err: any) {
+    const latency = Date.now() - startTime;
+    const errCode = err?.code || 'NETWORK_OR_AUTH_ERROR';
+    const errMessage = err?.message || String(err);
+    const formattedErr = `Firebase Chyba [${errCode}]: ${errMessage}`;
+    return {
+      success: false,
+      message: formattedErr,
+      latencyMs: latency,
+      rawError: err
+    };
+  }
+}
 
 // Sanitize firestoreDatabaseId: a valid Firestore database ID must consist only of lowercase letters, numbers, and hyphens (up to 63 chars), or be '(default)'.
 // It must NOT be a URL, and must NOT contain slashes, colons, or dots.

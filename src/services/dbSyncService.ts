@@ -10,8 +10,8 @@
  * Ensures persistent storage across Vercel deployments and sandboxed environments.
  */
 
-import { getSupabase, isSupabaseConfigured, getSupabaseUrl, getSupabaseAnonKey } from '../lib/supabase';
-import { db, saveDocument as saveFirebaseDoc, deleteDocument as deleteFirebaseDoc, getCollectionData as getFirebaseCollection } from '../lib/firebase';
+import { getSupabase, isSupabaseConfigured, getSupabaseUrl, getSupabaseAnonKey, getSupabaseConfigDiagnostics, testSupabaseConnection } from '../lib/supabase';
+import { db, saveDocument as saveFirebaseDoc, deleteDocument as deleteFirebaseDoc, getCollectionData as getFirebaseCollection, getFirebaseConfigDiagnostics, testFirebaseConnection } from '../lib/firebase';
 import { doc, setDoc, deleteDoc, getDoc } from 'firebase/firestore';
 import { Article, ExperienceStory, ForumPost, Comment, Donation, Partner, User } from '../types';
 
@@ -26,8 +26,12 @@ export interface DualSyncResult {
 export interface DatabaseStatus {
   supabaseConfigured: boolean;
   supabaseConnected: boolean;
+  supabaseError?: string | null;
+  supabaseDetails?: any;
   firebaseConfigured: boolean;
   firebaseConnected: boolean;
+  firebaseError?: string | null;
+  firebaseDetails?: any;
   lastSyncTimestamp: string | null;
 }
 
@@ -35,48 +39,24 @@ class DbSyncService {
   private lastSyncTime: string | null = null;
 
   /**
-   * Returns current connectivity status of both Supabase and Firebase
+   * Returns current connectivity status of both Supabase and Firebase with exact diagnostic details
    */
   async getStatus(): Promise<DatabaseStatus> {
-    const supConfigured = isSupabaseConfigured();
-    let supConnected = false;
-    let fbConnected = false;
+    const supDiag = getSupabaseConfigDiagnostics();
+    const supTest = await testSupabaseConnection();
 
-    // Test Supabase connection
-    if (supConfigured) {
-      try {
-        const supabase = getSupabase();
-        if (supabase) {
-          const { error } = await supabase.from('articles').select('id').limit(1);
-          supConnected = !error;
-        }
-      } catch (e) {
-        supConnected = false;
-      }
-    }
-
-    // Test Firebase connection
-    try {
-      if (db) {
-        fbConnected = true;
-      }
-    } catch (e) {
-      fbConnected = false;
-    }
-
-    const fbConfigured = !!(
-      (import.meta as any)?.env?.VITE_FIREBASE_PROJECT_ID ||
-      (import.meta as any)?.env?.FIREBASE_PROJECT_ID ||
-      (import.meta as any)?.env?.VITE_FIREBASE_API_KEY ||
-      (import.meta as any)?.env?.FIREBASE_API_KEY ||
-      (typeof window !== 'undefined' && localStorage.getItem('synthesis_hub_firebase_api_key_override'))
-    );
+    const fbDiag = getFirebaseConfigDiagnostics();
+    const fbTest = await testFirebaseConnection();
 
     return {
-      supabaseConfigured: supConfigured,
-      supabaseConnected: supConnected,
-      firebaseConfigured: fbConfigured,
-      firebaseConnected: fbConnected,
+      supabaseConfigured: supDiag.isConfigured,
+      supabaseConnected: supTest.success,
+      supabaseError: supTest.success ? null : supTest.message,
+      supabaseDetails: supDiag,
+      firebaseConfigured: fbDiag.apiKeyConfigured,
+      firebaseConnected: fbTest.success,
+      firebaseError: fbTest.success ? null : fbTest.message,
+      firebaseDetails: fbDiag,
       lastSyncTimestamp: this.lastSyncTime
     };
   }

@@ -15,9 +15,9 @@ import {
   Lock, LogIn, ArrowLeft, Home, ShieldCheck, User as UserIcon
 } from 'lucide-react';
 import { Article, ExperienceStory, ForumPost, Comment, User, Donation, Partner } from '../types';
-import { getSupabaseUrl, getSupabaseAnonKey, isSupabaseConfigured, getSupabase, resetSupabaseInstance } from '../lib/supabase';
+import { getSupabaseUrl, getSupabaseAnonKey, isSupabaseConfigured, getSupabase, resetSupabaseInstance, testSupabaseConnection, getSupabaseConfigDiagnostics } from '../lib/supabase';
 import { useLanguage } from '../lib/LanguageContext';
-import { saveDocument, deleteDocument, getCollectionData } from '../lib/firebase';
+import { saveDocument, deleteDocument, getCollectionData, testFirebaseConnection, getFirebaseConfigDiagnostics } from '../lib/firebase';
 import { dbSyncService } from '../services/dbSyncService';
 import { AIAdminActions } from '../lib/ai-admin/actions';
 import { AIAdminClient } from '../lib/ai-admin/client';
@@ -111,7 +111,7 @@ export default function AdminPanel({
     setIsAddingPartner(true);
   };
 
-  const handleSavePartner = (e: React.FormEvent) => {
+  const handleSavePartner = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!partnerName.trim() || !partnerLink.trim()) {
       alert('Prosím vyplňte název partnera a odkaz.');
@@ -131,6 +131,8 @@ export default function AdminPanel({
         showOnMainPage: partnerShowOnMainPage
       };
       setPartners(prev => prev.map(p => p.id === editingPartner.id ? updatedPartner : p));
+      await dbSyncService.dualSaveDocument('partners', updatedPartner.id, updatedPartner);
+      logDatabaseActivity('UPDATE_PARTNER', 'SUCCESS', `Partner "${updatedPartner.name}" byl úspěšně aktualizován v databázi.`);
     } else {
       const newPartner: Partner = {
         id: `partner-${Date.now()}`,
@@ -145,26 +147,32 @@ export default function AdminPanel({
         createdAt: new Date().toISOString()
       };
       setPartners(prev => [newPartner, ...prev]);
+      await dbSyncService.dualSaveDocument('partners', newPartner.id, newPartner);
+      logDatabaseActivity('CREATE_PARTNER', 'SUCCESS', `Partner "${newPartner.name}" byl úspěšně zaevidován v databázi.`);
     }
 
     setIsAddingPartner(false);
     setEditingPartner(null);
   };
 
-  const handleDeletePartner = (id: string) => {
+  const handleDeletePartner = async (id: string) => {
     if (confirm('Opravdu chcete tohoto partnera smazat?')) {
       setPartners(prev => prev.filter(p => p.id !== id));
+      await dbSyncService.dualDeleteDocument('partners', id);
+      logDatabaseActivity('DELETE_PARTNER', 'SUCCESS', `Partner s ID "${id}" byl odstraněn z databáze.`);
     }
   };
 
-  const handleToggleRecommended = (p: Partner) => {
+  const handleToggleRecommended = async (p: Partner) => {
     const updated = { ...p, isRecommended: !p.isRecommended };
     setPartners(prev => prev.map(item => item.id === p.id ? updated : item));
+    await dbSyncService.dualSaveDocument('partners', updated.id, updated);
   };
 
-  const handleToggleShowOnMain = (p: Partner) => {
+  const handleToggleShowOnMain = async (p: Partner) => {
     const updated = { ...p, showOnMainPage: !p.showOnMainPage };
     setPartners(prev => prev.map(item => item.id === p.id ? updated : item));
+    await dbSyncService.dualSaveDocument('partners', updated.id, updated);
   };
 
   // Supabase states
@@ -535,6 +543,10 @@ export default function AdminPanel({
   // --- DATABASE & CLOUD STATUS STATES ---
   const [firebaseStatus, setFirebaseStatus] = useState<'active' | 'loading' | 'offline' | 'error'>('loading');
   const [supabaseStatus, setSupabaseStatus] = useState<'active' | 'loading' | 'offline' | 'error'>('loading');
+  const [firebaseErrorMsg, setFirebaseErrorMsg] = useState<string | null>(null);
+  const [supabaseErrorMsg, setSupabaseErrorMsg] = useState<string | null>(null);
+  const [firebaseDiagInfo, setFirebaseDiagInfo] = useState<any>(null);
+  const [supabaseDiagInfo, setSupabaseDiagInfo] = useState<any>(null);
   const [pingLatency, setPingLatency] = useState<number | null>(null);
   const [dbTableCounts, setDbTableCounts] = useState({
     articles: 0,
@@ -558,6 +570,17 @@ export default function AdminPanel({
       // 1. Firebase check (concurrently, non-blocking)
       const firebasePromise = (async () => {
         setFirebaseStatus('loading');
+        const diag = getFirebaseConfigDiagnostics();
+        setFirebaseDiagInfo(diag);
+        const fbTest = await testFirebaseConnection();
+        if (fbTest.success) {
+          setFirebaseStatus('active');
+          setFirebaseErrorMsg(null);
+        } else {
+          setFirebaseStatus('error');
+          setFirebaseErrorMsg(fbTest.message);
+        }
+
         try {
           // Wrapped with a 4-second timeout to prevent hangs
           const dbUsers = await Promise.race([
@@ -579,18 +602,28 @@ export default function AdminPanel({
               return merged;
             });
           }
-          setFirebaseStatus('active');
-        } catch (err) {
+        } catch (err: any) {
           console.log("Firestore offline or unavailable (using local fallback list):", err);
-          setFirebaseStatus('offline');
         }
       })();
 
       // 2. Supabase check (concurrently, non-blocking)
       const supabasePromise = (async () => {
         setSupabaseStatus('loading');
-        const startTime = Date.now();
-        let supActive = false;
+        const diag = getSupabaseConfigDiagnostics();
+        setSupabaseDiagInfo(diag);
+        const supTest = await testSupabaseConnection();
+
+        if (supTest.success) {
+          setSupabaseStatus('active');
+          setSupabaseErrorMsg(null);
+          if (supTest.latencyMs) setPingLatency(supTest.latencyMs);
+        } else {
+          setSupabaseStatus('error');
+          setSupabaseErrorMsg(supTest.message);
+        }
+
+        let supActive = supTest.success;
         const sb = getSupabase();
 
         if (sb && isSupabaseConfigured()) {
@@ -618,20 +651,10 @@ export default function AdminPanel({
                 comments: commCheck && commCheck.count !== null ? commCheck.count : comments.length,
                 donations: donCheck && donCheck.count !== null ? donCheck.count : donations.length
               }));
-              setSupabaseStatus('active');
-              supActive = true;
-              setPingLatency(Date.now() - startTime);
-            } else {
-              // Timeout or null response - graceful fallback
-              console.warn("Supabase live tables check timed out, using fallback datasets.");
-              setSupabaseStatus('offline');
             }
           } catch (e: any) {
             console.warn("Supabase live tables check unavailable:", e?.message || e);
-            setSupabaseStatus('offline');
           }
-        } else {
-          setSupabaseStatus('offline');
         }
 
         if (!supActive) {
@@ -907,7 +930,7 @@ export default function AdminPanel({
   };
 
   // Article Actions
-  const handleSaveArticleForm = (e: React.FormEvent) => {
+  const handleSaveArticleForm = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!articleEditorState.title.trim() || !articleEditorState.content.trim()) {
       alert('Vyplňte prosím název a obsah článku.');
@@ -927,6 +950,9 @@ export default function AdminPanel({
       tags: articleEditorState.tags.split(',').map(t => t.trim())
     };
     setArticles(prev => [newArt, ...prev]);
+    await dbSyncService.dualSaveDocument('articles', newArt.id, newArt);
+    logDatabaseActivity('CREATE_ARTICLE', 'SUCCESS', `Článek "${newArt.title}" v kategorii ${newArt.category} byl uložen a publikován.`);
+
     // Log audit
     setAuditLogs(prev => [
       {
@@ -948,47 +974,83 @@ export default function AdminPanel({
     });
   };
 
+  const handleDeleteArticle = async (id: string) => {
+    if (confirm('Opravdu chcete smazat tento článek z databáze?')) {
+      setArticles(prev => prev.filter(a => a.id !== id));
+      await dbSyncService.dualDeleteDocument('articles', id);
+      logDatabaseActivity('DELETE_ARTICLE', 'SUCCESS', `Článek s ID "${id}" byl odstraněn.`);
+      setAuditLogs(prev => [
+        {
+          date: new Date().toLocaleString('cs-CZ'),
+          user: currentUser?.email || 'admin@synthesis.cz',
+          ip: '192.168.1.104',
+          category: 'Smazání článku',
+          desc: `Smazán článek ID: ${id}.`,
+          browser: 'Admin OS',
+          hash: 'sha256:' + Math.random().toString(36).substr(2, 6)
+        },
+        ...prev
+      ]);
+    }
+  };
+
   // Add Judikatura ruling
-  const handleAddRuling = (e: React.FormEvent) => {
+  const handleAddRuling = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newRuling.sign || !newRuling.topic || !newRuling.phrase) {
       alert('Doplňte povinné údaje rozsudku.');
       return;
     }
-    setRulings(prev => [
-      {
-        id: 'j-' + Date.now(),
-        court: newRuling.court,
-        sign: newRuling.sign,
-        date: newRuling.date || new Date().toISOString().split('T')[0],
-        topic: newRuling.topic,
-        phrase: newRuling.phrase,
-        summary: newRuling.summary || 'Stručný komentář editora k právní větě.'
-      },
-      ...prev
-    ]);
+    const newRulObj = {
+      id: 'j-' + Date.now(),
+      court: newRuling.court,
+      sign: newRuling.sign,
+      date: newRuling.date || new Date().toISOString().split('T')[0],
+      topic: newRuling.topic,
+      phrase: newRuling.phrase,
+      summary: newRuling.summary || 'Stručný komentář editora k právní věte.'
+    };
+    setRulings(prev => [newRulObj, ...prev]);
+    await dbSyncService.dualSaveDocument('rulings', newRulObj.id, newRulObj);
+    logDatabaseActivity('CREATE_RULING', 'SUCCESS', `Judikát "${newRulObj.sign}" bol uložený do databázy.`);
     setNewRuling({ court: 'Ústavní soud', sign: '', date: '', topic: '', phrase: '', summary: '' });
     alert('Judikát byl zaevidován a automaticky propojen se souvisejícími články.');
   };
 
+  const handleDeleteRuling = async (id: string) => {
+    if (confirm('Opravdu chcete vymazat tento judikát?')) {
+      setRulings(prev => prev.filter(x => x.id !== id));
+      await dbSyncService.dualDeleteDocument('rulings', id);
+      logDatabaseActivity('DELETE_RULING', 'SUCCESS', `Judikát s ID "${id}" bol zmazaný z databázy.`);
+    }
+  };
+
   // Add Document template
-  const handleAddDoc = (e: React.FormEvent) => {
+  const handleAddDoc = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newDoc.title) return;
-    setDocTemplates(prev => [
-      {
-        id: 'd-' + Date.now(),
-        title: newDoc.title,
-        type: newDoc.type,
-        court: newDoc.court,
-        date: newDoc.date || new Date().toISOString().split('T')[0],
-        version: newDoc.version,
-        size: '150 KB'
-      },
-      ...prev
-    ]);
+    const newDocObj = {
+      id: 'd-' + Date.now(),
+      title: newDoc.title,
+      type: newDoc.type,
+      court: newDoc.court,
+      date: newDoc.date || new Date().toISOString().split('T')[0],
+      version: newDoc.version,
+      size: '150 KB'
+    };
+    setDocTemplates(prev => [newDocObj, ...prev]);
+    await dbSyncService.dualSaveDocument('doc_templates', newDocObj.id, newDocObj);
+    logDatabaseActivity('CREATE_DOC_TEMPLATE', 'SUCCESS', `Vzor podania "${newDocObj.title}" bol zaevidovaný.`);
     setNewDoc({ title: '', type: 'Návrh k soudu', court: 'Okresní soud', date: '', version: 'v1.0' });
     alert('Nový vzor podání byl vložen do databáze šablon.');
+  };
+
+  const handleDeleteDocTemplate = async (id: string) => {
+    if (confirm('Opravdu chcete vymazat túto šablónu dokumentu?')) {
+      setDocTemplates(prev => prev.filter(x => x.id !== id));
+      await dbSyncService.dualDeleteDocument('doc_templates', id);
+      logDatabaseActivity('DELETE_DOC_TEMPLATE', 'SUCCESS', `Šablóna s ID "${id}" bola odstránená.`);
+    }
   };
 
   // Add Chronology step to Case
@@ -2087,6 +2149,57 @@ ${cases.map(c => `Název: ${c.title}\nStav: ${c.status}\nChronologie:\n` + (c.ch
                   </div>
                 </form>
               </div>
+
+              {/* Published Articles List */}
+              <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-2xs space-y-4">
+                <div className="flex justify-between items-center border-b border-slate-50 pb-3">
+                  <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                    <FileText className="w-4 h-4 text-indigo-500" />
+                    Publikované články v databázi ({articles.length})
+                  </h3>
+                  <span className="text-[10px] text-slate-400 font-mono">Live CMS Table</span>
+                </div>
+
+                <div className="overflow-hidden border border-slate-100 rounded-xl bg-white">
+                  <table className="w-full text-left text-xs border-collapse">
+                    <thead>
+                      <tr className="bg-slate-50 text-slate-400 font-mono text-[9px] uppercase border-b border-slate-100">
+                        <th className="p-3">Název článku</th>
+                        <th className="p-3">Kategorie</th>
+                        <th className="p-3">Autor</th>
+                        <th className="p-3">Datum</th>
+                        <th className="p-3 text-right">Akce</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {articles.map((a) => (
+                        <tr key={a.id} className="hover:bg-slate-50/40 transition-colors">
+                          <td className="p-3 font-semibold text-slate-800 max-w-xs truncate" title={a.title}>
+                            {a.title}
+                          </td>
+                          <td className="p-3">
+                            <span className="bg-indigo-50 text-indigo-700 text-[10px] font-bold px-2 py-0.5 rounded">
+                              {a.category}
+                            </span>
+                          </td>
+                          <td className="p-3 text-slate-600 font-medium">{a.author}</td>
+                          <td className="p-3 text-slate-400 font-mono text-[10px]">{a.date}</td>
+                          <td className="p-3 text-right">
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteArticle(a.id)}
+                              className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 cursor-pointer transition-colors"
+                              title="Smazat článek"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
           )}
 
@@ -2143,7 +2256,7 @@ ${cases.map(c => `Název: ${c.title}\nStav: ${c.status}\nChronologie:\n` + (c.ch
                       </span>
                       
                       <button
-                        onClick={() => setRulings(prev => prev.filter(x => x.id !== r.id))}
+                        onClick={() => handleDeleteRuling(r.id)}
                         className="text-rose-600 hover:underline cursor-pointer flex items-center gap-0.5"
                       >
                         Odebrat judikát
@@ -2268,7 +2381,7 @@ ${cases.map(c => `Název: ${c.title}\nStav: ${c.status}\nChronologie:\n` + (c.ch
                         </td>
                         <td className="p-3 text-right">
                           <button
-                            onClick={() => setDocTemplates(prev => prev.filter(x => x.id !== d.id))}
+                            onClick={() => handleDeleteDocTemplate(d.id)}
                             className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 cursor-pointer"
                             title="Odebrat šablonu"
                           >
@@ -4365,43 +4478,57 @@ ${cases.map(c => `Název: ${c.title}\nStav: ${c.status}\nChronologie:\n` + (c.ch
                     <div className="p-3.5 bg-slate-50 rounded-xl space-y-2">
                       <div className="flex justify-between border-b border-slate-100/50 pb-1.5">
                         <span className="text-slate-400 font-mono text-[10px]">PROJEKT ID</span>
-                        <span className="font-mono text-slate-700 font-bold">synthesis-os-db</span>
+                        <span className="font-mono text-slate-700 font-bold">{firebaseDiagInfo?.projectId || 'synthesis-os-db'}</span>
                       </div>
                       <div className="flex justify-between border-b border-slate-100/50 pb-1.5">
-                        <span className="text-slate-400 font-mono text-[10px]">FIRESTORE DB ID</span>
-                        <span className="font-mono text-slate-700 font-bold">(default)</span>
+                        <span className="text-slate-400 font-mono text-[10px]">ZDROJ PROMĚNNÉ</span>
+                        <span className="font-mono text-indigo-600 font-bold text-[10px]">{firebaseDiagInfo?.apiKeySource || 'Automaticky'}</span>
                       </div>
                       <div className="flex justify-between pb-0.5">
-                        <span className="text-slate-400 font-mono text-[10px]">REŽIM STORAGE</span>
-                        <span className="font-mono text-slate-700 font-bold">Hybrid (Auth + NoSQL)</span>
+                        <span className="text-slate-400 font-mono text-[10px]">API KLÍČ STATUS</span>
+                        <span className="font-mono text-slate-700 font-bold">
+                          {firebaseDiagInfo?.apiKeyConfigured ? `✔️ ZADÁN (${firebaseDiagInfo.apiKeyMasked})` : '❌ CHYBÍ'}
+                        </span>
                       </div>
                     </div>
 
-                    <div className="p-3 bg-indigo-50/50 border border-indigo-100/30 rounded-xl space-y-1">
-                      <strong className="text-slate-800 font-bold block text-[11px]">Firestore kolekce (Users):</strong>
-                      <p className="text-slate-500 text-[11px] leading-relaxed">
-                        Spravuje profily registrovaných uživatelů, ověření účtů, speciální role a bezpečnostní vazby RBAC.
-                      </p>
-                    </div>
+                    {firebaseErrorMsg ? (
+                      <div className="p-3 bg-rose-50 border border-rose-200/80 rounded-xl space-y-1.5 text-rose-900 text-[11px] font-mono leading-relaxed">
+                        <strong className="block text-rose-900 font-bold font-sans text-xs flex items-center gap-1">
+                          <AlertTriangle className="w-3.5 h-3.5 text-rose-600" />
+                          Chybová hláška z Firebase:
+                        </strong>
+                        <p className="p-2 bg-white/80 rounded border border-rose-200 text-rose-800 break-words">{firebaseErrorMsg}</p>
+                      </div>
+                    ) : (
+                      <div className="p-3 bg-indigo-50/50 border border-indigo-100/30 rounded-xl space-y-1">
+                        <strong className="text-slate-800 font-bold block text-[11px]">Firestore kolekce (Users):</strong>
+                        <p className="text-slate-500 text-[11px] leading-relaxed">
+                          Spravuje profily registrovaných uživatelů, ověření účtů, speciální role a bezpečnostní vazby RBAC.
+                        </p>
+                      </div>
+                    )}
 
                     <button
                       type="button"
                       onClick={async () => {
                         setFirebaseStatus('loading');
-                        try {
-                          const users = await Promise.race([
-                            getCollectionData<User>('users', []),
-                            new Promise<User[]>((_, reject) => setTimeout(() => reject(new Error('Firebase timeout')), 5000))
-                          ]);
+                        const diag = getFirebaseConfigDiagnostics();
+                        setFirebaseDiagInfo(diag);
+                        const testRes = await testFirebaseConnection();
+                        if (testRes.success) {
                           setFirebaseStatus('active');
-                          alert(`Firebase test úspěšný! Načteno ${users.length} uživatelských profilů.`);
-                        } catch (e) {
+                          setFirebaseErrorMsg(null);
+                          alert(`✅ Firebase Test Úspěšný!\n\n${testRes.message}\nZdroj API klíče: ${diag.apiKeySource}`);
+                        } else {
                           setFirebaseStatus('error');
-                          alert("Firebase test selhal nebo vypršel časový limit spojení. Zkontrolujte prosím konfiguraci projektu.");
+                          setFirebaseErrorMsg(testRes.message);
+                          alert(`❌ Firebase Test Selhal!\n\n${testRes.message}\n\nProjekt ID: ${diag.projectId}\nZdroj API klíče: ${diag.apiKeySource}`);
                         }
                       }}
-                      className="w-full py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200/80 rounded-xl font-bold text-slate-700 text-xs transition-all cursor-pointer"
+                      className="w-full py-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200/80 rounded-xl font-bold text-slate-700 text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5"
                     >
+                      <RefreshCw className={`w-3.5 h-3.5 ${firebaseStatus === 'loading' ? 'animate-spin' : ''}`} />
                       Otestovat Firestore spojení (Ping)
                     </button>
                   </div>
@@ -4421,7 +4548,7 @@ ${cases.map(c => `Název: ${c.title}\nStav: ${c.status}\nChronologie:\n` + (c.ch
                     }`}>
                       {supabaseStatus === 'active' ? `🟢 AKTIVNÍ (${pingLatency ? `${pingLatency}ms` : 'OK'})` :
                        supabaseStatus === 'loading' ? '⏳ NAČÍTÁNÍ...' :
-                       '🟡 FALLBACK / LOKÁLNÍ'}
+                       '🔴 CHYBA / ODPOJENO'}
                     </span>
                   </div>
 
@@ -4429,64 +4556,60 @@ ${cases.map(c => `Název: ${c.title}\nStav: ${c.status}\nChronologie:\n` + (c.ch
                     <div className="p-3.5 bg-slate-50 rounded-xl space-y-2">
                       <div className="flex justify-between border-b border-slate-100/50 pb-1.5">
                         <span className="text-slate-400 font-mono text-[10px]">DATABÁZE URL</span>
-                        <span className="font-mono text-slate-700 font-bold break-all max-w-[150px] truncate" title={supUrl || 'Nenastaveno'}>
+                        <span className="font-mono text-slate-700 font-bold break-all max-w-[170px] truncate" title={supUrl || 'Nenastaveno'}>
                           {supUrl || 'Nenastaveno'}
                         </span>
                       </div>
                       <div className="flex justify-between border-b border-slate-100/50 pb-1.5">
-                        <span className="text-slate-400 font-mono text-[10px]">ANON KLÍČ</span>
-                        <span className="font-mono text-slate-700 font-bold">
-                          {supKey ? '••••••••••••••••••••' : 'Nenastaveno'}
-                        </span>
+                        <span className="text-slate-400 font-mono text-[10px]">ZDROJ KLÍČE</span>
+                        <span className="font-mono text-indigo-600 font-bold text-[10px]">{supabaseDiagInfo?.keySource || 'Automaticky'}</span>
                       </div>
                       <div className="flex justify-between pb-0.5">
-                        <span className="text-slate-400 font-mono text-[10px]">RLS PROTECTION</span>
-                        <span className="font-mono text-emerald-600 font-extrabold uppercase">ZAPNUTO (RLS)</span>
+                        <span className="text-slate-400 font-mono text-[10px]">ANON KLÍČ STATUS</span>
+                        <span className="font-mono text-slate-700 font-bold">
+                          {supKey ? `✔️ ZADÁN (${supKey.length} zn.)` : '❌ CHYBÍ'}
+                        </span>
                       </div>
                     </div>
 
-                    <div className="p-3 bg-emerald-50/50 border border-emerald-100/30 rounded-xl space-y-1">
-                      <strong className="text-slate-800 font-bold block text-[11px]">Relační PostgreSQL motor:</strong>
-                      <p className="text-slate-500 text-[11px] leading-relaxed">
-                        Ukládá články, příběhy, komunitní fórum, komentáře a finanční dary tátů.
-                      </p>
-                    </div>
+                    {supabaseErrorMsg ? (
+                      <div className="p-3 bg-rose-50 border border-rose-200/80 rounded-xl space-y-1.5 text-rose-900 text-[11px] font-mono leading-relaxed">
+                        <strong className="block text-rose-900 font-bold font-sans text-xs flex items-center gap-1">
+                          <AlertTriangle className="w-3.5 h-3.5 text-rose-600" />
+                          Chybová hláška ze Supabase:
+                        </strong>
+                        <p className="p-2 bg-white/80 rounded border border-rose-200 text-rose-800 break-words">{supabaseErrorMsg}</p>
+                      </div>
+                    ) : (
+                      <div className="p-3 bg-emerald-50/50 border border-emerald-100/30 rounded-xl space-y-1">
+                        <strong className="text-slate-800 font-bold block text-[11px]">Relační PostgreSQL motor:</strong>
+                        <p className="text-slate-500 text-[11px] leading-relaxed">
+                          Ukládá články, příběhy, komunitní fórum, komentáře a finanční dary tátů.
+                        </p>
+                      </div>
+                    )}
 
                     <button
                       type="button"
                       onClick={async () => {
                         setSupabaseStatus('loading');
-                        const startTime = Date.now();
-                        const sb = getSupabase();
-                        if (sb && isSupabaseConfigured()) {
-                          try {
-                            const result = await Promise.race([
-                              sb.from('articles').select('id', { count: 'exact', head: true }).then(({ error }) => {
-                                if (error) return false;
-                                return true;
-                              }),
-                              new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 3000))
-                            ]);
-
-                            if (result) {
-                              setSupabaseStatus('active');
-                              setPingLatency(Date.now() - startTime);
-                              alert(`Supabase test úspěšný! Odezva ${Date.now() - startTime}ms.`);
-                            } else {
-                              setSupabaseStatus('offline');
-                              alert("Supabase vypršela lhůta odezvy (timeout) nebo není k dispozici. Aplikace využívá lokální/Firestore vrstvu.");
-                            }
-                          } catch (e) {
-                            setSupabaseStatus('error');
-                            alert("Supabase test selhal. Zkontrolujte připojení k PostgreSQL.");
-                          }
+                        const diag = getSupabaseConfigDiagnostics();
+                        setSupabaseDiagInfo(diag);
+                        const testRes = await testSupabaseConnection();
+                        if (testRes.success) {
+                          setSupabaseStatus('active');
+                          setSupabaseErrorMsg(null);
+                          if (testRes.latencyMs) setPingLatency(testRes.latencyMs);
+                          alert(`✅ Supabase Test Úspěšný!\n\n${testRes.message}\n\nZdroj URL: ${diag.urlSource}\nZdroj Klíče: ${diag.keySource}`);
                         } else {
-                          setSupabaseStatus('offline');
-                          alert("Supabase není nakonfigurováno.");
+                          setSupabaseStatus('error');
+                          setSupabaseErrorMsg(testRes.message);
+                          alert(`❌ Supabase Test Selhal!\n\n${testRes.message}\n\nURL: ${diag.url}\nZdroj klíče: ${diag.keySource}\nDélka klíče: ${diag.keyLength}`);
                         }
                       }}
-                      className="w-full py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200/80 rounded-xl font-bold text-slate-700 text-xs transition-all cursor-pointer"
+                      className="w-full py-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200/80 rounded-xl font-bold text-slate-700 text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5"
                     >
+                      <RefreshCw className={`w-3.5 h-3.5 ${supabaseStatus === 'loading' ? 'animate-spin' : ''}`} />
                       Otestovat Supabase spojení (Ping)
                     </button>
                   </div>
