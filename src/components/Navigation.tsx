@@ -185,8 +185,8 @@ export default function Navigation({
               </div>
             </div>
 
-            {/* Desktop Navigation Topbar */}
-            <nav className="hidden xl:flex items-center justify-center gap-1 max-w-[65%] py-1">
+            {/* Responsive Desktop & Tablet Navigation Topbar */}
+            <nav className="hidden md:flex items-center justify-center gap-1 lg:gap-1.5 max-w-[70%] py-1">
               {PUBLIC_TOPBAR_ITEMS.slice(0, 7).map((item) => {
                 const ItemIcon = item.icon;
                 const isActive = activeTab === item.id;
@@ -196,7 +196,7 @@ export default function Navigation({
                   <button
                     key={item.id}
                     onClick={() => handleTabClick(item.id)}
-                    className={`flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all border cursor-pointer ${
+                    className={`flex items-center gap-1 px-2 lg:px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all border cursor-pointer whitespace-nowrap ${
                       isActive
                         ? isSimulator || isHub
                           ? 'bg-teal-600 border-teal-700 text-white shadow-3xs'
@@ -210,16 +210,17 @@ export default function Navigation({
                     title={item.desc}
                   >
                     <ItemIcon className={`w-3.5 h-3.5 ${isActive ? (isSimulator || isHub ? 'text-white' : 'text-teal-600') : (isSimulator ? 'text-teal-700' : isHub ? 'text-indigo-600' : 'text-slate-400')}`} />
-                    <span>{item.label}</span>
+                    <span className="hidden lg:inline">{item.label}</span>
+                    <span className="inline lg:hidden">{item.label.split(' ')[0]}</span>
                     {isSimulator && (
-                      <span className={`text-[9px] font-mono px-1.5 py-0.2 rounded-full uppercase tracking-tighter ml-0.5 font-black ${
+                      <span className={`text-[9px] font-mono px-1.5 py-0.2 rounded-full uppercase tracking-tighter ml-0.5 font-black hidden xl:inline-block ${
                         isActive ? 'bg-teal-700 text-teal-100' : 'bg-teal-200/90 text-teal-950'
                       }`}>
                         PÉČE
                       </span>
                     )}
                     {isHub && (
-                      <span className={`text-[9px] font-mono px-1.5 py-0.2 rounded-full uppercase tracking-tighter ml-0.5 font-black ${
+                      <span className={`text-[9px] font-mono px-1.5 py-0.2 rounded-full uppercase tracking-tighter ml-0.5 font-black hidden xl:inline-block ${
                         isActive ? 'bg-teal-700 text-teal-100' : 'bg-indigo-100 text-indigo-800'
                       }`}>
                         HUB
@@ -237,7 +238,7 @@ export default function Navigation({
               >
                 <button
                   onClick={() => setOpenDropdown(openDropdown === 'categories' ? null : 'categories')}
-                  className={`flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all border cursor-pointer ${
+                  className={`flex items-center gap-1 px-2 lg:px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all border cursor-pointer whitespace-nowrap ${
                     openDropdown === 'categories'
                       ? 'bg-indigo-50 border-indigo-200 text-indigo-900 shadow-3xs'
                       : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100 hover:text-slate-900'
@@ -253,12 +254,12 @@ export default function Navigation({
                 </button>
 
                 {openDropdown === 'categories' && (
-                  <div className="absolute left-1/2 -translate-x-1/2 mt-1 w-[740px] bg-white border border-indigo-200 rounded-3xl shadow-2xl p-4 z-50 animate-in fade-in duration-150">
+                  <div className="absolute left-1/2 -translate-x-1/2 mt-1 w-[90vw] max-w-[780px] bg-white border border-indigo-200 rounded-3xl shadow-2xl p-4 z-50 animate-in fade-in duration-150">
                     <div className="flex items-center justify-between border-b border-slate-100 pb-2.5 mb-3 gap-3">
                       <div className="flex items-center gap-2 shrink-0">
                         <Layers className="w-4 h-4 text-indigo-600" />
                         <span className="text-xs font-extrabold text-slate-900 font-display uppercase tracking-wider">
-                          Kategorie (21)
+                          21 Odborných Kategorií
                         </span>
                       </div>
                       <div className="relative flex-1 max-w-xs">
@@ -284,7 +285,7 @@ export default function Navigation({
                       </span>
                     </div>
 
-                    <div className="grid grid-cols-3 gap-1.5 max-h-[360px] overflow-y-auto pr-1">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 gap-2 max-h-[380px] overflow-y-auto pr-1">
                       {filteredCategories.map((cat) => (
                         <button
                           key={cat.id}
@@ -465,7 +466,7 @@ export default function Navigation({
             </div>
 
             {/* Mobile Menu Toggle */}
-            <div className="flex xl:hidden items-center gap-2">
+            <div className="flex md:hidden items-center gap-2">
               <NotificationCenter onNavigate={handleTabClick} />
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -476,6 +477,90 @@ export default function Navigation({
               </button>
             </div>
 
+          </div>
+        </div>
+
+        {/* Desktop & Tablet Quick Access Bar (Pevná lišta rychlých odkazů) */}
+        <div className="hidden md:block bg-slate-50/90 border-t border-slate-100 py-1.5 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto flex items-center justify-between gap-2 overflow-x-auto text-[11px] font-bold">
+            <div className="flex items-center gap-1.5 shrink-0 text-slate-400 font-mono text-[10px] uppercase tracking-wider">
+              <Compass className="w-3.5 h-3.5 text-teal-600" />
+              <span>Rychlé odkazní centrum:</span>
+            </div>
+
+            <div className="flex items-center gap-2 overflow-x-auto py-0.5">
+              <button
+                onClick={() => handleTabClick('crisis')}
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg transition-all border cursor-pointer shrink-0 ${
+                  activeTab === 'crisis'
+                    ? 'bg-rose-600 text-white border-rose-700 shadow-3xs'
+                    : 'bg-rose-50/80 hover:bg-rose-100 text-rose-900 border-rose-200/80'
+                }`}
+              >
+                <ShieldAlert className="w-3.5 h-3.5 text-rose-600" />
+                <span>Krizová pomoc 24/7</span>
+              </button>
+
+              <button
+                onClick={() => handleTabClick('coparent-hub')}
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg transition-all border cursor-pointer shrink-0 ${
+                  activeTab === 'coparent-hub'
+                    ? 'bg-indigo-600 text-white border-indigo-700 shadow-3xs'
+                    : 'bg-indigo-50/80 hover:bg-indigo-100 text-indigo-900 border-indigo-200/80'
+                }`}
+              >
+                <Users className="w-3.5 h-3.5 text-indigo-600" />
+                <span>Rodičovský Hub</span>
+              </button>
+
+              <button
+                onClick={() => handleTabClick('ai-assistant')}
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg transition-all border cursor-pointer shrink-0 ${
+                  activeTab === 'ai-assistant'
+                    ? 'bg-teal-600 text-white border-teal-700 shadow-3xs'
+                    : 'bg-teal-50/80 hover:bg-teal-100 text-teal-900 border-teal-200/80'
+                }`}
+              >
+                <Sparkles className="w-3.5 h-3.5 text-teal-600 animate-pulse" />
+                <span>AI Průvodce &amp; Asistent</span>
+              </button>
+
+              <button
+                onClick={() => handleTabClick('plan-pece')}
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg transition-all border cursor-pointer shrink-0 ${
+                  activeTab === 'plan-pece'
+                    ? 'bg-emerald-600 text-white border-emerald-700 shadow-3xs'
+                    : 'bg-emerald-50/80 hover:bg-emerald-100 text-emerald-900 border-emerald-200/80'
+                }`}
+              >
+                <Sliders className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Simulátor Péče</span>
+              </button>
+
+              <button
+                onClick={() => handleTabClick('judikatura')}
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg transition-all border cursor-pointer shrink-0 ${
+                  activeTab === 'judikatura'
+                    ? 'bg-amber-600 text-white border-amber-700 shadow-3xs'
+                    : 'bg-amber-50/80 hover:bg-amber-100 text-amber-900 border-amber-200/80'
+                }`}
+              >
+                <Scale className="w-3.5 h-3.5 text-amber-600" />
+                <span>Judikatura ÚS</span>
+              </button>
+
+              <button
+                onClick={() => handleTabClick('ke-stazeni')}
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg transition-all border cursor-pointer shrink-0 ${
+                  activeTab === 'ke-stazeni'
+                    ? 'bg-slate-800 text-white border-slate-900 shadow-3xs'
+                    : 'bg-white hover:bg-slate-100 text-slate-700 border-slate-200'
+                }`}
+              >
+                <FileText className="w-3.5 h-3.5 text-slate-500" />
+                <span>Vzory podání</span>
+              </button>
+            </div>
           </div>
         </div>
 
