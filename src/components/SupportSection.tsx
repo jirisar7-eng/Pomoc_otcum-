@@ -823,6 +823,45 @@ export default function SupportSection({
             </div>
           </div>
 
+          {/* Featured Active Sponsor Spotlight - WEDOS */}
+          <div className="bg-gradient-to-r from-slate-900 via-teal-950 to-slate-900 border-2 border-teal-500/50 rounded-2xl p-5 md:p-6 text-white shadow-xl space-y-3 relative overflow-hidden" id="wedos-sponsors-tab-card">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+              <div className="flex items-center gap-3.5">
+                <div className="w-12 h-12 rounded-xl bg-white p-2 shrink-0 flex items-center justify-center shadow-md">
+                  <div className="text-center">
+                    <span className="text-slate-900 font-black text-xs tracking-tighter block font-display leading-none">WEDOS</span>
+                    <span className="text-[7px] text-teal-600 font-bold uppercase tracking-widest block mt-0.5">Internet</span>
+                  </div>
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="bg-teal-500/20 text-teal-300 border border-teal-500/30 text-[9px] font-mono font-bold uppercase px-2 py-0.5 rounded-full">
+                      ★ Generální technologický sponzor
+                    </span>
+                    <span className="bg-amber-400/20 text-amber-300 border border-amber-400/30 text-[9px] font-mono font-bold uppercase px-2 py-0.5 rounded-full">
+                      Webhosting NoLimit
+                    </span>
+                  </div>
+                  <h3 className="text-sm font-bold text-white font-display mt-0.5">WEDOS Internet, a.s.</h3>
+                </div>
+              </div>
+
+              <a
+                href="https://www.wedos.cz"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-2 bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-xs rounded-xl transition-all flex items-center gap-1.5 shadow-md shrink-0 cursor-pointer"
+              >
+                <span>Navštívit WEDOS.cz</span>
+                <ArrowUpRight className="w-3.5 h-3.5" />
+              </a>
+            </div>
+
+            <p className="text-xs text-slate-300 leading-relaxed pt-1">
+              Velké děkujeme společnosti <strong>WEDOS Internet, a.s.</strong>, která oficiálně zaštítila náš projekt a poskytuje nám zdarma kompletní sponzorovaný <strong>webhosting NoLimit</strong> a technologickou podporu pro plynulý chod portálu.
+            </p>
+          </div>
+
           {/* Core features overview */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">

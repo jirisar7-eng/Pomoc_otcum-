@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Sparkles, Scale, Heart, Shield, BookOpen } from 'lucide-react';
+import { Sparkles, Scale, Heart, Shield, BookOpen, ExternalLink, Server } from 'lucide-react';
 
 import { User, Article, ExperienceStory, ForumPost, Comment, Donation, Partner } from './types';
 import { 
@@ -793,6 +793,41 @@ export default function App() {
               </p>
             </div>
 
+          </div>
+
+          {/* Official Technology Partner & Webhosting Sponsor Card */}
+          <div className="mt-8 bg-gradient-to-r from-slate-950 via-slate-900 to-teal-950/80 border border-teal-500/30 rounded-2xl p-4 md:p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-lg" id="wedos-footer-partner-card">
+            <div className="flex items-center gap-3.5">
+              <div className="w-12 h-12 rounded-xl bg-white p-1.5 shrink-0 flex items-center justify-center border border-slate-200 shadow-xs">
+                <div className="text-center">
+                  <span className="text-slate-950 font-black text-xs tracking-tighter block font-display leading-none">WEDOS</span>
+                  <span className="text-[7px] text-teal-600 font-bold uppercase tracking-widest block">Internet</span>
+                </div>
+              </div>
+              <div className="space-y-0.5">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="font-extrabold text-white text-xs">WEDOS Internet, a.s.</span>
+                  <span className="bg-teal-500/20 text-teal-300 border border-teal-500/30 text-[9px] uppercase font-bold px-2 py-0.5 rounded-full font-mono">
+                    Technologický partner
+                  </span>
+                  <span className="bg-amber-400/20 text-amber-300 border border-amber-400/30 text-[9px] uppercase font-bold px-2 py-0.5 rounded-full font-mono">
+                    Sponzor webhostingu
+                  </span>
+                </div>
+                <p className="text-slate-300 text-[11px] leading-relaxed">
+                  Společnost WEDOS poskytla projektu „Táta má právo“ technologickou podporu a webhosting NoLimit.
+                </p>
+              </div>
+            </div>
+            <a
+              href="https://www.wedos.cz"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-4 py-2 bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-xs rounded-xl transition-all shrink-0 flex items-center gap-1.5 shadow-md hover:scale-105 cursor-pointer whitespace-nowrap"
+            >
+              <span>Navštívit WEDOS.cz</span>
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
           </div>
 
           <div className="border-t border-slate-800 mt-8 pt-6 flex flex-col md:flex-row items-center justify-between text-[11px] text-slate-500 font-mono">

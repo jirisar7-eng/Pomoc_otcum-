@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Partner } from '../types';
-import { Search, Share2, MapPin, ExternalLink, ShieldCheck, HeartHandshake } from 'lucide-react';
+import { Search, Share2, MapPin, ExternalLink, ShieldCheck, HeartHandshake, Server, Award, Sparkles } from 'lucide-react';
 
 interface PartnersSectionProps {
   partners: Partner[];
@@ -16,7 +16,7 @@ export default function PartnersSection({ partners = [] }: PartnersSectionProps)
     { id: 'Advokát', label: 'Advokáti' },
     { id: 'Psycholog', label: 'Psychologové' },
     { id: 'Mediátor', label: 'Mediátoři' },
-    { id: 'Ostatní', label: 'Ostatní specialisté' }
+    { id: 'Ostatní', label: 'Ostatní & Technologičtí' }
   ];
 
   const filteredPartners = partners.filter(p => {
@@ -35,14 +35,61 @@ export default function PartnersSection({ partners = [] }: PartnersSectionProps)
         <div className="relative max-w-3xl space-y-3">
           <div className="flex items-center gap-2">
             <HeartHandshake className="w-5 h-5 text-teal-400" />
-            <span className="text-[10px] uppercase font-bold text-teal-400 tracking-wider font-mono">Prověřená síť kontaktů</span>
+            <span className="text-[10px] uppercase font-bold text-teal-400 tracking-wider font-mono">Prověřená síť kontaktů & Sponzoři</span>
           </div>
           <h1 className="text-2xl md:text-4xl font-black tracking-tight font-display">
-            Spolupracující partneři & odborníci
+            Spolupracující partneři, sponzoři & odborníci
           </h1>
           <p className="text-slate-300 text-xs md:text-sm leading-relaxed">
-            Věříme, že v náročných opatrovnických sporech je klíčová podpora opravdových odborníků. Zde naleznete seznam našich doporučených partnerů, kteří sdílejí naše hodnoty a aktivně pomáhají tátům i mámám nalézat konsenzuální řešení s ohledem na nejlepší zájem dětí.
+            Věříme, že v náročných opatrovnických sporech je klíčová podpora opravdových odborníků i silných technologických partnerů. Zde naleznete seznam našich doporučených partnerů a sponzorů, kteří sdílejí naše hodnoty a pomáhají zajišťovat stabilní chod portálu pro táty i mámy.
           </p>
+        </div>
+      </div>
+
+      {/* Official Technology Sponsor Banner - WEDOS Internet, a.s. */}
+      <div className="bg-gradient-to-r from-blue-950 via-slate-900 to-teal-950 rounded-3xl border-2 border-teal-500/40 p-6 md:p-8 text-white shadow-2xl relative overflow-hidden space-y-4" id="wedos-official-sponsor-banner">
+        <div className="absolute -top-12 -right-12 w-64 h-64 bg-teal-500/10 rounded-full blur-2xl pointer-events-none" />
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative z-10">
+          <div className="flex items-start gap-4">
+            <div className="w-16 h-16 rounded-2xl bg-white p-2.5 shadow-md border border-slate-200 shrink-0 flex items-center justify-center">
+              <div className="text-center">
+                <span className="text-slate-900 font-black text-sm tracking-tighter block font-display leading-none">WEDOS</span>
+                <span className="text-[8px] text-teal-600 font-bold uppercase tracking-widest block mt-0.5">Internet</span>
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="bg-teal-500/20 text-teal-300 border border-teal-500/40 text-[10px] font-mono font-bold uppercase px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                  <Award className="w-3 h-3 text-teal-400" />
+                  Oficiální technologický partner & Webhosting
+                </span>
+                <span className="bg-amber-400/20 text-amber-300 border border-amber-400/30 text-[10px] font-mono font-bold uppercase px-2 py-0.5 rounded-full">
+                  ★ Sponzor projektu
+                </span>
+              </div>
+              <h2 className="text-xl md:text-2xl font-black font-display text-white">
+                WEDOS Internet, a.s. &mdash; Webhosting NoLimit
+              </h2>
+              <p className="text-slate-200 text-xs md:text-sm leading-relaxed max-w-3xl">
+                Společnost <strong>WEDOS Internet, a.s.</strong> poskytla projektu <em>„Táta má právo“</em> bezplatnou technologickou podporu a profesionální webhosting <strong>NoLimit</strong>. Díky této sponzorské záštitě běží náš portál na rychlé, bezpečné a stabilní české infrastruktuře.
+              </p>
+            </div>
+          </div>
+
+          <div className="shrink-0 w-full md:w-auto flex flex-col sm:flex-row md:flex-col gap-2.5">
+            <a
+              href="https://www.wedos.cz"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-5 py-3 bg-teal-500 hover:bg-teal-400 text-slate-950 font-extrabold text-xs rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 text-center"
+            >
+              <span>Navštívit WEDOS.cz</span>
+              <ExternalLink className="w-4 h-4" />
+            </a>
+            <span className="text-[10px] text-slate-400 text-center font-mono">
+              Sponzorováno v rámci podpory neziskových projektů
+            </span>
+          </div>
         </div>
       </div>
 

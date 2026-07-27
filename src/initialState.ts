@@ -99,6 +99,18 @@ export const INITIAL_PARTNERS: Partner[] = [
     createdAt: new Date().toISOString()
   },
   {
+    id: 'p-wedos',
+    name: 'WEDOS Internet, a.s.',
+    description: 'Oficiální technologický partner a sponzor webhostingu. Společnost WEDOS poskytuje projektu „Táta má právo“ bezplatnou technologickou podporu a sponzorovaný webhosting NoLimit pro stabilní a rychlý chod.',
+    logoUrl: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=120&q=80',
+    link: 'https://www.wedos.cz',
+    category: 'Ostatní',
+    region: 'Česká republika / Hluboká nad Vltavou',
+    isRecommended: true,
+    showOnMainPage: true,
+    createdAt: new Date().toISOString()
+  },
+  {
     id: 'p-ospod',
     name: 'OSPOD (Orgán sociálně-právní ochrany dětí)',
     description: 'Působí na odboru sociálních věcí každého Městského nebo Obecního úřadu obce s rozšířenou působností (ORP) podle místa trvalého bydliště dítěte. Působí jako soudem jmenovaný kolizní opatrovník.',
