@@ -95,7 +95,9 @@ export default function Navigation({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [categoryFilter, setCategoryFilter] = useState('');
-  const [topicsAccordionOpen, setTopicsAccordionOpen] = useState(true);
+  const [topicsAccordionOpen, setTopicsAccordionOpen] = useState(false);
+  const [quickNavAccordionOpen, setQuickNavAccordionOpen] = useState(false);
+  const [aboutAccordionOpen, setAboutAccordionOpen] = useState(false);
 
   const filteredCategories = useMemo(() => {
     if (!categoryFilter.trim()) return HUB_CATEGORIES;
@@ -582,415 +584,357 @@ export default function Navigation({
                 </button>
               </div>
 
-              {/* SCROLLABLE DRAWER BODY (4 DISTINCT PILLARS) */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-6">
+              {/* SCROLLABLE DRAWER BODY (RADICALLY SIMPLIFIED) */}
+              <div className="flex-1 overflow-y-auto p-3.5 sm:p-4 space-y-4">
                 
-                {/* 1. SECTOR: 🚀 RYCHLÝ ROZCESTNÍK (Core Navigation) */}
-                <div className="space-y-2.5">
-                  <div className="flex items-center gap-2 px-1 text-xs font-black text-slate-900 font-display uppercase tracking-wider">
-                    <span className="text-base">🚀</span>
-                    <span>Rychlý Rozcestník</span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <button
-                      onClick={() => handleTabClick('plan-pece')}
-                      className={`col-span-2 flex items-center justify-between p-3 rounded-2xl text-xs font-black transition-all border cursor-pointer ${
-                        activeTab === 'plan-pece'
-                          ? 'bg-teal-600 text-white border-teal-700 shadow-md'
-                          : 'bg-gradient-to-r from-teal-50 to-emerald-50 hover:from-teal-100 hover:to-emerald-100 text-teal-950 border-teal-300'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <Sliders className={`w-4.5 h-4.5 shrink-0 ${activeTab === 'plan-pece' ? 'text-white' : 'text-teal-600'}`} />
-                        <span className="truncate">Simulátor Péče & Sourozenecká Soudržnost</span>
-                      </div>
-                      <span className={`text-[9px] font-mono px-2 py-0.5 rounded-full uppercase font-black shrink-0 ${
-                        activeTab === 'plan-pece' ? 'bg-teal-700 text-teal-100' : 'bg-teal-200 text-teal-950'
-                      }`}>
-                        INTERAKTIVNÍ
-                      </span>
-                    </button>
-
-                    <button
-                      onClick={() => handleTabClick('coparent-hub')}
-                      className={`col-span-2 flex items-center justify-between p-3 rounded-2xl text-xs font-black transition-all border cursor-pointer ${
-                        activeTab === 'coparent-hub'
-                          ? 'bg-indigo-600 text-white border-indigo-700 shadow-md'
-                          : 'bg-indigo-50 hover:bg-indigo-100 text-indigo-950 border-indigo-200'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <Users className={`w-4.5 h-4.5 shrink-0 ${activeTab === 'coparent-hub' ? 'text-white' : 'text-indigo-600'}`} />
-                        <span className="truncate">Rodičovský Hub (CoParenting)</span>
-                      </div>
-                      <span className={`text-[9px] font-mono px-2 py-0.5 rounded-full uppercase font-black shrink-0 ${
-                        activeTab === 'coparent-hub' ? 'bg-indigo-700 text-indigo-100' : 'bg-indigo-200 text-indigo-950'
-                      }`}>
-                        PÁROVÁNÍ KLÍČŮ
-                      </span>
-                    </button>
-
-                    <button
-                      onClick={() => handleTabClick('home')}
-                      className={`flex items-center gap-2.5 p-2.5 rounded-2xl text-xs font-bold text-left transition-all border cursor-pointer ${
-                        activeTab === 'home'
-                          ? 'bg-teal-50 text-teal-950 border-teal-300 shadow-xs'
-                          : 'bg-slate-50 hover:bg-slate-100/90 text-slate-800 border-slate-200/80'
-                      }`}
-                    >
-                      <Home className={`w-4 h-4 shrink-0 ${activeTab === 'home' ? 'text-teal-600' : 'text-slate-500'}`} />
-                      <span className="truncate">Domů</span>
-                    </button>
-
-                    <button
-                      onClick={() => handleTabClick('news')}
-                      className={`flex items-center gap-2.5 p-2.5 rounded-2xl text-xs font-bold text-left transition-all border cursor-pointer ${
-                        activeTab === 'news'
-                          ? 'bg-teal-50 text-teal-950 border-teal-300 shadow-xs'
-                          : 'bg-slate-50 hover:bg-slate-100/90 text-slate-800 border-slate-200/80'
-                      }`}
-                    >
-                      <FileText className={`w-4 h-4 shrink-0 ${activeTab === 'news' ? 'text-teal-600' : 'text-slate-500'}`} />
-                      <span className="truncate">Články & Redakce</span>
-                    </button>
-
-                    <button
-                      onClick={() => handleTabClick('knihovna-studii')}
-                      className={`flex items-center gap-2.5 p-2.5 rounded-2xl text-xs font-bold text-left transition-all border cursor-pointer ${
-                        activeTab === 'knihovna-studii'
-                          ? 'bg-teal-50 text-teal-950 border-teal-300 shadow-xs'
-                          : 'bg-slate-50 hover:bg-slate-100/90 text-slate-800 border-slate-200/80'
-                      }`}
-                    >
-                      <BookOpen className={`w-4 h-4 shrink-0 ${activeTab === 'knihovna-studii' ? 'text-teal-600' : 'text-slate-500'}`} />
-                      <span className="truncate">Knihovna studií</span>
-                    </button>
-
-                    <button
-                      onClick={() => handleTabClick('videoteka')}
-                      className={`flex items-center gap-2.5 p-2.5 rounded-2xl text-xs font-bold text-left transition-all border cursor-pointer ${
-                        activeTab === 'videoteka'
-                          ? 'bg-teal-50 text-teal-950 border-teal-300 shadow-xs'
-                          : 'bg-slate-50 hover:bg-slate-100/90 text-slate-800 border-slate-200/80'
-                      }`}
-                    >
-                      <Tv className={`w-4 h-4 shrink-0 ${activeTab === 'videoteka' ? 'text-teal-600' : 'text-slate-500'}`} />
-                      <span className="truncate">Videotéka</span>
-                    </button>
-
-                    <button
-                      onClick={() => handleTabClick('judikatura')}
-                      className={`col-span-2 flex items-center justify-between p-2.5 rounded-2xl text-xs font-bold transition-all border cursor-pointer ${
-                        activeTab === 'judikatura'
-                          ? 'bg-teal-50 text-teal-950 border-teal-300 shadow-xs'
-                          : 'bg-slate-50 hover:bg-slate-100/90 text-slate-800 border-slate-200/80'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <Scale className={`w-4 h-4 shrink-0 ${activeTab === 'judikatura' ? 'text-teal-600' : 'text-slate-500'}`} />
-                        <span className="truncate">Judikatura Ústavního soudu</span>
-                      </div>
-                      <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* 2. SECTOR: 🔒 SOUKROMÁ ZÓNA & NÁSTROJE (User Space & AI) */}
-                <div className="space-y-2.5 border-t border-slate-100 pt-4">
-                  <div className="flex items-center justify-between px-1">
-                    <div className="flex items-center gap-2 text-xs font-black text-teal-900 font-display uppercase tracking-wider">
-                      <span className="text-base">🔒</span>
-                      <span>Soukromá Zóna & AI Nástroje</span>
-                    </div>
-                    {isLoggedIn && (
-                      <span className="text-[9px] font-mono bg-teal-100 text-teal-900 px-2 py-0.5 rounded-full font-bold">
-                        Aktivní účet
-                      </span>
-                    )}
+                {/* 1. SECTOR: 4 CORE KEY ITEMS (Clean & Minimal) */}
+                <div className="space-y-2">
+                  <div className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider px-1">
+                    Klíčové služby
                   </div>
 
-                  {!isLoggedIn && (
-                    <div className="bg-gradient-to-br from-teal-50 via-slate-50 to-indigo-50/60 p-3 rounded-2xl border border-teal-200/80 space-y-2 shadow-3xs">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-black text-slate-900 font-display">Přihlášení &amp; Registrace</span>
-                        <span className="text-[9px] font-mono bg-teal-100 text-teal-900 px-2 py-0.5 rounded-full font-bold">Zdarma</span>
-                      </div>
-                      <p className="text-[10px] text-slate-600 leading-tight">
-                        Přihlaste se nebo si vytvořte bezplatný účet pro ukládání kalendáře péče, spisu a přístup k AI asistentovi.
-                      </p>
-                      <div className="grid grid-cols-2 gap-2 pt-1">
-                        <button
-                          onClick={() => {
-                            onOpenAuth('login');
-                            setMobileMenuOpen(false);
-                          }}
-                          className="flex items-center justify-center gap-1.5 py-2 px-3 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl cursor-pointer shadow-xs"
-                        >
-                          <LogIn className="w-3.5 h-3.5 text-teal-300" />
-                          <span>Přihlásit se</span>
-                        </button>
-                        <button
-                          onClick={() => {
-                            onOpenAuth('register');
-                            setMobileMenuOpen(false);
-                          }}
-                          className="flex items-center justify-center gap-1.5 py-2 px-3 bg-teal-600 hover:bg-teal-700 text-white font-extrabold text-xs rounded-xl cursor-pointer shadow-xs border border-teal-500"
-                        >
-                          <UserPlus className="w-3.5 h-3.5 text-teal-100" />
-                          <span>Registrovat</span>
-                        </button>
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="grid grid-cols-1 gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {/* 1. Krizová pomoc */}
                     <button
-                      onClick={() => handleTabClick('user-portal')}
+                      onClick={() => handleTabClick('crisis')}
                       className={`flex items-center justify-between p-3 rounded-2xl text-xs font-bold text-left transition-all border cursor-pointer ${
-                        activeTab === 'user-portal'
-                          ? 'bg-teal-50 text-teal-950 border-teal-300 shadow-xs'
-                          : 'bg-gradient-to-r from-teal-50/50 to-emerald-50/50 hover:from-teal-100/60 hover:to-emerald-100/60 text-slate-800 border-teal-200/70'
+                        activeTab === 'crisis'
+                          ? 'bg-rose-600 text-white border-rose-700 shadow-sm'
+                          : 'bg-rose-50/80 hover:bg-rose-100/80 text-rose-950 border-rose-200/90 shadow-3xs'
                       }`}
                     >
                       <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-8 h-8 rounded-xl bg-teal-600 text-white flex items-center justify-center shrink-0 shadow-3xs">
-                          <UserCheck className="w-4 h-4" />
+                        <div className="w-8.5 h-8.5 rounded-xl bg-rose-600 text-white flex items-center justify-center shrink-0 shadow-3xs">
+                          <ShieldAlert className="w-4.5 h-4.5" />
                         </div>
                         <div className="min-w-0">
-                          <span className="text-xs font-extrabold text-slate-900 block truncate">Můj portál</span>
-                          <span className="text-[10px] text-teal-700 block truncate">Osobní kalendář, spis a data</span>
+                          <span className="text-xs font-black text-rose-950 block truncate">🚨 Krizová pomoc &amp; SOS linky</span>
+                          <span className="text-[10px] text-rose-700 block truncate font-medium">Rychlá pomoc 24/7 v nouzi</span>
                         </div>
                       </div>
-                      <ChevronRight className="w-4 h-4 text-teal-500 shrink-0" />
+                      <ChevronRight className="w-4 h-4 text-rose-500 shrink-0 ml-1" />
                     </button>
 
+                    {/* 2. Rodičovský Hub */}
+                    <button
+                      onClick={() => handleTabClick('coparent-hub')}
+                      className={`flex items-center justify-between p-3 rounded-2xl text-xs font-bold text-left transition-all border cursor-pointer ${
+                        activeTab === 'coparent-hub'
+                          ? 'bg-indigo-600 text-white border-indigo-700 shadow-sm'
+                          : 'bg-indigo-50/80 hover:bg-indigo-100/80 text-indigo-950 border-indigo-200/90 shadow-3xs'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-8.5 h-8.5 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-3xs">
+                          <Users className="w-4.5 h-4.5" />
+                        </div>
+                        <div className="min-w-0">
+                          <span className="text-xs font-black text-indigo-950 block truncate">👨‍👩‍👦 Rodičovský Hub (Co-Parenting)</span>
+                          <span className="text-[10px] text-indigo-700 block truncate font-medium">Sdílený kalendář, spory a párování</span>
+                        </div>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-indigo-500 shrink-0 ml-1" />
+                    </button>
+
+                    {/* 3. AI Právní Asistent */}
                     <button
                       onClick={() => handleTabClick('ai-assistant')}
                       className={`flex items-center justify-between p-3 rounded-2xl text-xs font-bold text-left transition-all border cursor-pointer ${
                         activeTab === 'ai-assistant'
-                          ? 'bg-indigo-50 text-indigo-950 border-indigo-300 shadow-xs'
-                          : 'bg-gradient-to-r from-indigo-50/50 to-purple-50/50 hover:from-indigo-100/60 hover:to-purple-100/60 text-slate-800 border-indigo-200/70'
+                          ? 'bg-teal-600 text-white border-teal-700 shadow-sm'
+                          : 'bg-teal-50/80 hover:bg-teal-100/80 text-teal-950 border-teal-200/90 shadow-3xs'
                       }`}
                     >
                       <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-3xs">
-                          <Sparkles className="w-4 h-4" />
+                        <div className="w-8.5 h-8.5 rounded-xl bg-teal-600 text-white flex items-center justify-center shrink-0 shadow-3xs">
+                          <Sparkles className="w-4.5 h-4.5" />
                         </div>
                         <div className="min-w-0">
-                          <span className="text-xs font-extrabold text-indigo-950 block truncate">AI Právní Asistent</span>
-                          <span className="text-[10px] text-indigo-700 block truncate">Sjednocené centrum generativního AI</span>
+                          <span className="text-xs font-black text-teal-950 block truncate">🤖 AI Právní Asistent</span>
+                          <span className="text-[10px] text-teal-700 block truncate font-medium">Syntetický poradce a rozbor spisu</span>
                         </div>
                       </div>
-                      <ChevronRight className="w-4 h-4 text-indigo-500 shrink-0" />
+                      <ChevronRight className="w-4 h-4 text-teal-500 shrink-0 ml-1" />
                     </button>
 
-                    <div className="grid grid-cols-2 gap-2">
-                      <button
-                        onClick={() => handleTabClick('forum')}
-                        className={`flex items-center gap-2.5 p-2.5 rounded-2xl text-xs font-bold text-left transition-all border cursor-pointer ${
-                          activeTab === 'forum'
-                            ? 'bg-teal-50 text-teal-950 border-teal-300 shadow-xs'
-                            : 'bg-slate-50 hover:bg-slate-100 text-slate-800 border-slate-200/80'
-                        }`}
-                      >
-                        <MessageSquare className="w-4 h-4 text-teal-600 shrink-0" />
-                        <span className="truncate">Komunita & Fórum</span>
-                      </button>
-
-                      <button
-                        onClick={() => handleTabClick('ke-stazeni')}
-                        className={`flex items-center gap-2.5 p-2.5 rounded-2xl text-xs font-bold text-left transition-all border cursor-pointer ${
-                          activeTab === 'ke-stazeni'
-                            ? 'bg-teal-50 text-teal-950 border-teal-300 shadow-xs'
-                            : 'bg-slate-50 hover:bg-slate-100 text-slate-800 border-slate-200/80'
-                        }`}
-                      >
-                        <FolderCheck className="w-4 h-4 text-teal-600 shrink-0" />
-                        <span className="truncate">Vzory podání & žalob</span>
-                      </button>
-                    </div>
-
-                    {isAdmin && (
-                      <button
-                        onClick={() => handleTabClick('admin')}
-                        className="w-full flex items-center justify-between p-2.5 bg-indigo-600 text-white font-bold text-xs rounded-2xl shadow-sm cursor-pointer mt-1"
-                      >
-                        <div className="flex items-center gap-2">
-                          <Shield className="w-4 h-4 text-indigo-200" />
-                          <span>Administrace portálu</span>
+                    {/* 4. Můj portál */}
+                    <button
+                      onClick={() => handleTabClick('user-portal')}
+                      className={`flex items-center justify-between p-3 rounded-2xl text-xs font-bold text-left transition-all border cursor-pointer ${
+                        activeTab === 'user-portal'
+                          ? 'bg-emerald-600 text-white border-emerald-700 shadow-sm'
+                          : 'bg-emerald-50/80 hover:bg-emerald-100/80 text-emerald-950 border-emerald-200/90 shadow-3xs'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-8.5 h-8.5 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-3xs">
+                          <UserCheck className="w-4.5 h-4.5" />
                         </div>
-                        <ChevronRight className="w-4 h-4 text-indigo-200" />
-                      </button>
-                    )}
+                        <div className="min-w-0">
+                          <span className="text-xs font-black text-emerald-950 block truncate">👤 Můj portál</span>
+                          <span className="text-[10px] text-emerald-700 block truncate font-medium">Osobní kalendář, spis a uložení</span>
+                        </div>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-emerald-500 shrink-0 ml-1" />
+                    </button>
                   </div>
                 </div>
 
-                {/* 3. SECTOR: 🗂️ ODBORNÉ TÉMATA & OKRUHY (21 Kategorizovaných oblastí) */}
-                <div className="space-y-2.5 border-t border-slate-100 pt-4">
-                  <button
-                    onClick={() => setTopicsAccordionOpen(!topicsAccordionOpen)}
-                    className="w-full flex items-center justify-between p-3 bg-indigo-50/70 hover:bg-indigo-100/70 border border-indigo-200/80 rounded-2xl text-left transition-all cursor-pointer shadow-3xs"
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <span className="text-base shrink-0">🗂️</span>
-                      <span className="text-xs font-black text-indigo-950 font-display uppercase tracking-wider truncate">
-                        Odborné Témata & Okruhy
-                      </span>
-                      <span className="px-2 py-0.5 bg-indigo-200 text-indigo-900 text-[10px] font-mono font-black rounded-full shrink-0">
-                        21
-                      </span>
-                    </div>
-                    {topicsAccordionOpen ? <ChevronDown className="w-4 h-4 text-indigo-600 shrink-0" /> : <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />}
-                  </button>
+                {/* 2. SECTOR: SBALITELNÉ KATEGORIE & SEKCE (Accordions - Closed by default) */}
+                <div className="space-y-2 border-t border-slate-200/80 pt-3">
+                  <div className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider px-1">
+                    Rozšiřující sekce &amp; Archiv
+                  </div>
 
-                  {topicsAccordionOpen && (
-                    <div className="space-y-2.5 animate-in fade-in duration-150 pt-1">
-                      {/* Instant Category Filter */}
-                      <div className="relative">
-                        <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                        <input 
-                          type="text"
-                          placeholder="Filtrovat např. výživné, střídavá péče..."
-                          value={categoryFilter}
-                          onChange={(e) => setCategoryFilter(e.target.value)}
-                          className="w-full bg-slate-50 border border-slate-200/90 rounded-2xl pl-9 pr-8 py-2 text-xs font-medium text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-500"
-                        />
-                        {categoryFilter && (
-                          <button
-                            onClick={() => setCategoryFilter('')}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs font-bold cursor-pointer"
-                          >
-                            ✕
-                          </button>
-                        )}
+                  {/* ACCORDION 1: 🗂️ Odborná témata (21 Kategorií) */}
+                  <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-3xs">
+                    <button
+                      onClick={() => setTopicsAccordionOpen(!topicsAccordionOpen)}
+                      className="w-full flex items-center justify-between p-3 bg-slate-50 hover:bg-slate-100 text-left transition-all cursor-pointer font-bold text-xs text-slate-800"
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <span className="text-base shrink-0">🗂️</span>
+                        <span className="font-extrabold text-slate-900 truncate">Odborná témata &amp; Okruhy</span>
+                        <span className="px-2 py-0.5 bg-indigo-100 text-indigo-900 text-[10px] font-mono font-black rounded-full shrink-0">
+                          21
+                        </span>
                       </div>
+                      {topicsAccordionOpen ? (
+                        <ChevronDown className="w-4 h-4 text-indigo-600 shrink-0" />
+                      ) : (
+                        <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
+                      )}
+                    </button>
 
-                      {/* 2-Column Grid of Compact Tiles */}
-                      <div className="grid grid-cols-2 gap-2">
-                        {filteredCategories.map((cat) => (
-                          <button
-                            key={cat.id}
-                            onClick={() => {
-                              handleCategoryClick(cat.slug, cat.name);
-                              setMobileMenuOpen(false);
-                            }}
-                            className="flex items-start gap-2 p-2.5 bg-white hover:bg-indigo-50/80 active:bg-indigo-100 border border-slate-200/80 hover:border-indigo-300 rounded-2xl text-left transition-all shadow-3xs cursor-pointer group"
-                          >
-                            <span className="text-lg shrink-0 group-hover:scale-110 transition-transform leading-none mt-0.5">{cat.icon}</span>
-                            <div className="min-w-0">
-                              <span className="text-xs font-bold text-slate-900 group-hover:text-indigo-950 block leading-tight line-clamp-2">
+                    {topicsAccordionOpen && (
+                      <div className="p-3 border-t border-slate-100 bg-slate-50/50 space-y-2.5 animate-in fade-in duration-150">
+                        {/* Category Filter */}
+                        <div className="relative">
+                          <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                          <input 
+                            type="text"
+                            placeholder="Filtrovat témata..."
+                            value={categoryFilter}
+                            onChange={(e) => setCategoryFilter(e.target.value)}
+                            className="w-full bg-white border border-slate-200 rounded-xl pl-9 pr-8 py-1.5 text-xs font-medium text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-500"
+                          />
+                          {categoryFilter && (
+                            <button
+                              onClick={() => setCategoryFilter('')}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs font-bold cursor-pointer"
+                            >
+                              ✕
+                            </button>
+                          )}
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto pr-1">
+                          {filteredCategories.map((cat) => (
+                            <button
+                              key={cat.id}
+                              onClick={() => {
+                                handleCategoryClick(cat.slug, cat.name);
+                                setMobileMenuOpen(false);
+                              }}
+                              className="flex items-start gap-2 p-2 bg-white hover:bg-indigo-50/80 active:bg-indigo-100 border border-slate-200/80 hover:border-indigo-300 rounded-xl text-left transition-all cursor-pointer group"
+                            >
+                              <span className="text-base shrink-0 group-hover:scale-110 transition-transform leading-none mt-0.5">{cat.icon}</span>
+                              <span className="text-xs font-bold text-slate-800 group-hover:text-indigo-950 block leading-tight line-clamp-2 min-w-0">
                                 {cat.name}
                               </span>
+                            </button>
+                          ))}
+                          {filteredCategories.length === 0 && (
+                            <div className="col-span-2 text-center py-4 text-xs text-slate-400 font-mono bg-white rounded-xl border border-dashed border-slate-200">
+                              Žádná kategorie neodpovídá "{categoryFilter}"
                             </div>
-                          </button>
-                        ))}
-                        {filteredCategories.length === 0 && (
-                          <div className="col-span-2 text-center py-6 text-xs text-slate-400 font-mono bg-slate-50 rounded-2xl border border-dashed border-slate-200">
-                            Žádná kategorie neodpovídá "{categoryFilter}"
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* ACCORDION 2: 🚀 Rychlý rozcestník */}
+                  <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-3xs">
+                    <button
+                      onClick={() => setQuickNavAccordionOpen(!quickNavAccordionOpen)}
+                      className="w-full flex items-center justify-between p-3 bg-slate-50 hover:bg-slate-100 text-left transition-all cursor-pointer font-bold text-xs text-slate-800"
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <span className="text-base shrink-0">🚀</span>
+                        <span className="font-extrabold text-slate-900 truncate">Rychlý rozcestník &amp; Nástroje</span>
+                      </div>
+                      {quickNavAccordionOpen ? (
+                        <ChevronDown className="w-4 h-4 text-teal-600 shrink-0" />
+                      ) : (
+                        <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
+                      )}
+                    </button>
+
+                    {quickNavAccordionOpen && (
+                      <div className="p-3 border-t border-slate-100 bg-slate-50/50 grid grid-cols-2 gap-2 animate-in fade-in duration-150">
+                        <button
+                          onClick={() => handleTabClick('plan-pece')}
+                          className="col-span-2 flex items-center justify-between p-2.5 bg-gradient-to-r from-teal-50 to-emerald-50 hover:from-teal-100 hover:to-emerald-100 text-teal-950 border border-teal-300 rounded-xl text-xs font-extrabold cursor-pointer"
+                        >
+                          <div className="flex items-center gap-2 min-w-0">
+                            <Sliders className="w-4 h-4 text-teal-600 shrink-0" />
+                            <span className="truncate">Simulátor Péče</span>
                           </div>
+                          <span className="text-[9px] font-mono px-1.5 py-0.5 bg-teal-200 text-teal-950 rounded-md uppercase font-black shrink-0">PÉČE</span>
+                        </button>
+
+                        <button
+                          onClick={() => handleTabClick('home')}
+                          className="flex items-center gap-2 p-2 bg-white hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 cursor-pointer"
+                        >
+                          <Home className="w-4 h-4 text-slate-500 shrink-0" />
+                          <span className="truncate">Domů</span>
+                        </button>
+
+                        <button
+                          onClick={() => handleTabClick('news')}
+                          className="flex items-center gap-2 p-2 bg-white hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 cursor-pointer"
+                        >
+                          <FileText className="w-4 h-4 text-slate-500 shrink-0" />
+                          <span className="truncate">Články &amp; Redakce</span>
+                        </button>
+
+                        <button
+                          onClick={() => handleTabClick('knihovna-studii')}
+                          className="flex items-center gap-2 p-2 bg-white hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 cursor-pointer"
+                        >
+                          <BookOpen className="w-4 h-4 text-slate-500 shrink-0" />
+                          <span className="truncate">Knihovna studií</span>
+                        </button>
+
+                        <button
+                          onClick={() => handleTabClick('videoteka')}
+                          className="flex items-center gap-2 p-2 bg-white hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 cursor-pointer"
+                        >
+                          <Tv className="w-4 h-4 text-slate-500 shrink-0" />
+                          <span className="truncate">Videotéka</span>
+                        </button>
+
+                        <button
+                          onClick={() => handleTabClick('judikatura')}
+                          className="flex items-center gap-2 p-2 bg-white hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 cursor-pointer"
+                        >
+                          <Scale className="w-4 h-4 text-slate-500 shrink-0" />
+                          <span className="truncate">Judikatura ÚS</span>
+                        </button>
+
+                        <button
+                          onClick={() => handleTabClick('forum')}
+                          className="flex items-center gap-2 p-2 bg-white hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 cursor-pointer"
+                        >
+                          <MessageSquare className="w-4 h-4 text-slate-500 shrink-0" />
+                          <span className="truncate">Komunita &amp; Fórum</span>
+                        </button>
+
+                        <button
+                          onClick={() => handleTabClick('ke-stazeni')}
+                          className="col-span-2 flex items-center justify-between p-2 bg-white hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 cursor-pointer"
+                        >
+                          <div className="flex items-center gap-2 min-w-0">
+                            <FolderCheck className="w-4 h-4 text-teal-600 shrink-0" />
+                            <span className="truncate">Vzory podání &amp; žalob</span>
+                          </div>
+                          <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
+                        </button>
+
+                        {isAdmin && (
+                          <button
+                            onClick={() => handleTabClick('admin')}
+                            className="col-span-2 flex items-center justify-between p-2.5 bg-indigo-600 text-white font-bold text-xs rounded-xl shadow-xs cursor-pointer"
+                          >
+                            <div className="flex items-center gap-2">
+                              <Shield className="w-4 h-4 text-indigo-200" />
+                              <span>Administrace portálu</span>
+                            </div>
+                            <ChevronRight className="w-4 h-4 text-indigo-200" />
+                          </button>
                         )}
                       </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* 4. SECTOR: ℹ️ O PROJEKTU & ZÁZEMÍ (Footer Menu) */}
-                <div className="space-y-2.5 border-t border-slate-100 pt-4 pb-2">
-                  <div className="flex items-center gap-2 px-1 text-xs font-black text-slate-900 font-display uppercase tracking-wider">
-                    <span className="text-base">ℹ️</span>
-                    <span>O projektu &amp; Zázemí</span>
+                    )}
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2">
-                    {/* 1. 📖 Cesta zakladatele (Můj příběh & Spis) */}
+                  {/* ACCORDION 3: ℹ️ O projektu & Zázemí */}
+                  <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-3xs">
                     <button
-                      onClick={() => handleTabClick('cesta-zakladatele')}
-                      className={`col-span-2 flex items-center justify-between p-2.5 rounded-2xl text-xs font-bold text-left transition-all border cursor-pointer ${
-                        activeTab === 'cesta-zakladatele'
-                          ? 'bg-amber-50 text-amber-950 border-amber-300 shadow-xs font-extrabold'
-                          : 'bg-amber-50/40 hover:bg-amber-100/50 text-amber-900 border-amber-200/80'
-                      }`}
+                      onClick={() => setAboutAccordionOpen(!aboutAccordionOpen)}
+                      className="w-full flex items-center justify-between p-3 bg-slate-50 hover:bg-slate-100 text-left transition-all cursor-pointer font-bold text-xs text-slate-800"
                     >
-                      <div className="flex items-center gap-2.5">
-                        <Compass className="w-4 h-4 text-amber-600 shrink-0" />
-                        <span className="text-xs font-extrabold text-amber-950">📖 Cesta zakladatele (Můj příběh &amp; Spis)</span>
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <span className="text-base shrink-0">ℹ️</span>
+                        <span className="font-extrabold text-slate-900 truncate">O projektu &amp; Zázemí</span>
                       </div>
-                      <ChevronRight className="w-4 h-4 text-amber-500 shrink-0" />
+                      {aboutAccordionOpen ? (
+                        <ChevronDown className="w-4 h-4 text-slate-600 shrink-0" />
+                      ) : (
+                        <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
+                      )}
                     </button>
 
-                    {/* 2. 📚 Odborný slovník pojmů */}
-                    <button
-                      onClick={() => {
-                        window.dispatchEvent(new CustomEvent('open-glossary', { detail: '' }));
-                        setMobileMenuOpen(false);
-                      }}
-                      className="col-span-2 flex items-center justify-between p-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-2xl text-left transition-all cursor-pointer"
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <BookOpen className="w-4 h-4 text-teal-600 shrink-0" />
-                        <span className="text-xs font-bold text-slate-900">📚 Odborný slovník pojmů</span>
+                    {aboutAccordionOpen && (
+                      <div className="p-3 border-t border-slate-100 bg-slate-50/50 space-y-2 animate-in fade-in duration-150">
+                        <button
+                          onClick={() => handleTabClick('cesta-zakladatele')}
+                          className="w-full flex items-center justify-between p-2 bg-amber-50/60 hover:bg-amber-100/60 border border-amber-200/80 rounded-xl text-left transition-all cursor-pointer"
+                        >
+                          <div className="flex items-center gap-2 min-w-0">
+                            <Compass className="w-4 h-4 text-amber-600 shrink-0" />
+                            <span className="text-xs font-bold text-amber-950 truncate">📖 Cesta zakladatele (Můj příběh)</span>
+                          </div>
+                          <ChevronRight className="w-4 h-4 text-amber-500 shrink-0" />
+                        </button>
+
+                        <button
+                          onClick={() => {
+                            window.dispatchEvent(new CustomEvent('open-glossary', { detail: '' }));
+                            setMobileMenuOpen(false);
+                          }}
+                          className="w-full flex items-center justify-between p-2 bg-white hover:bg-slate-100 border border-slate-200 rounded-xl text-left transition-all cursor-pointer"
+                        >
+                          <div className="flex items-center gap-2 min-w-0">
+                            <BookOpen className="w-4 h-4 text-teal-600 shrink-0" />
+                            <span className="text-xs font-bold text-slate-900 truncate">📚 Odborný slovník pojmů</span>
+                          </div>
+                          <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
+                        </button>
+
+                        <div className="grid grid-cols-2 gap-2">
+                          <button
+                            onClick={() => handleTabClick('partners')}
+                            className="flex items-center gap-2 p-2 bg-white hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 cursor-pointer"
+                          >
+                            <Users className="w-4 h-4 text-slate-600 shrink-0" />
+                            <span className="truncate">🤝 Partneři</span>
+                          </button>
+
+                          <button
+                            onClick={() => handleTabClick('support')}
+                            className="flex items-center gap-2 p-2 bg-white hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 cursor-pointer"
+                          >
+                            <Heart className="w-4 h-4 text-teal-600 shrink-0" />
+                            <span className="truncate">💡 Podpora</span>
+                          </button>
+                        </div>
+
+                        <button
+                          onClick={() => handleTabClick('contacts')}
+                          className="w-full flex items-center justify-between p-2 bg-white hover:bg-slate-100 border border-slate-200 rounded-xl text-left transition-all cursor-pointer"
+                        >
+                          <div className="flex items-center gap-2 min-w-0">
+                            <Mail className="w-4 h-4 text-teal-600 shrink-0" />
+                            <span className="text-xs font-bold text-slate-900 truncate">✉️ Kontakt na autora projektu</span>
+                          </div>
+                          <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
+                        </button>
                       </div>
-                      <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
-                    </button>
-
-                    {/* 3. 🤝 Partneři projektu */}
-                    <button
-                      onClick={() => handleTabClick('partners')}
-                      className={`flex items-center gap-2 p-2.5 rounded-2xl text-xs font-bold text-left transition-all border cursor-pointer ${
-                        activeTab === 'partners'
-                          ? 'bg-teal-50 text-teal-950 border-teal-300 shadow-xs'
-                          : 'bg-slate-50 hover:bg-slate-100 text-slate-800 border-slate-200/80'
-                      }`}
-                    >
-                      <Users className="w-4 h-4 text-slate-600 shrink-0" />
-                      <span className="truncate">🤝 Partneři projektu</span>
-                    </button>
-
-                    {/* 4. 💡 Podpora provozu a financování */}
-                    <button
-                      onClick={() => handleTabClick('support')}
-                      className={`flex items-center gap-2 p-2.5 rounded-2xl text-xs font-bold text-left transition-all border cursor-pointer ${
-                        activeTab === 'support'
-                          ? 'bg-teal-50 text-teal-950 border-teal-300 shadow-xs'
-                          : 'bg-teal-50/50 hover:bg-teal-100/50 text-teal-900 border-teal-200/80'
-                      }`}
-                    >
-                      <Heart className="w-4 h-4 text-teal-600 shrink-0" />
-                      <span className="truncate">💡 Podpora provozu</span>
-                    </button>
-
-                    {/* 5. 🚨 Krizová pomoc & SOS linky */}
-                    <button
-                      onClick={() => handleTabClick('crisis')}
-                      className={`col-span-2 flex items-center justify-between p-2.5 rounded-2xl text-xs font-bold text-left transition-all border cursor-pointer ${
-                        activeTab === 'crisis'
-                          ? 'bg-rose-50 text-rose-950 border-rose-300 shadow-xs font-extrabold'
-                          : 'bg-rose-50/40 hover:bg-rose-100/50 text-rose-900 border-rose-200/80'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <ShieldAlert className="w-4 h-4 text-rose-600 shrink-0" />
-                        <span className="text-xs font-extrabold text-rose-950">🚨 Krizová pomoc &amp; SOS linky</span>
-                      </div>
-                      <ChevronRight className="w-4 h-4 text-rose-400 shrink-0" />
-                    </button>
-
-                    {/* 6. ✉️ Kontakt na autora projektu */}
-                    <button
-                      onClick={() => handleTabClick('contacts')}
-                      className={`col-span-2 flex items-center justify-between p-2.5 rounded-2xl text-xs font-bold text-left transition-all border cursor-pointer ${
-                        activeTab === 'contacts'
-                          ? 'bg-teal-50 text-teal-950 border-teal-300 shadow-xs font-extrabold'
-                          : 'bg-slate-50 hover:bg-slate-100 text-slate-800 border-slate-200/80'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <Mail className="w-4 h-4 text-teal-600 shrink-0" />
-                        <span className="text-xs font-bold text-slate-900">✉️ Kontakt na autora projektu</span>
-                      </div>
-                      <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
-                    </button>
+                    )}
                   </div>
+
                 </div>
 
               </div>
