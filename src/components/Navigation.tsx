@@ -139,8 +139,8 @@ export default function Navigation({
 
   return (
     <header className="sticky top-0 z-40 bg-white border-b border-slate-200/80 shadow-xs relative">
-      {/* Official Top Announcement Bar (Pevně nahoře jako první prvek) */}
-      <div className="bg-gradient-to-r from-amber-500 via-teal-600 to-indigo-700 text-white text-[11px] font-mono py-1.5 px-3 sm:px-4 text-center flex flex-wrap items-center justify-center gap-x-2 gap-y-1 font-semibold border-b border-amber-400/20 shrink-0">
+      {/* Official Top Announcement Bar (Pevně nahoře jako první prvek - viditelné od md: výše) */}
+      <div className="hidden md:flex bg-gradient-to-r from-amber-500 via-teal-600 to-indigo-700 text-white text-[11px] font-mono py-1.5 px-3 sm:px-4 text-center items-center justify-center gap-x-2 gap-y-1 font-semibold border-b border-amber-400/20 shrink-0">
         <Sparkles className="w-3.5 h-3.5 text-amber-200 animate-pulse shrink-0" />
         <span className="truncate max-w-[95vw] md:max-w-none">
           {t('hero_welcome', 'Oficiální spuštění alfa verze 0.0.1.2 portálu Táta má právo! 🚀')}
@@ -155,7 +155,7 @@ export default function Navigation({
 
       {/* Main Header Bar (Logo, XL Navigation, Search & User Profile) */}
       <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 border-b border-slate-100/80">
-        <div className="flex flex-wrap items-center justify-between min-h-[64px] py-2 gap-2 sm:gap-3">
+        <div className="flex items-center justify-between min-h-[56px] md:min-h-[64px] py-2 gap-2 sm:gap-3">
           
           {/* Logo & Branding */}
           <div className="flex items-center gap-2.5 cursor-pointer shrink-0" onClick={() => handleTabClick('home')}>
@@ -383,7 +383,7 @@ export default function Navigation({
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
               onNavigate={handleTabClick}
-              className="w-32 sm:w-40 md:w-48 lg:w-56"
+              className="hidden sm:block w-36 md:w-48 lg:w-56"
             />
 
             {/* Notification Center */}
@@ -476,8 +476,8 @@ export default function Navigation({
         </div>
       </div>
 
-      {/* Desktop & Tablet Quick Access Bar (Pevná lišta rychlých odkazů) */}
-      <div className="bg-slate-50/95 border-t border-slate-100 py-1.5 px-3 sm:px-4 lg:px-8">
+      {/* Desktop & Tablet Quick Access Bar (Pevná lišta rychlých odkazů - skryto na mobilu) */}
+      <div className="hidden md:block bg-slate-50/95 border-t border-slate-100 py-1.5 px-3 sm:px-4 lg:px-8">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2 text-[11px] font-bold">
           <div className="flex items-center gap-1.5 shrink-0 text-slate-500 font-mono text-[10px] uppercase tracking-wider">
             <Compass className="w-3.5 h-3.5 text-teal-600 shrink-0" />
