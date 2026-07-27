@@ -504,7 +504,7 @@ export default function FounderStoryView({ setActiveTab, setSearchQuery }: Found
               {/* Verbatim Document Text Box */}
               <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-inner space-y-3">
                 <div className="flex items-center justify-between border-b border-slate-100 pb-3 text-xs font-mono text-slate-400">
-                  <span className="font-bold uppercase tracking-wider">DOSLOVNÝ ANONYMIZOVANÝ TEXT DOKUMENTU</span>
+                  <span className="font-bold uppercase tracking-wider">VZDĚLÁVACÍ PŘÍPADOVÁ STUDIE (PŘEPRACOVANÝ TEXT DOKUMENTU)</span>
                   <span>STRANA {currentDoc.pageNumber} / {MY_ANONYMIZED_DOCUMENTS.length}</span>
                 </div>
 
