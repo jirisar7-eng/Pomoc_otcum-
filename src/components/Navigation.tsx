@@ -185,8 +185,8 @@ export default function Navigation({
               </div>
             </div>
 
-            {/* Responsive Desktop & Tablet Navigation Topbar */}
-            <nav className="hidden md:flex items-center justify-center gap-1 lg:gap-1.5 max-w-[70%] py-1">
+            {/* Responsive Desktop Navigation Topbar (XL screens only to prevent tablet overlaps) */}
+            <nav className="hidden xl:flex items-center justify-center gap-1.5 max-w-[65%] py-1">
               {PUBLIC_TOPBAR_ITEMS.slice(0, 7).map((item) => {
                 const ItemIcon = item.icon;
                 const isActive = activeTab === item.id;
@@ -196,7 +196,7 @@ export default function Navigation({
                   <button
                     key={item.id}
                     onClick={() => handleTabClick(item.id)}
-                    className={`flex items-center gap-1 px-2 lg:px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all border cursor-pointer whitespace-nowrap ${
+                    className={`flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all border cursor-pointer whitespace-nowrap ${
                       isActive
                         ? isSimulator || isHub
                           ? 'bg-teal-600 border-teal-700 text-white shadow-3xs'
@@ -210,17 +210,16 @@ export default function Navigation({
                     title={item.desc}
                   >
                     <ItemIcon className={`w-3.5 h-3.5 ${isActive ? (isSimulator || isHub ? 'text-white' : 'text-teal-600') : (isSimulator ? 'text-teal-700' : isHub ? 'text-indigo-600' : 'text-slate-400')}`} />
-                    <span className="hidden lg:inline">{item.label}</span>
-                    <span className="inline lg:hidden">{item.label.split(' ')[0]}</span>
+                    <span>{item.label}</span>
                     {isSimulator && (
-                      <span className={`text-[9px] font-mono px-1.5 py-0.2 rounded-full uppercase tracking-tighter ml-0.5 font-black hidden xl:inline-block ${
+                      <span className={`text-[9px] font-mono px-1.5 py-0.2 rounded-full uppercase tracking-tighter ml-0.5 font-black ${
                         isActive ? 'bg-teal-700 text-teal-100' : 'bg-teal-200/90 text-teal-950'
                       }`}>
                         PÉČE
                       </span>
                     )}
                     {isHub && (
-                      <span className={`text-[9px] font-mono px-1.5 py-0.2 rounded-full uppercase tracking-tighter ml-0.5 font-black hidden xl:inline-block ${
+                      <span className={`text-[9px] font-mono px-1.5 py-0.2 rounded-full uppercase tracking-tighter ml-0.5 font-black ${
                         isActive ? 'bg-teal-700 text-teal-100' : 'bg-indigo-100 text-indigo-800'
                       }`}>
                         HUB
@@ -386,7 +385,7 @@ export default function Navigation({
                 searchQuery={searchQuery}
                 setSearchQuery={setSearchQuery}
                 onNavigate={handleTabClick}
-                className="w-48 xl:w-64"
+                className="w-36 md:w-44 lg:w-52 xl:w-64"
               />
 
               {/* Notification Center */}
@@ -395,7 +394,7 @@ export default function Navigation({
               {/* Glossary Button */}
               <button
                 onClick={() => window.dispatchEvent(new CustomEvent('open-glossary', { detail: '' }))}
-                className="hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 font-bold text-[11px] rounded-xl transition-all cursor-pointer shadow-3xs"
+                className="hidden xl:flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 font-bold text-[11px] rounded-xl transition-all cursor-pointer shadow-3xs"
                 title="Slovník odborných pojmů"
               >
                 <BookOpen className="w-3.5 h-3.5 text-teal-600" />
@@ -405,7 +404,7 @@ export default function Navigation({
               {/* Support Button */}
               <button
                 onClick={() => handleTabClick('support')}
-                className={`hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border font-bold text-[11px] transition-all cursor-pointer ${
+                className={`hidden xl:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border font-bold text-[11px] transition-all cursor-pointer ${
                   activeTab === 'support'
                     ? 'bg-teal-50 border-teal-200 text-teal-800'
                     : 'bg-teal-50/40 hover:bg-teal-50 border-teal-100/50 text-teal-700 hover:border-teal-200 shadow-3xs'
@@ -455,7 +454,7 @@ export default function Navigation({
                   </button>
                   <button
                     onClick={() => onOpenAuth('register')}
-                    className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-500 hover:to-emerald-500 text-white font-extrabold text-[11px] rounded-xl shadow-xs hover:shadow-md transition-all cursor-pointer shrink-0 border border-teal-400/30"
+                    className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-500 hover:to-emerald-500 text-white font-extrabold text-[11px] rounded-xl shadow-xs hover:shadow-md transition-all cursor-pointer shrink-0 border border-teal-400/30"
                     title="Vytvořit nový účet zdarma"
                   >
                     <UserPlus className="w-3.5 h-3.5 text-teal-100" />
@@ -463,6 +462,17 @@ export default function Navigation({
                   </button>
                 </div>
               )}
+
+              {/* Tablet & Small Screen Menu Toggle Button */}
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="xl:hidden p-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl transition-all cursor-pointer border border-slate-200/80 flex items-center gap-1.5 font-bold text-xs shrink-0"
+                aria-label="Otevřít Menu"
+                title="Otevřít hlavní rozcestník a kategorie"
+              >
+                {mobileMenuOpen ? <X className="w-5 h-5 text-rose-600" /> : <Menu className="w-5 h-5 text-teal-700" />}
+                <span className="hidden md:inline text-xs font-bold text-slate-800">Menu</span>
+              </button>
             </div>
 
             {/* Mobile Menu Toggle */}
