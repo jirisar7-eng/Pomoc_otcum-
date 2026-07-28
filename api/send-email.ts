@@ -1,17 +1,39 @@
 import { sendEmail, validateEmailFormat } from '../src/services/resendServerService';
 
 export default async function handler(req: any, res: any) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ success: false, error: 'Metoda není povolena' });
+  // CORS Headers for Vercel Serverless Functions
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
+  );
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
   }
 
   try {
-    const { to, type, data, recipientEmail, code, magicUrl } = req.body || {};
-    const recipient = (to || recipientEmail || '').trim();
-    const emailType = (type || 'MAGIC_LINK') as any;
-    const emailData = data || { code, magicUrl };
+    const bodyData = req.body || {};
+    const queryData = req.query || {};
+
+    const to = bodyData.to || bodyData.recipientEmail || queryData.to || queryData.recipientEmail;
+    const type = bodyData.type || queryData.type || 'MAGIC_LINK';
+    const data = bodyData.data || { code: bodyData.code || queryData.code, magicUrl: bodyData.magicUrl || queryData.magicUrl };
+
+    const recipient = (to || '').trim();
+    const emailType = type as any;
 
     if (!recipient) {
+      if (req.method === 'GET') {
+        return res.status(200).json({
+          success: true,
+          status: 'online',
+          endpoint: '/api/send-email',
+          message: 'Endpoint /api/send-email je plně aktivní. Odesílejte požadavky s parametrem to nebo recipientEmail.'
+        });
+      }
       return res.status(400).json({ success: false, error: 'Chybí cílový e-mail (to).' });
     }
 
@@ -24,7 +46,7 @@ export default async function handler(req: any, res: any) {
       });
     }
 
-    const result = await sendEmail({ to: recipient, type: emailType, data: emailData });
+    const result = await sendEmail({ to: recipient, type: emailType, data });
     return res.status(200).json(result);
   } catch (error: any) {
     console.error('Error in /api/send-email:', error);

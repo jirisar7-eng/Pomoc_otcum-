@@ -1,16 +1,37 @@
 import { validateEmailFormat, verifyServerCode } from '../src/services/resendServerService';
 
 export default async function handler(req: any, res: any) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ success: false, error: 'Metoda není povolena' });
+  // CORS Headers for Vercel Serverless Functions
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
+  );
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
   }
 
   try {
-    const { email, recipientEmail, code, codeOrToken } = req.body || {};
-    const targetEmail = (email || recipientEmail || '').trim();
-    const codeToVerify = String(code || codeOrToken || '').trim();
+    const bodyData = req.body || {};
+    const queryData = req.query || {};
+    const email = bodyData.email || bodyData.recipientEmail || queryData.email || queryData.recipientEmail;
+    const code = bodyData.code || bodyData.codeOrToken || queryData.code || queryData.codeOrToken;
+
+    const targetEmail = (email || '').trim();
+    const codeToVerify = String(code || '').trim();
 
     if (!targetEmail || !codeToVerify) {
+      if (req.method === 'GET' && !targetEmail) {
+        return res.status(200).json({
+          success: true,
+          status: 'online',
+          endpoint: '/api/verify-code',
+          message: 'Endpoint /api/verify-code je plně aktivní. Odesílejte požadavky s parametry email a code.'
+        });
+      }
       return res.status(400).json({ success: false, error: 'Chybí e-mail nebo ověřovací kód.' });
     }
 

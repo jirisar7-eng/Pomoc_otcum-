@@ -785,14 +785,27 @@ PRAVIDLA PRO REAKCI:
 });
 
 // WEDOS SMTP Universal Email API Route
-app.post('/api/send-email', async (req, res) => {
+app.all('/api/send-email', async (req, res) => {
   try {
-    const { to, type, data, recipientEmail, code, magicUrl } = req.body || {};
-    const recipient = (to || recipientEmail || '').trim();
-    const emailType = (type || 'MAGIC_LINK') as any;
-    const emailData = data || { code, magicUrl };
+    const bodyData = req.body || {};
+    const queryData = req.query || {};
+
+    const to = bodyData.to || bodyData.recipientEmail || queryData.to || queryData.recipientEmail;
+    const type = bodyData.type || queryData.type || 'MAGIC_LINK';
+    const data = bodyData.data || { code: bodyData.code || queryData.code, magicUrl: bodyData.magicUrl || queryData.magicUrl };
+
+    const recipient = (to || '').trim();
+    const emailType = type as any;
 
     if (!recipient) {
+      if (req.method === 'GET') {
+        return res.status(200).json({
+          success: true,
+          status: 'online',
+          endpoint: '/api/send-email',
+          message: 'Endpoint /api/send-email je plně aktivní. Odesílejte požadavky s parametrem to nebo recipientEmail.'
+        });
+      }
       return res.status(400).json({ success: false, error: 'Chybí cílový e-mail (to).' });
     }
 
@@ -805,7 +818,7 @@ app.post('/api/send-email', async (req, res) => {
       });
     }
 
-    const result = await sendEmail({ to: recipient, type: emailType, data: emailData });
+    const result = await sendEmail({ to: recipient, type: emailType, data });
     return res.status(200).json(result);
   } catch (error: any) {
     console.error('[API /api/send-email Error]:', error);
@@ -817,12 +830,26 @@ app.post('/api/send-email', async (req, res) => {
 });
 
 // Login Verification Code Generation and Dispatch Route mapped to WEDOS SMTP Email Service
-app.post(['/api/send-code', '/api/send-magic-link'], async (req, res) => {
+app.all(['/api/send-code', '/api/send-magic-link'], async (req, res) => {
   try {
-    const { recipientEmail, email, code, magicUrl } = req.body || {};
-    const targetEmail = (recipientEmail || email || '').trim();
+    const bodyData = req.body || {};
+    const queryData = req.query || {};
+
+    const recipientEmail = bodyData.recipientEmail || bodyData.email || queryData.recipientEmail || queryData.email;
+    const code = bodyData.code || queryData.code;
+    const magicUrl = bodyData.magicUrl || queryData.magicUrl;
+
+    const targetEmail = (recipientEmail || '').trim();
 
     if (!targetEmail) {
+      if (req.method === 'GET') {
+        return res.status(200).json({
+          success: true,
+          status: 'online',
+          endpoint: '/api/send-code',
+          message: 'Endpoint /api/send-code je plně aktivní. Odesílejte požadavky pomocí POST nebo GET s parametrem email.'
+        });
+      }
       return res.status(400).json({ success: false, error: 'Chybí cílový e-mail.' });
     }
 
@@ -869,13 +896,26 @@ app.post(['/api/send-code', '/api/send-magic-link'], async (req, res) => {
 });
 
 // Verification Endpoint for checking 6-digit login codes stored on server
-app.post(['/api/verify-code', '/api/verify-magic-link'], async (req, res) => {
+app.all(['/api/verify-code', '/api/verify-magic-link'], async (req, res) => {
   try {
-    const { email, recipientEmail, code, codeOrToken } = req.body || {};
-    const targetEmail = (email || recipientEmail || '').trim();
-    const codeToVerify = String(code || codeOrToken || '').trim();
+    const bodyData = req.body || {};
+    const queryData = req.query || {};
+
+    const email = bodyData.email || bodyData.recipientEmail || queryData.email || queryData.recipientEmail;
+    const code = bodyData.code || bodyData.codeOrToken || queryData.code || queryData.codeOrToken;
+
+    const targetEmail = (email || '').trim();
+    const codeToVerify = String(code || '').trim();
 
     if (!targetEmail || !codeToVerify) {
+      if (req.method === 'GET' && !targetEmail) {
+        return res.status(200).json({
+          success: true,
+          status: 'online',
+          endpoint: '/api/verify-code',
+          message: 'Endpoint /api/verify-code je plně aktivní. Odesílejte požadavky s parametry email a code.'
+        });
+      }
       return res.status(400).json({ success: false, error: 'Chybí e-mail nebo ověřovací kód.' });
     }
 

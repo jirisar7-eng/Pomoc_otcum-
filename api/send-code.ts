@@ -35,15 +35,37 @@ export async function sendResendEmail({ recipientEmail, code, magicUrl }: { reci
 export const sendBrevoEmail = sendResendEmail;
 
 export default async function handler(req: any, res: any) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ success: false, error: 'Metoda není povolena' });
+  // CORS Headers for Vercel Serverless Functions
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
+  );
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
   }
 
   try {
-    const { recipientEmail, email, code, magicUrl } = req.body || {};
-    const targetEmail = (recipientEmail || email || '').trim();
+    const bodyData = req.body || {};
+    const queryData = req.query || {};
+    const recipientEmail = bodyData.recipientEmail || bodyData.email || queryData.recipientEmail || queryData.email;
+    const code = bodyData.code || queryData.code;
+    const magicUrl = bodyData.magicUrl || queryData.magicUrl;
+
+    const targetEmail = (recipientEmail || '').trim();
 
     if (!targetEmail) {
+      if (req.method === 'GET') {
+        return res.status(200).json({
+          success: true,
+          status: 'online',
+          endpoint: '/api/send-code',
+          message: 'Endpoint /api/send-code je plně aktivní. Odesílejte požadavky pomocí POST nebo GET s parametrem email.'
+        });
+      }
       return res.status(400).json({ success: false, error: 'Chybí cílový e-mail.' });
     }
 
