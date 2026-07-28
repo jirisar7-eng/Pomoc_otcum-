@@ -138,12 +138,15 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn, partne
 
             {/* Main Headline */}
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight font-display leading-[1.15]" id="hero-title">
-              {translateText('Průvodce opatrovnictvím,', language)} <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-teal-200 to-amber-200">{translateText('právem a psychologií pro otce', language)}</span>
+              {translateText('Tátova cesta – Práva otců', language)}{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-teal-200 to-amber-200">
+                {translateText('v opatrovnickém sporu', language)}
+              </span>
             </h1>
 
             {/* Description Subtext */}
             <p className="text-slate-300 text-sm sm:text-base leading-relaxed max-w-2xl" id="hero-description">
-              {translateText('Pevná opora pro táty v opatrovnickém sporu. Přinášíme ověřené právní rozbory, judikaturu Ústavního soudu, vědecké metaanalýzy a AI asistenta pro rovnocennou péči o vaše děti.', language)}
+              {translateText('Pevná opora a nezávislý průvodce pro táty v opatrovnickém sporu. Přinášíme ověřené právní rozbory pro práva otců, judikaturu Ústavního soudu, vzory podání k soudu zdarma, kalkulačky a AI asistenta pro rovnocennou střídavou péči.', language)}
             </p>
 
             {/* Action Buttons */}
@@ -362,10 +365,10 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn, partne
               <span>{translateText('Kompletní znalostní báze', language)}</span>
             </div>
             <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 font-display tracking-tight">
-              {translateText('21 Odborných tématických okruhů', language)}
+              {translateText('Opatrovnické spory & Práva otců: 21 odborných okruhů', language)}
             </h2>
             <p className="text-slate-500 text-xs sm:text-sm mt-1 max-w-2xl">
-              {translateText('Systematicky členěná knihovna znalostí, judikatury, metodických pokynů OSPOD a praktických rad.', language)}
+              {translateText('Systematicky členěná knihovna znalostí pro opatrovnický spor: judikatura, metodické pokyny OSPOD, střídavá péče a praktické rady pro práva otců.', language)}
             </p>
           </div>
 
@@ -577,7 +580,7 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn, partne
               <span>{translateText('Ústavní soud ČR & ESLP', language)}</span>
             </div>
             <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 font-display tracking-tight">
-              {translateText('Aktuální judikatura & Právní argumenty do vašich podání', language)}
+              {translateText('Judikatura a právní argumentace pro práva otců', language)}
             </h2>
             <p className="text-slate-500 text-xs sm:text-sm mt-1 max-w-2xl">
               {translateText('Klíčové nálezy garantující rovnocennou péči. Kliknutím jednoduše zkopírujte právní větu přímo do vašeho podání k soudu.', language)}
@@ -665,7 +668,7 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn, partne
             </div>
 
             <h2 className="text-2xl md:text-3xl font-extrabold text-white font-display tracking-tight">
-              {translateText('Jste v akutní krizové situaci?', language)}
+              {translateText('SOS Krizová pomoc při opatrovnickém sporu', language)}
             </h2>
 
             <p className="text-rose-100/90 text-xs sm:text-sm leading-relaxed">
