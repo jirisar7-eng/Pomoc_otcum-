@@ -802,7 +802,7 @@ app.post('/api/send-email', async (req, res) => {
     console.error('[API /api/send-email Error]:', error);
     return res.status(200).json({
       success: false,
-      error: error.message || 'Nepodařilo se odeslat e-mail přes Resend.'
+      error: error?.message || (typeof error === 'string' ? error : JSON.stringify(error)) || 'Nepodařilo se odeslat e-mail přes Resend.'
     });
   }
 });
@@ -836,7 +836,7 @@ app.post(['/api/send-code', '/api/send-magic-link'], async (req, res) => {
     console.error('Error sending magic link email via Resend:', error);
     return res.status(200).json({
       success: false,
-      error: error.message || 'Nepodařilo se odeslat e-mail přes Resend.'
+      error: error?.message || (typeof error === 'string' ? error : JSON.stringify(error)) || 'Nepodařilo se odeslat e-mail přes Resend.'
     });
   }
 });

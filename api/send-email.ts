@@ -21,7 +21,7 @@ export default async function handler(req: any, res: any) {
     console.error('Error in /api/send-email:', error);
     return res.status(200).json({
       success: false,
-      error: error.message || 'Nepodařilo se odeslat e-mail přes Resend.'
+      error: error?.message || (typeof error === 'string' ? error : JSON.stringify(error)) || 'Nepodařilo se odeslat e-mail přes Resend.'
     });
   }
 }

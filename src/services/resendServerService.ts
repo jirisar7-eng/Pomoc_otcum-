@@ -41,6 +41,7 @@ export interface SendEmailResponse {
   data?: any;
   error?: string;
   message?: string;
+  rawError?: any;
 }
 
 const DEFAULT_ADMIN_RECIPIENT = process.env.ADMIN_EMAIL || 'info@tatovacesta.cz';
@@ -58,7 +59,7 @@ export async function sendPortalEmail({
   subject: string;
   html: string;
   fromName?: string;
-}) {
+}): Promise<SendEmailResponse> {
   try {
     const fromAddress = 'info@tatovacesta.cz';
     const replyToAddress = 'info@tatovacesta.cz';
@@ -90,8 +91,13 @@ export async function sendPortalEmail({
 
     if (error) {
       console.error('[Resend API Error] Odmítnuto serverem Resend:', JSON.stringify(error, null, 2));
-      const errorMessage = typeof error === 'string' ? error : (error as any)?.message || JSON.stringify(error);
-      return { success: false, error: errorMessage };
+      const resendErr = error as any;
+      const errorMessage = typeof error === 'string'
+        ? error
+        : resendErr?.message
+          ? `${resendErr.name || 'ResendError'}: ${resendErr.message}${resendErr.statusCode ? ` (Status: ${resendErr.statusCode})` : ''}`
+          : JSON.stringify(error);
+      return { success: false, error: errorMessage, rawError: error };
     }
 
     console.log(`[Resend API Success] E-mail úspěšně odeslán. Response Data:`, JSON.stringify(data, null, 2));
@@ -103,7 +109,10 @@ export async function sendPortalEmail({
       stack: err?.stack,
       raw: err
     });
-    return { success: false, error: err?.message || JSON.stringify(err) };
+    const errMessage = err?.message
+      ? `${err.name || 'Error'}: ${err.message}`
+      : typeof err === 'string' ? err : JSON.stringify(err);
+    return { success: false, error: errMessage };
   }
 }
 

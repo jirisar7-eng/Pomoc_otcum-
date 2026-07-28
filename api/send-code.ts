@@ -47,7 +47,7 @@ export default async function handler(req: any, res: any) {
     console.error('Error in /api/send-code:', error);
     return res.status(200).json({
       success: false,
-      error: error.message || 'Chyba při odesílání e-mailu přes Resend.'
+      error: error?.message || (typeof error === 'string' ? error : JSON.stringify(error)) || 'Chyba při odesílání e-mailu přes Resend.'
     });
   }
 }
