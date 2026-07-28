@@ -222,6 +222,26 @@ export default function SupportSection({
           <p className="mt-3 text-sm text-slate-300 leading-relaxed">
             {translateText('Jsme nezávislý projekt vyvíjený pod záštitou studia Synthesis Jiřího Š. Naším posláním je poskytovat tátům a rodinám bezplatný přístup k vědecky podloženým informacím, vzorům podání, kalkulačkám a psychologické podpoře. Vše vyvíjíme otevřeně, bez reklam a s vizí budoucí autonomní správy (AI Admin).', language)}
           </p>
+
+          {/* Current Sponsorship Status Banner */}
+          <div className="mt-5 p-4 bg-slate-900/90 border border-teal-500/30 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] font-mono font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
+                ✓ Webhosting NoLimit (VEDOS)
+              </span>
+              <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] font-mono font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
+                ✓ Doména tatovacesta.cz (FORPSI)
+              </span>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="bg-amber-400/20 text-amber-300 border border-amber-400/40 text-[10px] font-mono font-bold px-2.5 py-1 rounded-full flex items-center gap-1 animate-pulse">
+                🎯 Hledáme sponzora pro VPS
+              </span>
+              <span className="bg-teal-400/20 text-teal-200 border border-teal-400/30 text-[10px] font-mono font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
+                💖 Hledáme dárce na rozvoj
+              </span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -326,34 +346,48 @@ export default function SupportSection({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  <tr>
-                    <td className="py-3 px-4 font-bold text-slate-800">Google AI Pro (Předplatné)</td>
-                    <td className="py-3 px-4 text-slate-600 leading-normal">Pokročilé limity pro vývoj v AI Studiu, Gemini Pro s Deep Research pro psaní článků, 5 TB disk na dokumenty.</td>
-                    <td className="py-3 px-4 text-right font-mono font-bold text-slate-800">550 Kč</td>
+                  <tr className="bg-emerald-50/20">
+                    <td className="py-3 px-4 font-bold text-slate-800">
+                      Webhosting NoLimit
+                      <span className="text-[9px] bg-emerald-100 text-emerald-800 font-mono font-bold px-1.5 py-0.5 rounded ml-1.5">✓ VEDOS</span>
+                    </td>
+                    <td className="py-3 px-4 text-slate-600 leading-normal">Profesionální sponzorovaný webhosting a zázemí od společnosti VEDOS Internet, a.s.</td>
+                    <td className="py-3 px-4 text-right font-mono font-bold text-emerald-700">0 Kč <span className="text-[9px] text-slate-400 font-normal block">(Sponzorováno)</span></td>
+                  </tr>
+                  <tr className="bg-emerald-50/20">
+                    <td className="py-3 px-4 font-bold text-slate-800">
+                      Doména tatovacesta.cz
+                      <span className="text-[9px] bg-emerald-100 text-emerald-800 font-mono font-bold px-1.5 py-0.5 rounded ml-1.5">✓ FORPSI</span>
+                    </td>
+                    <td className="py-3 px-4 text-slate-600 leading-normal">Bezplatná registrace a správa domény věnovaná společností FORPSI (Internet CZ, a.s.).</td>
+                    <td className="py-3 px-4 text-right font-mono font-bold text-emerald-700">0 Kč <span className="text-[9px] text-slate-400 font-normal block">(Sponzorováno)</span></td>
+                  </tr>
+                  <tr className="bg-amber-50/30">
+                    <td className="py-3 px-4 font-bold text-slate-800">
+                      Vlastní český server (VPS)
+                      <span className="text-[9px] bg-amber-100 text-amber-900 font-mono font-bold px-1.5 py-0.5 rounded ml-1.5">🎯 Hledáme sponzora</span>
+                    </td>
+                    <td className="py-3 px-4 text-slate-600 leading-normal">Trvale běžící Node.js Express server (server.ts) postavený na NVMe discích v ČR pro nezávislý chod.</td>
+                    <td className="py-3 px-4 text-right font-mono font-bold text-amber-900">250 Kč</td>
                   </tr>
                   <tr>
-                    <td className="py-3 px-4 font-bold text-slate-800">Vlastní český server (VPS)</td>
-                    <td className="py-3 px-4 text-slate-600 leading-normal">Trvale běžící Node.js Express server (server.ts) postavený na NVMe discích v ČR (např. Vedos VPS ON).</td>
-                    <td className="py-3 px-4 text-right font-mono font-bold text-slate-800">250 Kč</td>
+                    <td className="py-3 px-4 font-bold text-slate-800">Google AI Pro &amp; Gemini API</td>
+                    <td className="py-3 px-4 text-slate-600 leading-normal">Vývoj v AI Studiu, Gemini Pro s Deep Research pro psaní článků a reálná spotřeba tokenů pro AI asistenta.</td>
+                    <td className="py-3 px-4 text-right font-mono font-bold text-slate-800">750 Kč</td>
                   </tr>
                   <tr>
-                    <td className="py-3 px-4 font-bold text-slate-800">Google AI Studio / API</td>
-                    <td className="py-3 px-4 text-slate-600 leading-normal">Rezerva na drobné poplatky za reálnou spotřebu tokenů, až na web pustíme autonomního moderátora.</td>
-                    <td className="py-3 px-4 text-right font-mono font-bold text-slate-800">200 Kč</td>
-                  </tr>
-                  <tr>
-                    <td className="py-3 px-4 font-bold text-slate-800">Profesionální e-mail &amp; správa</td>
-                    <td className="py-3 px-4 text-slate-600 leading-normal">Google Workspace pro oficiální mail schránku na doméně (<a href="mailto:info@tatamapravo.cz" className="text-teal-600 hover:underline">info@tatamapravo.cz</a>) a doménu rozpočtenou na měsíc.</td>
+                    <td className="py-3 px-4 font-bold text-slate-800">Oficiální e-mail &amp; správa</td>
+                    <td className="py-3 px-4 text-slate-600 leading-normal">Google Workspace pro oficiální mail schránky na doméně (info@tatamapravo.cz, sarji@seznam.cz).</td>
                     <td className="py-3 px-4 text-right font-mono font-bold text-slate-800">180 Kč</td>
                   </tr>
                   <tr className="bg-slate-50/20">
                     <td className="py-3 px-4 font-bold text-slate-800">Zálohování a databáze</td>
                     <td className="py-3 px-4 text-slate-500 italic leading-normal">Produkční Firestore / Supabase vrstva pro hladký chod fóra a přípravu na Passkeys.</td>
-                    <td className="py-3 px-4 text-right font-mono font-semibold text-slate-500">0 Kč <span className="text-[9px] text-slate-400 font-normal block">(stále ve Free tieru)</span></td>
+                    <td className="py-3 px-4 text-right font-mono font-semibold text-slate-500">0 Kč <span className="text-[9px] text-slate-400 font-normal block">(ve Free tieru)</span></td>
                   </tr>
                   <tr className="bg-teal-50/30 font-bold">
-                    <td className="py-3 px-4 text-teal-900 font-display">CELKEM</td>
-                    <td className="py-3 px-4 text-teal-850">Kompletní měsíční náklady na provoz a vývoj</td>
+                    <td className="py-3 px-4 text-teal-900 font-display">CELKEM DÁRCI &amp; VPS</td>
+                    <td className="py-3 px-4 text-teal-850">Měsíční cíl pro dárce a hledaného sponzora pro VPS</td>
                     <td className="py-3 px-4 text-right font-mono text-teal-900 text-sm">1 180 Kč</td>
                   </tr>
                 </tbody>
@@ -823,48 +857,96 @@ export default function SupportSection({
             </div>
           </div>
 
-          {/* Featured Active Sponsor Spotlight - WEDOS */}
-          <div className="bg-gradient-to-r from-slate-900 via-teal-950 to-slate-900 border-2 border-teal-500/50 rounded-2xl p-5 md:p-6 text-white shadow-xl space-y-3 relative overflow-hidden" id="wedos-sponsors-tab-card">
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-              <div className="flex items-center gap-3.5">
-                <div className="w-12 h-12 rounded-xl bg-white p-1.5 shrink-0 flex items-center justify-center shadow-md overflow-hidden border border-slate-100">
-                  <img 
-                    src="https://vedos.cz/wp-content/uploads/2025/03/VEDOS-Hosting-logo.svg" 
-                    alt="WEDOS Logo" 
-                    className="w-full h-full object-contain"
-                    referrerPolicy="no-referrer"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = "https://www.wedos.cz/wp-content/uploads/2025/03/VEDOS-Hosting-logo.svg";
-                    }}
-                  />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="bg-teal-500/20 text-teal-300 border border-teal-500/30 text-[9px] font-mono font-bold uppercase px-2 py-0.5 rounded-full">
-                      ★ Generální technologický sponzor
-                    </span>
-                    <span className="bg-amber-400/20 text-amber-300 border border-amber-400/30 text-[9px] font-mono font-bold uppercase px-2 py-0.5 rounded-full">
-                      Webhosting NoLimit
-                    </span>
+          {/* Featured Active Sponsors Spotlight - VEDOS & FORPSI */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs uppercase font-black text-slate-500 tracking-wider font-mono flex items-center gap-1.5">
+                <Shield className="w-4 h-4 text-emerald-600" />
+                Oficiální sponzoři infrastruktury
+              </h3>
+              <span className="text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 font-mono font-bold px-2 py-0.5 rounded-full">
+                ✓ Webhosting a Doména pokryty
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* FORPSI */}
+              <div className="bg-gradient-to-br from-slate-900 via-slate-850 to-blue-950 border-2 border-blue-500/40 rounded-2xl p-5 text-white shadow-lg space-y-3 relative overflow-hidden flex flex-col justify-between">
+                <div className="space-y-3 relative z-10">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-xl bg-white p-1.5 shrink-0 flex items-center justify-center shadow-md overflow-hidden border border-slate-100">
+                      <img 
+                        src="https://forpsi.com/Forpsi/media/Forpsi/General/logo.svg" 
+                        alt="FORPSI Logo" 
+                        className="w-full h-full object-contain"
+                        referrerPolicy="no-referrer"
+                      />
+                    </div>
+                    <div>
+                      <span className="bg-blue-500/20 text-blue-300 border border-blue-500/30 text-[9px] font-mono font-bold uppercase px-2 py-0.5 rounded-full">
+                        ★ Sponzor domény
+                      </span>
+                      <h4 className="text-sm font-bold text-white font-display mt-1">FORPSI (Internet CZ, a.s.)</h4>
+                    </div>
                   </div>
-                  <h3 className="text-sm font-bold text-white font-display mt-0.5">WEDOS Internet, a.s.</h3>
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    Společnost FORPSI věnovala a bezplatně zaregistrovala doménu <strong>tatovacesta.cz</strong> pro stabilní prezentaci a růst projektu. Děkujeme za podporu!
+                  </p>
+                </div>
+                <div className="pt-2 border-t border-slate-800 flex justify-between items-center relative z-10">
+                  <span className="text-[10px] text-blue-300 font-mono font-bold">Doména tatovacesta.cz</span>
+                  <a
+                    href="https://www.forpsi.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-3 py-1.5 bg-blue-500 hover:bg-blue-400 text-white font-bold text-xs rounded-lg transition-all flex items-center gap-1 shadow-xs cursor-pointer"
+                  >
+                    <span>FORPSI.com</span>
+                    <ArrowUpRight className="w-3 h-3" />
+                  </a>
                 </div>
               </div>
 
-              <a
-                href="https://www.wedos.cz"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-4 py-2 bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-xs rounded-xl transition-all flex items-center gap-1.5 shadow-md shrink-0 cursor-pointer"
-              >
-                <span>Navštívit WEDOS.cz</span>
-                <ArrowUpRight className="w-3.5 h-3.5" />
-              </a>
+              {/* VEDOS */}
+              <div className="bg-gradient-to-br from-slate-900 via-slate-850 to-teal-950 border-2 border-teal-500/40 rounded-2xl p-5 text-white shadow-lg space-y-3 relative overflow-hidden flex flex-col justify-between">
+                <div className="space-y-3 relative z-10">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-xl bg-white p-1.5 shrink-0 flex items-center justify-center shadow-md overflow-hidden border border-slate-100">
+                      <img 
+                        src="https://vedos.cz/wp-content/uploads/2025/03/VEDOS-Hosting-logo.svg" 
+                        alt="VEDOS Logo" 
+                        className="w-full h-full object-contain"
+                        referrerPolicy="no-referrer"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = "https://www.wedos.cz/wp-content/uploads/2025/03/VEDOS-Hosting-logo.svg";
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <span className="bg-teal-500/20 text-teal-300 border border-teal-500/30 text-[9px] font-mono font-bold uppercase px-2 py-0.5 rounded-full">
+                        ★ Generální sponzor hostingu
+                      </span>
+                      <h4 className="text-sm font-bold text-white font-display mt-1">VEDOS Internet, a.s.</h4>
+                    </div>
+                  </div>
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    Společnost VEDOS poskytla projektu bezplatný profesionální webhosting <strong>NoLimit</strong> a technickou záštitu pro rychlý a bezproblémový provoz.
+                  </p>
+                </div>
+                <div className="pt-2 border-t border-slate-800 flex justify-between items-center relative z-10">
+                  <span className="text-[10px] text-teal-300 font-mono font-bold">Webhosting NoLimit</span>
+                  <a
+                    href="https://www.vedos.cz"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-3 py-1.5 bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-xs rounded-lg transition-all flex items-center gap-1 shadow-xs cursor-pointer"
+                  >
+                    <span>VEDOS.cz</span>
+                    <ArrowUpRight className="w-3 h-3" />
+                  </a>
+                </div>
+              </div>
             </div>
-
-            <p className="text-xs text-slate-300 leading-relaxed pt-1">
-              Velké děkujeme společnosti <strong>WEDOS Internet, a.s.</strong>, která oficiálně zaštítila náš projekt a poskytuje nám zdarma kompletní sponzorovaný <strong>webhosting NoLimit</strong> a technologickou podporu pro plynulý chod portálu.
-            </p>
           </div>
 
           {/* Core features overview */}
@@ -1009,18 +1091,22 @@ export default function SupportSection({
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-3xs space-y-3 flex flex-col justify-between">
+              <div className="bg-amber-50/40 border-2 border-amber-300 p-5 rounded-2xl shadow-3xs space-y-3 flex flex-col justify-between">
                 <div className="space-y-2">
-                  <div className="w-8 h-8 rounded-lg bg-teal-50 flex items-center justify-center text-teal-600">
-                    <Server className="w-4.5 h-4.5" />
+                  <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center text-amber-800">
+                    <Server className="w-4.5 h-4.5 text-amber-900" />
                   </div>
-                  <h4 className="text-xs font-bold text-slate-850 font-display">Technologické partnerství</h4>
-                  <p className="text-[11px] text-slate-500 leading-relaxed">
-                    Poskytnutí nebo zafinancování pronájmu VPS serveru (cca 250 Kč / měsíčně neboli 3 000 Kč / rok).
+                  <div className="flex items-center gap-1.5">
+                    <h4 className="text-xs font-bold text-amber-950 font-display">1. Sponzor pro VPS server</h4>
+                    <span className="text-[9px] bg-amber-200 text-amber-900 font-mono font-bold px-1.5 py-0.5 rounded">HLAVNÍ CÍL</span>
+                  </div>
+                  <p className="text-[11px] text-slate-700 leading-relaxed">
+                    Poskytnutí nebo zafinancování pronájmu českého VPS serveru (cca 250 Kč / měsíčně neboli 3 000 Kč / rok) pro nezávislý chod Node.js backendu a databáze.
                   </p>
                 </div>
-                <div className="pt-2 border-t border-slate-100 mt-1">
-                  <span className="text-[11px] font-bold text-teal-800 font-mono">~ 3 000 Kč / rok</span>
+                <div className="pt-2 border-t border-amber-200/60 mt-1 flex justify-between items-center">
+                  <span className="text-[11px] font-bold text-amber-900 font-mono">~ 3 000 Kč / rok</span>
+                  <span className="text-[10px] text-amber-800 font-bold">Hledáme sponzora 🎯</span>
                 </div>
               </div>
 
@@ -1029,13 +1115,14 @@ export default function SupportSection({
                   <div className="w-8 h-8 rounded-lg bg-teal-50 flex items-center justify-center text-teal-600">
                     <Cpu className="w-4.5 h-4.5" />
                   </div>
-                  <h4 className="text-xs font-bold text-slate-850 font-display">Financování AI infrastruktury</h4>
+                  <h4 className="text-xs font-bold text-slate-850 font-display">2. Dárci na podporu projektu</h4>
                   <p className="text-[11px] text-slate-500 leading-relaxed">
-                    Krytí reálné spotřeby tokenů v Google AI Studio (cca 200 Kč / měsíc) pro komunikaci s uživateli a běh autonomního moderátora.
+                    Drobná finanční podpora od dárců na krytí provozu AI asistenta (Gemini API tokeny), psaní nových právních článků a přípravu bezplatných vzorů podání.
                   </p>
                 </div>
-                <div className="pt-2 border-t border-slate-100 mt-1">
-                  <span className="text-[11px] font-bold text-teal-800 font-mono">~ 200 Kč / měsíc</span>
+                <div className="pt-2 border-t border-slate-100 mt-1 flex justify-between items-center">
+                  <span className="text-[11px] font-bold text-teal-800 font-mono">Libovolný dar</span>
+                  <span className="text-[10px] text-teal-700 font-bold">Hledáme dárce 💖</span>
                 </div>
               </div>
 
@@ -1044,13 +1131,13 @@ export default function SupportSection({
                   <div className="w-8 h-8 rounded-lg bg-teal-50 flex items-center justify-center text-teal-600">
                     <Shield className="w-4.5 h-4.5" />
                   </div>
-                  <h4 className="text-xs font-bold text-slate-850 font-display">Finanční záštita právní pomoci</h4>
+                  <h4 className="text-xs font-bold text-slate-850 font-display">3. Právní &amp; Odborná záštita</h4>
                   <p className="text-[11px] text-slate-500 leading-relaxed">
-                    Podpora na propojení portálu s advokáty pro bezplatné krizové konzultace pro táty v nouzi.
+                    Propojení s advokáty, rodinnými mediátory a psychology pro konzultace a revize vzorů podání pro táty v nouzi.
                   </p>
                 </div>
                 <div className="pt-2 border-t border-slate-100 mt-1">
-                  <span className="text-[11px] font-bold text-teal-800 font-mono">Individuální podpora</span>
+                  <span className="text-[11px] font-bold text-teal-800 font-mono">Odborné partnerství</span>
                 </div>
               </div>
             </div>
