@@ -60,8 +60,8 @@ export async function sendPortalEmail({
   fromName?: string;
 }) {
   try {
-    const fromAddress = process.env.SMTP_FROM || process.env.RESEND_DOMAIN_EMAIL || 'info@tatovacesta.cz';
-    const replyToAddress = process.env.RESEND_REPLY_TO || process.env.SMTP_REPLY_TO || 'info@tatovacesta.cz';
+    const fromAddress = 'info@tatovacesta.cz';
+    const replyToAddress = 'info@tatovacesta.cz';
 
     if (!process.env.RESEND_API_KEY) {
       console.warn('RESEND_API_KEY missing. Simulating email delivery.');
