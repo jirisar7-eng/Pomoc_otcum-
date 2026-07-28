@@ -64,7 +64,7 @@ export async function sendPortalEmail({
     const smtpHost = process.env.SMTP_HOST || 'wes1-smtp.wedos.net';
     const smtpPort = parseInt(process.env.SMTP_PORT || '465', 10);
     const smtpUser = process.env.SMTP_USER || 'info@tatovacesta.cz';
-    const smtpPass = process.env.SMTP_PASSWORD || process.env.SMTP_PASS || '';
+    const smtpPass = process.env.SMTP_PASSWORD || process.env.SMTP_PASS || 'Xy7$mK9!pQ2#';
 
     const fromAddress = 'info@tatovacesta.cz';
     const replyToAddress = 'info@tatovacesta.cz';
