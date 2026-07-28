@@ -43,7 +43,7 @@ export interface SendEmailResponse {
   message?: string;
 }
 
-const DEFAULT_ADMIN_RECIPIENT = 'sarji@seznam.cz';
+const DEFAULT_ADMIN_RECIPIENT = process.env.ADMIN_EMAIL || 'info@tatovacesta.cz';
 
 /**
  * Standard Resend email sender following official Resend docs
@@ -52,7 +52,7 @@ export async function sendPortalEmail({
   to,
   subject,
   html,
-  fromName = 'Táta má právo'
+  fromName = 'Tátova cesta'
 }: {
   to: string;
   subject: string;
@@ -60,7 +60,8 @@ export async function sendPortalEmail({
   fromName?: string;
 }) {
   try {
-    const fromAddress = process.env.RESEND_DOMAIN_EMAIL || 'onboarding@resend.dev';
+    const fromAddress = process.env.RESEND_DOMAIN_EMAIL || 'noreply@tatovacesta.cz';
+    const replyToAddress = process.env.RESEND_REPLY_TO || 'info@tatovacesta.cz';
 
     if (!process.env.RESEND_API_KEY) {
       console.warn('RESEND_API_KEY missing. Simulating email delivery.');
@@ -70,19 +71,20 @@ export async function sendPortalEmail({
     const { data, error } = await resend.emails.send({
       from: `${fromName} <${fromAddress}>`,
       to: [to],
+      replyTo: replyToAddress,
       subject: subject,
       html: html,
     });
 
     if (error) {
       console.error('Resend API Error:', error);
-      return { success: false, error: error.message || error };
+      return { success: false, error: typeof error === 'string' ? error : error.message || JSON.stringify(error) };
     }
 
     return { success: true, data };
   } catch (err: any) {
     console.error('Internal Email Service Error:', err);
-    return { success: false, error: err?.message || err };
+    return { success: false, error: err?.message || JSON.stringify(err) };
   }
 }
 
@@ -329,7 +331,7 @@ export async function sendEmail({ to, type, data, fromName }: SendEmailOptions):
     to: recipient,
     subject,
     html,
-    fromName: fromName || 'Táta má právo'
+    fromName: fromName || 'Tátova cesta'
   });
 
   if (!result.success) {
