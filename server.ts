@@ -9,7 +9,7 @@ import dotenv from 'dotenv';
 import fs from 'fs';
 import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI } from '@google/genai';
-import { sendEmail } from './src/services/resendServerService';
+import { sendEmail, validateEmailFormat, generateNumericCode, verifyServerCode } from './src/services/resendServerService';
 import { checkGitHubStatus, readGitHubFile, saveGitHubFile } from './src/services/githubServerService';
 
 dotenv.config();
@@ -796,6 +796,15 @@ app.post('/api/send-email', async (req, res) => {
       return res.status(400).json({ success: false, error: 'Chybí cílový e-mail (to).' });
     }
 
+    const validation = validateEmailFormat(recipient);
+    if (!validation.isValid) {
+      console.warn(`[Express /api/send-email] Zamítnut neplatný/podezřelý e-mailový vstup: "${recipient}". Důvod: ${validation.reason}`);
+      return res.status(200).json({
+        success: false,
+        error: validation.error || 'Zadejte prosím platnou e-mailovou adresu ve správném tvaru (např. jmeno@domena.cz).'
+      });
+    }
+
     const result = await sendEmail({ to: recipient, type: emailType, data: emailData });
     return res.status(200).json(result);
   } catch (error: any) {
@@ -807,20 +816,34 @@ app.post('/api/send-email', async (req, res) => {
   }
 });
 
-// Legacy Magic Link / Code Route mapped to WEDOS SMTP Email Service
+// Login Verification Code Generation and Dispatch Route mapped to WEDOS SMTP Email Service
 app.post(['/api/send-code', '/api/send-magic-link'], async (req, res) => {
   try {
     const { recipientEmail, email, code, magicUrl } = req.body || {};
     const targetEmail = (recipientEmail || email || '').trim();
 
-    if (!targetEmail || !code) {
-      return res.status(400).json({ success: false, error: 'Chybí e-mail nebo kód' });
+    if (!targetEmail) {
+      return res.status(400).json({ success: false, error: 'Chybí cílový e-mail.' });
     }
+
+    const validation = validateEmailFormat(targetEmail);
+    if (!validation.isValid) {
+      console.warn(`[Express /api/send-code] Zamítnut neplatný/podezřelý e-mailový vstup: "${targetEmail}". Důvod: ${validation.reason}`);
+      return res.status(200).json({
+        success: false,
+        error: validation.error || 'Zadejte prosím platnou e-mailovou adresu ve správném tvaru (např. jmeno@domena.cz).'
+      });
+    }
+
+    // Always ensure a random 6-digit numeric verification code generated on the server
+    const codeToUse = (code && /^\d{6}$/.test(String(code).trim()))
+      ? String(code).trim()
+      : generateNumericCode();
 
     const result = await sendEmail({
       to: targetEmail,
       type: 'MAGIC_LINK',
-      data: { code, magicUrl }
+      data: { code: codeToUse, magicUrl }
     });
 
     if (result.success === false) {
@@ -831,12 +854,56 @@ app.post(['/api/send-code', '/api/send-magic-link'], async (req, res) => {
       });
     }
 
-    return res.status(200).json(result);
+    return res.status(200).json({
+      ...result,
+      code: codeToUse,
+      message: 'Šestimístný ověřovací kód byl vygenerován a odeslán na váš e-mail.'
+    });
   } catch (error: any) {
     console.error('Error sending magic link email via WEDOS SMTP:', error);
     return res.status(200).json({
       success: false,
       error: error?.message || (typeof error === 'string' ? error : JSON.stringify(error)) || 'Nepodařilo se odeslat e-mail přes WEDOS SMTP.'
+    });
+  }
+});
+
+// Verification Endpoint for checking 6-digit login codes stored on server
+app.post(['/api/verify-code', '/api/verify-magic-link'], async (req, res) => {
+  try {
+    const { email, recipientEmail, code, codeOrToken } = req.body || {};
+    const targetEmail = (email || recipientEmail || '').trim();
+    const codeToVerify = String(code || codeOrToken || '').trim();
+
+    if (!targetEmail || !codeToVerify) {
+      return res.status(400).json({ success: false, error: 'Chybí e-mail nebo ověřovací kód.' });
+    }
+
+    const validation = validateEmailFormat(targetEmail);
+    if (!validation.isValid) {
+      console.warn(`[Express /api/verify-code] Zamítnut neplatný e-mailový vstup: "${targetEmail}". Důvod: ${validation.reason}`);
+      return res.status(200).json({
+        success: false,
+        error: validation.error || 'Zadejte prosím platnou e-mailovou adresu ve správném tvaru (např. jmeno@domena.cz).'
+      });
+    }
+
+    const verificationResult = verifyServerCode(targetEmail, codeToVerify);
+    if (!verificationResult.success) {
+      console.warn(`[Express /api/verify-code] Neúspěšné ověření pro "${targetEmail}": ${verificationResult.error}`);
+      return res.status(200).json({
+        success: false,
+        error: verificationResult.error
+      });
+    }
+
+    console.log(`[Express /api/verify-code] Uživatel "${targetEmail}" úspěšně ověřen šestimístným kódem.`);
+    return res.status(200).json({ success: true, verified: true, email: targetEmail });
+  } catch (error: any) {
+    console.error('Error verifying code via WEDOS server store:', error);
+    return res.status(200).json({
+      success: false,
+      error: error?.message || 'Chyba při ověřování kódu na serveru.'
     });
   }
 });

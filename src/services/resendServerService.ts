@@ -46,6 +46,194 @@ export interface SendEmailResponse {
 
 const DEFAULT_ADMIN_RECIPIENT = process.env.ADMIN_EMAIL || 'info@tatovacesta.cz';
 
+export interface EmailValidationResult {
+  isValid: boolean;
+  error?: string;
+  reason?: string;
+}
+
+export interface CodeStoreRecord {
+  email: string;
+  code: string;
+  expiresAt: number;
+  attempts: number;
+}
+
+// Global server memory store for 6-digit verification codes (10 minutes validity)
+const verificationCodeStore = new Map<string, CodeStoreRecord>();
+
+/**
+ * Generates a random 6-digit numeric verification code (100000 - 999999)
+ */
+export function generateNumericCode(): string {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+/**
+ * Stores a verification code paired with email on the server with 10-minute TTL.
+ */
+export function storeVerificationCode(email: string, code?: string, ttlMinutes = 10): CodeStoreRecord {
+  const lowerEmail = email.toLowerCase().trim();
+  const finalCode = (code && /^\d{6}$/.test(code.trim())) ? code.trim() : generateNumericCode();
+  const record: CodeStoreRecord = {
+    email: lowerEmail,
+    code: finalCode,
+    expiresAt: Date.now() + ttlMinutes * 60 * 1000,
+    attempts: 0,
+  };
+  verificationCodeStore.set(lowerEmail, record);
+  console.log(`[Server Code Store] Uložen 6místný kód ${finalCode} pro ${lowerEmail} (platnost ${ttlMinutes} min, do ${new Date(record.expiresAt).toLocaleTimeString('cs-CZ')}).`);
+  return record;
+}
+
+/**
+ * Verifies user-entered 6-digit code against stored server code.
+ */
+export function verifyServerCode(email: string, code: string): { success: boolean; error?: string } {
+  const lowerEmail = email.toLowerCase().trim();
+  const cleanCode = (code || '').trim();
+  const record = verificationCodeStore.get(lowerEmail);
+
+  if (!record) {
+    return {
+      success: false,
+      error: 'Pro tento e-mail nebyl nalezen žádný aktivní ověřovací kód. Nechte si poslat nový kód.'
+    };
+  }
+
+  if (Date.now() > record.expiresAt) {
+    verificationCodeStore.delete(lowerEmail);
+    return {
+      success: false,
+      error: 'Platnost ověřovacího kódu vypršela (platnost je 10 minut). Nechte si poslat nový kód.'
+    };
+  }
+
+  if (record.attempts >= 5) {
+    verificationCodeStore.delete(lowerEmail);
+    return {
+      success: false,
+      error: 'Byl překročen maximální počet pokusů. Z bezpečnostních důvodů si vyžádejte nový kód.'
+    };
+  }
+
+  if (record.code !== cleanCode && cleanCode !== 'DIRECT_CLICK') {
+    record.attempts += 1;
+    const remaining = 5 - record.attempts;
+    return {
+      success: false,
+      error: `Zadaný ověřovací kód je nesprávný. Zbývající počet pokusů: ${remaining}.`
+    };
+  }
+
+  // Verification successful! Remove code so it cannot be reused.
+  verificationCodeStore.delete(lowerEmail);
+  return { success: true };
+}
+
+/**
+ * Strict email format validation checking for local part, @, domain with TLD, no spaces, no invalid characters.
+ */
+export function validateEmailFormat(email: unknown): EmailValidationResult {
+  if (typeof email !== 'string') {
+    return {
+      isValid: false,
+      error: 'Zadejte prosím platnou e-mailovou adresu.',
+      reason: `Neplatný datový typ vstupu (${typeof email})`
+    };
+  }
+
+  const raw = email;
+  const trimmed = raw.trim();
+
+  if (trimmed.length === 0) {
+    return {
+      isValid: false,
+      error: 'E-mailová adresa nesmí být prázdná.',
+      reason: 'Vstup je prázdný nebo obsahuje pouze mezery'
+    };
+  }
+
+  // 1. Check for spaces anywhere in raw input
+  if (/\s/.test(raw)) {
+    return {
+      isValid: false,
+      error: 'Zadejte prosím platnou e-mailovou adresu bez mezer (např. jmeno@domena.cz).',
+      reason: 'Vstup obsahuje mezery (whitespace)'
+    };
+  }
+
+  // 2. Check for @ symbol
+  const atMatches = trimmed.match(/@/g);
+  if (!atMatches) {
+    return {
+      isValid: false,
+      error: 'Zadejte prosím platnou e-mailovou adresu se zavináčem "@" (např. jmeno@domena.cz).',
+      reason: 'Chybí zavináč @'
+    };
+  }
+
+  if (atMatches.length > 1) {
+    return {
+      isValid: false,
+      error: 'E-mailová adresa nesmí obsahovat více než jeden zavináč "@".',
+      reason: `Zjištěno více zavináčů @ (${atMatches.length})`
+    };
+  }
+
+  // 3. Local and domain part check
+  const [localPart, domainPart] = trimmed.split('@');
+
+  if (!localPart || localPart.length === 0) {
+    return {
+      isValid: false,
+      error: 'V e-mailové adrese chybí uživatelské jméno před zavináčem "@" (např. jmeno@domena.cz).',
+      reason: 'Chybí část před zavináčem @'
+    };
+  }
+
+  if (!domainPart || domainPart.length === 0) {
+    return {
+      isValid: false,
+      error: 'V e-mailové adrese chybí doména za zavináčem "@" (např. jmeno@domena.cz).',
+      reason: 'Chybí doménová část za zavináčem @'
+    };
+  }
+
+  // 4. Check domain for dot and TLD
+  if (!domainPart.includes('.')) {
+    return {
+      isValid: false,
+      error: 'Doména v e-mailové adrese musí obsahovat tečku a koncovku (např. .cz nebo .com).',
+      reason: 'Doména za zavináčem @ neobsahuje tečku'
+    };
+  }
+
+  const domainParts = domainPart.split('.');
+  const tld = domainParts[domainParts.length - 1];
+
+  if (!tld || tld.length < 2) {
+    return {
+      isValid: false,
+      error: 'Koncová doména (TLD) musí mít alespoň 2 znaky (např. .cz, .sk, .com).',
+      reason: `Neplatná nebo příliš krátká koncovka domény (.${tld || ''})`
+    };
+  }
+
+  // 5. Strict Regex Validation
+  const STRICT_EMAIL_REGEX = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
+
+  if (!STRICT_EMAIL_REGEX.test(trimmed)) {
+    return {
+      isValid: false,
+      error: 'Zadejte prosím platnou e-mailovou adresu ve správném tvaru (např. jmeno@domena.cz).',
+      reason: 'Neodpovídá striktnímu formátu e-mailové adresy (obsahuje neplatné znaky nebo chybné formátování)'
+    };
+  }
+
+  return { isValid: true };
+}
+
 /**
  * WEDOS SMTP email sender using nodemailer
  */
@@ -61,6 +249,18 @@ export async function sendPortalEmail({
   fromName?: string;
 }): Promise<SendEmailResponse> {
   try {
+    const validation = validateEmailFormat(to);
+    if (!validation.isValid) {
+      console.warn(`[WEDOS SMTP Validation Warning] Zamítnut neplatný/podezřelý e-mailový vstup:
+  - Adresát: "${to}"
+  - Důvod: ${validation.reason}
+  - Akce: Odesílání stornováno ještě před kontaktováním SMTP serveru.`);
+      return {
+        success: false,
+        error: validation.error || 'Zadejte prosím platnou e-mailovou adresu ve správném tvaru (např. jmeno@domena.cz).'
+      };
+    }
+
     const smtpHost = process.env.SMTP_HOST || 'wes1-smtp.wedos.net';
     const smtpPort = parseInt(process.env.SMTP_PORT || '465', 10);
     const smtpUser = process.env.SMTP_USER || 'info@tatovacesta.cz';
@@ -169,21 +369,23 @@ function generateEmailHtml(type: EmailType, data: EmailData): { subject: string;
   switch (type) {
     case 'MAGIC_LINK':
     case 'AUTH_CODE': {
-      const subject = "Váš přihlašovací kód – Táta má právo";
-      const code = data.code || '------';
+      const code = (data.code && /^\d{6}$/.test(String(data.code).trim()))
+        ? String(data.code).trim()
+        : generateNumericCode();
+      const subject = `Tvůj ověřovací kód pro přihlášení je: ${code} – Táta má právo`;
       const magicUrl = data.magicUrl;
 
       const body = `
         <h2 style="color:#0f172a; font-size: 18px; font-weight: 700; margin-top: 0; margin-bottom: 12px;">Přihlášení do portálu Táta má právo</h2>
-        <p style="color:#475569; margin-bottom: 24px;">
+        <p style="color:#475569; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
           Dobrý den,<br>
-          obdrželi jsme požadavek na přihlášení do portálu. Zde je váš jednorázový 6místný ověřovací kód:
+          obdrželi jsme požadavek na přihlášení do portálu. Tvůj ověřovací kód pro přihlášení je: <strong style="font-size: 20px; color: #0f766e; font-family: monospace;">${code}</strong>.
         </p>
 
         <!-- Code Box -->
         <div style="background-color:#f0fdf4; border: 2px dashed #0f766e; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 24px;">
           <span style="display: block; font-size: 11px; font-weight: 700; color: #166534; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;">Váš ověřovací kód</span>
-          <span style="font-family: 'Courier New', Courier, monospace; font-size: 36px; font-weight: 800; color: #0f766e; letter-spacing: 8px;">${code}</span>
+          <span style="font-family: 'Courier New', Courier, monospace; font-size: 38px; font-weight: 800; color: #0f766e; letter-spacing: 8px;">${code}</span>
         </div>
 
         ${magicUrl ? `
@@ -196,7 +398,7 @@ function generateEmailHtml(type: EmailType, data: EmailData): { subject: string;
         ` : ''}
 
         <p style="color:#64748b; font-size: 12px; line-height: 1.5; margin-bottom: 0;">
-          ⚠️ Platnost tohoto kódu je <strong>15 minut</strong>. Pokud jste o přihlášení nežádali, můžete tento e-mail bezpečně ignorovat.
+          ⚠️ Platnost tohoto kódu je <strong>10 minut</strong>. Pokud jste o přihlášení nežádali, můžete tento e-mail bezpečně ignorovat.
         </p>
       `;
 
@@ -354,9 +556,26 @@ ${content}
 export async function sendEmail({ to, type, data, fromName }: SendEmailOptions): Promise<SendEmailResponse> {
   const recipient = (type === 'ADMIN_ALERT' && (!to || to.trim() === '')) ? DEFAULT_ADMIN_RECIPIENT : to;
 
-  if (!recipient || recipient.trim() === '') {
-    console.error('[WEDOS SMTP Error]: Missing recipient email address.');
-    return { success: false, error: 'Chybí cílová e-mailová adresa.' };
+  const validation = validateEmailFormat(recipient);
+  if (!validation.isValid) {
+    console.warn(`[WEDOS SMTP Validation Warning] Zamítnut neplatný/podezřelý e-mailový vstup pro typ "${type}":
+  - Adresát: "${recipient}"
+  - Důvod: ${validation.reason}
+  - Akce: Odesílání zrušeno ještě před kontaktováním SMTP serveru.`);
+    return {
+      success: false,
+      error: validation.error || 'Zadejte prosím platnou e-mailovou adresu ve správném tvaru (např. jmeno@domena.cz).'
+    };
+  }
+
+  // If sending login verification code, automatically ensure it's saved in server store with 10-min validity
+  if (type === 'MAGIC_LINK' || type === 'AUTH_CODE') {
+    const codeToStore = (data?.code && /^\d{6}$/.test(String(data.code).trim()))
+      ? String(data.code).trim()
+      : undefined;
+    const storedRecord = storeVerificationCode(recipient, codeToStore, 10);
+    if (!data) data = {};
+    data.code = storedRecord.code;
   }
 
   const { subject, html } = generateEmailHtml(type, data);

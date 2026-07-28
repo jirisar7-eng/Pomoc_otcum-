@@ -1,4 +1,4 @@
-import { sendEmail } from '../src/services/resendServerService';
+import { sendEmail, validateEmailFormat, generateNumericCode } from '../src/services/resendServerService';
 
 export interface ResendEmailResult {
   success: boolean;
@@ -6,20 +6,26 @@ export interface ResendEmailResult {
   message?: string;
   messageId?: string;
   provider?: string;
+  code?: string;
   error?: string;
 }
 
-export async function sendResendEmail({ recipientEmail, code, magicUrl }: { recipientEmail: string; code: string; magicUrl?: string }): Promise<ResendEmailResult> {
+export async function sendResendEmail({ recipientEmail, code, magicUrl }: { recipientEmail: string; code?: string; magicUrl?: string }): Promise<ResendEmailResult> {
+  const codeToUse = (code && /^\d{6}$/.test(String(code).trim()))
+    ? String(code).trim()
+    : generateNumericCode();
+
   const result = await sendEmail({
     to: recipientEmail,
     type: 'MAGIC_LINK',
-    data: { code, magicUrl }
+    data: { code: codeToUse, magicUrl }
   });
 
   return {
     success: result.success,
     delivered: result.delivered ?? true,
-    message: result.message || 'Kód byl odeslán přes WEDOS SMTP.',
+    code: codeToUse,
+    message: result.message || 'Šestimístný ověřovací kód byl úspěšně vygenerován a odeslán přes WEDOS SMTP.',
     provider: 'wedos_smtp',
     error: result.error
   };
@@ -37,8 +43,17 @@ export default async function handler(req: any, res: any) {
     const { recipientEmail, email, code, magicUrl } = req.body || {};
     const targetEmail = (recipientEmail || email || '').trim();
 
-    if (!targetEmail || !code) {
-      return res.status(400).json({ success: false, error: 'Chybí e-mail nebo kód' });
+    if (!targetEmail) {
+      return res.status(400).json({ success: false, error: 'Chybí cílový e-mail.' });
+    }
+
+    const validation = validateEmailFormat(targetEmail);
+    if (!validation.isValid) {
+      console.warn(`[Handler /api/send-code] Zamítnut neplatný/podezřelý e-mailový vstup: "${targetEmail}". Důvod: ${validation.reason}`);
+      return res.status(200).json({
+        success: false,
+        error: validation.error || 'Zadejte prosím platnou e-mailovou adresu ve správném tvaru (např. jmeno@domena.cz).'
+      });
     }
 
     const result = await sendResendEmail({ recipientEmail: targetEmail, code, magicUrl });

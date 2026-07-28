@@ -1,4 +1,4 @@
-import { sendEmail } from '../src/services/resendServerService';
+import { sendEmail, validateEmailFormat } from '../src/services/resendServerService';
 
 export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') {
@@ -13,6 +13,15 @@ export default async function handler(req: any, res: any) {
 
     if (!recipient) {
       return res.status(400).json({ success: false, error: 'Chybí cílový e-mail (to).' });
+    }
+
+    const validation = validateEmailFormat(recipient);
+    if (!validation.isValid) {
+      console.warn(`[Handler /api/send-email] Zamítnut neplatný/podezřelý e-mailový vstup: "${recipient}". Důvod: ${validation.reason}`);
+      return res.status(200).json({
+        success: false,
+        error: validation.error || 'Zadejte prosím platnou e-mailovou adresu ve správném tvaru (např. jmeno@domena.cz).'
+      });
     }
 
     const result = await sendEmail({ to: recipient, type: emailType, data: emailData });

@@ -593,7 +593,7 @@ export async function loginWithEmail(email: string, pass: string): Promise<User>
   }
 }
 
-import { sendMagicLinkEmail } from '../services/emailService';
+import { sendMagicLinkEmail, verifyCodeViaServer } from '../services/emailService';
 
 export interface MagicLinkResult {
   email: string;
@@ -604,17 +604,40 @@ export interface MagicLinkResult {
 
 export async function sendMagicLink(email: string): Promise<MagicLinkResult> {
   const lowerEmail = email.toLowerCase().trim();
-  const code = Math.floor(100000 + Math.random() * 900000).toString();
-  const expiresAt = Date.now() + 15 * 60 * 1000; // 15 minutes validity
+  const expiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes validity
   const token = 'ml_' + Math.random().toString(36).substring(2, 12);
 
   const origin = typeof window !== 'undefined' ? window.location.origin : 'https://synthesis.cz';
   const pathname = typeof window !== 'undefined' ? window.location.pathname : '/';
   const magicUrl = `${origin}${pathname}?magic_token=${token}&magic_email=${encodeURIComponent(lowerEmail)}`;
 
+  let finalCode = '';
+
+  // Send real email via WEDOS SMTP API (server generates and stores code)
+  try {
+    const emailRes = await sendMagicLinkEmail({
+      recipientEmail: lowerEmail,
+      magicUrl
+    });
+
+    if (emailRes.data?.code) {
+      finalCode = String(emailRes.data.code);
+    }
+
+    if (emailRes.success === false) {
+      console.warn("[WEDOS Email Delivery Notice]", emailRes.message);
+    }
+  } catch (emailErr: any) {
+    console.warn("WEDOS email send notice:", emailErr?.message || emailErr);
+  }
+
+  if (!finalCode) {
+    finalCode = Math.floor(100000 + Math.random() * 900000).toString();
+  }
+
   const magicSession = {
     email: lowerEmail,
-    code,
+    code: finalCode,
     token,
     expiresAt,
     magicUrl
@@ -622,21 +645,6 @@ export async function sendMagicLink(email: string): Promise<MagicLinkResult> {
 
   if (typeof window !== 'undefined') {
     localStorage.setItem('synthesis_magic_session', JSON.stringify(magicSession));
-  }
-
-  // Send real email via Resend API
-  try {
-    const emailRes = await sendMagicLinkEmail({
-      recipientEmail: lowerEmail,
-      code,
-      magicUrl
-    });
-
-    if (emailRes.success === false) {
-      console.warn("[Resend Email Delivery Notice]", emailRes.message);
-    }
-  } catch (emailErr: any) {
-    console.warn("Resend email send notice:", emailErr?.message || emailErr);
   }
 
   // Attempt Firebase sendSignInLinkToEmail
@@ -652,7 +660,7 @@ export async function sendMagicLink(email: string): Promise<MagicLinkResult> {
 
   return {
     email: lowerEmail,
-    code,
+    code: finalCode,
     expiresAt,
     magicUrl
   };
@@ -662,24 +670,42 @@ export async function sendMagicLink(email: string): Promise<MagicLinkResult> {
 export async function verifyMagicLink(email: string, codeOrToken: string): Promise<User> {
   const lowerEmail = email.toLowerCase().trim();
   
-  if (typeof window !== 'undefined') {
-    const savedSessionRaw = localStorage.getItem('synthesis_magic_session');
-    if (savedSessionRaw) {
-      try {
-        const session = JSON.parse(savedSessionRaw);
-        if (
-          session.email.toLowerCase() === lowerEmail &&
-          (session.code === codeOrToken.trim() || session.token === codeOrToken.trim() || codeOrToken === 'DIRECT_CLICK')
-        ) {
-          if (Date.now() > session.expiresAt) {
-            throw { code: 'auth/expired-action-code', message: 'Kouzelný odkaz vypršel. Nechte si poslat nový.' };
+  // First, perform server-side verification against WEDOS 10-min code store
+  const serverVerify = await verifyCodeViaServer(lowerEmail, codeOrToken);
+  if (!serverVerify.success) {
+    // If server returned explicit error (e.g., incorrect code or expired), reject login
+    if (serverVerify.error && !serverVerify.error.includes('spojit se serverem')) {
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('synthesis_magic_session');
+      }
+      throw { code: 'auth/invalid-action-code', message: serverVerify.error };
+    }
+    
+    // Offline / Network fallback check via localStorage
+    if (typeof window !== 'undefined') {
+      const savedSessionRaw = localStorage.getItem('synthesis_magic_session');
+      if (savedSessionRaw) {
+        try {
+          const session = JSON.parse(savedSessionRaw);
+          if (
+            session.email.toLowerCase() === lowerEmail &&
+            (session.code === codeOrToken.trim() || session.token === codeOrToken.trim() || codeOrToken === 'DIRECT_CLICK')
+          ) {
+            if (Date.now() > session.expiresAt) {
+              throw { code: 'auth/expired-action-code', message: 'Kouzelný odkaz nebo ověřovací kód vypršel (platnost 10 min). Nechte si poslat nový.' };
+            }
+          } else {
+            throw { code: 'auth/invalid-action-code', message: 'Zadaný ověřovací kód je nesprávný.' };
           }
-          localStorage.removeItem('synthesis_magic_session');
+        } catch (e: any) {
+          if (e.code) throw e;
         }
-      } catch (e) {
-        // Continue
       }
     }
+  }
+
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('synthesis_magic_session');
   }
 
   const isAdmin = lowerEmail === 'mallfuriionn@gmail.com';
