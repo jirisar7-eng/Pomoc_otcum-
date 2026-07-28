@@ -221,67 +221,130 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn, partne
       </section>
 
       {/* ========================================================================= */}
-      {/* 📰 SEKCE: HLAVNÍ ZPRÁVA A OFICIÁLNÍ OZNÁMENÍ (VEDOS MILESTONE)          */}
+      {/* 📰 SEKCE: OFICIÁLNÍ OZNÁMENÍ SPONZORŮ (VEDOS & FORPSI)                   */}
       {/* ========================================================================= */}
-      <section className="bg-gradient-to-r from-slate-900 via-slate-850 to-teal-950 text-white rounded-3xl p-6 sm:p-8 border-2 border-teal-500/40 shadow-xl relative overflow-hidden space-y-5" id="home-featured-announcement">
-        <div className="absolute top-0 right-0 w-80 h-80 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
-        
-        <div className="flex items-center justify-between flex-wrap gap-2 border-b border-slate-800 pb-3 relative z-10">
+      <section className="space-y-4" id="home-featured-announcements">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="flex h-2.5 w-2.5 relative">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-teal-500"></span>
             </span>
-            <span className="text-[11px] font-mono font-bold text-teal-300 uppercase tracking-wider">
-              {translateText('Oficiální zpráva z redakce • 27. Července 2026', language)}
-            </span>
+            <h2 className="text-lg font-black text-slate-900 font-display">
+              {translateText('Oficiální oznamy & Milníky partnerství', language)}
+            </h2>
           </div>
-          <span className="bg-amber-400/20 text-amber-300 border border-amber-400/30 text-[10px] font-mono font-bold uppercase px-2.5 py-0.5 rounded-full">
-            ★ První milník projektu
+          <span className="text-xs font-mono font-bold text-teal-600 bg-teal-50 px-3 py-1 rounded-full border border-teal-100">
+            ★ Infrastrukturní sponzoři
           </span>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center relative z-10">
-          <div className="lg:col-span-8 space-y-3">
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-white font-display leading-tight">
-              Oslava prvního milníku: VEDOS se stává technologickým partnerem projektu „Táta má právo“
-            </h2>
-            <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
-              Každý velký příběh potřebuje silný začátek a lidi, kteří věří v jeho smysl. S obrovskou radostí a hrdostí dnes můžeme oznámit, že projekt <strong>Táta má právo</strong> získal svého první oficiálního sponzora a technologického partnera – stala se jím společnost <strong>VEDOS Internet, a.s.</strong>, která projektu věnovala sponzorovaný webhosting <strong>NoLimit</strong>.
-            </p>
-            <div className="pt-2 flex flex-wrap items-center gap-3">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* FORPSI Card */}
+          <div className="bg-gradient-to-br from-slate-900 via-slate-850 to-blue-950 text-white rounded-3xl p-6 border-2 border-blue-500/40 shadow-xl relative overflow-hidden flex flex-col justify-between space-y-4">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="space-y-3 relative z-10">
+              <div className="flex items-center justify-between gap-2 border-b border-slate-800 pb-2.5">
+                <span className="text-[10px] font-mono font-bold text-blue-300 uppercase">
+                  28. Července 2026 • Sponzor domény
+                </span>
+                <span className="bg-amber-400/20 text-amber-300 border border-amber-400/30 text-[9px] font-mono font-bold uppercase px-2 py-0.5 rounded-full">
+                  ★ Doména tatovacesta.cz
+                </span>
+              </div>
+              <div className="flex items-start gap-3.5">
+                <div className="w-14 h-14 rounded-2xl bg-white p-2 shadow-md border border-slate-200 shrink-0 flex items-center justify-center overflow-hidden">
+                  <img 
+                    src="https://forpsi.com/Forpsi/media/Forpsi/General/logo.svg" 
+                    alt="FORPSI Logo" 
+                    className="w-full h-full object-contain"
+                    referrerPolicy="no-referrer"
+                  />
+                </div>
+                <div>
+                  <h3 className="text-lg font-black text-white font-display leading-tight">
+                    FORPSI: Sponzor doménové infrastruktury
+                  </h3>
+                  <span className="text-xs text-blue-300 font-mono">FORPSI (Internet CZ, a.s.)</span>
+                </div>
+              </div>
+              <p className="text-slate-300 text-xs leading-relaxed line-clamp-3">
+                S radostí oznamujeme nového sponzora. Společnost FORPSI věnovala a bezplatně zaregistrovala doménu <strong>tatovacesta.cz</strong> pro projekt Táta má právo. Přečtěte si více v samostatném článku.
+              </p>
+            </div>
+
+            <div className="pt-2 flex items-center justify-between gap-2 relative z-10">
+              <button
+                onClick={() => onNavigate('news', 'art-forpsi-milestone')}
+                className="px-4 py-2 bg-blue-500 hover:bg-blue-400 text-white font-extrabold text-xs rounded-xl shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
+              >
+                <BookOpen className="w-3.5 h-3.5" />
+                <span>Přečíst si celý článek</span>
+                <ArrowRight className="w-3 h-3" />
+              </button>
+              <a
+                href="https://www.forpsi.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 font-bold text-xs rounded-xl transition-all flex items-center gap-1 cursor-pointer"
+              >
+                <span>FORPSI.com</span>
+                <ExternalLink className="w-3 h-3 text-blue-400" />
+              </a>
+            </div>
+          </div>
+
+          {/* VEDOS Card */}
+          <div className="bg-gradient-to-br from-slate-900 via-slate-850 to-teal-950 text-white rounded-3xl p-6 border-2 border-teal-500/40 shadow-xl relative overflow-hidden flex flex-col justify-between space-y-4">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="space-y-3 relative z-10">
+              <div className="flex items-center justify-between gap-2 border-b border-slate-800 pb-2.5">
+                <span className="text-[10px] font-mono font-bold text-teal-300 uppercase">
+                  27. Července 2026 • Technologický partner
+                </span>
+                <span className="bg-amber-400/20 text-amber-300 border border-amber-400/30 text-[9px] font-mono font-bold uppercase px-2 py-0.5 rounded-full">
+                  ★ Webhosting NoLimit
+                </span>
+              </div>
+              <div className="flex items-start gap-3.5">
+                <div className="w-14 h-14 rounded-2xl bg-white p-2 shadow-md border border-slate-200 shrink-0 flex items-center justify-center overflow-hidden">
+                  <img 
+                    src="https://vedos.cz/wp-content/uploads/2025/03/VEDOS-Hosting-logo.svg" 
+                    alt="VEDOS Logo" 
+                    className="w-full h-full object-contain"
+                    referrerPolicy="no-referrer"
+                  />
+                </div>
+                <div>
+                  <h3 className="text-lg font-black text-white font-display leading-tight">
+                    VEDOS: Sponzor webhostingu NoLimit
+                  </h3>
+                  <span className="text-xs text-teal-300 font-mono">VEDOS Internet, a.s.</span>
+                </div>
+              </div>
+              <p className="text-slate-300 text-xs leading-relaxed line-clamp-3">
+                Společnost VEDOS poskytla projektu Táta má právo bezplatnou technologickou podporu a profesionální webhosting NoLimit pro stabilní a bleskový chod.
+              </p>
+            </div>
+
+            <div className="pt-2 flex items-center justify-between gap-2 relative z-10">
               <button
                 onClick={() => onNavigate('news', 'art-vedos-milestone')}
-                className="px-5 py-2.5 bg-teal-500 hover:bg-teal-400 text-slate-950 font-extrabold text-xs rounded-xl shadow-md transition-all flex items-center gap-2 cursor-pointer"
+                className="px-4 py-2 bg-teal-500 hover:bg-teal-400 text-slate-950 font-extrabold text-xs rounded-xl shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
               >
-                <BookOpen className="w-4 h-4 text-slate-950" />
-                <span>Přečíst si celý článek v Aktualitách</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                <BookOpen className="w-3.5 h-3.5" />
+                <span>Přečíst si celý článek</span>
+                <ArrowRight className="w-3 h-3" />
               </button>
               <a
                 href="https://www.vedos.cz"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-bold text-xs rounded-xl transition-all flex items-center gap-1.5 cursor-pointer"
+                className="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 font-bold text-xs rounded-xl transition-all flex items-center gap-1 cursor-pointer"
               >
-                <span>Navštívit VEDOS.cz</span>
-                <ExternalLink className="w-3.5 h-3.5 text-teal-400" />
+                <span>VEDOS.cz</span>
+                <ExternalLink className="w-3 h-3 text-teal-400" />
               </a>
-            </div>
-          </div>
-
-          <div className="lg:col-span-4 bg-slate-900/90 border border-teal-500/30 rounded-2xl p-5 text-center space-y-3 flex flex-col items-center justify-center">
-            <div className="w-20 h-20 rounded-2xl bg-white p-2.5 shadow-md border border-slate-200 flex items-center justify-center overflow-hidden">
-              <img 
-                src="https://vedos.cz/wp-content/uploads/2025/03/VEDOS-Hosting-logo.svg" 
-                alt="VEDOS Logo" 
-                className="w-full h-full object-contain"
-                referrerPolicy="no-referrer"
-              />
-            </div>
-            <div className="space-y-1">
-              <span className="text-xs font-black text-white font-display block">VEDOS Internet, a.s.</span>
-              <span className="text-[10px] text-teal-300 font-mono block">Sponzor Webhostingu NoLimit</span>
             </div>
           </div>
         </div>

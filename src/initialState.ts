@@ -18,6 +18,37 @@ import {
 
 export const INITIAL_ARTICLES: Article[] = [
   {
+    id: 'art-forpsi-milestone',
+    title: 'FORPSI se stává sponzorem doménové infrastruktury projektu „Táta má právo“',
+    summary: 'S radostí oznamujeme nového oficiálního sponzora infrastruktury. Společnost FORPSI (Internet CZ, a.s.) věnovala a zaregistrovala doménu tatovacesta.cz pro náš projekt.',
+    content: `Každý významný projekt potřebuje pevnou základnu na internetu. S radostí oznamujeme, že společnost FORPSI (Internet CZ, a.s.) se stala oficiálním sponzorem doménové infrastruktury projektu Táta má právo a věnovala bezplatnou registrovaci domény tatovacesta.cz.
+
+FORPSI: Stabilní pilíř českého internetu a spolehlivý partner pro vaše projekty
+Ať už s budováním webových stránek teprve začínáte, nebo jste zkušený vývojář spravující desítky projektů, jméno FORPSI (Internet CZ, a.s.) pravděpodobně dobře znáte. Patří totiž k nejvýznamnějším a nejstabilnějším poskytovatelům domainhostingových a serverových služeb na českém trhu.
+
+Od registrace domény až po cloudová řešení
+Společnost FORPSI se dlouhodobě etabluje jako univerzální partner pro online projekty všeho druhu. Její portfolio pokrývá ty nejdůležitější oblasti:
+• Registrace domén: Nabízí správu statisíců domén – od klasických národních přípon jako .cz přes gTLD až po novodobé doménové koncovky.
+• Webhosting a serverové služby: Od cenově dostupné hostovací varianty pro menší prezentační weby až po výkonné virtuální servery (VPS) a dedikované stroje pro náročné aplikace.
+• Bezpečnost a infrastruktura: Poskytuje spolehlivé SSL certifikáty, vlastní datacentra s vysokým stupněm zabezpečení a nepřetržitou technickou podporu.
+
+Podpora komunity a smysluplných projektů
+Kromě komerčních služeb je FORPSI známé také svou podporou zajímavých iniciativ, neziskových projektů a začínajících tvůrců. Formou sponzoringu registrací domén či technologického zázemí pomáhá autorům přivádět k životu projekty s veřejně prospěšným či komunitním přesahem, což usnadňuje start mnoha novým myšlenkám a platformám.
+
+Proč se na FORPSI spolehnout?
+Díky dlouholeté tradici, robustní technické infrastruktuře a vstřícnému přístupu zákaznické podpory představuje FORPSI bezpečný přístav pro každého, kdo chce mít jistotu, že jeho doména a digitální zázemí poběží stabilně a bez výpadků.
+
+Děkujeme společnosti FORPSI (Internet CZ, a.s.) za důvěru a podporu projektu!`,
+    category: 'Aktuality',
+    date: '2026-07-28',
+    author: 'Redakce Táta má právo',
+    likes: 74,
+    commentsCount: 8,
+    readTime: '3 min',
+    tags: ['FORPSI', 'Sponzor', 'Doména', 'Partnerství', 'Novinky'],
+    imageUrl: 'https://forpsi.com/Forpsi/media/Forpsi/General/logo.svg'
+  },
+  {
     id: 'art-vedos-milestone',
     title: 'Oslava prvního milníku: VEDOS se stává technologickým partnerem projektu „Táta má právo“',
     summary: 'S obrovskou radostí oznamujeme, že projekt Táta má právo získal svého prvního oficiálního sponzora a technologického partnera – společnost VEDOS Internet, a.s., která nám věnovala webhosting NoLimit.',
