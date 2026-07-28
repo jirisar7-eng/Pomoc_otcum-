@@ -63,8 +63,20 @@ export async function sendPortalEmail({
     const fromAddress = 'info@tatovacesta.cz';
     const replyToAddress = 'info@tatovacesta.cz';
 
-    if (!process.env.RESEND_API_KEY) {
-      console.warn('RESEND_API_KEY missing. Simulating email delivery.');
+    const apiKey = process.env.RESEND_API_KEY;
+    const apiKeyPreview = apiKey
+      ? `${apiKey.substring(0, 6)}...${apiKey.substring(Math.max(0, apiKey.length - 4))}`
+      : 'NENÍ NASTAVEN';
+
+    console.log(`[Resend API Request] Odesílám e-mail:
+  - Odesílatel: ${fromName} <${fromAddress}>
+  - Adresát: ${to}
+  - Odpovědět na: ${replyToAddress}
+  - Předmět: ${subject}
+  - API Klíč: ${apiKeyPreview} (Délka: ${apiKey?.length || 0})`);
+
+    if (!apiKey) {
+      console.warn('[Resend API Warning] RESEND_API_KEY chybí v prostředí. E-mail se simuluje.');
       return { success: true, delivered: false, message: 'Simulované doručení (chybí RESEND_API_KEY).' };
     }
 
@@ -77,13 +89,20 @@ export async function sendPortalEmail({
     });
 
     if (error) {
-      console.error('Resend API Error:', error);
-      return { success: false, error: typeof error === 'string' ? error : error.message || JSON.stringify(error) };
+      console.error('[Resend API Error] Odmítnuto serverem Resend:', JSON.stringify(error, null, 2));
+      const errorMessage = typeof error === 'string' ? error : (error as any)?.message || JSON.stringify(error);
+      return { success: false, error: errorMessage };
     }
 
+    console.log(`[Resend API Success] E-mail úspěšně odeslán. Response Data:`, JSON.stringify(data, null, 2));
     return { success: true, data };
   } catch (err: any) {
-    console.error('Internal Email Service Error:', err);
+    console.error('[Resend Exception] Vnitřní chyba e-mailové služby:', {
+      message: err?.message,
+      name: err?.name,
+      stack: err?.stack,
+      raw: err
+    });
     return { success: false, error: err?.message || JSON.stringify(err) };
   }
 }
