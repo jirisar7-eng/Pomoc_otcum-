@@ -9,7 +9,7 @@ import dotenv from 'dotenv';
 import fs from 'fs';
 import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI } from '@google/genai';
-import { sendEmail, validateEmailFormat, generateNumericCode, verifyServerCode } from './src/services/resendServerService';
+import { sendEmail, validateEmailFormat, generateNumericCode, verifyServerCode } from './src/services/wedosSmtpService';
 import { checkGitHubStatus, readGitHubFile, saveGitHubFile } from './src/services/githubServerService';
 
 dotenv.config();
