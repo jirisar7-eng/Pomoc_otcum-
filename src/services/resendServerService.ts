@@ -1,4 +1,22 @@
 import nodemailer from 'nodemailer';
+import { createRequire } from 'module';
+
+function createSmtpTransporter(options: any) {
+  let nm: any = nodemailer;
+  if (!nm || typeof nm.createTransport !== 'function') {
+    if ((nodemailer as any)?.default && typeof (nodemailer as any).default.createTransport === 'function') {
+      nm = (nodemailer as any).default;
+    } else {
+      try {
+        const require = createRequire(import.meta.url);
+        nm = require('nodemailer');
+      } catch (e) {
+        // Fallback
+      }
+    }
+  }
+  return nm.createTransport(options);
+}
 
 export type EmailType = 
   | 'MAGIC_LINK'
@@ -285,7 +303,7 @@ export async function sendPortalEmail({
       return { success: true, delivered: false, message: 'Simulované doručení (chybí SMTP autentizační údaje).' };
     }
 
-    const transporter = nodemailer.createTransport({
+    const transporter = createSmtpTransporter({
       host: smtpHost,
       port: smtpPort,
       secure: smtpPort === 465,
