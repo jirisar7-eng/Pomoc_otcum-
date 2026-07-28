@@ -77,19 +77,16 @@ export default function IntroScreen({ onDismiss }: IntroScreenProps) {
               </p>
             </div>
 
-            {/* Official Technology Sponsor Block - WEDOS */}
-            <div className="bg-gradient-to-r from-slate-900 via-slate-850 to-teal-950 p-5 rounded-2xl border-2 border-teal-500/40 text-white space-y-3 shadow-md relative overflow-hidden" id="wedos-intro-sponsor-block">
+            {/* Official Technology Sponsor Block - VEDOS */}
+            <div className="bg-gradient-to-r from-slate-900 via-slate-850 to-teal-950 p-5 rounded-2xl border-2 border-teal-500/40 text-white space-y-3 shadow-md relative overflow-hidden" id="vedos-intro-sponsor-block">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3.5">
                   <div className="w-14 h-14 rounded-xl bg-white p-2 shrink-0 flex items-center justify-center border border-slate-200 shadow-sm overflow-hidden">
                     <img 
                       src="https://vedos.cz/wp-content/uploads/2025/03/VEDOS-Hosting-logo.svg" 
-                      alt="WEDOS Logo" 
+                      alt="VEDOS Logo" 
                       className="w-full h-full object-contain"
                       referrerPolicy="no-referrer"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = "https://www.wedos.cz/wp-content/uploads/2025/03/VEDOS-Hosting-logo.svg";
-                      }}
                     />
                   </div>
                   <div className="space-y-1">
@@ -103,23 +100,23 @@ export default function IntroScreen({ onDismiss }: IntroScreenProps) {
                       </span>
                     </div>
                     <h3 className="text-sm font-bold text-white font-display">
-                      WEDOS Internet, a.s. &mdash; Webhosting NoLimit
+                      VEDOS Internet, a.s. &mdash; Webhosting NoLimit
                     </h3>
                   </div>
                 </div>
 
                 <a
-                  href="https://www.wedos.cz"
+                  href="https://www.vedos.cz"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-3.5 py-2 bg-teal-500 hover:bg-teal-400 text-slate-950 font-extrabold text-xs rounded-lg transition-all flex items-center gap-1.5 shadow-sm shrink-0 cursor-pointer"
                 >
-                  <span>Navštívit WEDOS.cz</span>
+                  <span>Navštívit VEDOS.cz</span>
                   <ExternalLink className="w-3.5 h-3.5" />
                 </a>
               </div>
               <p className="text-slate-300 text-xs leading-relaxed">
-                Stabilní provoz a bezpečný webhosting portálu <strong>Táta má právo</strong> sponzorsky zaštiťuje společnost <strong>WEDOS Internet, a.s.</strong>, která projektu v rámci podpory neziskových a společensky smysluplných aktivit poskytuje zdarma kompletní webhosting NoLimit.
+                Stabilní provoz a bezpečný webhosting portálu <strong>Táta má právo</strong> sponzorsky zaštiťuje společnost <strong>VEDOS Internet, a.s.</strong>, která projektu v rámci podpory neziskových a společensky smysluplných aktivit poskytuje zdarma kompletní webhosting NoLimit.
               </p>
             </div>
 

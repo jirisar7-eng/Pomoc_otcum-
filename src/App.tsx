@@ -148,13 +148,23 @@ export default function App() {
   const [glossaryOpen, setGlossaryOpen] = useState<boolean>(false);
   const [selectedGlossaryTerm, setSelectedGlossaryTerm] = useState<string | null>(null);
 
+  const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null);
+
+  const handleNavigate = (tabId: string, articleId?: string) => {
+    setActiveTab(tabId);
+    if (articleId) {
+      setSelectedArticleId(articleId);
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   // Lifed States for full Back-Office Synchronizations
   const [articles, setLocalArticles] = useState<Article[]>(() => {
     const loaded = getStoredState<Article[]>('articles', INITIAL_ARTICLES);
-    const wedosArt = INITIAL_ARTICLES.find(a => a.id === 'art-wedos-milestone');
-    if (wedosArt) {
-      const rest = loaded.filter(a => a.id !== 'art-wedos-milestone');
-      return [wedosArt, ...rest];
+    const milestoneArt = INITIAL_ARTICLES.find(a => a.id.includes('milestone'));
+    if (milestoneArt) {
+      const rest = loaded.filter(a => !a.id.includes('milestone'));
+      return [milestoneArt, ...rest];
     }
     return loaded;
   });
@@ -177,9 +187,19 @@ export default function App() {
   const [donations, setLocalDonations] = useState<Donation[]>(() => 
     getStoredState<Donation[]>('donations', INITIAL_DONATIONS)
   );
-  const [partners, setLocalPartners] = useState<Partner[]>(() => 
-    getStoredState<Partner[]>('partners', INITIAL_PARTNERS)
-  );
+  const [partners, setLocalPartners] = useState<Partner[]>(() => {
+    const loaded = getStoredState<Partner[]>('partners', INITIAL_PARTNERS);
+    const forpsiP = INITIAL_PARTNERS.find(p => p.id === 'p-forpsi');
+    const vedosP = INITIAL_PARTNERS.find(p => p.id === 'p-vedos');
+    let updated = loaded;
+    if (forpsiP && !updated.some(p => p.id === 'p-forpsi')) {
+      updated = [forpsiP, ...updated];
+    }
+    if (vedosP) {
+      updated = updated.map(p => p.id === 'p-vedos' ? vedosP : p);
+    }
+    return updated;
+  });
 
   // Track if Firebase collections have been successfully loaded
   const [isFirebaseLoaded, setIsFirebaseLoaded] = useState<boolean>(false);
@@ -519,7 +539,7 @@ export default function App() {
           >
             {activeTab === 'home' && (
               <HeroSection
-                onNavigate={setActiveTab}
+                onNavigate={handleNavigate}
                 onOpenAuth={() => setAuthModalOpen(true)}
                 isLoggedIn={!!currentUser}
                 partners={partners}
@@ -688,6 +708,8 @@ export default function App() {
                 searchQuery={searchQuery}
                 currentUser={currentUser}
                 externalArticles={articles}
+                selectedArticleId={selectedArticleId}
+                setSelectedArticleId={setSelectedArticleId}
               />
             )}
 

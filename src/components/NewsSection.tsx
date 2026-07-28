@@ -33,16 +33,36 @@ interface NewsSectionProps {
   searchQuery: string;
   currentUser: User | null;
   externalArticles: Article[];
+  selectedArticleId?: string | null;
+  setSelectedArticleId?: (id: string | null) => void;
 }
 
-export default function NewsSection({ searchQuery: globalSearchQuery, currentUser, externalArticles }: NewsSectionProps) {
+export default function NewsSection({ 
+  searchQuery: globalSearchQuery, 
+  currentUser, 
+  externalArticles,
+  selectedArticleId: propSelectedArticleId,
+  setSelectedArticleId: propSetSelectedArticleId
+}: NewsSectionProps) {
   const { language } = useLanguage();
 
   const translatedArticles = useMemo(() => {
     return externalArticles.map(art => getTranslatedObject(art.id, art, language));
   }, [externalArticles, language]);
 
-  const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null);
+  const [internalSelectedArticleId, setInternalSelectedArticleId] = useState<string | null>(null);
+
+  const activeArticleId = propSelectedArticleId !== undefined ? propSelectedArticleId : internalSelectedArticleId;
+
+  const handleSelectArticle = (id: string | null) => {
+    if (propSetSelectedArticleId) {
+      propSetSelectedArticleId(id);
+    } else {
+      setInternalSelectedArticleId(id);
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const [comments, setComments] = useState<Comment[]>(INITIAL_COMMENTS);
   const [newCommentText, setNewCommentText] = useState('');
   const [guestName, setGuestName] = useState('');
@@ -51,8 +71,12 @@ export default function NewsSection({ searchQuery: globalSearchQuery, currentUse
   const [commentError, setCommentError] = useState('');
 
   const activeArticle = useMemo(() => {
-    return translatedArticles.find(art => art.id === selectedArticleId) || null;
-  }, [translatedArticles, selectedArticleId]);
+    if (!activeArticleId) return null;
+    return translatedArticles.find(art => 
+      art.id === activeArticleId || 
+      (activeArticleId.includes('milestone') && art.id.includes('milestone'))
+    ) || null;
+  }, [translatedArticles, activeArticleId]);
 
   const filteredArticles = useMemo(() => {
     return translatedArticles.filter(art => {
@@ -67,9 +91,9 @@ export default function NewsSection({ searchQuery: globalSearchQuery, currentUse
   }, [translatedArticles, globalSearchQuery]);
 
   const activeComments = useMemo(() => {
-    if (!selectedArticleId) return [];
-    return comments.filter(c => c.contentId === selectedArticleId && c.contentType === 'article' && !c.reported);
-  }, [comments, selectedArticleId]);
+    if (!activeArticleId) return [];
+    return comments.filter(c => c.contentId === activeArticleId && c.contentType === 'article' && !c.reported);
+  }, [comments, activeArticleId]);
 
   const handleRefreshSpam = () => {
     const n1 = Math.floor(Math.random() * 8) + 2;
@@ -99,7 +123,7 @@ export default function NewsSection({ searchQuery: globalSearchQuery, currentUse
 
     const newComment: Comment = {
       id: 'comm-' + Math.random().toString(36).substr(2, 9),
-      contentId: selectedArticleId || '',
+      contentId: activeArticleId || '',
       contentType: 'article',
       userId: currentUser?.id || 'usr-guest',
       userName: currentUser?.name || guestName.trim(),
@@ -134,11 +158,11 @@ export default function NewsSection({ searchQuery: globalSearchQuery, currentUse
     <div className="space-y-6" id="news-section-container">
       
       {/* Article Detail View */}
-      {selectedArticleId && activeArticle ? (
+      {activeArticleId && activeArticle ? (
         <div className="space-y-6" id="news-article-expanded">
           <button
             id="back-to-articles-grid"
-            onClick={() => setSelectedArticleId(null)}
+            onClick={() => handleSelectArticle(null)}
             className="flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-slate-900 transition-colors bg-white px-4 py-2.5 rounded-xl border border-slate-100 shadow-2xs cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4 text-slate-400" />
@@ -360,7 +384,7 @@ export default function NewsSection({ searchQuery: globalSearchQuery, currentUse
               filteredArticles.map((art) => (
                 <div
                   key={art.id}
-                  onClick={() => setSelectedArticleId(art.id)}
+                  onClick={() => handleSelectArticle(art.id)}
                   className="bg-white p-6 rounded-2xl border border-slate-100 hover:border-teal-200 shadow-2xs hover:shadow-xs transition-all flex flex-col justify-between cursor-pointer"
                   id={`article-card-${art.id}`}
                 >

@@ -18,32 +18,32 @@ import {
 
 export const INITIAL_ARTICLES: Article[] = [
   {
-    id: 'art-wedos-milestone',
-    title: 'Oslava prvního milníku: WEDOS se stává technologickým partnerem projektu „Táta má právo“',
-    summary: 'S obrovskou radostí oznamujeme, že projekt Táta má právo získal svého prvního oficiálního sponzora a technologického partnera – společnost WEDOS, a.s., která nám věnovala webhosting NoLimit.',
-    content: `Každý velký příběh potřebuje silný začátek a lidi, kteří věří v jeho smysl. S obrovskou radostí a hrdostí dnes můžeme oznámit, že projekt Táta má právo získal svého první oficiálního sponzora a technologického partnera – stala se jím společnost WEDOS, a.s.
+    id: 'art-vedos-milestone',
+    title: 'Oslava prvního milníku: VEDOS se stává technologickým partnerem projektu „Táta má právo“',
+    summary: 'S obrovskou radostí oznamujeme, že projekt Táta má právo získal svého prvního oficiálního sponzora a technologického partnera – společnost VEDOS Internet, a.s., která nám věnovala webhosting NoLimit.',
+    content: `Každý velký příběh potřebuje silný začátek a lidi, kteří věří v jeho smysl. S obrovskou radostí a hrdostí dnes můžeme oznámit, že projekt Táta má právo získal svého první oficiálního sponzora a technologického partnera – stala se jím společnost VEDOS Internet, a.s.
 
 Kdo je náš nový partner?
-Společnost WEDOS patří mezi největší, nejstabilnější a nejrychleji rostoucí poskytovatele webhostingových služeb a datacentrových řešení v České republice. Jsou známí svou špičkovou technickou infrastrukturou, maximálním důrazem na bezpečnost, bleskovou rychlostí a ekologicky udržitelným provozem svých datových center. Jejich služby využívají desítky tisíc projektů, firem i jednotlivců.
+Společnost VEDOS patří mezi největší, nejstabilnější a nejrychleji rostoucí poskytovatele webhostingových služeb a datacentrových řešení v České republice. Jsou známí svou špičkovou technickou infrastrukturou, maximálním důrazem na bezpečnost, bleskovou rychlostí a ekologicky udržitelným provozem svých datových center. Jejich služby využívají desítky tisíc projektů, firem i jednotlivců.
 
 Jak nám pomohli do začátku?
-Rozjet moderní portál postavený na pokročilých technologiích, jako je React, vyžaduje spolehlivé, rychlé a bezpečné zázemí. A právě v tomto klíčovém momentu podala společnost WEDOS pomocnou ruku.
+Rozjet moderní portál postavený na pokročilých technologiích, jako je React, vyžaduje spolehlivé, rychlé a bezpečné zázemí. A právě v tomto klíčovém momentu podala společnost VEDOS pomocnou ruku.
 V rámci podpory smysluplných projektů nám poskytla oblíbený webhosting NoLimit na celý rok zdarma.
 
 Tato velkorysá technologická pomoc nám dává obrovskou svobodu a klid v zádech. Díky nim se můžeme plně soustředit na to nejdůležitější – vývoj užitečných nástrojů, rozšiřování odborných textů, posilování právní podpory a pomoc všem tatínkům, kteří to v opatrovnických sporech a rodinných situacích nemají jednoduché.
 
 Velké díky!
-Vážíme si toho, že WEDOS ukázal sociální cítění a podpořil projekt, jehož cílem je férovost, rovnocenná péče a blaho dětí.
+Vážíme si toho, že VEDOS ukázal sociální cítění a podpořil projekt, jehož cílem je férovost, rovnocenná péče a blaho dětí.
 
-Tento krok je pro nás obrovským impulzem do další práce. Děkujeme společnosti WEDOS za důvěru a těšíme se na skvělou spolupráci!`,
+Tento krok je pro nás obrovským impulzem do další práce. Děkujeme společnosti VEDOS za důvěru a těšíme se na skvělou spolupráci!`,
     category: 'Aktuality',
     date: '2026-07-27',
     author: 'Redakce Táta má právo',
     likes: 89,
     commentsCount: 12,
     readTime: '3 min',
-    tags: ['WEDOS', 'Sponzor', 'Partnerství', 'Novinky'],
-    imageUrl: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=800&q=80'
+    tags: ['VEDOS', 'Sponzor', 'Partnerství', 'Novinky'],
+    imageUrl: 'https://vedos.cz/wp-content/uploads/2025/03/VEDOS-Hosting-logo.svg'
   },
   {
     id: 'art-1',
@@ -127,13 +127,25 @@ export const INITIAL_PARTNERS: Partner[] = [
     createdAt: new Date().toISOString()
   },
   {
-    id: 'p-wedos',
-    name: 'WEDOS Internet, a.s.',
-    description: 'Oficiální technologický partner a sponzor webhostingu. Společnost WEDOS poskytuje projektu „Táta má právo“ bezplatnou technologickou podporu a sponzorovaný webhosting NoLimit pro stabilní a rychlý chod.',
+    id: 'p-vedos',
+    name: 'VEDOS Internet, a.s.',
+    description: 'Oficiální technologický partner a sponzor webhostingu. Společnost VEDOS poskytuje projektu „Táta má právo“ bezplatnou technologickou podporu a sponzorovaný webhosting NoLimit pro stabilní a rychlý chod.',
     logoUrl: 'https://vedos.cz/wp-content/uploads/2025/03/VEDOS-Hosting-logo.svg',
-    link: 'https://www.wedos.cz',
+    link: 'https://www.vedos.cz',
     category: 'Ostatní',
     region: 'Česká republika / Hluboká nad Vltavou',
+    isRecommended: true,
+    showOnMainPage: true,
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 'p-forpsi',
+    name: 'FORPSI (Internet CZ, a.s.)',
+    description: 'Oficiální sponzor doménové infrastruktury. Společnost FORPSI věnovala a bezplatně zaregistrovala doménu tatovacesta.cz pro projekt „Táta má právo“.',
+    logoUrl: 'https://forpsi.com/Forpsi/media/Forpsi/General/logo.svg',
+    link: 'https://www.forpsi.com',
+    category: 'Ostatní',
+    region: 'Česká republika / Ktiš',
     isRecommended: true,
     showOnMainPage: true,
     createdAt: new Date().toISOString()

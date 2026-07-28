@@ -333,7 +333,7 @@ export default function SupportSection({
                   </tr>
                   <tr>
                     <td className="py-3 px-4 font-bold text-slate-800">Vlastní český server (VPS)</td>
-                    <td className="py-3 px-4 text-slate-600 leading-normal">Trvale běžící Node.js Express server (server.ts) postavený na NVMe discích v ČR (např. Wedos VPS ON).</td>
+                    <td className="py-3 px-4 text-slate-600 leading-normal">Trvale běžící Node.js Express server (server.ts) postavený na NVMe discích v ČR (např. Vedos VPS ON).</td>
                     <td className="py-3 px-4 text-right font-mono font-bold text-slate-800">250 Kč</td>
                   </tr>
                   <tr>
