@@ -42,10 +42,10 @@ export default function IntroScreen({ onDismiss }: IntroScreenProps) {
           <div className="space-y-3 text-center sm:text-left border-b border-slate-100 pb-6">
             <div className="inline-flex items-center gap-2 bg-rose-50 border border-rose-100 px-3.5 py-1.5 rounded-full text-rose-700 font-mono text-[10px] uppercase font-bold tracking-wider mb-2">
               <Sparkles className="w-3.5 h-3.5 text-rose-500 animate-pulse" />
-              Projekt ve vývoji • Alfa Verze
+              Projekt ve vývoji • Beta Verze 0.0.1
             </div>
             <h1 className="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight font-display leading-tight">
-              📢 Oznámení k alfa verzi portálu <br />
+              📢 Oznámení k beta verzi 0.0.1 portálu <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-600 via-emerald-600 to-rose-500">
                 Táta má právo
               </span>
@@ -59,7 +59,7 @@ export default function IntroScreen({ onDismiss }: IntroScreenProps) {
             </p>
             
             <p>
-              Portál <strong>Táta má právo</strong> je v aktivní fázi vývoje (alfa verze). Systém přihlašování je již plně funkční a 100% bezpečný. Využíváme moderní biometrické ověření Passkeys (otisk prstu / FaceID) a přihlášení přes Google, takže vaše účty i citlivá data jsou v maximálním bezpečí bez nutnosti ukládat klasická hesla. Po obsahové i funkční stránce je většina hlavních sekcí připravena a další interaktivní nástroje postupně rozšiřujeme.
+              Portál <strong>Táta má právo</strong> je v aktivní fázi vývoje (beta verze 0.0.1). Systém přihlašování je již plně funkční a 100% bezpečný. Využíváme moderní biometrické ověření Passkeys (otisk prstu / FaceID) a přihlášení přes Google, takže vaše účty i citlivá data jsou v maximálním bezpečí bez nutnosti ukládat klasická hesla. Po obsahové i funkční stránce je většina hlavních sekcí připravena a další interaktivní nástroje postupně rozšiřujeme.
             </p>
 
             <p>

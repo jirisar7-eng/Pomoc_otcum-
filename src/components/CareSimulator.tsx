@@ -2108,7 +2108,7 @@ Tento simulační výpočet objektivně prokazuje, že navržený harmonogram je
 
             {/* Disclaimer */}
             <div className="text-[9px] text-slate-400 leading-normal text-center pt-8">
-              Tento tiskový dokument byl vygenerován autonomně v rámci systému Synthesis OS 0.0.1.1. Výpočty a grafy vycházejí z exaktního matematického vyhodnocení 28-denní mřížky plánu péče a slouží jako podklad pro soudní jednání nebo jednání s OSPOD.
+              Tento tiskový dokument byl vygenerován autonomně v rámci systému Synthesis OS 0.0.1 (Beta). Výpočty a grafy vycházejí z exaktního matematického vyhodnocení 28-denní mřížky plánu péče a slouží jako podklad pro soudní jednání nebo jednání s OSPOD.
             </div>
 
           </div>

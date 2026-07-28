@@ -131,7 +131,7 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn, partne
               className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-amber-400/10 border border-amber-400/30 text-amber-300 rounded-full text-xs font-semibold backdrop-blur-sm shadow-inner"
             >
               <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
-              <span className="font-mono text-[11px] uppercase tracking-wider text-amber-300">Alfa verze 0.0.1.2</span>
+              <span className="font-mono text-[11px] uppercase tracking-wider text-amber-300">Beta verze 0.0.1</span>
               <span className="text-amber-400/60">•</span>
               <span className="text-slate-300">{t('brand_name', 'Portál Táta má právo')}</span>
             </motion.div>

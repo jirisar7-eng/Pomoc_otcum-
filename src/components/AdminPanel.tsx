@@ -1347,9 +1347,9 @@ Nahraď všechna rodná jména dětí, rodičů, adresy, rodná čísla a kontak
     }
   };
 
-  // Reset and clean demo data for official Alpha 0.0.1.1 Launch
+  // Reset and clean demo data for official Beta 0.0.1 Launch
   const handleClearDemoData = () => {
-    if (confirm('Opravdu chcete vyčistit veškerá uživatelská demo data (komentáře k diskuzím, nahlášené spamy, testovací příspěvky) a připravit web pro oficiální spuštění alfa verze 0.0.1.1?')) {
+    if (confirm('Opravdu chcete vyčistit veškerá uživatelská demo data (komentáře k diskuzím, nahlášené spamy, testovací příspěvky) a připravit web pro oficiální spuštění beta verze 0.0.1?')) {
       // Clear localStorage so we revert to clean curated defaults (the system will repopulate clean defaults on refresh)
       localStorage.removeItem('synthesis_hub_comments');
       localStorage.removeItem('synthesis_hub_posts');
@@ -1364,14 +1364,14 @@ Nahraď všechna rodná jména dětí, rodičů, adresy, rodná čísla a kontak
           user: currentUser?.name || 'Hlavní Administrátor',
           ip: 'Synthesis OS VM',
           category: 'Ostrý start',
-          desc: 'Spuštěno vyčištění zkušebních dat a oficiální aktivace alfa verze 0.0.1.1 pro veřejnost.',
+          desc: 'Spuštěno vyčištění zkušebních dat a oficiální aktivace beta verze 0.0.1 pro veřejnost.',
           browser: 'Synthesis Core Manager',
-          hash: 'sha256:0011a0ff'
+          hash: 'sha256:0011b0ff'
         },
         ...prev
       ]);
 
-      alert('Všechna uživatelská demo data byla pročištěna. Systém byl úspěšně připraven pro oficiální spuštění alfa verze 0.0.1.1! Stránka se nyní aktualizuje pro načtení pročištěného stavu.');
+      alert('Všechna uživatelská demo data byla pročištěna. Systém byl úspěšně připraven pro oficiální spuštění beta verze 0.0.1! Stránka se nyní aktualizuje pro načtení pročištěného stavu.');
       window.location.reload();
     }
   };
@@ -4350,7 +4350,7 @@ ${cases.map(c => `Název: ${c.title}\nStav: ${c.status}\nChronologie:\n` + (c.ch
                 <div className="absolute top-0 right-0 w-32 h-32 bg-teal-500/10 rounded-full blur-2xl" />
                 
                 <div className="space-y-1.5 relative z-10 text-xs">
-                  <strong className="text-sm font-bold block text-teal-300">Příprava na spuštění Alfa verze 0.0.1.1</strong>
+                  <strong className="text-sm font-bold block text-teal-300">Příprava na spuštění Beta verze 0.0.1</strong>
                   <p className="text-slate-300 leading-relaxed">
                     Vymaže zkušební uživatelská data, vyčistí nahlášené testovací spamy z diskuzí a připraví databázi pro oficiální ostrý start.
                   </p>
@@ -4361,7 +4361,7 @@ ${cases.map(c => `Název: ${c.title}\nStav: ${c.status}\nChronologie:\n` + (c.ch
                   className="px-4 py-2.5 bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-400 hover:to-emerald-400 text-slate-950 font-extrabold text-xs rounded-xl cursor-pointer z-10 flex items-center gap-1.5 transition-all shadow-md shadow-teal-950/40 shrink-0"
                 >
                   <Sparkles className="w-3.5 h-3.5" />
-                  Vyčistit & Spustit Alfa 0.0.1.1
+                  Vyčistit & Spustit Beta 0.0.1
                 </button>
               </div>
 

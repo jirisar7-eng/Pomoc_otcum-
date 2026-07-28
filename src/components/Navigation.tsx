@@ -145,7 +145,7 @@ export default function Navigation({
       <div className="hidden xl:flex bg-gradient-to-r from-amber-500 via-teal-600 to-indigo-700 text-white text-[11px] font-mono py-1.5 px-3 sm:px-4 text-center items-center justify-center gap-x-2 gap-y-1 font-semibold border-b border-amber-400/20 shrink-0">
         <Sparkles className="w-3.5 h-3.5 text-amber-200 animate-pulse shrink-0" />
         <span className="truncate max-w-[95vw] md:max-w-none">
-          {t('hero_welcome', 'Oficiální spuštění alfa verze 0.0.1.2 portálu Táta má právo! 🚀')}
+          {t('hero_welcome', 'Oficiální spuštění verze Beta 0.0.1 portálu Táta má právo! 🚀')}
         </span>
         <span className="hidden sm:inline text-amber-200/80">•</span>
         <span className="hidden md:inline text-[10px] text-teal-100 font-sans">

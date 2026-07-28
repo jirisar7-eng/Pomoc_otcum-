@@ -355,9 +355,9 @@ export const TRANSLATIONS: TranslationDictionary = {
 
   // Hero Section Header text
   hero_welcome: {
-    cs: "Oficiální spuštění alfa verze 0.0.1.2 portálu Táta má právo! 🚀",
-    sk: "Oficiálne spustenie alfa verzie 0.0.1.2 portálu Otec má právo! 🚀",
-    en: "Official launch of Alpha v0.0.1.2 of the Father Has Rights portal! 🚀"
+    cs: "Oficiální spuštění verze Beta 0.0.1 portálu Táta má právo! 🚀",
+    sk: "Oficiálne spustenie verzie Beta 0.0.1 portálu Otec má právo! 🚀",
+    en: "Official launch of Beta v0.0.1 of the Father Has Rights portal! 🚀"
   },
 
   // Modules, Cards & Buttons

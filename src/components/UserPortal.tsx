@@ -2466,7 +2466,7 @@ Tento koncept byl formulován v souladu se zásadami věcné, jasné a nekonfron
               <div className="flex justify-between items-start border-b-2 border-slate-900 pb-5">
                 <div>
                   <h1 className="text-xl font-bold uppercase tracking-wider text-slate-900 font-display">Synthesis OS — Spisový Protokol</h1>
-                  <span className="text-[9px] font-mono font-bold text-teal-600 bg-teal-50 px-2.5 py-0.5 rounded-full block w-fit mt-1">Alfa Verze 0.0.1.1 (Oficiální Spuštění)</span>
+                  <span className="text-[9px] font-mono font-bold text-teal-600 bg-teal-50 px-2.5 py-0.5 rounded-full block w-fit mt-1">Beta Verze 0.0.1 (Oficiální Spuštění)</span>
                   <p className="text-[10px] text-slate-400 mt-1">Datum generování: {new Date().toLocaleDateString('cs-CZ')}</p>
                 </div>
                 <div className="text-right text-[10px] text-slate-400 font-mono">
