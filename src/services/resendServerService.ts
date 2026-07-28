@@ -60,8 +60,8 @@ export async function sendPortalEmail({
   fromName?: string;
 }) {
   try {
-    const fromAddress = process.env.RESEND_DOMAIN_EMAIL || 'noreply@tatovacesta.cz';
-    const replyToAddress = process.env.RESEND_REPLY_TO || 'info@tatovacesta.cz';
+    const fromAddress = process.env.SMTP_FROM || process.env.RESEND_DOMAIN_EMAIL || 'info@tatovacesta.cz';
+    const replyToAddress = process.env.RESEND_REPLY_TO || process.env.SMTP_REPLY_TO || 'info@tatovacesta.cz';
 
     if (!process.env.RESEND_API_KEY) {
       console.warn('RESEND_API_KEY missing. Simulating email delivery.');
@@ -119,8 +119,8 @@ function generateEmailHtml(type: EmailType, data: EmailData): { subject: string;
             <tr>
               <td style="background-color:#f8fafc; border-top: 1px solid #f1f5f9; padding: 20px 32px; text-align: center;">
                 <p style="color:#94a3b8; font-size: 11px; margin: 0; line-height: 1.5;">
-                  &copy; ${currentYear} Táta má právo | Právní asistent a spravedlivá péče o děti<br>
-                  Tento e-mail byl odeslán ze služby Resend pro portál Táta má právo.
+                  &copy; ${currentYear} Tátova cesta | Právní asistent a spravedlivá péče o děti<br>
+                  Tento e-mail byl odeslán ze služby Resend pro portál Tátova cesta (tatovacesta.cz).
                 </p>
               </td>
             </tr>
