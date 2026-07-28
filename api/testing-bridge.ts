@@ -81,8 +81,8 @@ export default async function handler(req: any, res: any) {
     const githubTokenSet = !!process.env.GITHUB_TOKEN;
     const githubRepo = process.env.GITHUB_REPO || 'Pomoc-otcum/Pomoc_otcum';
 
-    // 5. Diagnostics: Resend / SMTP Email Services
-    const resendKeySet = !!process.env.RESEND_API_KEY;
+    // 5. Diagnostics: WEDOS SMTP Email Services
+    const smtpUserSet = !!(process.env.SMTP_USER || process.env.SMTP_PASSWORD || process.env.SMTP_PASS);
 
     // 6. Module Statuses Breakdown
     const modules = {
@@ -120,10 +120,10 @@ export default async function handler(req: any, res: any) {
       },
       email_service: {
         id: 'mod_email',
-        name: 'E-mailový Notifikační Servis (Resend)',
-        status: resendKeySet ? 'operational' : 'notice',
-        provider: 'Resend API',
-        details: resendKeySet ? 'Resend API klíč ověřen' : 'RESEND_API_KEY nepředán v ENV'
+        name: 'E-mailový Notifikační Servis (WEDOS SMTP)',
+        status: smtpUserSet ? 'operational' : 'notice',
+        provider: 'WEDOS SMTP (wes1-smtp.wedos.net)',
+        details: smtpUserSet ? 'WEDOS SMTP přihlašovací údaje předány' : 'SMTP_USER nebo SMTP_PASSWORD nepředán v ENV'
       }
     };
 
@@ -152,7 +152,7 @@ export default async function handler(req: any, res: any) {
           supabaseConfigured,
           firebaseConfigured,
           githubTokenSet,
-          resendKeySet,
+          smtpUserSet,
           testerSecretSet: true
         }
       },

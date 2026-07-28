@@ -173,7 +173,7 @@ function generateMarkdownReport(
     report += `- **Firebase projekty:** ${bridgeData.database.firebase === 'connected' ? '✅ Konfigurováno' : 'ℹ️ Nepoužito'}\n`;
     report += `- **Gemini API Klíč:** ${env.geminiKey ? '✅ Nastaven (Aktivní)' : '⚠️ Chybí (Aktivní lokální AI záloha)'}\n`;
     report += `- **GitHub Token:** ${env.githubTokenSet ? '✅ Propojeno s repozitářem' : 'ℹ️ Pouze lokální zápis'}\n`;
-    report += `- **Resend Email API:** ${env.resendKeySet ? '✅ Aktivní' : 'ℹ️ Simulace doručování'}\n`;
+    report += `- **WEDOS SMTP Email API:** ${env.smtpUserSet ? '✅ Aktivní' : 'ℹ️ Simulace doručování'}\n`;
   } else {
     report += `⚠️ Diagnostické údaje z brány se nepodařilo načíst: ${errorMessage || 'Neznámá chyba'}\n`;
   }

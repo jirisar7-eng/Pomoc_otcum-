@@ -19,8 +19,8 @@ export async function sendResendEmail({ recipientEmail, code, magicUrl }: { reci
   return {
     success: result.success,
     delivered: result.delivered ?? true,
-    message: result.message || 'Kód byl odeslán přes Resend.',
-    provider: 'resend',
+    message: result.message || 'Kód byl odeslán přes WEDOS SMTP.',
+    provider: 'wedos_smtp',
     error: result.error
   };
 }
@@ -47,7 +47,7 @@ export default async function handler(req: any, res: any) {
     console.error('Error in /api/send-code:', error);
     return res.status(200).json({
       success: false,
-      error: error?.message || (typeof error === 'string' ? error : JSON.stringify(error)) || 'Chyba při odesílání e-mailu přes Resend.'
+      error: error?.message || (typeof error === 'string' ? error : JSON.stringify(error)) || 'Chyba při odesílání e-mailu přes WEDOS SMTP.'
     });
   }
 }

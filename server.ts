@@ -370,7 +370,7 @@ app.all(['/api/testing-bridge', '/api/testing-bridge.ts'], async (req, res) => {
     const geminiKeySet = !!(process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY);
     const githubTokenSet = !!process.env.GITHUB_TOKEN;
     const githubRepo = process.env.GITHUB_REPO || 'Pomoc-otcum/Pomoc_otcum';
-    const resendKeySet = !!process.env.RESEND_API_KEY;
+    const smtpUserSet = !!(process.env.SMTP_USER || process.env.SMTP_PASSWORD || process.env.SMTP_PASS);
 
     let aiStatus = 'operational';
     let aiDetails = 'Gemini API configured with lazy fallback engine.';
@@ -415,10 +415,10 @@ app.all(['/api/testing-bridge', '/api/testing-bridge.ts'], async (req, res) => {
       },
       email_service: {
         id: 'mod_email',
-        name: 'E-mailový Notifikační Servis (Resend)',
-        status: resendKeySet ? 'operational' : 'notice',
-        provider: 'Resend API',
-        details: resendKeySet ? 'Resend API klíč ověřen' : 'RESEND_API_KEY nepředán v ENV'
+        name: 'E-mailový Notifikační Servis (WEDOS SMTP)',
+        status: smtpUserSet ? 'operational' : 'notice',
+        provider: 'WEDOS SMTP (wes1-smtp.wedos.net)',
+        details: smtpUserSet ? 'WEDOS SMTP přihlašovací údaje předány' : 'SMTP_USER nebo SMTP_PASSWORD nepředán v ENV'
       }
     };
 
@@ -453,7 +453,7 @@ app.all(['/api/testing-bridge', '/api/testing-bridge.ts'], async (req, res) => {
           supabaseConfigured,
           firebaseConfigured,
           githubTokenSet,
-          resendKeySet,
+          smtpUserSet,
           testerSecretSet: true
         }
       },
@@ -784,7 +784,7 @@ PRAVIDLA PRO REAKCI:
   }
 });
 
-// Resend Universal Email API Route
+// WEDOS SMTP Universal Email API Route
 app.post('/api/send-email', async (req, res) => {
   try {
     const { to, type, data, recipientEmail, code, magicUrl } = req.body || {};
@@ -802,12 +802,12 @@ app.post('/api/send-email', async (req, res) => {
     console.error('[API /api/send-email Error]:', error);
     return res.status(200).json({
       success: false,
-      error: error?.message || (typeof error === 'string' ? error : JSON.stringify(error)) || 'Nepodařilo se odeslat e-mail přes Resend.'
+      error: error?.message || (typeof error === 'string' ? error : JSON.stringify(error)) || 'Nepodařilo se odeslat e-mail přes WEDOS SMTP.'
     });
   }
 });
 
-// Legacy Magic Link / Code Route mapped to Resend Email Service
+// Legacy Magic Link / Code Route mapped to WEDOS SMTP Email Service
 app.post(['/api/send-code', '/api/send-magic-link'], async (req, res) => {
   try {
     const { recipientEmail, email, code, magicUrl } = req.body || {};
@@ -827,16 +827,16 @@ app.post(['/api/send-code', '/api/send-magic-link'], async (req, res) => {
       console.error('[API /api/send-code Error Result]:', result.error);
       return res.status(200).json({
         success: false,
-        error: result.error || 'Nepodařilo se odeslat e-mail přes Resend.'
+        error: result.error || 'Nepodařilo se odeslat e-mail přes WEDOS SMTP.'
       });
     }
 
     return res.status(200).json(result);
   } catch (error: any) {
-    console.error('Error sending magic link email via Resend:', error);
+    console.error('Error sending magic link email via WEDOS SMTP:', error);
     return res.status(200).json({
       success: false,
-      error: error?.message || (typeof error === 'string' ? error : JSON.stringify(error)) || 'Nepodařilo se odeslat e-mail přes Resend.'
+      error: error?.message || (typeof error === 'string' ? error : JSON.stringify(error)) || 'Nepodařilo se odeslat e-mail přes WEDOS SMTP.'
     });
   }
 });

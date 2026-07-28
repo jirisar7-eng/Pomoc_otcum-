@@ -1,4 +1,4 @@
-import { resend } from '../lib/resend';
+import nodemailer from 'nodemailer';
 
 export type EmailType = 
   | 'MAGIC_LINK'
@@ -47,7 +47,7 @@ export interface SendEmailResponse {
 const DEFAULT_ADMIN_RECIPIENT = process.env.ADMIN_EMAIL || 'info@tatovacesta.cz';
 
 /**
- * Standard Resend email sender following official Resend docs
+ * WEDOS SMTP email sender using nodemailer
  */
 export async function sendPortalEmail({
   to,
@@ -61,58 +61,66 @@ export async function sendPortalEmail({
   fromName?: string;
 }): Promise<SendEmailResponse> {
   try {
+    const smtpHost = process.env.SMTP_HOST || 'wes1-smtp.wedos.net';
+    const smtpPort = parseInt(process.env.SMTP_PORT || '465', 10);
+    const smtpUser = process.env.SMTP_USER || 'info@tatovacesta.cz';
+    const smtpPass = process.env.SMTP_PASSWORD || process.env.SMTP_PASS || '';
+
     const fromAddress = 'info@tatovacesta.cz';
     const replyToAddress = 'info@tatovacesta.cz';
 
-    const apiKey = process.env.RESEND_API_KEY;
-    const apiKeyPreview = apiKey
-      ? `${apiKey.substring(0, 6)}...${apiKey.substring(Math.max(0, apiKey.length - 4))}`
-      : 'NENÍ NASTAVEN';
+    const userPreview = smtpUser ? smtpUser : 'NENÍ NASTAVEN';
+    const passSet = !!smtpPass;
 
-    console.log(`[Resend API Request] Odesílám e-mail:
+    console.log(`[WEDOS SMTP Request] Odesílám e-mail:
+  - SMTP Server: ${smtpHost}:${smtpPort}
+  - SMTP Uživatel: ${userPreview} (Heslo nastaveno: ${passSet ? 'ANO' : 'NE'})
   - Odesílatel: ${fromName} <${fromAddress}>
   - Adresát: ${to}
   - Odpovědět na: ${replyToAddress}
-  - Předmět: ${subject}
-  - API Klíč: ${apiKeyPreview} (Délka: ${apiKey?.length || 0})`);
+  - Předmět: ${subject}`);
 
-    if (!apiKey) {
-      console.warn('[Resend API Warning] RESEND_API_KEY chybí v prostředí. E-mail se simuluje.');
-      return { success: true, delivered: false, message: 'Simulované doručení (chybí RESEND_API_KEY).' };
+    if (!smtpPass && !process.env.SMTP_USER) {
+      console.warn('[WEDOS SMTP Warning] SMTP_USER nebo SMTP_PASSWORD/SMTP_PASS chybí v prostředí. E-mail se simuluje.');
+      return { success: true, delivered: false, message: 'Simulované doručení (chybí SMTP autentizační údaje).' };
     }
 
-    const { data, error } = await resend.emails.send({
-      from: `${fromName} <${fromAddress}>`,
-      to: [to],
+    const transporter = nodemailer.createTransport({
+      host: smtpHost,
+      port: smtpPort,
+      secure: smtpPort === 465,
+      auth: {
+        user: smtpUser,
+        pass: smtpPass,
+      },
+      tls: {
+        rejectUnauthorized: false
+      }
+    });
+
+    const info = await transporter.sendMail({
+      from: `"${fromName}" <${fromAddress}>`,
+      to: to,
       replyTo: replyToAddress,
       subject: subject,
       html: html,
     });
 
-    if (error) {
-      console.error('[Resend API Error] Odmítnuto serverem Resend:', JSON.stringify(error, null, 2));
-      const resendErr = error as any;
-      const errorMessage = typeof error === 'string'
-        ? error
-        : resendErr?.message
-          ? `${resendErr.name || 'ResendError'}: ${resendErr.message}${resendErr.statusCode ? ` (Status: ${resendErr.statusCode})` : ''}`
-          : JSON.stringify(error);
-      return { success: false, error: errorMessage, rawError: error };
-    }
-
-    console.log(`[Resend API Success] E-mail úspěšně odeslán. Response Data:`, JSON.stringify(data, null, 2));
-    return { success: true, data };
+    console.log(`[WEDOS SMTP Success] E-mail úspěšně odeslán. Message ID:`, info.messageId);
+    return { success: true, delivered: true, data: info };
   } catch (err: any) {
-    console.error('[Resend Exception] Vnitřní chyba e-mailové služby:', {
+    console.error('[WEDOS SMTP Exception] Vnitřní chyba při odesílání přes WEDOS SMTP:', {
       message: err?.message,
       name: err?.name,
-      stack: err?.stack,
+      code: err?.code,
+      command: err?.command,
+      response: err?.response,
       raw: err
     });
     const errMessage = err?.message
-      ? `${err.name || 'Error'}: ${err.message}`
+      ? `${err.name || 'SMTPError'}: ${err.message}${err.code ? ` (Kód: ${err.code})` : ''}`
       : typeof err === 'string' ? err : JSON.stringify(err);
-    return { success: false, error: errMessage };
+    return { success: false, error: errMessage, rawError: err };
   }
 }
 
@@ -341,19 +349,19 @@ ${content}
 }
 
 /**
- * Universal email sending function powered by Resend SDK
+ * Universal email sending function powered by WEDOS SMTP
  */
 export async function sendEmail({ to, type, data, fromName }: SendEmailOptions): Promise<SendEmailResponse> {
   const recipient = (type === 'ADMIN_ALERT' && (!to || to.trim() === '')) ? DEFAULT_ADMIN_RECIPIENT : to;
 
   if (!recipient || recipient.trim() === '') {
-    console.error('[Resend Email Error]: Missing recipient email address.');
+    console.error('[WEDOS SMTP Error]: Missing recipient email address.');
     return { success: false, error: 'Chybí cílová e-mailová adresa.' };
   }
 
   const { subject, html } = generateEmailHtml(type, data);
 
-  console.log(`[Resend Email Service] Sending email type="${type}" to="${recipient}" subject="${subject}"`);
+  console.log(`[WEDOS SMTP Email Service] Sending email type="${type}" to="${recipient}" subject="${subject}"`);
   
   const result = await sendPortalEmail({
     to: recipient,
