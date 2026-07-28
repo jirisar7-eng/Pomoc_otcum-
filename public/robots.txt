@@ -36,4 +36,4 @@ Disallow: /api/private/
 # LLMs Text File: /llms.txt
 # AI Context Page: /ai-context
 
-Sitemap: https://tatamapravo.cz/sitemap.xml
+Sitemap: https://tatovacesta.cz/sitemap.xml

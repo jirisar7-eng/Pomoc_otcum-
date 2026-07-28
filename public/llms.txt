@@ -4,7 +4,7 @@
 
 ## Project Overview
 - **Name**: Táta má právo (Repo: `Pomoc_otcum`)
-- **Domain**: https://tatamapravo.cz
+- **Domain**: https://tatovacesta.cz
 - **Target Audience**: Fathers, mothers, legal representatives, OSPOD social workers, and mediators.
 - **Primary Goal**: Protecting the best interests of the child (*nejlepší zájem dítěte*), ensuring equal parenting (*střídavá a společná péče*), preserving sibling bonds (*sourozenecké vazby*), and eliminating parental alienation (*rodičovská alienace / PAS*).
 - **Core Stack**: React 18 (Vite), TypeScript, Node.js (Express), Gemini AI API, GitHub REST API Sync, Vercel SPA Routing.
@@ -69,9 +69,9 @@ The platform is organized into 21 modular categories. Each category contains cur
 ---
 
 ## AI Context & Crawler Machine Links
-- **Full AI Context Page**: https://tatamapravo.cz/ai-context
-- **Sitemap XML**: https://tatamapravo.cz/sitemap.xml
-- **Robots Configuration**: https://tatamapravo.cz/robots.txt
+- **Full AI Context Page**: https://tatovacesta.cz/ai-context
+- **Sitemap XML**: https://tatovacesta.cz/sitemap.xml
+- **Robots Configuration**: https://tatovacesta.cz/robots.txt
 - **GitHub Repository**: https://github.com/Pomoc-otcum/Pomoc_otcum
 
 ---
