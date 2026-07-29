@@ -1,6 +1,6 @@
 import { sendEmail, validateEmailFormat, generateNumericCode } from './_wedosSmtp';
 
-export interface ResendEmailResult {
+export interface WedosEmailResult {
   success: boolean;
   delivered?: boolean;
   message?: string;
@@ -10,7 +10,9 @@ export interface ResendEmailResult {
   error?: string;
 }
 
-export async function sendResendEmail({ recipientEmail, code, magicUrl }: { recipientEmail: string; code?: string; magicUrl?: string }): Promise<ResendEmailResult> {
+export type ResendEmailResult = WedosEmailResult;
+
+export async function sendWedosEmail({ recipientEmail, code, magicUrl }: { recipientEmail: string; code?: string; magicUrl?: string }): Promise<WedosEmailResult> {
   const codeToUse = (code && /^\d{6}$/.test(String(code).trim()))
     ? String(code).trim()
     : generateNumericCode();
@@ -31,8 +33,9 @@ export async function sendResendEmail({ recipientEmail, code, magicUrl }: { reci
   };
 }
 
-// Backward compatibility alias
-export const sendBrevoEmail = sendResendEmail;
+// Backward compatibility aliases
+export const sendResendEmail = sendWedosEmail;
+export const sendBrevoEmail = sendWedosEmail;
 
 export default async function handler(req: any, res: any) {
   // CORS Headers for Vercel Serverless Functions
@@ -78,7 +81,7 @@ export default async function handler(req: any, res: any) {
       });
     }
 
-    const result = await sendResendEmail({ recipientEmail: targetEmail, code, magicUrl });
+    const result = await sendWedosEmail({ recipientEmail: targetEmail, code, magicUrl });
     return res.status(200).json(result);
   } catch (error: any) {
     console.error('Error in /api/send-code:', error);

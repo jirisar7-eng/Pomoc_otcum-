@@ -208,7 +208,7 @@ export class AiTesterService {
         latencyMs: 110,
         lastChecked: new Date().toLocaleTimeString('cs-CZ'),
         recommendation: 'E-mailové notifikace o změnách v případech se odesílají spolehlivě.',
-        endpoint: 'smtp.resend.com'
+        endpoint: 'wes1-smtp.wedos.net'
       },
       {
         id: 'api-8',
