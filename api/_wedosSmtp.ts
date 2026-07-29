@@ -514,37 +514,79 @@ function generateEmailHtml(type: EmailType, data: EmailData): { subject: string;
       const code = (data.code && /^\d{6}$/.test(String(data.code).trim()))
         ? String(data.code).trim()
         : generateNumericCode();
-      const subject = `Tvůj ověřovací kód pro přihlášení je: ${code} – Táta má právo`;
-      const magicUrl = data.magicUrl;
+      const subject = `Tvůj ověřovací kód pro přihlášení je: ${code} – Tátova cesta`;
+      const magicLink = data.magicUrl;
 
-      const body = `
-        <h2 style="color:#0f172a; font-size: 18px; font-weight: 700; margin-top: 0; margin-bottom: 12px;">Přihlášení do portálu Táta má právo</h2>
-        <p style="color:#475569; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
-          Dobrý den,<br>
-          obdrželi jsme požadavek na přihlášení do portálu. Tvůj ověřovací kód pro přihlášení je: <strong style="font-size: 20px; color: #0f766e; font-family: monospace;">${code}</strong>.
-        </p>
+      const html = `<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Přihlášení – Tátova cesta</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #0f172a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #e2e8f0;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #0f172a; padding: 40px 0;">
+        <tr>
+            <td align="center">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width: 600px; background-color: #1e293b; border-radius: 16px; overflow: hidden; border: 1px solid #334155; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+                    
+                    <!-- Hlavička -->
+                    <tr>
+                        <td align="center" style="padding: 32px 24px; background-color: #0f172a; border-bottom: 1px solid #334155;">
+                            <span style="font-size: 12px; text-transform: uppercase; letter-spacing: 2px; color: #14b8a6; font-weight: 600; display: block; margin-bottom: 8px;">Synthesis OS</span>
+                            <h1 style="margin: 0; font-size: 24px; color: #ffffff; font-weight: 700;">Tátova cesta</h1>
+                        </td>
+                    </tr>
 
-        <!-- Code Box -->
-        <div style="background-color:#f0fdf4; border: 2px dashed #0f766e; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 24px;">
-          <span style="display: block; font-size: 11px; font-weight: 700; color: #166534; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;">Váš ověřovací kód</span>
-          <span style="font-family: 'Courier New', Courier, monospace; font-size: 38px; font-weight: 800; color: #0f766e; letter-spacing: 8px;">${code}</span>
-        </div>
+                    <!-- Obsah -->
+                    <tr>
+                        <td style="padding: 40px 32px;">
+                            <h2 style="margin: 0 0 16px 0; font-size: 20px; color: #ffffff; font-weight: 600;">Přihlášení do portálu</h2>
+                            <p style="margin: 0 0 24px 0; font-size: 15px; line-height: 1.6; color: #cbd5e1;">Dobrý den,<br>obdrželi jsme požadavek na přihlášení do portálu. Váš ověřovací kód je:</p>
 
-        ${magicUrl ? `
-        <!-- Direct 1-Click Login Button -->
-        <div style="text-align: center; margin-bottom: 28px;">
-          <a href="${magicUrl}" style="display: inline-block; background-color: #0f766e; color: #ffffff; font-weight: 700; font-size: 14px; padding: 14px 28px; text-decoration: none; border-radius: 12px; box-shadow: 0 4px 12px rgba(15, 118, 110, 0.25);">
-            Přihlásit se 1 kliknutím ✨
-          </a>
-        </div>
-        ` : ''}
+                            <!-- Box s kódem -->
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin: 32px 0;">
+                                <tr>
+                                    <td align="center" style="background-color: #0f172a; border: 2px dashed #14b8a6; border-radius: 12px; padding: 24px;">
+                                        <span style="font-size: 36px; font-weight: 800; letter-spacing: 8px; color: #2dd4bf; font-family: monospace; display: inline-block; margin-left: 8px;">${code}</span>
+                                    </td>
+                                </tr>
+                            </table>
 
-        <p style="color:#64748b; font-size: 12px; line-height: 1.5; margin-bottom: 0;">
-          ⚠️ Platnost tohoto kódu je <strong>10 minut</strong>. Pokud jste o přihlášení nežádali, můžete tento e-mail bezpečně ignorovat.
-        </p>
-      `;
+                            ${magicLink ? `
+                            <!-- Tlačítko 1-kliknutí -->
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin: 32px 0 24px 0;">
+                                <tr>
+                                    <td align="center">
+                                        <a href="${magicLink}" target="_blank" style="background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%); color: #ffffff; padding: 14px 28px; border-radius: 9999px; font-size: 15px; font-weight: 600; text-decoration: none; display: inline-block; box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3);">Přihlásit se 1 kliknutím ✨</a>
+                                    </td>
+                                </tr>
+                            </table>
+                            ` : ''}
 
-      return { subject, html: `${headerHtml}${body}${footerHtml}` };
+                            <!-- Upozornění -->
+                            <p style="margin: 24px 0 0 0; font-size: 13px; line-height: 1.5; color: #94a3b8; text-align: center;">
+                                ⚠️ Platnost toho kódu je <strong>10 minut</strong>.<br>Pokud jste o přihlášení nežádali, můžete tento e-mail bezpečně ignorovat.
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- Patička -->
+                    <tr>
+                        <td align="center" style="padding: 24px; background-color: #0f172a; border-top: 1px solid #334155; font-size: 12px; color: #64748b; line-height: 1.5;">
+                            &copy; ${currentYear} Tátova cesta &bull; Právní asistent a spravedlivá péče o děti<br>
+                            Tento e-mail byl odeslán automaticky (tatovacesta.cz).
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>`;
+
+      return { subject, html };
     }
 
     case 'WELCOME': {

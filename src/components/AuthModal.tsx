@@ -34,8 +34,7 @@ import {
   UserCheck,
   Fingerprint,
   Wand2,
-  Send,
-  MailCheck
+  Send
 } from 'lucide-react';
 import { User, UserRole } from '../types';
 import { 
@@ -525,8 +524,7 @@ export default function AuthModal({ isOpen, onClose, onLogin, initialMode = 'log
       setLoading(false);
       setStatus({
         type: 'success',
-        title: 'Kód byl úspěšně odeslán do vaší e-mailové schránky! ✨',
-        text: `Zkontrolujte svou poštu na ${targetEmail}. Zadejte 6místný kód z e-mailu nebo použijte tlačítko v e-mailu.`
+        text: `E-mail s ověřovacím kódem a kouzelným odkazem byl úspěšně odeslán na adresu ${targetEmail}.`
       });
     } catch (err: any) {
       setLoading(false);
@@ -1148,16 +1146,6 @@ export default function AuthModal({ isOpen, onClose, onLogin, initialMode = 'log
                   </form>
                 ) : (
                   <div className="space-y-4">
-                    <div className="bg-emerald-50 border border-emerald-200 p-4 rounded-xl text-xs text-emerald-950 space-y-2">
-                      <div className="flex items-center gap-2 font-bold text-emerald-900">
-                        <MailCheck className="w-5 h-5 text-emerald-600 shrink-0" />
-                        <span>Kouzelný odkaz odeslán na {magicEmail || email}!</span>
-                      </div>
-                      <p className="text-[11px] text-emerald-800 leading-relaxed">
-                        Zkontrolujte e-mailovou schránku. Můžete zadat 6místný kód z e-mailu nebo použít tlačítko okamžitého přihlášení níže.
-                      </p>
-                    </div>
-
                     <div>
                       <label className="block text-xs font-semibold text-slate-700 mb-1.5">6místný kód z e-mailu</label>
                       <div className="relative">
@@ -1196,7 +1184,10 @@ export default function AuthModal({ isOpen, onClose, onLogin, initialMode = 'log
 
                       <button
                         type="button"
-                        onClick={() => setMagicSent(false)}
+                        onClick={() => {
+                          setMagicSent(false);
+                          setStatus({ type: 'idle', text: '' });
+                        }}
                         className="w-full py-1.5 text-slate-500 hover:text-slate-800 text-[11px] font-semibold text-center cursor-pointer"
                       >
                         Zadat jiný e-mail
