@@ -186,45 +186,78 @@ export default function Navigation({
           </div>
 
           {/* Responsive Desktop Navigation Topbar (XL screens 1280px+ only to prevent tablet overlaps) */}
-          <nav className="hidden xl:flex items-center justify-center gap-1.5 py-1">
-            {PUBLIC_TOPBAR_ITEMS.slice(0, 7).map((item) => {
+          <nav className="hidden xl:flex items-center justify-center gap-1 py-1">
+            {PUBLIC_TOPBAR_ITEMS.map((item) => {
               const ItemIcon = item.icon;
-              const isActive = activeTab === item.id;
-              const isSimulator = item.id === 'plan-pece';
-              const isHub = item.id === 'coparent-hub';
+              const hasSub = item.subItems && item.subItems.length > 0;
+              const isItemActive = activeTab === item.id || (hasSub && item.subItems?.some(sub => sub.id === activeTab));
+
+              if (hasSub) {
+                return (
+                  <div 
+                    key={item.id}
+                    className="relative"
+                    onMouseEnter={() => setOpenDropdown(item.id)}
+                    onMouseLeave={() => setOpenDropdown(null)}
+                  >
+                    <button
+                      onClick={() => setOpenDropdown(openDropdown === item.id ? null : item.id)}
+                      className={`flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all border cursor-pointer whitespace-nowrap ${
+                        isItemActive
+                          ? 'bg-teal-50 border-teal-200 text-teal-800 shadow-3xs'
+                          : openDropdown === item.id
+                            ? 'bg-slate-100 border-slate-200 text-slate-900'
+                            : 'bg-transparent border-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                      }`}
+                      title={item.desc}
+                    >
+                      <ItemIcon className={`w-3.5 h-3.5 ${isItemActive ? 'text-teal-600' : 'text-slate-400'}`} />
+                      <span>{item.label}</span>
+                      <ChevronDown className="w-3 h-3 text-slate-400" />
+                    </button>
+
+                    {openDropdown === item.id && (
+                      <div className="absolute left-0 mt-1 w-64 bg-white border border-slate-200 rounded-2xl shadow-xl p-2 z-50 animate-in fade-in duration-100">
+                        <div className="text-[10px] font-mono font-bold text-slate-400 px-2 py-1 uppercase tracking-wider border-b border-slate-100 mb-1 flex items-center justify-between">
+                          <span>{item.label}</span>
+                          <span className="text-[9px] text-teal-600 bg-teal-50 px-1.5 py-0.2 rounded font-mono">{item.subItems?.length} položek</span>
+                        </div>
+                        <div className="space-y-0.5">
+                          {item.subItems!.map((sub) => (
+                            <button
+                              key={sub.id}
+                              onClick={() => {
+                                handleTabClick(sub.id);
+                                setOpenDropdown(null);
+                              }}
+                              className={`w-full text-left p-2 rounded-xl text-xs transition-colors cursor-pointer ${
+                                activeTab === sub.id ? 'bg-teal-50 text-teal-950 font-bold' : 'hover:bg-slate-50 text-slate-700'
+                              }`}
+                            >
+                              <div className="font-bold text-slate-900 block truncate">{sub.label}</div>
+                              {sub.desc && <div className="text-[10px] text-slate-400 block truncate leading-tight mt-0.5">{sub.desc}</div>}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              }
+
               return (
                 <button
                   key={item.id}
                   onClick={() => handleTabClick(item.id)}
                   className={`flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all border cursor-pointer whitespace-nowrap ${
-                    isActive
-                      ? isSimulator || isHub
-                        ? 'bg-teal-600 border-teal-700 text-white shadow-3xs'
-                        : 'bg-teal-50 border-teal-200 text-teal-800 shadow-3xs'
-                      : isSimulator
-                        ? 'bg-gradient-to-r from-teal-50/90 to-emerald-50/90 border-teal-300 text-teal-900 hover:bg-teal-100 hover:border-teal-400 shadow-3xs font-extrabold'
-                        : isHub
-                          ? 'bg-indigo-50/60 border-indigo-200/80 text-indigo-900 hover:bg-indigo-100/80 shadow-3xs font-extrabold'
-                          : 'bg-transparent border-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                    isItemActive
+                      ? 'bg-teal-50 border-teal-200 text-teal-800 shadow-3xs'
+                      : 'bg-transparent border-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                   }`}
                   title={item.desc}
                 >
-                  <ItemIcon className={`w-3.5 h-3.5 ${isActive ? (isSimulator || isHub ? 'text-white' : 'text-teal-600') : (isSimulator ? 'text-teal-700' : isHub ? 'text-indigo-600' : 'text-slate-400')}`} />
+                  <ItemIcon className={`w-3.5 h-3.5 ${isItemActive ? 'text-teal-600' : 'text-slate-400'}`} />
                   <span>{item.label}</span>
-                  {isSimulator && (
-                    <span className={`text-[9px] font-mono px-1.5 py-0.2 rounded-full uppercase tracking-tighter ml-0.5 font-black ${
-                      isActive ? 'bg-teal-700 text-teal-100' : 'bg-teal-200/90 text-teal-950'
-                    }`}>
-                      PÉČE
-                    </span>
-                  )}
-                  {isHub && (
-                    <span className={`text-[9px] font-mono px-1.5 py-0.2 rounded-full uppercase tracking-tighter ml-0.5 font-black ${
-                      isActive ? 'bg-teal-700 text-teal-100' : 'bg-indigo-100 text-indigo-800'
-                    }`}>
-                      HUB
-                    </span>
-                  )}
                 </button>
               );
             })}

@@ -1002,7 +1002,7 @@ export default function SystemMonitoring({
               { name: 'Passkeys / WebAuthn API', desc: 'Biometrické přihlášení', purpose: 'Přihlášení otiskem / FaceID', status: '200 OK', speed: '12 ms', err: 'Žádná chyba', advice: 'Hardware ověření aktivní.' },
               { name: 'reCAPTCHA v3 / Enterprise', desc: 'Ochrana proti botům a spamu', purpose: 'Filtrace formulářových odeslání', status: '200 OK', speed: '110 ms', err: 'Žádná chyba', advice: 'Skóre bota v pořádku.' },
               { name: 'Google Maps Platform', desc: 'Geolokace a mapy poradních center', purpose: 'Zobrazení spádových soudů a poraden', status: '200 OK', speed: '140 ms', err: 'Žádná chyba', advice: 'Klíče nastaveny.' },
-              { name: 'E-mailová služba WEDOS SMTP', desc: 'Služba nodemailer napojená na WEDOS SMTP (wes1-smtp.wedos.net:465)', purpose: 'Odesílání přihlašovacích kódů a notifikací', status: '200 OK', speed: '140 ms', err: 'Žádná chyba', advice: 'SMTP klient aktivní (info@tatovacesta.cz).' },
+              { name: 'WEDOS SMTP & Firebase Realtime DB', desc: 'Služba nodemailer + Firebase Realtime DB pro 6místné kódové úložiště (10 min TTL)', purpose: 'Odesílání přihlašovacích kódů, magic linků a notifikací', status: '200 OK', speed: '120 ms', err: 'Žádná chyba', advice: 'SMTP & Realtime DB store aktivní (info@tatovacesta.cz).' },
               { 
                 name: `GitHub REST API (${ghStatus?.repo || 'Pomoc-otcum/Pomoc_otcum'})`, 
                 desc: 'Ukládání a čtení dokumentace, kategorií a spisu z GitHubu', 

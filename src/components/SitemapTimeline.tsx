@@ -104,19 +104,22 @@ export default function SitemapTimeline({ setActiveTab, onOpenGlossary, currentU
       techStack: ['Tailwind UI', 'MathJS Formula Parsing', 'Precedent Analyzer Engine']
     },
     {
-      date: 'Červenec 2026 (Aktuální verze V1.6)',
-      title: 'Simulátor Sourozenců, Identitní Hub & AI Správa Synthesis OS V1.6',
+      date: 'Červenec 2026 (Aktuální verze V1.7 Stable Prod)',
+      title: 'Realtime DB OTP Ukládání, HTML E-mailová Šablona Tátova Cesta & Synthesis OS V1.7',
       category: 'AI & Integrace',
       status: 'current',
-      description: 'Rozsáhlá aktualizace jádra Synthesis OS obsahující 5-krokový Simulátor Péče & Sourozenecké Soudržnosti, Identitní Hub pro správa účtů a AI Administraci.',
+      description: 'Rozsáhlá aktualizace jádra Synthesis OS obsahující bezpečné Firebase Realtime DB úložiště pro WEDOS SMTP kód, responzivní e-mailovou šablonu Tátova cesta, sjednocené bezheslové UI a 5-krokový Simulátor Péče.',
       details: [
+        'Zprovoznění bezpečné Firebase Realtime Database synchronizace pro 6místné ověřovací kódy z WEDOS SMTP s 10minutovou TTL expirací a explicitním ošetřením chyb pro garanci doručitelnosti.',
+        'Nasazení moderní, responzivní dark HTML e-mailové šablony „Tátova cesta“ se stylizovaným boxem kódu a tlačítkem pro přihlášení jedním kliknutím.',
+        'Sjednocení uživatelského rozhraní v AuthModal.tsx do jediné stručné a přehledné notifikace s optimalizovanou výškou pro mobilní zařízení.',
         'Spuštění 5-krokového průvodce Simulátor Péče & Sourozenecké Soudržnosti (CareSimulatorWizard) s hodnocením emoční vazby dětí dle judikatury ÚS ČR (sp. zn. I. ÚS 2482/13) a generátorem podkladů pro Soud / OSPOD.',
         'Implementace nového Identitního Hubu s podporou multi-emailového propojení účtů, Passkey/Biometrického přihlášení a bezpečnostních upozornění.',
         'Integrace SmartVideoEmbed a edukační Videotéky pro přehrávání a správu instruktážních videí z opatrovnických řízení.',
         'Zprovoznění AI Moderátora a AI Modulu Auditora v administrátorské sekci pro automatizované rešerše na webu, kontrolu fóra a nezávislý systémový audit.',
-        'Zavedení duálního ukládání a plné synchronizace mezi Firebase Firestore a Supabase PostgreSQL.'
+        'Zavedení duálního ukládání a plné synchronizace mezi Firebase Firestore, Firebase Realtime DB a Supabase PostgreSQL.'
       ],
-      techStack: ['React 18', 'TypeScript', 'CareSimulatorWizard', 'IdentityHub Service', 'SmartVideoEmbed', 'Gemini AI API SDK', 'Firebase + Supabase']
+      techStack: ['React 18', 'TypeScript', 'Firebase Realtime DB', 'WEDOS SMTP', 'HTML Responsive E-mail', 'CareSimulatorWizard', 'IdentityHub Service', 'Gemini AI API SDK', 'Firebase + Supabase']
     },
     {
       date: 'Podzim 2026 (Plánováno)',
@@ -513,7 +516,7 @@ export default function SitemapTimeline({ setActiveTab, onOpenGlossary, currentU
             <span className="text-xs text-slate-500 block">{translateText('Celkový stav platformy:', language)}</span>
             <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-600">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping inline-block" />
-              100% {translateText('Funkčnost (V1.6 Stable Prod)', language)}
+              100% {translateText('Funkčnost (V1.7 Stable Prod)', language)}
             </span>
           </div>
         </div>
