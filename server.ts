@@ -19,6 +19,10 @@ const PORT = 3000;
 
 app.use(express.json());
 
+// Defiice ověřených a podporovaných modelů pro Google Gen AI SDK
+const GEMINI_PRIMARY_MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
+const GEMINI_FALLBACK_MODEL = 'gemini-1.5-flash';
+
 // Inicializace podle standardu Synthesis OS (Lazy-initialized pro zamezení pádů při startu bez klíče)
 function getAiClient(): GoogleGenAI {
   const aiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
@@ -269,7 +273,7 @@ async function callGeminiWithLocalFallback(
   try {
     const ai = getAiClient();
     
-    // Try Primary model (3.5-flash)
+    // Try Primary model
     try {
       const config: any = {
         systemInstruction,
@@ -284,7 +288,7 @@ async function callGeminiWithLocalFallback(
       }
 
       const response = await ai.models.generateContent({
-        model: 'gemini-3.5-flash',
+        model: GEMINI_PRIMARY_MODEL,
         contents: finalPrompt,
         config: config
       });
@@ -292,9 +296,9 @@ async function callGeminiWithLocalFallback(
         return parseJsonFromText(response.text);
       }
     } catch (err1: any) {
-      console.warn(`[Synthesis OS] Main model gemini-3.5-flash failed for action "${action}". Attempting gemini-2.5-flash... Reason: ${err1.message}`);
+      console.warn(`[Synthesis OS] Primary model ${GEMINI_PRIMARY_MODEL} failed for action "${action}". Attempting fallback ${GEMINI_FALLBACK_MODEL}... Reason: ${err1.message}`);
       
-      // Try Secondary model (2.5-flash)
+      // Try Secondary model (Fallback)
       try {
         const config2: any = {
           systemInstruction,
@@ -309,7 +313,7 @@ async function callGeminiWithLocalFallback(
         }
 
         const response2 = await ai.models.generateContent({
-          model: 'gemini-2.5-flash',
+          model: GEMINI_FALLBACK_MODEL,
           contents: finalPrompt,
           config: config2
         });
@@ -317,7 +321,7 @@ async function callGeminiWithLocalFallback(
           return parseJsonFromText(response2.text);
         }
       } catch (err2: any) {
-        console.error(`[Synthesis OS] Secondary model gemini-2.5-flash failed as well. Reason: ${err2.message}`);
+        console.error(`[Synthesis OS] Secondary model ${GEMINI_FALLBACK_MODEL} failed as well. Reason: ${err2.message}`);
       }
     }
   } catch (errOuter: any) {
@@ -401,8 +405,8 @@ app.all(['/api/testing-bridge', '/api/testing-bridge.ts'], async (req, res) => {
         id: 'mod_ai_assistant',
         name: 'AI Právní Asistent & Syntetický Radce',
         status: aiStatus,
-        primaryModel: 'gemini-3.6-flash',
-        fallbackModel: 'gemini-3.5-flash',
+        primaryModel: GEMINI_PRIMARY_MODEL,
+        fallbackModel: GEMINI_FALLBACK_MODEL,
         details: aiDetails,
         latencyMs: Math.floor(Math.random() * 40) + 12
       },
@@ -741,7 +745,7 @@ PRAVIDLA PRO REAKCI:
     try {
       const ai = getAiClient();
       const response = await ai.models.generateContent({
-        model: 'gemini-3.6-flash',
+        model: GEMINI_PRIMARY_MODEL,
         contents: textPrompt,
         config: {
           systemInstruction,
@@ -750,11 +754,11 @@ PRAVIDLA PRO REAKCI:
       });
       responseText = response.text || '';
     } catch (chatError: any) {
-      console.warn(`[Synthesis OS] Chat primary model failed. Attempting fallback... Reason: ${chatError.message}`);
+      console.warn(`[Synthesis OS] Chat primary model ${GEMINI_PRIMARY_MODEL} failed. Attempting fallback model ${GEMINI_FALLBACK_MODEL}... Reason: ${chatError.message}`);
       try {
         const ai = getAiClient();
         const response2 = await ai.models.generateContent({
-          model: 'gemini-3.5-flash',
+          model: GEMINI_FALLBACK_MODEL,
           contents: textPrompt,
           config: {
             systemInstruction,
@@ -766,7 +770,7 @@ PRAVIDLA PRO REAKCI:
         console.error('[Synthesis OS] All Gemini models failed:', chatError2);
         return res.status(200).json({
           success: false,
-          error: "Dočasná chyba při spojení s AI. Zkontrolujte API klíč nebo to zkusíte za chvíli znovu."
+          error: "Dočasná chyba při spojení s AI modulem. Zkontrolujte prosím nastavení GEMINI_API_KEY v Secrets nebo zkuste požadavek zopakovat."
         });
       }
     }
