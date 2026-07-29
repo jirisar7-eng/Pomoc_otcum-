@@ -14,8 +14,13 @@ import {
   AlertCircle, 
   Loader2, 
   HelpCircle,
-  Clock
+  Clock,
+  SlidersHorizontal,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
+import AiProviderSelector from './AiProviderSelector';
+import { getAIClientConfig, AIClientConfig } from '../lib/aiConfig';
 
 interface ChatMessage {
   id: string;
@@ -26,6 +31,8 @@ interface ChatMessage {
 
 export default function AiAssistant() {
   const [isOpen, setIsOpen] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [aiConfig, setAiConfig] = useState<AIClientConfig>(getAIClientConfig());
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: 'welcome',
@@ -41,10 +48,14 @@ export default function AiAssistant() {
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    setAiConfig(getAIClientConfig());
+  }, [isOpen]);
+
+  useEffect(() => {
     if (chatEndRef.current) {
       chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages, isLoading]);
+  }, [messages, isLoading, showSettings]);
 
   const presetQuestions = [
     'Jak se připravit na jednání s OSPOD?',
@@ -69,10 +80,16 @@ export default function AiAssistant() {
     setErrorText('');
 
     try {
+      const currentConfig = getAIClientConfig();
       const response = await fetch('/api/gemini/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: textToSend })
+        body: JSON.stringify({ 
+          prompt: textToSend,
+          provider: currentConfig.provider,
+          model: currentConfig.model,
+          apiKey: currentConfig.customApiKey || undefined
+        })
       });
 
       let data: any = null;
@@ -147,8 +164,8 @@ export default function AiAssistant() {
             className="w-80 md:w-96 h-[500px] bg-white rounded-2xl border border-slate-100 shadow-2xl flex flex-col justify-between overflow-hidden"
           >
             {/* Header */}
-            <div className="bg-slate-850 text-white p-4 flex items-center justify-between border-b border-slate-800">
-              <div className="flex items-center gap-2.5">
+            <div className="bg-slate-850 text-white p-3.5 flex items-center justify-between border-b border-slate-800">
+              <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-lg bg-teal-500/10 flex items-center justify-center border border-teal-500/20 text-teal-400">
                   <Bot className="w-4.5 h-4.5" />
                 </div>
@@ -157,18 +174,45 @@ export default function AiAssistant() {
                     Synthesis AI Assistant
                     <Sparkles className="w-3 h-3 text-teal-400 fill-teal-400" />
                   </h3>
-                  <span className="text-[9px] text-teal-400 font-bold uppercase tracking-widest block -mt-0.5">Online rádce</span>
+                  <div className="flex items-center gap-1 text-[9px] text-teal-400 font-bold uppercase tracking-wider">
+                    <span>{aiConfig.provider} ({aiConfig.model})</span>
+                    {aiConfig.customApiKey && <span className="text-amber-400" title="Vlastní API klíč">🔑</span>}
+                  </div>
                 </div>
               </div>
 
-              <button
-                id="close-ai-assistant-btn"
-                onClick={() => setIsOpen(false)}
-                className="text-slate-400 hover:text-white p-1 rounded-lg transition-colors cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </button>
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => setShowSettings(!showSettings)}
+                  className={`p-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer flex items-center gap-1 ${
+                    showSettings ? 'bg-teal-600 text-white' : 'text-slate-300 hover:text-white hover:bg-slate-800'
+                  }`}
+                  title="Přepnout AI poskytovatele & model"
+                >
+                  <SlidersHorizontal className="w-3.5 h-3.5" />
+                  {showSettings ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                </button>
+
+                <button
+                  id="close-ai-assistant-btn"
+                  onClick={() => setIsOpen(false)}
+                  className="text-slate-400 hover:text-white p-1.5 rounded-lg transition-colors cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
             </div>
+
+            {/* AI Provider Settings Drawer */}
+            {showSettings && (
+              <div className="p-2.5 bg-slate-950 border-b border-slate-800 animate-fadeIn shrink-0 max-h-[220px] overflow-y-auto">
+                <AiProviderSelector
+                  compact
+                  onConfigChange={(updated) => setAiConfig(updated)}
+                />
+              </div>
+            )}
 
             {/* Message Thread viewport */}
             <div className="flex-1 p-4 overflow-y-auto space-y-4 bg-slate-50/50 scrollbar-thin" id="ai-messages-container">

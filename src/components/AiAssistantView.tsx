@@ -7,6 +7,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { MarkdownRenderer } from './MarkdownRenderer';
 import { AIAdminClient } from '../lib/ai-admin/client';
+import AiProviderSelector from './AiProviderSelector';
+import { getAIClientConfig, AIClientConfig } from '../lib/aiConfig';
 import { 
   Bot, 
   Send, 
@@ -39,7 +41,8 @@ import {
   Layers,
   FileCode,
   FolderPlus,
-  Compass
+  Compass,
+  SlidersHorizontal
 } from 'lucide-react';
 import { User } from '../types';
 
@@ -204,6 +207,11 @@ export default function AiAssistantView({
   const [activeSubTab, setActiveSubTab] = useState<'chat' | 'notebook' | 'analysis' | 'docs'>('chat');
   const [selectedPromptCategory, setSelectedPromptCategory] = useState<string>('all');
   const [promptFilterText, setPromptFilterText] = useState<string>('');
+  const [aiConfig, setAiConfig] = useState<AIClientConfig>(getAIClientConfig());
+
+  useEffect(() => {
+    setAiConfig(getAIClientConfig());
+  }, []);
   
   // Dynamic Markdown loading & error state
   const [markdownDoc, setMarkdownDoc] = useState<string>('');
@@ -844,34 +852,48 @@ export default function AiAssistantView({
         </div>
       )}
       {activeSubTab === 'chat' && (
-        <div className="bg-white rounded-3xl border border-slate-200 shadow-lg overflow-hidden flex flex-col min-h-[600px]">
-          
-          {/* Chat Header Controls */}
-          <div className="bg-slate-850 text-white p-4 sm:p-5 flex items-center justify-between border-b border-slate-800">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-teal-500/20 text-teal-400 border border-teal-500/30 flex items-center justify-center">
-                <Bot className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="font-bold text-sm sm:text-base font-display flex items-center gap-1.5 text-white">
-                  Synthesis AI Právní Poradce
-                  <Sparkles className="w-4 h-4 text-teal-400 fill-teal-400" />
-                </h3>
-                <span className="text-[11px] text-teal-400 font-mono font-semibold block">
-                  On-line | Česká legislativa & OSPOD praxe
-                </span>
-              </div>
-            </div>
+        <div className="space-y-6 animate-fadeIn">
+          {/* Interactive AI Provider & Key Switcher */}
+          <AiProviderSelector
+            onConfigChange={(updated) => setAiConfig(updated)}
+          />
 
-            <button
-              onClick={handleClearChat}
-              className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
-              title="Vyčistit konverzaci"
-            >
-              <Trash2 className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Vymazat chat</span>
-            </button>
-          </div>
+          <div className="bg-white rounded-3xl border border-slate-200 shadow-lg overflow-hidden flex flex-col min-h-[600px]">
+            {/* Chat Header Controls */}
+            <div className="bg-slate-850 text-white p-4 sm:p-5 flex flex-wrap items-center justify-between gap-3 border-b border-slate-800">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-teal-500/20 text-teal-400 border border-teal-500/30 flex items-center justify-center">
+                  <Bot className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-sm sm:text-base font-display flex items-center gap-1.5 text-white">
+                    Synthesis AI Právní Poradce
+                    <Sparkles className="w-4 h-4 text-teal-400 fill-teal-400" />
+                  </h3>
+                  <div className="flex items-center gap-2 text-[11px] text-teal-400 font-mono font-semibold">
+                    <span>Aktivní: {aiConfig.provider.toUpperCase()} ({aiConfig.model})</span>
+                    {aiConfig.customApiKey ? (
+                      <span className="bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded text-[10px] font-sans">
+                        🔑 Vlastní API klíč
+                      </span>
+                    ) : (
+                      <span className="bg-slate-800 text-slate-300 border border-slate-700 px-2 py-0.5 rounded text-[10px] font-sans">
+                        🌐 Systémový klíč
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onClick={handleClearChat}
+                className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                title="Vyčistit konverzaci"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Vymazat chat</span>
+              </button>
+            </div>
 
           {/* Chat Message Thread */}
           <div className="flex-1 p-4 sm:p-6 overflow-y-auto space-y-4 bg-slate-50/60 max-h-[500px]" id="ai-chat-thread">
@@ -1003,6 +1025,7 @@ export default function AiAssistantView({
           </div>
 
         </div>
+      </div>
       )}
 
       {/* TAB 2: ANALYSIS & BIFF REWRITE */}

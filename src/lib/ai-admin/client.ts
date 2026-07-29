@@ -9,6 +9,22 @@
  * AI Admin endpoint, routing execution to the Gemini 3.5 LLM.
  */
 
+import { getAIClientConfig } from '../aiConfig';
+
+function getLocalUserId(): string | undefined {
+  if (typeof window === 'undefined') return undefined;
+  try {
+    const raw = localStorage.getItem('synthesis_hub_local_user');
+    if (raw) {
+      const u = JSON.parse(raw);
+      if (u && u.id) return u.id;
+    }
+  } catch {
+    // ignore
+  }
+  return undefined;
+}
+
 export interface AIAdminExecutionResponse<T = any> {
   success: boolean;
   action: string;
@@ -36,13 +52,29 @@ export class AIAdminClient {
     params: Record<string, any> = {}
   ): Promise<AIAdminExecutionResponse<T>> {
     try {
+      const aiConfig = getAIClientConfig();
+      const userId = params.userId || getLocalUserId();
+
+      const payloadParams = {
+        ...params,
+        userId,
+        clientProvider: params.clientProvider || aiConfig.provider,
+        clientModel: params.clientModel || aiConfig.model,
+        clientApiKey: params.clientApiKey || aiConfig.customApiKey || undefined,
+      };
+
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      };
+      if (userId) {
+        headers['x-user-id'] = userId;
+      }
+
       const response = await fetch(this.endpoint, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: JSON.stringify({ action, params }),
+        headers,
+        body: JSON.stringify({ action, params: payloadParams }),
       });
 
       let errData: any = {};
@@ -74,18 +106,43 @@ export class AIAdminClient {
   }
 
   /**
-   * Directly queries the secure server-side Gemini proxy (convenience helper).
-   * @param prompt The prompt to send to Gemini
+   * Directly queries the secure server-side AI proxy.
+   * @param prompt The prompt to send to the AI
    * @param systemInstruction Optional system instruction to override the default persona
+   * @param overrides Optional custom provider/model/key/userId overrides
    */
-  static async queryGemini(prompt: string, systemInstruction?: string): Promise<string> {
+  static async queryGemini(
+    prompt: string, 
+    systemInstruction?: string,
+    overrides?: {
+      provider?: string;
+      model?: string;
+      apiKey?: string;
+      userId?: string;
+    }
+  ): Promise<string> {
     try {
+      const aiConfig = getAIClientConfig();
+      const userId = overrides?.userId || getLocalUserId();
+
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      if (userId) {
+        headers['x-user-id'] = userId;
+      }
+
       const response = await fetch('/api/gemini/chat', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ prompt, systemInstruction }),
+        headers,
+        body: JSON.stringify({
+          prompt,
+          systemInstruction,
+          userId,
+          provider: overrides?.provider || aiConfig.provider,
+          model: overrides?.model || aiConfig.model,
+          apiKey: overrides?.apiKey || aiConfig.customApiKey || undefined,
+        }),
       });
 
       let data: any = {};

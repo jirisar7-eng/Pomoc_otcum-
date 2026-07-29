@@ -19,9 +19,58 @@ const PORT = 3000;
 
 app.use(express.json());
 
-// Defiice ověřených a podporovaných modelů pro Google Gen AI SDK
-const GEMINI_PRIMARY_MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
-const GEMINI_FALLBACK_MODEL = 'gemini-1.5-flash';
+// Helper pro sanaci náznaku/prefiksů modelů z prostředí pro Google Gen AI SDK
+function cleanModelName(modelName?: string): string {
+  if (!modelName) return 'gemini-2.5-flash';
+  let cleaned = modelName.trim();
+  if (cleaned.startsWith('models/')) {
+    cleaned = cleaned.replace(/^models\//, '');
+  }
+  if (cleaned === 'gemini-1.5-flash' || cleaned.includes('1.5') || cleaned.includes('3.6') || cleaned.includes('3.5')) {
+    return 'gemini-2.5-flash';
+  }
+  return cleaned;
+}
+
+// Defiice ověřených a podporovaných modelů pro různé AI poskytovatele
+function getAiProviderConfig() {
+  const provider = (process.env.AI_PROVIDER || 'gemini').toLowerCase().trim();
+  
+  const geminiApiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
+  const geminiPrimaryModel = cleanModelName(process.env.GEMINI_MODEL) || 'gemini-2.5-flash';
+  const geminiFallbackModel = 'gemini-2.0-flash';
+
+  const openaiApiKey = process.env.OPENAI_API_KEY;
+  const openaiModel = process.env.OPENAI_MODEL || 'gpt-4o-mini';
+  const openaiBaseUrl = process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1';
+
+  const anthropicApiKey = process.env.ANTHROPIC_API_KEY;
+  const anthropicModel = process.env.ANTHROPIC_MODEL || 'claude-3-5-haiku-20241022';
+
+  return {
+    provider,
+    gemini: {
+      apiKey: geminiApiKey,
+      primaryModel: geminiPrimaryModel,
+      fallbackModel: geminiFallbackModel,
+      isConfigured: !!geminiApiKey
+    },
+    openai: {
+      apiKey: openaiApiKey,
+      model: openaiModel,
+      baseUrl: openaiBaseUrl,
+      isConfigured: !!openaiApiKey
+    },
+    anthropic: {
+      apiKey: anthropicApiKey,
+      model: anthropicModel,
+      isConfigured: !!anthropicApiKey
+    }
+  };
+}
+
+const GEMINI_PRIMARY_MODEL = cleanModelName(process.env.GEMINI_MODEL) || 'gemini-2.5-flash';
+const GEMINI_FALLBACK_MODEL = 'gemini-2.0-flash';
 
 // Inicializace podle standardu Synthesis OS (Lazy-initialized pro zamezení pádů při startu bez klíče)
 function getAiClient(): GoogleGenAI {
@@ -37,6 +86,178 @@ function getAiClient(): GoogleGenAI {
       }
     }
   });
+}
+
+// Flexibilní víceposkytovatelový generátor AI odpovědí (Gemini / OpenAI / Anthropic)
+async function generateMultiProviderContent(options: {
+  prompt: string;
+  systemInstruction?: string;
+  temperature?: number;
+  responseMimeType?: string;
+  responseSchema?: any;
+  isCrawl?: boolean;
+  clientProvider?: string;
+  clientModel?: string;
+  clientApiKey?: string;
+}): Promise<{ text: string; provider: string; model: string; keySource?: 'user_custom' | 'system_env' }> {
+  const config = getAiProviderConfig();
+  const provider = (options.clientProvider || config.provider).toLowerCase().trim();
+  const customKey = options.clientApiKey?.trim();
+  const keySource = customKey ? 'user_custom' : 'system_env';
+
+  // 1. OPENAI PROVIDER
+  if (provider === 'openai') {
+    const apiKey = customKey || config.openai.apiKey;
+    const model = options.clientModel?.trim() || config.openai.model || 'gpt-4o-mini';
+
+    if (!apiKey) {
+      throw new Error("Chybí OpenAI API klíč. Vložte jej v nastavení AI v aplikaci nebo nastavte OPENAI_API_KEY v Secrets.");
+    }
+    const messages: any[] = [];
+    if (options.systemInstruction) {
+      messages.push({ role: 'system', content: options.systemInstruction });
+    }
+    messages.push({ role: 'user', content: options.prompt });
+
+    const reqBody: any = {
+      model,
+      messages,
+      temperature: options.temperature ?? 0.7,
+    };
+
+    if (options.responseMimeType === 'application/json') {
+      reqBody.response_format = { type: 'json_object' };
+    }
+
+    const res = await fetch(`${config.openai.baseUrl}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify(reqBody)
+    });
+
+    if (!res.ok) {
+      const errJson: any = await res.json().catch(() => ({}));
+      throw new Error(`OpenAI API chyba ${res.status}: ${errJson.error?.message || res.statusText}`);
+    }
+
+    const data: any = await res.json();
+    const text = data.choices?.[0]?.message?.content || '';
+    return { text, provider: 'openai', model, keySource };
+  }
+
+  // 2. ANTHROPIC / CLAUDE PROVIDER
+  if (provider === 'anthropic' || provider === 'claude') {
+    const apiKey = customKey || config.anthropic.apiKey;
+    const model = options.clientModel?.trim() || config.anthropic.model || 'claude-3-5-haiku-20241022';
+
+    if (!apiKey) {
+      throw new Error("Chybí Anthropic API klíč. Vložte jej v nastavení AI v aplikaci nebo nastavte ANTHROPIC_API_KEY v Secrets.");
+    }
+
+    const reqBody: any = {
+      model,
+      max_tokens: 2048,
+      temperature: options.temperature ?? 0.7,
+      messages: [
+        { role: 'user', content: options.prompt }
+      ]
+    };
+    if (options.systemInstruction) {
+      reqBody.system = options.systemInstruction;
+    }
+
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify(reqBody)
+    });
+
+    if (!res.ok) {
+      const errJson: any = await res.json().catch(() => ({}));
+      throw new Error(`Anthropic API chyba ${res.status}: ${errJson.error?.message || res.statusText}`);
+    }
+
+    const data: any = await res.json();
+    const text = data.content?.[0]?.text || '';
+    return { text, provider: 'anthropic', model, keySource };
+  }
+
+  // 3. GEMINI PROVIDER (DEFAULT / FALLBACK)
+  const geminiApiKey = customKey || config.gemini.apiKey;
+  if (!geminiApiKey) {
+    throw new Error("Chybí Google Gemini API klíč. Vložte jej v nastavení AI v aplikaci nebo nastavte GEMINI_API_KEY v Secrets.");
+  }
+
+  const primaryModel = cleanModelName(options.clientModel) || config.gemini.primaryModel || 'gemini-2.5-flash';
+  const fallbackModel = config.gemini.fallbackModel || 'gemini-2.0-flash';
+
+  const ai = customKey 
+    ? new GoogleGenAI({ apiKey: customKey, httpOptions: { headers: { 'User-Agent': 'aistudio-build' } } })
+    : getAiClient();
+
+  try {
+    const geminiConfig: any = {
+      systemInstruction: options.systemInstruction,
+      temperature: options.temperature ?? 0.3,
+    };
+
+    if (options.isCrawl) {
+      geminiConfig.tools = [{ googleSearch: {} }];
+    } else if (options.responseMimeType) {
+      geminiConfig.responseMimeType = options.responseMimeType;
+      if (options.responseSchema) {
+        geminiConfig.responseSchema = options.responseSchema;
+      }
+    }
+
+    const response = await ai.models.generateContent({
+      model: primaryModel,
+      contents: options.prompt,
+      config: geminiConfig
+    });
+
+    return {
+      text: response.text || '',
+      provider: 'gemini',
+      model: primaryModel,
+      keySource
+    };
+  } catch (err1: any) {
+    console.warn(`[Synthesis OS] Primary Gemini model ${primaryModel} failed. Attempting fallback ${fallbackModel}... Reason: ${err1.message}`);
+
+    const fallbackConfig: any = {
+      systemInstruction: options.systemInstruction,
+      temperature: options.temperature ?? 0.3,
+    };
+
+    if (options.isCrawl) {
+      fallbackConfig.tools = [{ googleSearch: {} }];
+    } else if (options.responseMimeType) {
+      fallbackConfig.responseMimeType = options.responseMimeType;
+      if (options.responseSchema) {
+        fallbackConfig.responseSchema = options.responseSchema;
+      }
+    }
+
+    const response2 = await ai.models.generateContent({
+      model: fallbackModel,
+      contents: options.prompt,
+      config: fallbackConfig
+    });
+
+    return {
+      text: response2.text || '',
+      provider: 'gemini',
+      model: fallbackModel
+    };
+  }
 }
 
 // Resilient fallback dataset for offline/high-demand scenarios
@@ -262,70 +483,29 @@ async function callGeminiWithLocalFallback(
   responseSchema: any,
   params: any
 ): Promise<any> {
-  // If we are crawling the internet, we cannot use responseMimeType: 'application/json' with tools.
-  // We append a reminder to the prompt to output a clean markdown json block.
   const isCrawl = action === 'CRAWL_INTERNET';
   const finalPrompt = isCrawl 
-    ? `${prompt}\n\nDŮLEŽITÉ: Odpověz výhradně ve formátu JSON podle zadaného schématu, obaleném v bloku \`\`\`json \\n ... \\n \`\`\`. Nepřidávej žádný jiný doprovodný text mimo tento JSON blok.`
-    : prompt;
+    ? `${prompt}\n\nDŮLEŽITÉ: Odpověz výhradně ve formátu JSON podle zadaného schématu, obaleném v bloku \`\`\`json \n ... \n \`\`\`. Nepřidávej žádný jiný doprovodný text mimo tento JSON blok.`
+    : `${prompt}\n\nDŮLEŽITÉ: Odpověz výhradně jako platný JSON objekt.`;
 
-  // 1. Try getting the AI Client and calling Gemini
   try {
-    const ai = getAiClient();
-    
-    // Try Primary model
-    try {
-      const config: any = {
-        systemInstruction,
-        temperature: action === 'SCAN_COMMENT' ? 0.1 : 0.3,
-      };
+    const aiRes = await generateMultiProviderContent({
+      prompt: finalPrompt,
+      systemInstruction,
+      temperature: action === 'SCAN_COMMENT' ? 0.1 : 0.3,
+      responseMimeType: isCrawl ? undefined : 'application/json',
+      responseSchema: isCrawl ? undefined : responseSchema,
+      isCrawl,
+      clientProvider: params?.clientProvider,
+      clientModel: params?.clientModel,
+      clientApiKey: params?.clientApiKey
+    });
 
-      if (isCrawl) {
-        config.tools = [{ googleSearch: {} }];
-      } else {
-        config.responseMimeType = 'application/json';
-        config.responseSchema = responseSchema;
-      }
-
-      const response = await ai.models.generateContent({
-        model: GEMINI_PRIMARY_MODEL,
-        contents: finalPrompt,
-        config: config
-      });
-      if (response.text) {
-        return parseJsonFromText(response.text);
-      }
-    } catch (err1: any) {
-      console.warn(`[Synthesis OS] Primary model ${GEMINI_PRIMARY_MODEL} failed for action "${action}". Attempting fallback ${GEMINI_FALLBACK_MODEL}... Reason: ${err1.message}`);
-      
-      // Try Secondary model (Fallback)
-      try {
-        const config2: any = {
-          systemInstruction,
-          temperature: action === 'SCAN_COMMENT' ? 0.1 : 0.3,
-        };
-        
-        if (isCrawl) {
-          config2.tools = [{ googleSearch: {} }];
-        } else {
-          config2.responseMimeType = 'application/json';
-          config2.responseSchema = responseSchema;
-        }
-
-        const response2 = await ai.models.generateContent({
-          model: GEMINI_FALLBACK_MODEL,
-          contents: finalPrompt,
-          config: config2
-        });
-        if (response2.text) {
-          return parseJsonFromText(response2.text);
-        }
-      } catch (err2: any) {
-        console.error(`[Synthesis OS] Secondary model ${GEMINI_FALLBACK_MODEL} failed as well. Reason: ${err2.message}`);
-      }
+    if (aiRes.text) {
+      return parseJsonFromText(aiRes.text);
     }
   } catch (errOuter: any) {
-    console.warn(`[Synthesis OS] Gemini initialization or query failed. Activating Local Fallback Engine. Reason: ${errOuter.message}`);
+    console.warn(`[Synthesis OS] AI Provider execution failed (${errOuter.message}). Activating Local Fallback Engine.`);
   }
 
   // 2. Last line of defense: high quality local/offline data generator
@@ -376,13 +556,21 @@ app.all(['/api/testing-bridge', '/api/testing-bridge.ts'], async (req, res) => {
     const githubRepo = process.env.GITHUB_REPO || 'Pomoc-otcum/Pomoc_otcum';
     const smtpUserSet = !!(process.env.SMTP_USER || process.env.SMTP_PASSWORD || process.env.SMTP_PASS);
 
-    let aiStatus = 'operational';
-    let aiDetails = 'Gemini API configured with lazy fallback engine.';
+    const aiConfig = getAiProviderConfig();
+    const activeProvider = aiConfig.provider;
+    let providerModelName = aiConfig.gemini.primaryModel;
+    let providerConfigured = aiConfig.gemini.isConfigured;
 
-    if (!geminiKeySet) {
-      aiStatus = 'degraded';
-      aiDetails = 'GEMINI_API_KEY není nastaven v prostředí. Běží záložní offline AI motor.';
+    if (activeProvider === 'openai') {
+      providerModelName = aiConfig.openai.model;
+      providerConfigured = aiConfig.openai.isConfigured;
+    } else if (activeProvider === 'anthropic' || activeProvider === 'claude') {
+      providerModelName = aiConfig.anthropic.model;
+      providerConfigured = aiConfig.anthropic.isConfigured;
     }
+
+    let aiStatus = providerConfigured ? 'operational' : 'degraded';
+    let aiDetails = `Poskytovatel: ${activeProvider.toUpperCase()} (${providerModelName}). ${providerConfigured ? 'Nakonfigurováno a připraveno.' : 'Chybí API klíč v prostředí, běží záložní engine.'}`;
 
     const modules = {
       calendar_and_case_files: {
@@ -405,8 +593,9 @@ app.all(['/api/testing-bridge', '/api/testing-bridge.ts'], async (req, res) => {
         id: 'mod_ai_assistant',
         name: 'AI Právní Asistent & Syntetický Radce',
         status: aiStatus,
-        primaryModel: GEMINI_PRIMARY_MODEL,
-        fallbackModel: GEMINI_FALLBACK_MODEL,
+        provider: activeProvider,
+        primaryModel: providerModelName,
+        fallbackModel: aiConfig.gemini.fallbackModel,
         details: aiDetails,
         latencyMs: Math.floor(Math.random() * 40) + 12
       },
@@ -706,19 +895,206 @@ app.get('/api/audit-logs', (req, res) => {
   }
 });
 
-// Secure API Proxy for Synthesis AI Assistant
-app.post(['/api/gemini/chat', '/api/chat'], async (req, res) => {
+// ==========================================
+// USER API KEYS DATABASE PERSISTENCE SERVICE
+// ==========================================
+const USER_KEYS_FILE = path.join(process.cwd(), 'data_user_api_keys.json');
+
+interface UserApiKeysRecord {
+  userId: string;
+  geminiApiKey?: string;
+  openaiApiKey?: string;
+  anthropicApiKey?: string;
+  preferredProvider?: string;
+  preferredModel?: string;
+  updatedAt: string;
+}
+
+function readAllUserApiKeys(): Record<string, UserApiKeysRecord> {
   try {
-    // 1. KONTROLA API KLÍČE
-    const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
-    if (!apiKey) {
+    if (fs.existsSync(USER_KEYS_FILE)) {
+      const data = fs.readFileSync(USER_KEYS_FILE, 'utf-8');
+      return JSON.parse(data) || {};
+    }
+  } catch (err) {
+    console.warn('[User API Keys] Failed to read keys file:', err);
+  }
+  return {};
+}
+
+function writeAllUserApiKeys(store: Record<string, UserApiKeysRecord>): void {
+  try {
+    fs.writeFileSync(USER_KEYS_FILE, JSON.stringify(store, null, 2), 'utf-8');
+  } catch (err) {
+    console.warn('[User API Keys] Failed to write keys file:', err);
+  }
+}
+
+function getUserApiKeys(userId: string): UserApiKeysRecord | null {
+  if (!userId) return null;
+  const store = readAllUserApiKeys();
+  return store[userId] || null;
+}
+
+function maskApiKey(key?: string): string {
+  if (!key) return '';
+  const trimmed = key.trim();
+  if (trimmed.length <= 8) return '••••••••';
+  return `${trimmed.slice(0, 4)}...${trimmed.slice(-4)}`;
+}
+
+// GET /api/user/keys?userId=xxx
+app.get('/api/user/keys', (req, res) => {
+  try {
+    const userId = (req.query.userId as string || '').trim();
+    if (!userId) {
+      return res.status(400).json({ success: false, error: 'Chybí ID uživatele (userId).' });
+    }
+
+    const userKeys = getUserApiKeys(userId);
+    if (!userKeys) {
       return res.status(200).json({
-        success: false,
-        error: "Dočasná chyba při spojení s AI. Zkontrolujte API klíč nebo to zkusíte za chvíli znovu."
+        success: true,
+        userId,
+        keys: {
+          geminiApiKey: '',
+          openaiApiKey: '',
+          anthropicApiKey: '',
+          hasGeminiKey: false,
+          hasOpenaiKey: false,
+          hasAnthropicKey: false,
+          preferredProvider: 'gemini',
+          preferredModel: 'gemini-2.5-flash',
+        }
       });
     }
 
-    const { prompt, history, message } = req.body || {};
+    return res.status(200).json({
+      success: true,
+      userId,
+      keys: {
+        geminiApiKey: maskApiKey(userKeys.geminiApiKey),
+        openaiApiKey: maskApiKey(userKeys.openaiApiKey),
+        anthropicApiKey: maskApiKey(userKeys.anthropicApiKey),
+        hasGeminiKey: !!(userKeys.geminiApiKey && userKeys.geminiApiKey.trim()),
+        hasOpenaiKey: !!(userKeys.openaiApiKey && userKeys.openaiApiKey.trim()),
+        hasAnthropicKey: !!(userKeys.anthropicApiKey && userKeys.anthropicApiKey.trim()),
+        preferredProvider: userKeys.preferredProvider || 'gemini',
+        preferredModel: userKeys.preferredModel || 'gemini-2.5-flash',
+        updatedAt: userKeys.updatedAt,
+      }
+    });
+  } catch (err: any) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// POST /api/user/keys
+app.post('/api/user/keys', (req, res) => {
+  try {
+    const {
+      userId,
+      geminiApiKey,
+      openaiApiKey,
+      anthropicApiKey,
+      preferredProvider,
+      preferredModel
+    } = req.body || {};
+
+    const cleanUserId = (userId || '').trim();
+    if (!cleanUserId) {
+      return res.status(400).json({ success: false, error: 'Chybí ID uživatele (userId).' });
+    }
+
+    const store = readAllUserApiKeys();
+    const existing: UserApiKeysRecord = store[cleanUserId] || {
+      userId: cleanUserId,
+      geminiApiKey: '',
+      openaiApiKey: '',
+      anthropicApiKey: '',
+      preferredProvider: 'gemini',
+      preferredModel: 'gemini-2.5-flash',
+      updatedAt: new Date().toISOString()
+    };
+
+    const resolveKey = (incoming: any, existingKey?: string) => {
+      if (incoming === undefined) return existingKey || '';
+      if (incoming === 'CLEAR' || incoming === '') return '';
+      if (typeof incoming === 'string' && incoming.includes('...')) return existingKey || ''; // preserve existing unmasked key
+      return incoming.trim();
+    };
+
+    const updatedRecord: UserApiKeysRecord = {
+      userId: cleanUserId,
+      geminiApiKey: resolveKey(geminiApiKey, existing.geminiApiKey),
+      openaiApiKey: resolveKey(openaiApiKey, existing.openaiApiKey),
+      anthropicApiKey: resolveKey(anthropicApiKey, existing.anthropicApiKey),
+      preferredProvider: preferredProvider || existing.preferredProvider || 'gemini',
+      preferredModel: preferredModel || existing.preferredModel || 'gemini-2.5-flash',
+      updatedAt: new Date().toISOString(),
+    };
+
+    store[cleanUserId] = updatedRecord;
+    writeAllUserApiKeys(store);
+
+    return res.status(200).json({
+      success: true,
+      message: 'Osobní API klíče byly bezpečně uloženy do databáze.',
+      userId: cleanUserId,
+      keys: {
+        geminiApiKey: maskApiKey(updatedRecord.geminiApiKey),
+        openaiApiKey: maskApiKey(updatedRecord.openaiApiKey),
+        anthropicApiKey: maskApiKey(updatedRecord.anthropicApiKey),
+        hasGeminiKey: !!(updatedRecord.geminiApiKey && updatedRecord.geminiApiKey.trim()),
+        hasOpenaiKey: !!(updatedRecord.openaiApiKey && updatedRecord.openaiApiKey.trim()),
+        hasAnthropicKey: !!(updatedRecord.anthropicApiKey && updatedRecord.anthropicApiKey.trim()),
+        preferredProvider: updatedRecord.preferredProvider,
+        preferredModel: updatedRecord.preferredModel,
+        updatedAt: updatedRecord.updatedAt,
+      }
+    });
+  } catch (err: any) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// DELETE /api/user/keys
+app.delete('/api/user/keys', (req, res) => {
+  try {
+    const userId = (req.body?.userId || req.query?.userId as string || '').trim();
+    const provider = (req.body?.provider || req.query?.provider as string || '').trim().toLowerCase();
+
+    if (!userId) {
+      return res.status(400).json({ success: false, error: 'Chybí ID uživatele (userId).' });
+    }
+
+    const store = readAllUserApiKeys();
+    if (store[userId]) {
+      if (provider === 'gemini') {
+        delete store[userId].geminiApiKey;
+      } else if (provider === 'openai') {
+        delete store[userId].openaiApiKey;
+      } else if (provider === 'anthropic' || provider === 'claude') {
+        delete store[userId].anthropicApiKey;
+      } else {
+        delete store[userId];
+      }
+      writeAllUserApiKeys(store);
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: provider ? `API klíč pro ${provider} byl odstraněn.` : 'Všechny AI klíče uživatele byly smazány z databáze.'
+    });
+  } catch (err: any) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Secure API Proxy for Synthesis AI Assistant (Supports Gemini, OpenAI, Anthropic via AI_PROVIDER & Client Config)
+app.post(['/api/gemini/chat', '/api/chat'], async (req, res) => {
+  try {
+    const { prompt, history, message, systemInstruction: clientSystemInstruction, provider: reqProvider, model: reqModel, apiKey: reqApiKey, userId: reqUserId } = req.body || {};
     const textPrompt = prompt || message;
 
     if (!textPrompt) {
@@ -727,63 +1103,79 @@ app.post(['/api/gemini/chat', '/api/chat'], async (req, res) => {
         error: 'Chybí dotaz (prompt).'
       });
     }
-    
-    const systemInstruction = `
-Jsi "Synthesis AI" - inteligentní rodinný poradce a právní asistent v systému Synthesis OS.
-Tvým účelem je poskytovat rodičům věcné, srozumitelné a nestranné informace týkající se opatrovnického řízení, péče o děti, komunikace s OSPOD, soudních řízení v ČR a přípravy dohod o péči a výživném.
 
-PRAVIDLA PRO REAKCI:
-1. Jazyk: Vždy odpovídej v češtině.
-2. Tón: Buď empatický, profesionální, klidný a věcný.
-3. Princip: Vždy zdůrazňuj a podporuj **nejlepší zájem dítěte** a rovný přístup k oběma rodičům. Vyvaruj se jakékoliv zaujatosti vůči otcům nebo matkám.
-4. Struktura: Používej přehledné odrážky (Checklisty), pokud odpovídáš na dotazy typu "Jak se připravit", "Na co nezapomenout" nebo "Jak postupovat".
-5. Právní upozornění: Nejsi certifikovaný advokát. Na konci odpovědi uveď diskrétní, stručnou poznámku: "Tato odpověď má informativní charakter a nenahrazuje individuální právní pomoc."
-6. Délka: Odpovídej stručně a strukturovaně, aby se text dobře četl v chatovacím okně (max 3-4 odstavce).
-`;
+    // Resolve userId & User Stored Keys from database
+    const userId = (reqUserId || (req.headers['x-user-id'] as string) || '').trim();
+    const userKeysRecord = userId ? getUserApiKeys(userId) : null;
 
-    let responseText = '';
-    try {
-      const ai = getAiClient();
-      const response = await ai.models.generateContent({
-        model: GEMINI_PRIMARY_MODEL,
-        contents: textPrompt,
-        config: {
-          systemInstruction,
-          temperature: 0.7,
-        }
-      });
-      responseText = response.text || '';
-    } catch (chatError: any) {
-      console.warn(`[Synthesis OS] Chat primary model ${GEMINI_PRIMARY_MODEL} failed. Attempting fallback model ${GEMINI_FALLBACK_MODEL}... Reason: ${chatError.message}`);
-      try {
-        const ai = getAiClient();
-        const response2 = await ai.models.generateContent({
-          model: GEMINI_FALLBACK_MODEL,
-          contents: textPrompt,
-          config: {
-            systemInstruction,
-            temperature: 0.7,
-          }
-        });
-        responseText = response2.text || '';
-      } catch (chatError2: any) {
-        console.error('[Synthesis OS] All Gemini models failed:', chatError2);
-        return res.status(200).json({
-          success: false,
-          error: "Dočasná chyba při spojení s AI modulem. Zkontrolujte prosím nastavení GEMINI_API_KEY v Secrets nebo zkuste požadavek zopakovat."
-        });
+    const provider = (reqProvider || userKeysRecord?.preferredProvider || 'gemini').toLowerCase().trim();
+    const model = reqModel || userKeysRecord?.preferredModel || undefined;
+
+    // Determine API Key: client provided -> user stored in database -> fallback system env
+    let apiKeyToUse = reqApiKey?.trim();
+    let isUserKeyFromDb = false;
+
+    if (!apiKeyToUse && userKeysRecord) {
+      if (provider === 'gemini' && userKeysRecord.geminiApiKey) {
+        apiKeyToUse = userKeysRecord.geminiApiKey;
+        isUserKeyFromDb = true;
+      } else if (provider === 'openai' && userKeysRecord.openaiApiKey) {
+        apiKeyToUse = userKeysRecord.openaiApiKey;
+        isUserKeyFromDb = true;
+      } else if ((provider === 'anthropic' || provider === 'claude') && userKeysRecord.anthropicApiKey) {
+        apiKeyToUse = userKeysRecord.anthropicApiKey;
+        isUserKeyFromDb = true;
       }
     }
 
+    const mandatorySystemPrompt = `
+Jsi odborný a empatický asistent pro oblast opatrovnického práva v ČR, rodinných vztahů a péče o děti.
+Mluv vždy klidně, věcně, srozumitelně a s podporou pro rodiče v náročné situaci.
+
+ZÁVAZNÉ INSTRUKCE PRO CHOVÁNÍ AI ASISTENTA:
+
+1. ROLE A TÓN:
+- Jsi odborný a empatický asistent pro oblast opatrovnického práva v ČR, rodinných vztahů a péče o děti.
+- Mluv vždy klidně, věcně, srozumitelně a s podporou pro rodiče v náročné situaci.
+- Vždy zdůrazňuj a podporuj nejlepší zájem dítěte a rovný, nestranný přístup k oběma rodičům.
+
+2. POVINNÝ DISCLAIMER:
+- Na začátku nebo na konci každé odpovědi (kde je to relevantní) vždy zohledni a uveď upozornění, že odpovědi slouží výhradně pro orientační účely a nenahrazují kvalifikované právní poradenství advokáta.
+
+3. PŘESNOST A BEZPEČNOST:
+- Nikdy si nevymýšlej neexistující zákony ani paragrafy. Uváděj výhradně reálné a platné právní předpisy ČR (např. občanský zákoník č. 89/2012 Sb., zákon o sociálně-právní ochraně dětí č. 359/1999 Sb. atd.).
+- Pokud si nejsi jistý nebo dotaz vyžaduje individuální právní posouzení, odkaž uživatele na odbornou sekci portálu nebo na krizový plán.
+
+4. FORMÁT ODPOVĚDI:
+- Odpovídej vždy v českém jazyce, přehledně a strukturovaně (využívej odrážky, checklisty nebo očíslované kroky).
+`.trim();
+
+    const systemInstruction = clientSystemInstruction 
+      ? `${mandatorySystemPrompt}\n\n[Doplňující kontextualizace]:\n${clientSystemInstruction}`
+      : mandatorySystemPrompt;
+
+    const aiResult = await generateMultiProviderContent({
+      prompt: textPrompt,
+      systemInstruction,
+      temperature: 0.7,
+      clientProvider: provider,
+      clientModel: model,
+      clientApiKey: apiKeyToUse,
+    });
+
     return res.status(200).json({
       success: true,
-      text: responseText
+      text: aiResult.text,
+      provider: aiResult.provider,
+      model: aiResult.model,
+      keySource: isUserKeyFromDb ? 'user_database' : (reqApiKey ? 'user_custom' : 'system_env'),
+      usedUserKey: isUserKeyFromDb || !!reqApiKey
     });
-  } catch (error: any) {
-    console.error('Gemini API Error:', error);
-    return res.status(200).json({ 
-      success: false, 
-      error: "Dočasná chyba při spojení s AI. Zkontrolujte API klíč nebo to zkusíte za chvíli znovu." 
+  } catch (chatError: any) {
+    console.error('[Synthesis OS] AI Chat generation failed:', chatError);
+    return res.status(200).json({
+      success: false,
+      error: `Dočasná chyba při generování AI odpovědi (${chatError.message}). Zkontrolujte klíč v nastavení.`
     });
   }
 });

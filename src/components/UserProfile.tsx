@@ -30,6 +30,7 @@ import { saveDocument } from '../lib/firebase';
 import { dbSyncService } from '../services/dbSyncService';
 import { useLanguage } from '../lib/LanguageContext';
 import IdentityHubSettings from './IdentityHubSettings';
+import UserApiKeyManager from './UserApiKeyManager';
 
 interface UserProfileProps {
   currentUser: UserType | null;
@@ -345,6 +346,9 @@ export default function UserProfile({
         currentUser={currentUser} 
         onUpdateCurrentUser={onUpdateCurrentUser} 
       />
+
+      {/* 3b. USER API KEYS MANAGER FOR AI MODELS */}
+      <UserApiKeyManager currentUser={currentUser} />
 
       {/* 4. PROFILE DETAILS & EDIT FORM */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
