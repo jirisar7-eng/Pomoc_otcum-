@@ -798,17 +798,16 @@ export default function App() {
 
             {/* Quick Links */}
             <div className="space-y-3">
-              <h4 className="text-xs uppercase font-bold tracking-wider text-slate-300">{t('footer_useful_sections', 'Užitečné sekce')}</h4>
+              <h4 className="text-xs uppercase font-bold tracking-wider text-slate-300">{t('footer_useful_sections', 'Užitečné sekce & Právní info')}</h4>
               <div className="grid grid-cols-2 gap-2 text-xs text-slate-400">
                 <button onClick={() => setActiveTab('opatrovnicka-agenda')} className="text-left hover:text-teal-400 transition-colors cursor-pointer">{t('nav_opatrovnicka_agenda', 'Opatrovnická agenda')}</button>
                 <button onClick={() => setActiveTab('ke-stazeni')} className="text-left hover:text-teal-400 transition-colors cursor-pointer">{t('nav_ke_stazeni', 'Vzory podání')}</button>
                 <button onClick={() => setActiveTab('plan-pece')} className="text-left hover:text-teal-400 transition-colors cursor-pointer">{t('nav_plan_pece', 'Plán péče')}</button>
-                <button onClick={() => setActiveTab('user-portal')} className="text-left hover:text-teal-400 transition-colors cursor-pointer">{t('nav_user_portal', 'Moje Pracovna')}</button>
-                <button onClick={() => { setActiveTab('sitemap'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="text-left hover:text-teal-400 font-bold text-teal-400 transition-colors cursor-pointer flex items-center gap-1 mt-1">
-                  📂 {t('btn_sitemap', 'Mapa stránek & Vývoj')}
-                </button>
-                <button onClick={() => setActiveTab('support')} className="text-left text-teal-400 hover:text-teal-300 font-bold transition-colors cursor-pointer flex items-center gap-1 mt-1">
-                  <Heart className="w-3.5 h-3.5 text-teal-400 animate-pulse" /> {t('btn_support', 'Podpořit chod webu')}
+                <button onClick={() => setActiveTab('user-portal')} className="text-left hover:text-teal-400 transition-colors cursor-pointer">{t('nav_user_portal', 'Můj portál')}</button>
+                <button onClick={() => setActiveTab('contacts')} className="text-left hover:text-teal-400 transition-colors cursor-pointer">Kontakt na autora</button>
+                <button onClick={() => openCookieConsentModal()} className="text-left hover:text-teal-400 transition-colors cursor-pointer">GDPR & Cookies</button>
+                <button onClick={() => { setActiveTab('sitemap'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="text-left hover:text-teal-400 font-bold text-teal-400 transition-colors cursor-pointer flex items-center gap-1 mt-1 col-span-2">
+                  📂 {t('btn_sitemap', 'Vývoj projektu (Tech Lab)')}
                 </button>
               </div>
             </div>
