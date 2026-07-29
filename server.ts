@@ -928,7 +928,7 @@ app.all(['/api/verify-code', '/api/verify-magic-link'], async (req, res) => {
       });
     }
 
-    const verificationResult = verifyServerCode(targetEmail, codeToVerify);
+    const verificationResult = await verifyServerCode(targetEmail, codeToVerify);
     if (!verificationResult.success) {
       console.warn(`[Express /api/verify-code] Neúspěšné ověření pro "${targetEmail}": ${verificationResult.error}`);
       return res.status(200).json({

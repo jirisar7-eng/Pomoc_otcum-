@@ -44,7 +44,7 @@ export default async function handler(req: any, res: any) {
       });
     }
 
-    const verificationResult = verifyServerCode(targetEmail, codeToVerify);
+    const verificationResult = await verifyServerCode(targetEmail, codeToVerify);
     if (!verificationResult.success) {
       console.warn(`[Handler /api/verify-code] Neúspěšné ověření pro "${targetEmail}": ${verificationResult.error}`);
       return res.status(200).json({

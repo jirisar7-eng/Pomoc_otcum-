@@ -80,6 +80,102 @@ export interface CodeStoreRecord {
 // Global server memory store for 6-digit verification codes (10 minutes validity)
 const verificationCodeStore = new Map<string, CodeStoreRecord>();
 
+function getFirebaseDbUrl(): string {
+  const url = process.env.FIREBASE_DATABASE_URL || 
+              process.env.VITE_FIREBASE_DATABASE_URL || 
+              process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL ||
+              'https://pomocotcum-default-rtdb.europe-west1.firebasedatabase.app';
+  return url.replace(/\/+$/, '');
+}
+
+/**
+ * Encodes an email address into a safe Firebase Realtime Database key string (hex encoded).
+ */
+export function encodeEmailKey(email: string): string {
+  const clean = email.toLowerCase().trim();
+  return Buffer.from(clean, 'utf-8').toString('hex');
+}
+
+/**
+ * Saves a verification code record to Firebase Realtime Database.
+ */
+async function saveCodeToFirebase(record: CodeStoreRecord): Promise<void> {
+  const dbUrl = getFirebaseDbUrl();
+  const key = encodeEmailKey(record.email);
+  const endpoint = `${dbUrl}/verification_codes/${key}.json`;
+
+  const response = await fetch(endpoint, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(record)
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text().catch(() => '');
+    throw new Error(`Firebase Realtime DB status ${response.status}: ${errorText || response.statusText}`);
+  }
+}
+
+/**
+ * Deletes a verification code record from Firebase Realtime Database.
+ */
+async function deleteCodeFromFirebase(email: string): Promise<void> {
+  try {
+    const dbUrl = getFirebaseDbUrl();
+    const key = encodeEmailKey(email);
+    const endpoint = `${dbUrl}/verification_codes/${key}.json`;
+    await fetch(endpoint, { method: 'DELETE' });
+  } catch (err) {
+    console.warn(`[Firebase Code Store Warning] Smazání kódu pro ${email} selhalo:`, err);
+  }
+}
+
+/**
+ * Updates attempts for a verification code record in Firebase Realtime Database.
+ */
+async function updateAttemptsInFirebase(email: string, attempts: number): Promise<void> {
+  try {
+    const dbUrl = getFirebaseDbUrl();
+    const key = encodeEmailKey(email);
+    const endpoint = `${dbUrl}/verification_codes/${key}.json`;
+    await fetch(endpoint, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ attempts })
+    });
+  } catch (err) {
+    console.warn(`[Firebase Code Store Warning] Aktualizace pokusů pro ${email} selhala:`, err);
+  }
+}
+
+/**
+ * Fetches a verification code record from Firebase Realtime Database.
+ */
+async function fetchCodeFromFirebase(email: string): Promise<CodeStoreRecord | null> {
+  try {
+    const dbUrl = getFirebaseDbUrl();
+    const key = encodeEmailKey(email);
+    const endpoint = `${dbUrl}/verification_codes/${key}.json`;
+
+    const response = await fetch(endpoint, { method: 'GET' });
+    if (!response.ok) return null;
+
+    const data = await response.json();
+    if (data && typeof data === 'object' && data.code && data.expiresAt) {
+      return {
+        email: data.email || email.toLowerCase().trim(),
+        code: String(data.code).trim(),
+        expiresAt: Number(data.expiresAt),
+        attempts: Number(data.attempts || 0)
+      };
+    }
+    return null;
+  } catch (err) {
+    console.warn(`[Firebase Code Store Fetch Error] Nepodařilo se načíst kód pro ${email}:`, err);
+    return null;
+  }
+}
+
 /**
  * Generates a random 6-digit numeric verification code (100000 - 999999)
  */
@@ -88,9 +184,9 @@ export function generateNumericCode(): string {
 }
 
 /**
- * Stores a verification code paired with email on the server with 10-minute TTL.
+ * Stores a verification code paired with email on the server & Firebase Realtime Database with 10-minute TTL.
  */
-export function storeVerificationCode(email: string, code?: string, ttlMinutes = 10): CodeStoreRecord {
+export async function storeVerificationCode(email: string, code?: string, ttlMinutes = 10): Promise<CodeStoreRecord> {
   const lowerEmail = email.toLowerCase().trim();
   const finalCode = (code && /^\d{6}$/.test(code.trim())) ? code.trim() : generateNumericCode();
   const record: CodeStoreRecord = {
@@ -99,18 +195,41 @@ export function storeVerificationCode(email: string, code?: string, ttlMinutes =
     expiresAt: Date.now() + ttlMinutes * 60 * 1000,
     attempts: 0,
   };
+
+  // 1. Local memory store
   verificationCodeStore.set(lowerEmail, record);
-  console.log(`[Server Code Store] Uložen 6místný kód ${finalCode} pro ${lowerEmail} (platnost ${ttlMinutes} min, do ${new Date(record.expiresAt).toLocaleTimeString('cs-CZ')}).`);
+
+  // 2. Firebase Realtime Database store with explicit try-catch error boundary
+  try {
+    await saveCodeToFirebase(record);
+    console.log(`[Firebase Code Store] Uložen 6místný kód ${finalCode} pro ${lowerEmail} v Firebase Realtime Database.`);
+  } catch (dbErr: any) {
+    console.error(`[Firebase Code Store Error] Zápis kódu do Firebase pro ${lowerEmail} selhal:`, dbErr?.message || dbErr);
+    verificationCodeStore.delete(lowerEmail);
+    throw new Error(`Nepodařilo se uložit ověřovací kód do databáze (${dbErr?.message || 'DB Error'}). E-mail nebyl odeslán.`);
+  }
+
   return record;
 }
 
 /**
- * Verifies user-entered 6-digit code against stored server code.
+ * Verifies user-entered 6-digit code against stored server & Firebase Realtime Database code.
  */
-export function verifyServerCode(email: string, code: string): { success: boolean; error?: string } {
+export async function verifyServerCode(email: string, code: string): Promise<{ success: boolean; error?: string }> {
   const lowerEmail = email.toLowerCase().trim();
   const cleanCode = (code || '').trim();
-  const record = verificationCodeStore.get(lowerEmail);
+
+  // 1. Check local memory store
+  let record = verificationCodeStore.get(lowerEmail);
+
+  // 2. Fallback to Firebase Realtime Database if missing or expired in local memory
+  if (!record || Date.now() > record.expiresAt) {
+    const remoteRecord = await fetchCodeFromFirebase(lowerEmail);
+    if (remoteRecord) {
+      record = remoteRecord;
+      verificationCodeStore.set(lowerEmail, record);
+    }
+  }
 
   if (!record) {
     return {
@@ -121,6 +240,7 @@ export function verifyServerCode(email: string, code: string): { success: boolea
 
   if (Date.now() > record.expiresAt) {
     verificationCodeStore.delete(lowerEmail);
+    await deleteCodeFromFirebase(lowerEmail);
     return {
       success: false,
       error: 'Platnost ověřovacího kódu vypršela (platnost je 10 minut). Nechte si poslat nový kód.'
@@ -129,6 +249,7 @@ export function verifyServerCode(email: string, code: string): { success: boolea
 
   if (record.attempts >= 5) {
     verificationCodeStore.delete(lowerEmail);
+    await deleteCodeFromFirebase(lowerEmail);
     return {
       success: false,
       error: 'Byl překročen maximální počet pokusů. Z bezpečnostních důvodů si vyžádejte nový kód.'
@@ -137,6 +258,8 @@ export function verifyServerCode(email: string, code: string): { success: boolea
 
   if (record.code !== cleanCode && cleanCode !== 'DIRECT_CLICK') {
     record.attempts += 1;
+    verificationCodeStore.set(lowerEmail, record);
+    await updateAttemptsInFirebase(lowerEmail, record.attempts);
     const remaining = 5 - record.attempts;
     return {
       success: false,
@@ -146,6 +269,7 @@ export function verifyServerCode(email: string, code: string): { success: boolea
 
   // Verification successful! Remove code so it cannot be reused.
   verificationCodeStore.delete(lowerEmail);
+  await deleteCodeFromFirebase(lowerEmail);
   return { success: true };
 }
 
@@ -586,14 +710,22 @@ export async function sendEmail({ to, type, data, fromName }: SendEmailOptions):
     };
   }
 
-  // If sending login verification code, automatically ensure it's saved in server store with 10-min validity
+  // If sending login verification code, automatically ensure it's saved in server store & Firebase Realtime Database with 10-min validity
   if (type === 'MAGIC_LINK' || type === 'AUTH_CODE') {
     const codeToStore = (data?.code && /^\d{6}$/.test(String(data.code).trim()))
       ? String(data.code).trim()
       : undefined;
-    const storedRecord = storeVerificationCode(recipient, codeToStore, 10);
-    if (!data) data = {};
-    data.code = storedRecord.code;
+    try {
+      const storedRecord = await storeVerificationCode(recipient, codeToStore, 10);
+      if (!data) data = {};
+      data.code = storedRecord.code;
+    } catch (saveError: any) {
+      console.error(`[WEDOS SMTP Error] Selhalo uložení kódu do databáze pro ${recipient}:`, saveError);
+      return {
+        success: false,
+        error: saveError?.message || 'Chyba při ukládání ověřovacího kódu do databáze. E-mail nebyl odeslán.'
+      };
+    }
   }
 
   const { subject, html } = generateEmailHtml(type, data);
