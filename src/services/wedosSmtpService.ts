@@ -1,2 +1,2 @@
-export * from '../../api/_wedosSmtp';
+export * from '../../api/_wedosSmtp.js';
 

@@ -1,4 +1,4 @@
-import { sendEmail, validateEmailFormat, generateNumericCode } from './_wedosSmtp';
+import { sendEmail, validateEmailFormat, generateNumericCode } from './_wedosSmtp.js';
 
 export interface WedosEmailResult {
   success: boolean;

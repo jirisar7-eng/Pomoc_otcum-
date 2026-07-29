@@ -1,4 +1,4 @@
-import { sendEmail, validateEmailFormat } from './_wedosSmtp';
+import { sendEmail, validateEmailFormat } from './_wedosSmtp.js';
 
 export default async function handler(req: any, res: any) {
   // CORS Headers for Vercel Serverless Functions
