@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Sparkles, Scale, Heart, Shield, BookOpen, ExternalLink, Server } from 'lucide-react';
+import { Sparkles, Scale, Heart, Shield, BookOpen, ExternalLink, Server, Share2 } from 'lucide-react';
 
 import { User, Article, ExperienceStory, ForumPost, Comment, Donation, Partner } from './types';
 import { 
@@ -812,6 +812,20 @@ export default function App() {
               <p className="text-slate-400 text-xs leading-relaxed max-w-sm">
                 {t('brand_mission')}
               </p>
+              
+              {/* Official Facebook Group Link */}
+              <div className="pt-1">
+                <a
+                  href="https://www.facebook.com/share/g/19HoPx33mn/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/40 text-blue-300 hover:text-blue-200 text-xs font-bold rounded-xl transition-all cursor-pointer"
+                >
+                  <Share2 className="w-3.5 h-3.5 text-blue-400" />
+                  <span>Oficiální Facebook Skupina</span>
+                  <ExternalLink className="w-3 h-3 text-blue-400" />
+                </a>
+              </div>
             </div>
 
             {/* Quick Links */}

@@ -22,7 +22,10 @@ import {
   UserCheck, 
   Compass, 
   Wrench, 
-  FileText 
+  FileText,
+  ExternalLink,
+  Share2,
+  Users
 } from 'lucide-react';
 
 interface KontaktSectionProps {
@@ -228,6 +231,28 @@ export default function KontaktSection({ currentUser, onOpenAuth, setActiveTab }
                       )}
                     </div>
                   )}
+                </div>
+
+                {/* Official Facebook Group Card */}
+                <div className="p-4 bg-gradient-to-br from-blue-900 via-indigo-950 to-slate-900 rounded-2xl border border-blue-500/40 text-white space-y-2.5 shadow-md">
+                  <div className="flex items-center gap-2">
+                    <Share2 className="w-4 h-4 text-blue-300 shrink-0" />
+                    <span className="text-[10px] font-mono uppercase font-bold text-blue-200">
+                      Oficiální Facebook Skupina Portálu
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-200 leading-relaxed font-sans">
+                    Skupina určená pro vzájemnou pomoc rodičů a rozšíření obsahu portálu <strong>Táta má právo</strong> na sociální sítě.
+                  </p>
+                  <a
+                    href="https://www.facebook.com/share/g/19HoPx33mn/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full py-2 px-3 bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-xs rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
+                  >
+                    <span>Navštívit Facebook skupinu</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
                 </div>
 
               </div>

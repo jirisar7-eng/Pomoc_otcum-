@@ -302,11 +302,23 @@ export const INITIAL_PARTNERS: Partner[] = [
     createdAt: new Date().toISOString()
   },
   {
+    id: 'p-fb-group',
+    name: 'Oficiální Facebook skupina • Táta má právo',
+    description: 'Oficiální skupina náležící nášemu portálu jako rozšíření obsahu na sociální sítě. Konzultační a komunitní prostor pro rodiče v náročných životních situacích – rozvod, OSPOD, péče o děti a vzájemná podpora.',
+    logoUrl: '',
+    link: 'https://www.facebook.com/share/g/19HoPx33mn/',
+    category: 'Poradna',
+    region: 'Celá ČR / Facebook',
+    isRecommended: true,
+    showOnMainPage: true,
+    createdAt: new Date().toISOString()
+  },
+  {
     id: 'p-1',
-    name: 'Poradna pro tátu',
+    name: 'Poradna pro tátu (Facebook Stránka)',
     description: 'Konzultační a zpravodajská činnost pro rodiče v náročných životních situacích – rozvod, rozchod, OSPOD, soudy, advokáti i další odborníci.',
     logoUrl: '',
-    link: 'https://www.facebook.com/share/1AuWrz6fLY/',
+    link: 'https://www.facebook.com/share/g/19HoPx33mn/',
     category: 'Poradna',
     region: 'Celá ČR / Online',
     isRecommended: true,

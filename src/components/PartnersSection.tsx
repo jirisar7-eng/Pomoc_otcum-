@@ -55,7 +55,7 @@ export default function PartnersSection({ partners = [] }: PartnersSectionProps)
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* VEDOS Banner */}
           <div className="bg-gradient-to-br from-slate-900 via-slate-850 to-teal-950 rounded-3xl border-2 border-teal-500/40 p-6 text-white shadow-xl relative overflow-hidden flex flex-col justify-between space-y-4" id="vedos-official-sponsor-banner">
             <div className="absolute -top-10 -right-10 w-48 h-48 bg-teal-500/10 rounded-full blur-2xl pointer-events-none" />
@@ -150,6 +150,48 @@ export default function PartnersSection({ partners = [] }: PartnersSectionProps)
                 <ExternalLink className="w-3.5 h-3.5" />
               </a>
               <span className="text-[10px] text-slate-400 font-mono">Česko / Ktiš</span>
+            </div>
+          </div>
+
+          {/* Facebook Group Banner */}
+          <div className="bg-gradient-to-br from-slate-900 via-indigo-950 to-blue-950 rounded-3xl border-2 border-indigo-500/40 p-6 text-white shadow-xl relative overflow-hidden flex flex-col justify-between space-y-4" id="facebook-group-sponsor-banner">
+            <div className="absolute -top-10 -right-10 w-48 h-48 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none" />
+            <div className="space-y-3 relative z-10">
+              <div className="flex items-start gap-3.5">
+                <div className="w-14 h-14 rounded-2xl bg-blue-600 text-white shadow-md border border-blue-400 shrink-0 flex items-center justify-center font-bold text-2xl font-mono">
+                  fb
+                </div>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-[9px] font-mono font-bold uppercase px-2 py-0.5 rounded-full flex items-center gap-1">
+                      <Share2 className="w-3 h-3 text-indigo-400" />
+                      Oficiální Skupina
+                    </span>
+                    <span className="bg-emerald-400/20 text-emerald-300 border border-emerald-400/30 text-[9px] font-mono font-bold uppercase px-2 py-0.5 rounded-full">
+                      ★ Rozšíření obsahu
+                    </span>
+                  </div>
+                  <h3 className="text-lg font-black font-display text-white leading-tight">
+                    Facebook Komunita
+                  </h3>
+                </div>
+              </div>
+              <p className="text-slate-300 text-xs leading-relaxed">
+                Oficiální skupina určená pro táty i mámy v opatrovnických situacích. Komunitní diskuse, sdílení rád a rozšíření obsahu portálu <strong>Táta má právo</strong> na sociální sítě.
+              </p>
+            </div>
+
+            <div className="pt-3 flex items-center justify-between border-t border-slate-800 relative z-10">
+              <a
+                href="https://www.facebook.com/share/g/19HoPx33mn/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-2 bg-indigo-500 hover:bg-indigo-400 text-white font-extrabold text-xs rounded-xl transition-all shadow-md flex items-center gap-1.5 cursor-pointer"
+              >
+                <span>Připojit se ke skupině</span>
+                <ExternalLink className="w-3.5 h-3.5" />
+              </a>
+              <span className="text-[10px] text-slate-400 font-mono">Facebook Group</span>
             </div>
           </div>
         </div>
