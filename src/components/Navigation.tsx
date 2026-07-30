@@ -24,6 +24,7 @@ import {
   FileText,
   Tv,
   Users,
+  Bug,
   PhoneCall,
   MessageSquare,
   Briefcase,
@@ -942,7 +943,7 @@ export default function Navigation({
                             className="flex items-center gap-2 p-2 bg-white hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 cursor-pointer"
                           >
                             <Users className="w-4 h-4 text-slate-600 shrink-0" />
-                            <span className="truncate">🤝 Partneři</span>
+                            <span className="truncate">🤝 Sponzoři & Partneři</span>
                           </button>
 
                           <button
@@ -954,16 +955,41 @@ export default function Navigation({
                           </button>
                         </div>
 
-                        <button
-                          onClick={() => handleTabClick('contacts')}
-                          className="w-full flex items-center justify-between p-2 bg-white hover:bg-slate-100 border border-slate-200 rounded-xl text-left transition-all cursor-pointer"
-                        >
-                          <div className="flex items-center gap-2 min-w-0">
+                        <div className="grid grid-cols-2 gap-2">
+                          <button
+                            onClick={() => handleTabClick('rights')}
+                            className="flex items-center gap-2 p-2 bg-white hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 cursor-pointer"
+                          >
+                            <Scale className="w-4 h-4 text-amber-600 shrink-0" />
+                            <span className="truncate">⚖️ Podmínky užívání</span>
+                          </button>
+
+                          <button
+                            onClick={() => handleTabClick('sitemap')}
+                            className="flex items-center gap-2 p-2 bg-white hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 cursor-pointer"
+                          >
+                            <Compass className="w-4 h-4 text-sky-600 shrink-0" />
+                            <span className="truncate">🗺️ Mapa stránek</span>
+                          </button>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2">
+                          <button
+                            onClick={() => handleTabClick('contacts')}
+                            className="flex items-center gap-2 p-2 bg-white hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 cursor-pointer"
+                          >
                             <Mail className="w-4 h-4 text-teal-600 shrink-0" />
-                            <span className="text-xs font-bold text-slate-900 truncate">✉️ Kontakt na autora projektu</span>
-                          </div>
-                          <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
-                        </button>
+                            <span className="truncate">✉️ Kontakt</span>
+                          </button>
+
+                          <button
+                            onClick={() => handleTabClick('tickets')}
+                            className="flex items-center gap-2 p-2 bg-white hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 cursor-pointer"
+                          >
+                            <Bug className="w-4 h-4 text-amber-600 shrink-0" />
+                            <span className="truncate">🎫 Ticket systém</span>
+                          </button>
+                        </div>
                       </div>
                     )}
                   </div>

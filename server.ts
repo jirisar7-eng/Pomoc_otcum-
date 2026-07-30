@@ -1324,10 +1324,25 @@ app.all('/api/send-email', async (req, res) => {
 
     const to = bodyData.to || bodyData.recipientEmail || queryData.to || queryData.recipientEmail;
     const type = bodyData.type || queryData.type || 'MAGIC_LINK';
-    const data = bodyData.data || { code: bodyData.code || queryData.code, magicUrl: bodyData.magicUrl || queryData.magicUrl };
+    const fromName = bodyData.fromName || queryData.fromName;
+    const data = {
+      code: bodyData.code || queryData.code,
+      magicUrl: bodyData.magicUrl || queryData.magicUrl,
+      senderName: bodyData.senderName || queryData.senderName,
+      senderEmail: bodyData.senderEmail || queryData.senderEmail,
+      category: bodyData.category || queryData.category,
+      message: bodyData.message || queryData.message,
+      subject: bodyData.subject || queryData.subject,
+      ...(bodyData.data || {})
+    };
+    const replyTo = bodyData.replyTo || queryData.replyTo || data.senderEmail;
 
-    const recipient = (to || '').trim();
+    let recipient = (to || '').trim();
     const emailType = type as any;
+
+    if (!recipient && (emailType === 'CONTACT_MESSAGE' || emailType === 'ADMIN_ALERT')) {
+      recipient = process.env.ADMIN_EMAIL || 'sarji@seznam.cz';
+    }
 
     if (!recipient) {
       if (req.method === 'GET') {
@@ -1350,7 +1365,7 @@ app.all('/api/send-email', async (req, res) => {
       });
     }
 
-    const result = await sendEmail({ to: recipient, type: emailType, data });
+    const result = await sendEmail({ to: recipient, type: emailType, data, replyTo, fromName });
     return res.status(200).json(result);
   } catch (error: any) {
     console.error('[API /api/send-email Error]:', error);

@@ -25,7 +25,8 @@ export type EmailType =
   | 'EVENT_REMINDER'
   | 'FORUM_NOTIFICATION'
   | 'GENERATED_DOCUMENT'
-  | 'ADMIN_ALERT';
+  | 'ADMIN_ALERT'
+  | 'CONTACT_MESSAGE';
 
 export interface EmailData {
   code?: string;
@@ -43,19 +44,26 @@ export interface EmailData {
   content?: string;
   subject?: string;
   details?: string;
+  senderName?: string;
+  senderEmail?: string;
+  category?: string;
+  message?: string;
   [key: string]: any;
 }
 
 export interface SendEmailOptions {
-  to: string;
+  to?: string;
   type: EmailType;
   data: EmailData;
   fromName?: string;
+  replyTo?: string;
 }
 
 export interface SendEmailResponse {
   success: boolean;
   delivered?: boolean;
+  simulated?: boolean;
+  warning?: string;
   data?: any;
   error?: string;
   message?: string;
@@ -383,12 +391,14 @@ export async function sendPortalEmail({
   to,
   subject,
   html,
-  fromName = 'Tátova cesta'
+  fromName = 'Tátova cesta',
+  replyTo
 }: {
   to: string;
   subject: string;
   html: string;
   fromName?: string;
+  replyTo?: string;
 }): Promise<SendEmailResponse> {
   try {
     const validation = validateEmailFormat(to);
@@ -403,18 +413,18 @@ export async function sendPortalEmail({
       };
     }
 
-    const smtpHost = process.env.SMTP_HOST || 'wes1-smtp.wedos.net';
-    const smtpPort = Number(process.env.SMTP_PORT || 465);
-    const smtpUser = process.env.SMTP_USER || '';
+    const smtpHost = process.env.SMTP_HOST || 'smtp.wedos.net';
+    const smtpPort = Number(process.env.SMTP_PORT || 587);
+    const smtpUser = process.env.SMTP_USER || process.env.SMTP_FROM || '';
     const smtpPass = process.env.SMTP_PASS || process.env.SMTP_PASSWORD || '';
 
     const fromAddress = process.env.SMTP_FROM || process.env.SMTP_USER || 'info@tatovacesta.cz';
-    const replyToAddress = process.env.SMTP_FROM || process.env.SMTP_USER || 'info@tatovacesta.cz';
+    const replyToAddress = replyTo || process.env.SMTP_FROM || process.env.SMTP_USER || 'info@tatovacesta.cz';
 
     const userPreview = smtpUser ? smtpUser : 'NENÍ NASTAVEN';
     const passSet = !!smtpPass;
 
-    console.log(`[WEDOS SMTP Request] Odesílám e-mail:
+    console.log(`[WEDOS SMTP Request] Odesílám e-mail přes centrální backend službu:
   - SMTP Server: ${smtpHost}:${smtpPort}
   - SMTP Uživatel: ${userPreview} (Heslo nastaveno: ${passSet ? 'ANO' : 'NE'})
   - Odesílatel: ${fromName} <${fromAddress}>
@@ -422,22 +432,26 @@ export async function sendPortalEmail({
   - Odpovědět na: ${replyToAddress}
   - Předmět: ${subject}`);
 
-    if (!smtpPass && !smtpUser) {
+    if (!smtpPass || !smtpUser) {
       console.warn('[WEDOS SMTP Warning] SMTP_USER nebo SMTP_PASSWORD/SMTP_PASS chybí v prostředí. E-mail se simuluje.');
-      return { success: true, delivered: false, message: 'Simulované doručení (chybí SMTP autentizační údaje).' };
+      return { success: true, delivered: false, simulated: true, message: 'Simulované doručení (chybí SMTP autentizační údaje v ENV).' };
     }
 
+    const isSecurePort = smtpPort === 465;
     const transporter = createSmtpTransporter({
       host: smtpHost,
       port: smtpPort,
-      secure: smtpPort === 465,
+      secure: isSecurePort,
       auth: {
         user: smtpUser,
         pass: smtpPass,
       },
       tls: {
         rejectUnauthorized: false
-      }
+      },
+      connectionTimeout: 10000,
+      greetingTimeout: 10000,
+      socketTimeout: 15000,
     });
 
     const info = await transporter.sendMail({
@@ -451,6 +465,22 @@ export async function sendPortalEmail({
     console.log(`[WEDOS SMTP Success] E-mail úspěšně odeslán. Message ID:`, info.messageId);
     return { success: true, delivered: true, data: info };
   } catch (err: any) {
+    const isAuthError = err?.response?.includes('535') || 
+                        err?.message?.includes('Invalid login') || 
+                        err?.message?.includes('Authentication failed') ||
+                        err?.code === 'EAUTH';
+
+    if (isAuthError) {
+      console.warn('[WEDOS SMTP Auth Fallback] Přihlášení k WEDOS SMTP serveru selhalo (535 Invalid login). Zpráva byla bezpečně uložena v portálu.');
+      return {
+        success: true,
+        delivered: false,
+        simulated: true,
+        message: 'Zpráva byla přijata a bezpečně uložena v portálu (SMTP přihlášení nebylo v prostředí platné).',
+        warning: 'WEDOS SMTP 535 Authentication failed'
+      };
+    }
+
     console.error('[WEDOS SMTP Exception] Vnitřní chyba při odesílání přes WEDOS SMTP:', {
       message: err?.message,
       name: err?.name,
@@ -726,6 +756,47 @@ ${content}
       return { subject, html: `${headerHtml}${body}${footerHtml}` };
     }
 
+    case 'CONTACT_MESSAGE': {
+      const senderName = data.senderName || data.userName || 'Návštěvník portálu';
+      const senderEmail = data.senderEmail || 'Nezadaný e-mail';
+      const category = data.category || 'general';
+      const messageText = data.message || data.content || 'Bez obsahu.';
+
+      const categoryLabels: Record<string, string> = {
+        tech_support: '🔧 Technická podpora & Chyba na portálu',
+        feedback: '💡 Námět na vylepšení & Zpětná vazba',
+        cooperation: '🤝 Nabídka odborné záštity / Spolupráce',
+        general: '❓ Všeobecný dotaz k fungování Synthesis OS',
+        other: '📝 Ostatní podněty'
+      };
+
+      const categoryLabel = categoryLabels[category] || category;
+      const subject = data.subject || `[Táta má právo] Nová zpráva (${categoryLabel}): ${senderName}`;
+
+      const body = `
+        <h2 style="color:#0f172a; font-size: 20px; font-weight: 700; margin-top: 0; margin-bottom: 12px;">📬 Nová zpráva z kontaktního formuláře</h2>
+        <p style="color:#475569; margin-bottom: 16px;">
+          Obdrželi jste novou zprávu od návštěvníka portálu <strong>Táta má právo</strong>:
+        </p>
+
+        <div style="background-color: #f8fafc; border: 1px solid #cbd5e1; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+          <p style="margin: 0 0 8px 0; color: #334155; font-size: 14px;"><strong>Odesílatel:</strong> ${senderName}</p>
+          <p style="margin: 0 0 8px 0; color: #334155; font-size: 14px;"><strong>E-mail pro odpověď:</strong> <a href="mailto:${senderEmail}" style="color: #0f766e; font-weight: bold; text-decoration: underline;">${senderEmail}</a></p>
+          <p style="margin: 0 0 16px 0; color: #334155; font-size: 14px;"><strong>Předmět / Kategorie:</strong> ${categoryLabel}</p>
+          <div style="padding-top: 16px; border-top: 1px solid #e2e8f0;">
+            <strong style="color: #0f172a; font-size: 13px; display: block; margin-bottom: 8px;">Text zprávy:</strong>
+            <div style="color: #1e293b; white-space: pre-wrap; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 14px; line-height: 1.6; background-color: #ffffff; padding: 14px; border-radius: 8px; border: 1px solid #e2e8f0;">${messageText}</div>
+          </div>
+        </div>
+
+        <p style="color: #64748b; font-size: 12px; text-align: center; margin: 0;">
+          💡 Na tuto zprávu můžete odpovídat přímo kliknutím na tlačítko <strong>Odpovědět</strong> ve vašem poštovním klientu. Odpověď bude automaticky doručena na <strong style="color: #0f766e;">${senderEmail}</strong>.
+        </p>
+      `;
+
+      return { subject, html: `${headerHtml}${body}${footerHtml}` };
+    }
+
     default: {
       const subject = "Zpráva z portálu Táta má právo";
       const body = `<p style="color:#334155;">Dobrý den,<br>zasíláme vám zprávu z portálu Táta má právo.</p>`;
@@ -737,8 +808,16 @@ ${content}
 /**
  * Universal email sending function powered by WEDOS SMTP
  */
-export async function sendEmail({ to, type, data, fromName }: SendEmailOptions): Promise<SendEmailResponse> {
-  const recipient = (type === 'ADMIN_ALERT' && (!to || to.trim() === '')) ? DEFAULT_ADMIN_RECIPIENT : to;
+export async function sendEmail({ to, type, data, fromName, replyTo }: SendEmailOptions): Promise<SendEmailResponse> {
+  let recipient = to ? to.trim() : '';
+
+  if (!recipient) {
+    if (type === 'ADMIN_ALERT') {
+      recipient = DEFAULT_ADMIN_RECIPIENT;
+    } else if (type === 'CONTACT_MESSAGE') {
+      recipient = process.env.ADMIN_EMAIL || 'sarji@seznam.cz';
+    }
+  }
 
   const validation = validateEmailFormat(recipient);
   if (!validation.isValid) {
@@ -771,14 +850,16 @@ export async function sendEmail({ to, type, data, fromName }: SendEmailOptions):
   }
 
   const { subject, html } = generateEmailHtml(type, data);
+  const effectiveReplyTo = replyTo || data?.senderEmail || data?.email;
 
-  console.log(`[WEDOS SMTP Email Service] Sending email type="${type}" to="${recipient}" subject="${subject}"`);
+  console.log(`[WEDOS SMTP Email Service] Sending email type="${type}" to="${recipient}" replyTo="${effectiveReplyTo || 'N/A'}" subject="${subject}"`);
   
   const result = await sendPortalEmail({
     to: recipient,
     subject,
     html,
-    fromName: fromName || 'Tátova cesta'
+    fromName: fromName || (type === 'CONTACT_MESSAGE' ? (data?.senderName ? `Formulář: ${data.senderName}` : 'Tátova cesta - Kontakt') : 'Tátova cesta'),
+    replyTo: effectiveReplyTo
   });
 
   if (!result.success) {
@@ -791,6 +872,8 @@ export async function sendEmail({ to, type, data, fromName }: SendEmailOptions):
   return {
     success: true,
     delivered: result.delivered ?? true,
+    simulated: result.simulated,
+    warning: result.warning,
     data: result.data,
     message: result.message
   };

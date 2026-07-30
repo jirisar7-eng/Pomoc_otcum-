@@ -858,17 +858,23 @@ export default function SupportSection({
           </div>
 
           {/* Official Infrastructure Sponsors Notice */}
-          <div className="bg-gradient-to-r from-slate-900 via-slate-850 to-teal-950 border border-teal-500/30 rounded-2xl p-5 text-white shadow-lg flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <Shield className="w-4 h-4 text-teal-400" />
-                <span className="text-[10px] uppercase font-mono font-bold text-teal-400">Oficiální sponzoři infrastruktury</span>
+          <div className="bg-gradient-to-r from-slate-900 via-slate-850 to-teal-950 border-2 border-teal-500/40 rounded-2xl p-5 md:p-6 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-5 relative overflow-hidden">
+            <div className="absolute -right-10 -bottom-10 w-48 h-48 bg-teal-500/10 rounded-full blur-2xl pointer-events-none" />
+            <div className="space-y-1.5 relative z-10">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="bg-teal-500/20 text-teal-300 border border-teal-500/40 text-[9px] font-mono font-bold uppercase px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                  <Shield className="w-3.5 h-3.5 text-teal-400" />
+                  Infrastruktura 100% Pokryta Sponzory
+                </span>
+                <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[9px] font-mono font-bold uppercase px-2 py-0.5 rounded-full">
+                  ✓ Generální Sponzoři
+                </span>
               </div>
-              <h4 className="text-sm font-bold text-white font-display">
-                Sponzorováno společnostmi ALGOTECH (Cloud VPS), VEDOS (Webhosting) a FORPSI (Doména)
+              <h4 className="text-base font-extrabold text-white font-display">
+                Děkujeme společnostem ALGOTECH, VEDOS a FORPSI!
               </h4>
               <p className="text-xs text-slate-300 leading-relaxed max-w-2xl">
-                Veškeré podrobné sponzorské profily a certifikáty našich partnerských organizací jsou odteď centralizovány v oficiální sekci <strong>Spolupracující partneři & sponzoři</strong>.
+                Díky sponzorskému daru od <strong>ALGOTECH a.s.</strong> (Cloud VPS), <strong>VEDOS Internet, a.s.</strong> (Webhosting NoLimit) a <strong>FORPSI</strong> (Registrace domény) je veškeré technické zázemí portálu plně zabezpečeno na nejvyšší profesionální úrovni.
               </p>
             </div>
             <a
@@ -878,9 +884,9 @@ export default function SupportSection({
                 const btn = document.querySelector('[data-tab="partners"]') as HTMLElement;
                 if (btn) btn.click();
               }}
-              className="px-4 py-2 bg-teal-500 hover:bg-teal-400 text-slate-950 font-extrabold text-xs rounded-xl transition-all shrink-0 flex items-center gap-1.5 shadow-md cursor-pointer whitespace-nowrap"
+              className="px-5 py-2.5 bg-teal-500 hover:bg-teal-400 text-slate-950 font-extrabold text-xs rounded-xl transition-all shrink-0 flex items-center gap-1.5 shadow-md cursor-pointer whitespace-nowrap hover:scale-105 relative z-10"
             >
-              <span>Otevřít sekci Sponzoři</span>
+              <span>Zobrazit profil sponzorů</span>
               <ArrowUpRight className="w-4 h-4" />
             </a>
           </div>
@@ -1027,53 +1033,60 @@ export default function SupportSection({
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Card 1: Cloud VPS Secured */}
+              <div className="bg-emerald-50/50 border-2 border-emerald-400 p-5 rounded-2xl shadow-3xs space-y-3 flex flex-col justify-between">
+                <div className="space-y-2">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-800">
+                    <CheckCircle className="w-4.5 h-4.5 text-emerald-700" />
+                  </div>
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <h4 className="text-xs font-bold text-emerald-950 font-display">1. Cloud VPS Infrastruktura</h4>
+                    <span className="text-[9px] bg-emerald-200 text-emerald-900 font-mono font-bold px-1.5 py-0.5 rounded">SPLNĚNO ✓</span>
+                  </div>
+                  <p className="text-[11px] text-emerald-900 leading-relaxed">
+                    Vysokovýkonný Cloud VPS server pro bezpečný chod backendových mikroslužeb a databáze byl <strong>plně poskytnut společností ALGOTECH a.s.</strong>
+                  </p>
+                </div>
+                <div className="pt-2 border-t border-emerald-200/80 mt-1 flex justify-between items-center">
+                  <span className="text-[11px] font-bold text-emerald-900 font-mono">ALGOTECH a.s.</span>
+                  <span className="text-[10px] text-emerald-800 font-extrabold">Pokryto Sponzorem ★</span>
+                </div>
+              </div>
+
+              {/* Card 2: AI & API Support */}
               <div className="bg-amber-50/40 border-2 border-amber-300 p-5 rounded-2xl shadow-3xs space-y-3 flex flex-col justify-between">
                 <div className="space-y-2">
                   <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center text-amber-800">
-                    <Server className="w-4.5 h-4.5 text-amber-900" />
+                    <Cpu className="w-4.5 h-4.5 text-amber-900" />
                   </div>
-                  <div className="flex items-center gap-1.5">
-                    <h4 className="text-xs font-bold text-amber-950 font-display">1. Sponzor pro VPS server</h4>
-                    <span className="text-[9px] bg-amber-200 text-amber-900 font-mono font-bold px-1.5 py-0.5 rounded">HLAVNÍ CÍL</span>
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <h4 className="text-xs font-bold text-amber-950 font-display">2. AI Asistent & API Tokeny</h4>
+                    <span className="text-[9px] bg-amber-200 text-amber-900 font-mono font-bold px-1.5 py-0.5 rounded">AKTIVNÍ CÍL 🎯</span>
                   </div>
                   <p className="text-[11px] text-slate-700 leading-relaxed">
-                    Poskytnutí nebo zafinancování pronájmu českého VPS serveru (cca 250 Kč / měsíčně neboli 3 000 Kč / rok) pro nezávislý chod Node.js backendu a databáze.
+                    Financování provozu Gemini API pro bezplatné generování právních rozborů, rychlé analýzy rozsudků a asistenci tátům v reálném čase.
                   </p>
                 </div>
                 <div className="pt-2 border-t border-amber-200/60 mt-1 flex justify-between items-center">
-                  <span className="text-[11px] font-bold text-amber-900 font-mono">~ 3 000 Kč / rok</span>
-                  <span className="text-[10px] text-amber-800 font-bold">Hledáme sponzora 🎯</span>
+                  <span className="text-[11px] font-bold text-amber-900 font-mono">Provoz Gemini API</span>
+                  <span className="text-[10px] text-amber-800 font-bold">Hledáme dárce / sponzory 💖</span>
                 </div>
               </div>
 
-              <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-3xs space-y-3 flex flex-col justify-between">
-                <div className="space-y-2">
-                  <div className="w-8 h-8 rounded-lg bg-teal-50 flex items-center justify-center text-teal-600">
-                    <Cpu className="w-4.5 h-4.5" />
-                  </div>
-                  <h4 className="text-xs font-bold text-slate-850 font-display">2. Dárci na podporu projektu</h4>
-                  <p className="text-[11px] text-slate-500 leading-relaxed">
-                    Drobná finanční podpora od dárců na krytí provozu AI asistenta (Gemini API tokeny), psaní nových právních článků a přípravu bezplatných vzorů podání.
-                  </p>
-                </div>
-                <div className="pt-2 border-t border-slate-100 mt-1 flex justify-between items-center">
-                  <span className="text-[11px] font-bold text-teal-800 font-mono">Libovolný dar</span>
-                  <span className="text-[10px] text-teal-700 font-bold">Hledáme dárce 💖</span>
-                </div>
-              </div>
-
+              {/* Card 3: Legal counsel */}
               <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-3xs space-y-3 flex flex-col justify-between">
                 <div className="space-y-2">
                   <div className="w-8 h-8 rounded-lg bg-teal-50 flex items-center justify-center text-teal-600">
                     <Shield className="w-4.5 h-4.5" />
                   </div>
-                  <h4 className="text-xs font-bold text-slate-850 font-display">3. Právní &amp; Odborná záštita</h4>
+                  <h4 className="text-xs font-bold text-slate-850 font-display">3. Právní & Odborná záštita</h4>
                   <p className="text-[11px] text-slate-500 leading-relaxed">
                     Propojení s advokáty, rodinnými mediátory a psychology pro konzultace a revize vzorů podání pro táty v nouzi.
                   </p>
                 </div>
-                <div className="pt-2 border-t border-slate-100 mt-1">
+                <div className="pt-2 border-t border-slate-100 mt-1 flex justify-between items-center">
                   <span className="text-[11px] font-bold text-teal-800 font-mono">Odborné partnerství</span>
+                  <span className="text-[10px] text-teal-700 font-bold">Spolupráce 🤝</span>
                 </div>
               </div>
             </div>

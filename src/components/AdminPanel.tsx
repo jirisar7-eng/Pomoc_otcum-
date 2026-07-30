@@ -11,7 +11,7 @@ import {
   Database, Copy, RefreshCw, Play, Sparkles, LayoutDashboard,
   Scale, Folder, Briefcase, Camera, Video, Mic, MessageCircle,
   UserCheck, Users, Calendar, Cpu, BarChart2, Paintbrush, Search,
-  Sliders, Settings, Activity, FileCode, Share2, Download, ArrowUp, ArrowDown, Tv, Github,
+  Sliders, Settings, Activity, FileCode, Share2, Download, ArrowUp, ArrowDown, Tv, Github, Ticket as TicketIcon,
   Lock, LogIn, ArrowLeft, Home, ShieldCheck, User as UserIcon
 } from 'lucide-react';
 import { Article, ExperienceStory, ForumPost, Comment, User, Donation, Partner } from '../types';
@@ -26,6 +26,7 @@ import AdminVideoteka from './AdminVideoteka';
 import SystemMonitoring from './SystemMonitoring';
 import AiTesterRoot from './AiTester/AiTesterRoot';
 import GitHubManager from './GitHubManager';
+import TicketSystem from './TicketSystem';
 import { ElementRegistryTable } from './ElementRegistryTable';
 import { logDatabaseActivity } from '../utils';
 
@@ -1711,6 +1712,7 @@ ${cases.map(c => `Název: ${c.title}\nStav: ${c.status}\nChronologie:\n` + (c.ch
                 category: 'IV. Uživatelé & Systém',
                 items: [
                   { id: 'github_manager', label: 'GitHub Integrace & Sync', icon: Github, badge: 'GITHUB', highlight: true },
+                  { id: 'tickets', label: 'Ticket Systém & Podpora', icon: TicketIcon, badge: 'PODPORA', highlight: true },
                   { id: 'users', label: 'Správa uživatelů & RBAC', icon: Users },
                   { id: 'simulator', label: 'Nastavení simulátoru', icon: Sliders },
                   { id: 'appearance', label: 'Vzhled & Šablony', icon: Paintbrush },
@@ -1767,6 +1769,11 @@ ${cases.map(c => `Název: ${c.title}\nStav: ${c.status}\nChronologie:\n` + (c.ch
           {/* TAB GITHUB MANAGER */}
           {activeMenu === 'github_manager' && (
             <GitHubManager />
+          )}
+
+          {/* TAB TICKETS & SUPPORT */}
+          {activeMenu === 'tickets' && (
+            <TicketSystem currentUser={currentUser} />
           )}
 
           {/* TAB ELEMENT REGISTRY */}

@@ -94,10 +94,10 @@ export const PUBLIC_TOPBAR_ITEMS: NavItem[] = [
     label: 'Podpora projektu', 
     path: '/podpora', 
     icon: Heart, 
-    desc: 'Informace o poslání, transparentní účet a podporující organizace',
+    desc: 'Informace o poslání, sponzoři, transparentní účet a podporující organizace',
     subItems: [
-      { id: 'support', label: 'O portálu & Podpora', desc: 'Poslání portálu a transparentní vývoj' },
-      { id: 'partners', label: 'Partneři & Advokáti', desc: 'Spolupracující organizace a poradny' },
+      { id: 'support', label: 'O portálu & Podpora', desc: 'Poslání portálu, infrastruktura a finanční transparentnost' },
+      { id: 'partners', label: 'Sponzoři & Partneři', desc: 'Sponzoři (Algotech, VEDOS, FORPSI), poradny a advokáti' },
       { id: 'crisis', label: 'Krizová pomoc 24/7', desc: 'Kontakty na SOS linky a psychologickou pomoc' }
     ]
   },
@@ -106,11 +106,12 @@ export const PUBLIC_TOPBAR_ITEMS: NavItem[] = [
     label: 'O projektu', 
     path: '/cesta-zakladatele', 
     icon: BookOpen, 
-    desc: 'Příběh zakladatele, kontakty a vývojový Tech Lab',
+    desc: 'Příběh zakladatele, podmínky užívání, kontakty a vývojový Tech Lab',
     subItems: [
       { id: 'cesta-zakladatele', label: 'Příběh zakladatele', desc: 'Motivace a otevřený spis boje za syna' },
+      { id: 'rights', label: 'Podmínky užívání & AI info', desc: 'Právní doložka a odpovědnost autora' },
       { id: 'contacts', label: 'Kontakt na autora', desc: 'Přímé spojení na Jiřího Šára' },
-      { id: 'sitemap', label: 'Vývoj projektu (Tech Lab)', desc: 'Roadmapa, architektura Synthesis OS a stav systému' }
+      { id: 'sitemap', label: 'Mapa stránek & Vývoj (Tech Lab)', desc: 'Struktura portálu, časová osa a stav systému' }
     ]
   }
 ];

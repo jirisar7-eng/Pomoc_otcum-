@@ -25,8 +25,10 @@ import {
   FileText,
   ExternalLink,
   Share2,
-  Users
+  Users,
+  Loader2
 } from 'lucide-react';
+import { sendContactFormEmail } from '../services/emailService';
 
 interface KontaktSectionProps {
   currentUser?: any;
@@ -41,9 +43,10 @@ export default function KontaktSection({ currentUser, onOpenAuth, setActiveTab }
   const [category, setCategory] = useState('tech_support');
   const [msg, setMsg] = useState('');
   const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleSubmitMsg = (e: React.FormEvent) => {
+  const handleSubmitMsg = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
@@ -57,7 +60,27 @@ export default function KontaktSection({ currentUser, onOpenAuth, setActiveTab }
       return;
     }
 
-    setSent(true);
+    setLoading(true);
+
+    try {
+      const res = await sendContactFormEmail({
+        name: name.trim(),
+        email: email.trim(),
+        category,
+        message: msg.trim(),
+        recipient: 'sarji@seznam.cz'
+      });
+
+      if (res.success) {
+        setSent(true);
+      } else {
+        setError(res.error || res.message || 'Nepodařilo se odeslat zprávu přes SMTP server. Zkuste to prosím znovu.');
+      }
+    } catch (err: any) {
+      setError(err?.message || 'Chyba při odesílání e-mailu přes WEDOS SMTP.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleResetForm = () => {
@@ -114,6 +137,31 @@ export default function KontaktSection({ currentUser, onOpenAuth, setActiveTab }
             <strong>Tematicky čistá sekce:</strong> Tento formulář a kontakty slouží výhradně pro komunikaci s autorem portálu, vývojové podněty a technickou podporu platformy. Pokud hledáte externí krizové linky, právní poradny nebo rodinné advokáty, navštivte sekci <button onClick={() => setActiveTab && setActiveTab('crisis')} className="underline text-teal-300 font-bold hover:text-white">Krizová pomoc &amp; SOS linky</button>.
           </span>
         </div>
+      </div>
+
+      {/* Ticket System Quick Access Banner */}
+      <div className="bg-white border-2 border-teal-500/30 hover:border-teal-500 rounded-3xl p-6 shadow-sm transition-all flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-teal-50 border border-teal-200 text-teal-700 flex items-center justify-center shrink-0 text-2xl">
+            🎫
+          </div>
+          <div className="space-y-1">
+            <h3 className="text-base font-bold text-slate-900 font-display">
+              Ticket systém pro chyby, návrhy &amp; podporu
+            </h3>
+            <p className="text-xs text-slate-600">
+              Máte nápady na vylepšení, našli jste technickou chybu nebo potřebujete sledovat stav vašeho požadavku? Využijte náš přehledný systém ticketů.
+            </p>
+          </div>
+        </div>
+
+        <button
+          onClick={() => setActiveTab && setActiveTab('tickets')}
+          className="px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs rounded-2xl transition-all flex items-center gap-2 cursor-pointer shadow-md shrink-0"
+        >
+          <span>Otevřít Ticket systém</span>
+          <ChevronRight className="w-4 h-4 text-teal-400" />
+        </button>
       </div>
 
       {/* Main Grid: Left Column (Author Profile & Info), Right Column (Contact Form) */}
@@ -389,10 +437,20 @@ export default function KontaktSection({ currentUser, onOpenAuth, setActiveTab }
 
                 <button
                   type="submit"
-                  className="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md"
+                  disabled={loading}
+                  className="w-full py-3 bg-slate-900 hover:bg-slate-800 disabled:bg-slate-700 text-white font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md disabled:cursor-not-allowed"
                 >
-                  <Send className="w-4 h-4 text-teal-400" />
-                  <span>Odeslat zprávu Jiřímu Šárovi</span>
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 text-teal-400 animate-spin" />
+                      <span>Odesílam zprávu přes WEDOS SMTP...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-4 h-4 text-teal-400" />
+                      <span>Odeslat zprávu Jiřímu Šárovi</span>
+                    </>
+                  )}
                 </button>
 
               </form>

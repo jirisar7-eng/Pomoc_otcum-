@@ -5,7 +5,8 @@ export type EmailType =
   | 'EVENT_REMINDER'
   | 'FORUM_NOTIFICATION'
   | 'GENERATED_DOCUMENT'
-  | 'ADMIN_ALERT';
+  | 'ADMIN_ALERT'
+  | 'CONTACT_MESSAGE';
 
 export interface EmailData {
   code?: string;
@@ -23,6 +24,10 @@ export interface EmailData {
   content?: string;
   subject?: string;
   details?: string;
+  senderName?: string;
+  senderEmail?: string;
+  category?: string;
+  message?: string;
   [key: string]: any;
 }
 
@@ -36,6 +41,8 @@ export interface UniversalEmailOptions {
   to: string;
   type: EmailType;
   data: EmailData;
+  fromName?: string;
+  replyTo?: string;
 }
 
 export interface SendEmailResponse {
@@ -241,4 +248,41 @@ export async function sendMagicLinkEmail(payload: SendEmailPayload): Promise<Sen
       error: err.message
     };
   }
+}
+
+/**
+ * Helper function specifically for sending messages from the contact form
+ */
+export async function sendContactFormEmail({
+  name,
+  email,
+  category,
+  message,
+  recipient = 'sarji@seznam.cz'
+}: {
+  name: string;
+  email: string;
+  category: string;
+  message: string;
+  recipient?: string;
+}): Promise<SendEmailResponse> {
+  const emailValidation = validateClientEmail(email);
+  if (!emailValidation.isValid) {
+    return {
+      success: false,
+      message: emailValidation.error || 'Zadejte prosím platnou e-mailovou adresu ve správném tvaru.',
+      error: emailValidation.error
+    };
+  }
+
+  return sendEmail({
+    to: recipient,
+    type: 'CONTACT_MESSAGE',
+    data: {
+      senderName: name,
+      senderEmail: email,
+      category,
+      message
+    }
+  });
 }

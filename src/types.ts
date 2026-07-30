@@ -62,6 +62,40 @@ export interface User {
 
 export type ContentType = 'article' | 'forum' | 'advice';
 
+// Ticket System Types
+export type TicketCategory = 'bug' | 'feature' | 'support' | 'general';
+export type TicketStatus = 'open' | 'in_progress' | 'testing' | 'resolved' | 'rejected';
+export type TicketPriority = 'low' | 'medium' | 'critical';
+
+export interface TicketComment {
+  id: string;
+  authorName: string;
+  authorEmail: string;
+  isAdmin: boolean;
+  message: string;
+  createdAt: string;
+}
+
+export interface Ticket {
+  id: string;
+  ticketNumber: string; // e.g. TKT-1001
+  userId?: string;
+  userName: string;
+  userEmail: string;
+  category: TicketCategory;
+  priority: TicketPriority;
+  status: TicketStatus;
+  title: string;
+  description: string;
+  pageUrl?: string;
+  benefit?: string;
+  topicCategory?: string;
+  createdAt: string;
+  updatedAt: string;
+  comments: TicketComment[];
+  adminNote?: string;
+}
+
 export interface Comment {
   id: string;
   contentId: string;

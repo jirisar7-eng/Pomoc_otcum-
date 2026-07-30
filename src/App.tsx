@@ -66,6 +66,7 @@ import UserPortal from './components/UserPortal';
 import UserProfile from './components/UserProfile';
 import SitemapTimeline from './components/SitemapTimeline';
 import CareSimulator from './components/CareSimulator';
+import TicketSystem from './components/TicketSystem';
 
 // Combined structured sections and partners
 import OpatrovnickaAgenda from './components/OpatrovnickaAgenda';
@@ -721,6 +722,14 @@ export default function App() {
 
             {activeTab === 'contacts' && (
               <KontaktSection
+                currentUser={currentUser}
+                onOpenAuth={() => setAuthModalOpen(true)}
+                setActiveTab={setActiveTab}
+              />
+            )}
+
+            {(activeTab === 'tickets' || activeTab === 'ticket-system' || activeTab === 'podpora-tickety') && (
+              <TicketSystem
                 currentUser={currentUser}
                 onOpenAuth={() => setAuthModalOpen(true)}
                 setActiveTab={setActiveTab}
