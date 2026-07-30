@@ -127,7 +127,10 @@ export default function App() {
     }
     return user;
   });
-  const [showIntro, setShowIntro] = useState<boolean>(() => localStorage.getItem('tata_ma_pravo_hide_intro') !== 'true');
+  const [showIntro, setShowIntro] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return true;
+    return sessionStorage.getItem('tata_ma_pravo_session_intro_dismissed') !== 'true';
+  });
   const [activeTab, setActiveTab] = useState<string>(() => {
     if (typeof window !== 'undefined') {
       const hash = window.location.hash;
@@ -495,7 +498,17 @@ export default function App() {
   };
 
   if (showIntro) {
-    return <IntroScreen onDismiss={() => setShowIntro(false)} />;
+    return (
+      <IntroScreen 
+        onDismiss={(targetTab?: string) => {
+          setShowIntro(false);
+          if (targetTab) {
+            setActiveTab(targetTab);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }
+        }} 
+      />
+    );
   }
 
   return (
@@ -887,6 +900,12 @@ export default function App() {
             </div>
             <div className="flex flex-wrap gap-4 mt-2 md:mt-0 items-center">
               <LanguageSwitcher />
+              <button
+                onClick={() => { setShowIntro(true); window.scrollTo({top: 0, behavior: 'smooth'}); }}
+                className="text-amber-400 hover:text-amber-300 font-bold hover:underline transition-colors cursor-pointer flex items-center gap-1 mr-2"
+              >
+                📢 Beta Oznámení (Intro)
+              </button>
               <button
                 onClick={() => { setActiveTab('sitemap'); window.scrollTo({top: 0, behavior: 'smooth'}); }}
                 className="text-teal-400 hover:text-teal-300 font-bold hover:underline transition-colors cursor-pointer flex items-center gap-1 mr-2"

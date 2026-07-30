@@ -4,21 +4,39 @@
  */
 
 import React, { useState } from 'react';
-import { motion } from 'motion/react';
-import { Sparkles, ArrowRight, CheckCircle2, Flame, Heart, Info, Code, ExternalLink, Award } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
+import { 
+  Sparkles, 
+  ArrowRight, 
+  Heart, 
+  Code, 
+  ExternalLink, 
+  Award, 
+  Share2, 
+  Compass, 
+  Scale, 
+  FileText, 
+  X, 
+  ShieldCheck, 
+  ChevronRight 
+} from 'lucide-react';
 
 interface IntroScreenProps {
-  onDismiss: () => void;
+  onDismiss: (targetTab?: string) => void;
 }
 
 export default function IntroScreen({ onDismiss }: IntroScreenProps) {
   const [dontShowAgain, setDontShowAgain] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
 
-  const handleProceed = () => {
-    if (dontShowAgain) {
-      localStorage.setItem('tata_ma_pravo_hide_intro', 'true');
+  const handleProceed = (targetTab?: string) => {
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('tata_ma_pravo_session_intro_dismissed', 'true');
+      if (dontShowAgain) {
+        localStorage.setItem('tata_ma_pravo_hide_intro', 'true');
+      }
     }
-    onDismiss();
+    onDismiss(targetTab);
   };
 
   return (
@@ -77,49 +95,6 @@ export default function IntroScreen({ onDismiss }: IntroScreenProps) {
               </p>
             </div>
 
-            {/* Official Technology Sponsor Block - VEDOS */}
-            <div className="bg-gradient-to-r from-slate-900 via-slate-850 to-teal-950 p-5 rounded-2xl border-2 border-teal-500/40 text-white space-y-3 shadow-md relative overflow-hidden" id="vedos-intro-sponsor-block">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div className="flex items-center gap-3.5">
-                  <div className="w-14 h-14 rounded-xl bg-white p-2 shrink-0 flex items-center justify-center border border-slate-200 shadow-sm overflow-hidden">
-                    <img 
-                      src="https://vedos.cz/wp-content/uploads/2025/03/VEDOS-Hosting-logo.svg" 
-                      alt="VEDOS Logo" 
-                      className="w-full h-full object-contain"
-                      referrerPolicy="no-referrer"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="bg-teal-500/20 text-teal-300 border border-teal-500/30 text-[9px] font-mono font-bold uppercase px-2 py-0.5 rounded-full flex items-center gap-1">
-                        <Award className="w-3 h-3 text-teal-400" />
-                        Technologický partner
-                      </span>
-                      <span className="bg-amber-400/20 text-amber-300 border border-amber-400/30 text-[9px] font-mono font-bold uppercase px-2 py-0.5 rounded-full">
-                        ★ Sponzor webhostingu
-                      </span>
-                    </div>
-                    <h3 className="text-sm font-bold text-white font-display">
-                      VEDOS Internet, a.s. &mdash; Webhosting NoLimit
-                    </h3>
-                  </div>
-                </div>
-
-                <a
-                  href="https://www.vedos.cz"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-3.5 py-2 bg-teal-500 hover:bg-teal-400 text-slate-950 font-extrabold text-xs rounded-lg transition-all flex items-center gap-1.5 shadow-sm shrink-0 cursor-pointer"
-                >
-                  <span>Navštívit VEDOS.cz</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </a>
-              </div>
-              <p className="text-slate-300 text-xs leading-relaxed">
-                Stabilní provoz a bezpečný webhosting portálu <strong>Táta má právo</strong> sponzorsky zaštiťuje společnost <strong>VEDOS Internet, a.s.</strong>, která projektu v rámci podpory neziskových a společensky smysluplných aktivit poskytuje zdarma kompletní webhosting NoLimit.
-              </p>
-            </div>
-
             <p>
               Na projektu pracuji každý den. Opravuji chyby, přidávám nové funkce a vylepšuji uživatelské prostředí. A upřímně – nemyslím si, že tento web bude někdy „hotový“. Stejně jako každý kvalitní projekt se bude neustále vyvíjet, rozšiřovat a přizpůsobovat potřebám lidí, kteří ho používají.
             </p>
@@ -131,6 +106,37 @@ export default function IntroScreen({ onDismiss }: IntroScreenProps) {
             <div className="bg-rose-50/40 border border-rose-100/50 p-4.5 rounded-2xl text-rose-950 font-serif italic text-center text-xs sm:text-sm flex items-center justify-center gap-2">
               <Heart className="w-4.5 h-4.5 text-rose-500 fill-rose-500/20 shrink-0" />
               <span>Děkuji za vaši podporu a trpělivost. Každá připomínka posouvá projekt o krok dál.</span>
+            </div>
+
+            {/* Clean small quick-link buttons at the bottom */}
+            <div className="pt-2 border-t border-slate-100 flex flex-wrap items-center gap-2">
+              <span className="text-[11px] font-mono text-slate-400 font-medium mr-1">Rychlé odkazy:</span>
+              <button
+                type="button"
+                onClick={() => handleProceed('partners')}
+                className="px-3 py-1.5 bg-slate-100 hover:bg-teal-50 text-slate-700 hover:text-teal-800 border border-slate-200 hover:border-teal-300 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
+              >
+                <Award className="w-3.5 h-3.5 text-teal-600" />
+                <span>Sekce Sponzoři</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleProceed('sitemap')}
+                className="px-3 py-1.5 bg-slate-100 hover:bg-sky-50 text-slate-700 hover:text-sky-800 border border-slate-200 hover:border-sky-300 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
+              >
+                <Compass className="w-3.5 h-3.5 text-sky-600" />
+                <span>Mapa stránek</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setShowTermsModal(true)}
+                className="px-3 py-1.5 bg-slate-100 hover:bg-amber-50 text-slate-700 hover:text-amber-800 border border-slate-200 hover:border-amber-300 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
+              >
+                <Scale className="w-3.5 h-3.5 text-amber-600" />
+                <span>Podmínky užívání</span>
+              </button>
             </div>
           </div>
 
@@ -151,7 +157,7 @@ export default function IntroScreen({ onDismiss }: IntroScreenProps) {
 
             {/* CTA Button */}
             <button
-              onClick={handleProceed}
+              onClick={() => handleProceed()}
               className="w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 group cursor-pointer"
             >
               Pokračovat na hlavní stránku
@@ -161,6 +167,86 @@ export default function IntroScreen({ onDismiss }: IntroScreenProps) {
 
         </div>
       </motion.div>
+
+      {/* Terms of Use Modal */}
+      <AnimatePresence>
+        {showTermsModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-8 space-y-6 shadow-2xl border border-slate-200 relative overflow-hidden"
+            >
+              <div className="flex items-start justify-between border-b border-slate-100 pb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-amber-50 text-amber-600 border border-amber-200 flex items-center justify-center shrink-0">
+                    <Scale className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-slate-800 font-display">
+                      Podmínky užívání & AI Prohlášení
+                    </h3>
+                    <p className="text-xs text-slate-500 font-mono">
+                      Právní doložka a odpovědnost autora
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowTermsModal(false)}
+                  className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="space-y-4 text-slate-650 text-xs sm:text-sm leading-relaxed max-h-[60vh] overflow-y-auto pr-2">
+                <div className="p-4 bg-amber-50/60 border border-amber-200/80 rounded-2xl text-amber-900 space-y-2">
+                  <div className="flex items-center gap-2 font-bold text-xs uppercase font-mono">
+                    <ShieldCheck className="w-4 h-4 text-amber-600" />
+                    Důležité upozornění
+                  </div>
+                  <p className="text-xs">
+                    Tento web je budován svépomocí za použití umělé inteligence (AI), odborných zdrojů a mých vlastních zkušeností z opatrovnických sporů.
+                  </p>
+                </div>
+
+                <p>
+                  <strong>Autor není právník</strong> ani nemá právní či psychologické vzdělání. Veškeré informace, generované výstupy AI asistentů a vzory dokumentů na tomto portálu mají <strong>pouze informační a edukativní charakter</strong>.
+                </p>
+
+                <p>
+                  Obsah a vzory mohou obsahovat chyby nebo nepřesnosti. Užíváním tohoto portálu výslovně souhlasíte s tím, že <strong>autor nenese žádnou právní ani materiální odpovědnost</strong> za případné chyby, opomenutí či jakékoliv následky jejich použití v reálných soudních či opatrovnických řízeních.
+                </p>
+
+                <p>
+                  Všechny právní kroky, podání k soudu nebo komunikaci s OSPOD a advokáty doporučujeme vždy konzultovat s kvalifikovaným advokátem nebo odbornou právní poradnou.
+                </p>
+              </div>
+
+              <div className="border-t border-slate-100 pt-4 flex flex-col sm:flex-row items-center justify-end gap-3">
+                <button
+                  onClick={() => {
+                    setShowTermsModal(false);
+                    handleProceed('rights');
+                  }}
+                  className="w-full sm:w-auto px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <FileText className="w-4 h-4" />
+                  <span>Sekce Právní doložka</span>
+                </button>
+                <button
+                  onClick={() => setShowTermsModal(false)}
+                  className="w-full sm:w-auto px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold text-xs rounded-xl shadow-md transition-colors cursor-pointer"
+                >
+                  Rozumím a souhlasím
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
+
