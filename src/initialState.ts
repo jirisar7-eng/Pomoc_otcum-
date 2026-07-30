@@ -158,6 +158,18 @@ export const INITIAL_PARTNERS: Partner[] = [
     createdAt: new Date().toISOString()
   },
   {
+    id: 'p-algotech',
+    name: 'ALGOTECH a.s.',
+    description: 'Generální sponzor Cloud VPS infrastruktury. Společnost ALGOTECH poskytuje projektu „Táta má právo“ bezplatný vysokovýkonný Cloud VPS server pro bezproblémový provoz backendových mikroslužeb, databází a AI asistentů.',
+    logoUrl: 'https://www.algotech.cz/files/logo.svg',
+    link: 'https://www.algotech.cz/',
+    category: 'Ostatní',
+    region: 'Česká republika / Praha',
+    isRecommended: true,
+    showOnMainPage: true,
+    createdAt: new Date().toISOString()
+  },
+  {
     id: 'p-vedos',
     name: 'VEDOS Internet, a.s.',
     description: 'Oficiální technologický partner a sponzor webhostingu. Společnost VEDOS poskytuje projektu „Táta má právo“ bezplatnou technologickou podporu a sponzorovaný webhosting NoLimit pro stabilní a rychlý chod.',

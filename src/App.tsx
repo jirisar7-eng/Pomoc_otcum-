@@ -191,11 +191,19 @@ export default function App() {
   );
   const [partners, setLocalPartners] = useState<Partner[]>(() => {
     const loaded = getStoredState<Partner[]>('partners', INITIAL_PARTNERS);
+    const algotechP = INITIAL_PARTNERS.find(p => p.id === 'p-algotech');
     const forpsiP = INITIAL_PARTNERS.find(p => p.id === 'p-forpsi');
     const vedosP = INITIAL_PARTNERS.find(p => p.id === 'p-vedos');
+    const fbGroupP = INITIAL_PARTNERS.find(p => p.id === 'p-fb-group');
     let updated = loaded;
+    if (algotechP && !updated.some(p => p.id === 'p-algotech')) {
+      updated = [algotechP, ...updated];
+    }
     if (forpsiP && !updated.some(p => p.id === 'p-forpsi')) {
       updated = [forpsiP, ...updated];
+    }
+    if (fbGroupP && !updated.some(p => p.id === 'p-fb-group')) {
+      updated = [fbGroupP, ...updated];
     }
     if (vedosP) {
       updated = updated.map(p => p.id === 'p-vedos' ? vedosP : p);
@@ -854,44 +862,23 @@ export default function App() {
 
           </div>
 
-          {/* Official Technology Partner & Webhosting Sponsor Card */}
-          <div className="mt-8 bg-gradient-to-r from-slate-950 via-slate-900 to-teal-950/80 border border-teal-500/30 rounded-2xl p-4 md:p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-lg" id="wedos-footer-partner-card">
-            <div className="flex items-center gap-3.5">
-              <div className="w-12 h-12 rounded-xl bg-white p-1.5 shrink-0 flex items-center justify-center border border-slate-200 shadow-xs overflow-hidden">
-                <img 
-                  src="https://vedos.cz/wp-content/uploads/2025/03/VEDOS-Hosting-logo.svg" 
-                  alt="WEDOS Logo" 
-                  className="w-full h-full object-contain"
-                  referrerPolicy="no-referrer"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = "https://www.wedos.cz/wp-content/uploads/2025/03/VEDOS-Hosting-logo.svg";
-                  }}
-                />
+          {/* Link to Dedicated Partners & Sponsors Section */}
+          <div className="mt-8 bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm" id="sponsors-footer-notice">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-teal-500/10 border border-teal-500/30 flex items-center justify-center text-teal-400 font-bold shrink-0">
+                🤝
               </div>
-              <div className="space-y-0.5">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-extrabold text-white text-xs">WEDOS Internet, a.s.</span>
-                  <span className="bg-teal-500/20 text-teal-300 border border-teal-500/30 text-[9px] uppercase font-bold px-2 py-0.5 rounded-full font-mono">
-                    Technologický partner
-                  </span>
-                  <span className="bg-amber-400/20 text-amber-300 border border-amber-400/30 text-[9px] uppercase font-bold px-2 py-0.5 rounded-full font-mono">
-                    Sponzor webhostingu
-                  </span>
-                </div>
-                <p className="text-slate-300 text-[11px] leading-relaxed">
-                  Společnost WEDOS poskytla projektu „Táta má právo“ technologickou podporu a webhosting NoLimit.
-                </p>
+              <div className="text-xs text-slate-300">
+                <span className="font-extrabold text-white">Podpora projektu & Sponzoři:</span> Podporují nás <strong>ALGOTECH a.s.</strong> (Cloud VPS), <strong>VEDOS Internet, a.s.</strong> (Webhosting) a <strong>FORPSI</strong> (Doména).
               </div>
             </div>
-            <a
-              href="https://www.wedos.cz"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-4 py-2 bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-xs rounded-xl transition-all shrink-0 flex items-center gap-1.5 shadow-md hover:scale-105 cursor-pointer whitespace-nowrap"
+            <button
+              onClick={() => { setActiveTab('partners'); window.scrollTo({top: 0, behavior: 'smooth'}); }}
+              className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-teal-300 hover:text-white border border-slate-700 font-bold text-xs rounded-xl transition-all shrink-0 flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
             >
-              <span>Navštívit WEDOS.cz</span>
+              <span>Zobrazit sekci Sponzoři & Partneři</span>
               <ExternalLink className="w-3.5 h-3.5" />
-            </a>
+            </button>
           </div>
 
           <div className="border-t border-slate-800 mt-8 pt-6 flex flex-col md:flex-row items-center justify-between text-[11px] text-slate-500 font-mono">

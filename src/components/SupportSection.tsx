@@ -857,96 +857,32 @@ export default function SupportSection({
             </div>
           </div>
 
-          {/* Featured Active Sponsors Spotlight - VEDOS & FORPSI */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-xs uppercase font-black text-slate-500 tracking-wider font-mono flex items-center gap-1.5">
-                <Shield className="w-4 h-4 text-emerald-600" />
-                Oficiální sponzoři infrastruktury
-              </h3>
-              <span className="text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 font-mono font-bold px-2 py-0.5 rounded-full">
-                ✓ Webhosting a Doména pokryty
-              </span>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* FORPSI */}
-              <div className="bg-gradient-to-br from-slate-900 via-slate-850 to-blue-950 border-2 border-blue-500/40 rounded-2xl p-5 text-white shadow-lg space-y-3 relative overflow-hidden flex flex-col justify-between">
-                <div className="space-y-3 relative z-10">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-white p-1.5 shrink-0 flex items-center justify-center shadow-md overflow-hidden border border-slate-100">
-                      <img 
-                        src="https://forpsi.com/Forpsi/media/Forpsi/General/logo.svg" 
-                        alt="FORPSI Logo" 
-                        className="w-full h-full object-contain"
-                        referrerPolicy="no-referrer"
-                      />
-                    </div>
-                    <div>
-                      <span className="bg-blue-500/20 text-blue-300 border border-blue-500/30 text-[9px] font-mono font-bold uppercase px-2 py-0.5 rounded-full">
-                        ★ Sponzor domény
-                      </span>
-                      <h4 className="text-sm font-bold text-white font-display mt-1">FORPSI (Internet CZ, a.s.)</h4>
-                    </div>
-                  </div>
-                  <p className="text-xs text-slate-300 leading-relaxed">
-                    Společnost FORPSI věnovala a bezplatně zaregistrovala doménu <strong>tatovacesta.cz</strong> pro stabilní prezentaci a růst projektu. Děkujeme za podporu!
-                  </p>
-                </div>
-                <div className="pt-2 border-t border-slate-800 flex justify-between items-center relative z-10">
-                  <span className="text-[10px] text-blue-300 font-mono font-bold">Doména tatovacesta.cz</span>
-                  <a
-                    href="https://www.forpsi.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-3 py-1.5 bg-blue-500 hover:bg-blue-400 text-white font-bold text-xs rounded-lg transition-all flex items-center gap-1 shadow-xs cursor-pointer"
-                  >
-                    <span>FORPSI.com</span>
-                    <ArrowUpRight className="w-3 h-3" />
-                  </a>
-                </div>
+          {/* Official Infrastructure Sponsors Notice */}
+          <div className="bg-gradient-to-r from-slate-900 via-slate-850 to-teal-950 border border-teal-500/30 rounded-2xl p-5 text-white shadow-lg flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <Shield className="w-4 h-4 text-teal-400" />
+                <span className="text-[10px] uppercase font-mono font-bold text-teal-400">Oficiální sponzoři infrastruktury</span>
               </div>
-
-              {/* VEDOS */}
-              <div className="bg-gradient-to-br from-slate-900 via-slate-850 to-teal-950 border-2 border-teal-500/40 rounded-2xl p-5 text-white shadow-lg space-y-3 relative overflow-hidden flex flex-col justify-between">
-                <div className="space-y-3 relative z-10">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-white p-1.5 shrink-0 flex items-center justify-center shadow-md overflow-hidden border border-slate-100">
-                      <img 
-                        src="https://vedos.cz/wp-content/uploads/2025/03/VEDOS-Hosting-logo.svg" 
-                        alt="VEDOS Logo" 
-                        className="w-full h-full object-contain"
-                        referrerPolicy="no-referrer"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = "https://www.wedos.cz/wp-content/uploads/2025/03/VEDOS-Hosting-logo.svg";
-                        }}
-                      />
-                    </div>
-                    <div>
-                      <span className="bg-teal-500/20 text-teal-300 border border-teal-500/30 text-[9px] font-mono font-bold uppercase px-2 py-0.5 rounded-full">
-                        ★ Generální sponzor hostingu
-                      </span>
-                      <h4 className="text-sm font-bold text-white font-display mt-1">VEDOS Internet, a.s.</h4>
-                    </div>
-                  </div>
-                  <p className="text-xs text-slate-300 leading-relaxed">
-                    Společnost VEDOS poskytla projektu bezplatný profesionální webhosting <strong>NoLimit</strong> a technickou záštitu pro rychlý a bezproblémový provoz.
-                  </p>
-                </div>
-                <div className="pt-2 border-t border-slate-800 flex justify-between items-center relative z-10">
-                  <span className="text-[10px] text-teal-300 font-mono font-bold">Webhosting NoLimit</span>
-                  <a
-                    href="https://www.vedos.cz"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-3 py-1.5 bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-xs rounded-lg transition-all flex items-center gap-1 shadow-xs cursor-pointer"
-                  >
-                    <span>VEDOS.cz</span>
-                    <ArrowUpRight className="w-3 h-3" />
-                  </a>
-                </div>
-              </div>
+              <h4 className="text-sm font-bold text-white font-display">
+                Sponzorováno společnostmi ALGOTECH (Cloud VPS), VEDOS (Webhosting) a FORPSI (Doména)
+              </h4>
+              <p className="text-xs text-slate-300 leading-relaxed max-w-2xl">
+                Veškeré podrobné sponzorské profily a certifikáty našich partnerských organizací jsou odteď centralizovány v oficiální sekci <strong>Spolupracující partneři & sponzoři</strong>.
+              </p>
             </div>
+            <a
+              href="#partners"
+              onClick={(e) => {
+                e.preventDefault();
+                const btn = document.querySelector('[data-tab="partners"]') as HTMLElement;
+                if (btn) btn.click();
+              }}
+              className="px-4 py-2 bg-teal-500 hover:bg-teal-400 text-slate-950 font-extrabold text-xs rounded-xl transition-all shrink-0 flex items-center gap-1.5 shadow-md cursor-pointer whitespace-nowrap"
+            >
+              <span>Otevřít sekci Sponzoři</span>
+              <ArrowUpRight className="w-4 h-4" />
+            </a>
           </div>
 
           {/* Core features overview */}
