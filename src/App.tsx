@@ -88,6 +88,8 @@ import AiAdmin from './components/AiAdmin';
 import CategoryDetailView from './components/CategoryDetailView';
 import { SynthesisAperioHub } from './components/SynthesisAperioHub';
 import AiContextView from './components/AiContextView';
+import StateLawsSection from './components/StateLawsSection';
+import StateStatisticsSection from './components/StateStatisticsSection';
 
 export default function App() {
   const { t } = useLanguage();
@@ -560,6 +562,22 @@ export default function App() {
 
             {activeTab === 'judikatura' && (
               <JudikaturaSection />
+            )}
+
+            {(activeTab === 'state-laws' || activeTab === 'laws') && (
+              <StateLawsSection 
+                onOpenAiAssistant={() => {
+                  setActiveTab('ai-assistant');
+                }}
+              />
+            )}
+
+            {(activeTab === 'state-statistics' || activeTab === 'statistics') && (
+              <StateStatisticsSection 
+                onOpenAiAssistant={() => {
+                  setActiveTab('ai-assistant');
+                }}
+              />
             )}
 
             {activeTab === 'ke-stazeni' && (

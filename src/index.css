@@ -98,3 +98,87 @@ html {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-teal-300);
 }
+
+/* =======================================================
+   4-DEVICE RESPONSIVE DESIGN SYSTEM OVERRIDES
+   1. Portrait Mobile (< 640px)
+   2. Portrait Tablet (640px - 1023px, portrait)
+   3. Landscape Tablet (768px - 1279px, landscape)
+   4. Landscape Desktop (>= 1280px, landscape)
+   ======================================================= */
+
+/* 1. PORTRAIT MOBILE ENHANCEMENTS */
+@media (max-width: 639px) {
+  /* Ensure min 44px touch targets on mobile interactive controls */
+  button, input[type="button"], input[type="submit"], a.btn-touch {
+    min-height: 44px;
+  }
+
+  /* Compact padding for modals and containers on small portrait screens */
+  .device-modal-container {
+    padding: 0.75rem !important;
+    max-height: 94vh !important;
+  }
+
+  .device-chat-container {
+    height: calc(100vh - 110px) !important;
+    padding: 0.5rem !important;
+  }
+
+  /* Hide auxiliary side panels on portrait mobile */
+  .mobile-hide-sidepanel {
+    display: none !important;
+  }
+}
+
+/* 2. PORTRAIT TABLET ENHANCEMENTS (640px to 1023px portrait) */
+@media (min-width: 640px) and (max-width: 1023px) and (orientation: portrait) {
+  .device-layout-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .device-modal-container {
+    max-width: 90vw !important;
+    padding: 1.25rem !important;
+  }
+
+  .device-chat-container {
+    height: calc(100vh - 140px) !important;
+  }
+}
+
+/* 3. LANDSCAPE TABLET ENHANCEMENTS (768px to 1279px landscape) */
+@media (min-width: 768px) and (max-width: 1279px) and (orientation: landscape) {
+  .device-landscape-split {
+    display: grid !important;
+    grid-template-columns: 280px 1fr !important;
+    gap: 1rem !important;
+  }
+
+  .device-chat-container {
+    height: calc(100vh - 120px) !important;
+  }
+
+  .device-modal-container {
+    max-width: 85vw !important;
+  }
+}
+
+/* 4. LANDSCAPE DESKTOP WIDESCREEN ENHANCEMENTS (>= 1280px) */
+@media (min-width: 1280px) {
+  .device-landscape-split {
+    display: grid !important;
+    grid-template-columns: 320px 1fr !important;
+    gap: 1.5rem !important;
+  }
+
+  .device-desktop-grid-3 {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 1.5rem !important;
+  }
+
+  .device-chat-container {
+    height: calc(100vh - 160px) !important;
+  }
+}

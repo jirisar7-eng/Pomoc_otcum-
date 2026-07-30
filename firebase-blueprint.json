@@ -139,6 +139,26 @@
         "text": "string",
         "createdAt": "string"
       }
+    },
+    "state_laws": {
+      "description": "e-Sbírka právní předpisy a paragrafy",
+      "schema": {
+        "id": "string",
+        "lawNumber": "string",
+        "title": "string",
+        "paragraphs": "array",
+        "lastSynced": "string"
+      }
+    },
+    "state_statistics": {
+      "description": "Demografické a soudní statistiky ČSÚ a MPSV",
+      "schema": {
+        "id": "string",
+        "source": "string",
+        "summaryMetrics": "object",
+        "custodyTrend": "array",
+        "lastSynced": "string"
+      }
     }
   }
 }

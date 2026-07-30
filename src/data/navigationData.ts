@@ -67,6 +67,8 @@ export const PUBLIC_TOPBAR_ITEMS: NavItem[] = [
     desc: 'Judikatura Ústavního soudu, vědecké studie, vzory podání a právní řád',
     subItems: [
       { id: 'judikatura', label: 'Judikatura ÚS ČR', desc: 'Nálezy Ústavního soudu a přelomové judikáty' },
+      { id: 'state-laws', label: 'e-Sbírka (Zákony & Paragrafy)', desc: 'Aktualizovaná znění zákonů z oficiální e-Sbírky ČR' },
+      { id: 'state-statistics', label: 'Statistiky ČSÚ & MPSV', desc: 'Demografie a tvrdá data opatrovnických soudů' },
       { id: 'knihovna-studii', label: 'Vědecké studie', desc: 'Výzkumy, attachment a střídavá péče' },
       { id: 'ke-stazeni', label: 'Vzory podání & Dokumenty', desc: 'Připravené formuláře a podání k soudu' },
       { id: 'legal-wiki', label: 'Právní řád & Zákoník', desc: 'Právní wiki a paragrafové znění' },

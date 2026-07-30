@@ -117,5 +117,17 @@ service cloud.firestore {
         isAdmin()
       );
     }
+
+    // State Laws (e-Sbírka)
+    match /state_laws/{lawId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // State Statistics (ČSÚ & MPSV)
+    match /state_statistics/{statId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
   }
 }

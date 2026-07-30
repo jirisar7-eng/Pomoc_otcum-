@@ -11,6 +11,7 @@ import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI } from '@google/genai';
 import { sendEmail, validateEmailFormat, generateNumericCode, verifyServerCode } from './src/services/wedosSmtpService';
 import { checkGitHubStatus, readGitHubFile, saveGitHubFile } from './src/services/githubServerService';
+import { stateDataSyncService } from './server/stateDataSyncService';
 
 dotenv.config();
 
@@ -892,6 +893,141 @@ app.get('/api/audit-logs', (req, res) => {
     res.json(limitedLogs);
   } catch (err: any) {
     res.status(500).json({ error: 'Interní chyba při načítání logů', details: err.message });
+  }
+});
+
+// ==========================================
+// E-SBÍRKA, ČSÚ & MPSV STATE OPEN DATA API
+// ==========================================
+
+// GET /api/laws - Fetch state laws and paragraph database
+app.get(['/api/laws', '/api/state-data/laws'], (req, res) => {
+  try {
+    const dataset = stateDataSyncService.getLaws();
+    const search = (req.query.search as string || '').toLowerCase().trim();
+    const category = (req.query.category as string || '').trim();
+    const lawNumber = (req.query.lawNumber as string || '').trim();
+
+    // Flatten paragraphs for quick searching if requested
+    let allParagraphs = dataset.laws.flatMap(l => l.paragraphs);
+
+    if (category) {
+      allParagraphs = allParagraphs.filter(p => p.category === category);
+    }
+    if (lawNumber) {
+      allParagraphs = allParagraphs.filter(p => p.lawNumber.includes(lawNumber));
+    }
+    if (search) {
+      allParagraphs = allParagraphs.filter(p => 
+        p.paragraphNumber.toLowerCase().includes(search) ||
+        p.title.toLowerCase().includes(search) ||
+        p.content.toLowerCase().includes(search) ||
+        p.noteForFathers.toLowerCase().includes(search) ||
+        p.lawTitle.toLowerCase().includes(search)
+      );
+    }
+
+    return res.status(200).json({
+      success: true,
+      lastSynced: dataset.lastSynced,
+      source: dataset.source,
+      status: dataset.status,
+      totalLaws: dataset.totalLaws,
+      totalParagraphs: dataset.totalParagraphs,
+      laws: dataset.laws,
+      filteredParagraphs: allParagraphs
+    });
+  } catch (err: any) {
+    console.error('[StateData API] GET /api/laws failed:', err);
+    return res.status(500).json({ success: false, error: 'Chyba při načítání zákonů z e-Sbírky.', details: err.message });
+  }
+});
+
+// GET /api/laws/:id - Fetch single law by ID
+app.get('/api/laws/:id', (req, res) => {
+  try {
+    const { id } = req.params;
+    const dataset = stateDataSyncService.getLaws();
+    const law = dataset.laws.find(l => l.id === id || l.eSbirkaCode === id);
+    if (!law) {
+      return res.status(404).json({ success: false, error: `Zákon s ID "${id}" nebyl nalezen.` });
+    }
+    return res.status(200).json({ success: true, law });
+  } catch (err: any) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// GET /api/statistics - Fetch ČSÚ & MPSV custody & family statistics
+app.get(['/api/statistics', '/api/state-data/statistics'], (req, res) => {
+  try {
+    const dataset = stateDataSyncService.getStatistics();
+    return res.status(200).json({
+      success: true,
+      dataRange: dataset.dataRange,
+      lastSynced: dataset.lastSynced,
+      source: dataset.source,
+      summaryMetrics: dataset.summaryMetrics,
+      custodyTrend: dataset.custodyTrend,
+      regionalCourtDuration: dataset.regionalCourtDuration,
+      alimonyAgeBrackets: dataset.alimonyAgeBrackets,
+      keyCourtArguments: dataset.keyCourtArguments
+    });
+  } catch (err: any) {
+    console.error('[StateData API] GET /api/statistics failed:', err);
+    return res.status(500).json({ success: false, error: 'Chyba při načítání statistik ČSÚ a MPSV.', details: err.message });
+  }
+});
+
+// POST /api/state-data/sync - Trigger background update from e-Sbírka / ČSÚ / MPSV
+app.post(['/api/state-data/sync', '/api/laws/sync', '/api/statistics/sync'], async (req, res) => {
+  try {
+    const syncResult = await stateDataSyncService.syncAllStateData();
+    return res.status(200).json(syncResult);
+  } catch (err: any) {
+    return res.status(500).json({ success: false, error: 'Synchronizace selhala.', details: err.message });
+  }
+});
+
+// GET /api/state-data/e-sbirka/config - Retrieve e-Sbírka REST API registration configuration
+app.get(['/api/state-data/e-sbirka/config', '/api/e-sbirka/config'], (req, res) => {
+  try {
+    const config = stateDataSyncService.getESbirkaConfig();
+    return res.status(200).json({ success: true, config });
+  } catch (err: any) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// POST /api/state-data/e-sbirka/register - Register / Update e-Sbírka & e-Legislativa REST API registration settings
+app.post(['/api/state-data/e-sbirka/register', '/api/e-sbirka/register'], (req, res) => {
+  try {
+    const { organizationName, webhookUrl, environmentMode, syncFrequencyHours, registeredClientId } = req.body || {};
+    const updated = stateDataSyncService.saveESbirkaConfig({
+      ...(organizationName ? { organizationName } : {}),
+      ...(webhookUrl ? { webhookUrl } : {}),
+      ...(environmentMode ? { environmentMode } : {}),
+      ...(syncFrequencyHours ? { syncFrequencyHours: Number(syncFrequencyHours) } : {}),
+      ...(registeredClientId ? { registeredClientId } : {}),
+      status: 'REGISTERED'
+    });
+    return res.status(200).json({
+      success: true,
+      message: 'Registrace e-Sbírka & e-Legislativa REST API byla úspěšně uložena a verifikována.',
+      config: updated
+    });
+  } catch (err: any) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// GET /api/state-data/e-legislativa/drafts - Retrieve e-Legislativa pending legislative drafts
+app.get(['/api/state-data/e-legislativa/drafts', '/api/e-legislativa/drafts'], (req, res) => {
+  try {
+    const drafts = stateDataSyncService.getELegislativaDrafts();
+    return res.status(200).json({ success: true, totalDrafts: drafts.length, drafts });
+  } catch (err: any) {
+    return res.status(500).json({ success: false, error: err.message });
   }
 });
 
