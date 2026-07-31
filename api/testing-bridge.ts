@@ -122,7 +122,7 @@ export default async function handler(req: any, res: any) {
         id: 'mod_email',
         name: 'E-mailový Notifikační Servis (WEDOS SMTP)',
         status: smtpUserSet ? 'operational' : 'notice',
-        provider: 'WEDOS SMTP (wes1-smtp.wedos.net)',
+        provider: 'WEDOS SMTP (smtp.wedos.net)',
         details: smtpUserSet ? 'WEDOS SMTP přihlašovací údaje předány' : 'SMTP_USER nebo SMTP_PASSWORD nepředán v ENV'
       }
     };

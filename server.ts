@@ -611,7 +611,7 @@ app.all(['/api/testing-bridge', '/api/testing-bridge.ts'], async (req, res) => {
         id: 'mod_email',
         name: 'E-mailový Notifikační Servis (WEDOS SMTP)',
         status: smtpUserSet ? 'operational' : 'notice',
-        provider: 'WEDOS SMTP (wes1-smtp.wedos.net)',
+        provider: 'WEDOS SMTP (smtp.wedos.net)',
         details: smtpUserSet ? 'WEDOS SMTP přihlašovací údaje předány' : 'SMTP_USER nebo SMTP_PASSWORD nepředán v ENV'
       }
     };
