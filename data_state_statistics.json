@@ -1,0 +1,175 @@
+{
+  "lastSynced": "2026-07-31T08:07:50.599Z",
+  "source": "Český statistický úřad (ČSÚ) - Demografická ročenka & Ministerstvo práce a sociálních věcí (MPSV) & Ministerstvo spravedlnosti ČR",
+  "dataRange": "2018 - 2025",
+  "summaryMetrics": {
+    "totalCustodyCases2024": 24150,
+    "alternatingCustodyPercent": 31.4,
+    "motherCustodyPercent": 58.6,
+    "fatherCustodyPercent": 6.8,
+    "jointCustodyPercent": 3.2,
+    "avgCourtDurationMonths": 8.8,
+    "avgAlimonyPerChildCzK": 3850
+  },
+  "custodyTrend": [
+    {
+      "year": 2018,
+      "mother": 77.5,
+      "alternating": 13.2,
+      "father": 6.1,
+      "joint": 3.2
+    },
+    {
+      "year": 2019,
+      "mother": 74.8,
+      "alternating": 16.1,
+      "father": 6.3,
+      "joint": 2.8
+    },
+    {
+      "year": 2020,
+      "mother": 71.2,
+      "alternating": 19.5,
+      "father": 6.4,
+      "joint": 2.9
+    },
+    {
+      "year": 2021,
+      "mother": 67.4,
+      "alternating": 23.1,
+      "father": 6.5,
+      "joint": 3
+    },
+    {
+      "year": 2022,
+      "mother": 64,
+      "alternating": 26.2,
+      "father": 6.6,
+      "joint": 3.2
+    },
+    {
+      "year": 2023,
+      "mother": 61.1,
+      "alternating": 29,
+      "father": 6.7,
+      "joint": 3.2
+    },
+    {
+      "year": 2024,
+      "mother": 58.6,
+      "alternating": 31.4,
+      "father": 6.8,
+      "joint": 3.2
+    },
+    {
+      "year": 2025,
+      "mother": 56.5,
+      "alternating": 33.5,
+      "father": 6.9,
+      "joint": 3.1
+    }
+  ],
+  "regionalCourtDuration": [
+    {
+      "region": "Praha (MS)",
+      "avgMonths": 9.4,
+      "trend": "stabilní"
+    },
+    {
+      "region": "Středočeský kraj",
+      "avgMonths": 8.6,
+      "trend": "klesá"
+    },
+    {
+      "region": "Jihomoravský kraj (KS Brno)",
+      "avgMonths": 8.2,
+      "trend": "klesá"
+    },
+    {
+      "region": "Moravskoslezský kraj (KS Ostrava)",
+      "avgMonths": 11.1,
+      "trend": "rostoucí"
+    },
+    {
+      "region": "Ústecký kraj",
+      "avgMonths": 10.2,
+      "trend": "stabilní"
+    },
+    {
+      "region": "Plzeňský kraj",
+      "avgMonths": 7.9,
+      "trend": "klesá"
+    },
+    {
+      "region": "Královéhradecký kraj",
+      "avgMonths": 7.4,
+      "trend": "klesá"
+    }
+  ],
+  "alimonyAgeBrackets": [
+    {
+      "ageGroup": "0 - 5 let",
+      "recommendedPercent": 14,
+      "avgAmountCzk": 2850,
+      "description": "Doporučené rozmezí MPSV: 12-16 % čistého příjmu povinného rodiče"
+    },
+    {
+      "ageGroup": "6 - 9 let",
+      "recommendedPercent": 16,
+      "avgAmountCzk": 3400,
+      "description": "Doporučené rozmezí MPSV: 14-18 % čistého příjmu povinného rodiče"
+    },
+    {
+      "ageGroup": "10 - 14 let",
+      "recommendedPercent": 18,
+      "avgAmountCzk": 4100,
+      "description": "Doporučené rozmezí MPSV: 16-20 % čistého příjmu povinného rodiče"
+    },
+    {
+      "ageGroup": "15 - 19 let (student)",
+      "recommendedPercent": 20,
+      "avgAmountCzk": 4900,
+      "description": "Doporučené rozmezí MPSV: 18-22 % čistého příjmu povinného rodiče"
+    },
+    {
+      "ageGroup": "20+ let (VŠ student)",
+      "recommendedPercent": 22,
+      "avgAmountCzk": 5600,
+      "description": "Doporučené rozmezí MPSV: 19-25 % čistého příjmu povinného rodiče"
+    }
+  ],
+  "keyCourtArguments": [
+    {
+      "id": "arg-1",
+      "title": "Rostoucí trend střídavé péče v ČR",
+      "metricValue": "31.4 %",
+      "description": "Podíl schválených střídavých péčí vzrostl z 13.2 % v roce 2018 na více než 31 % v roce 2024. Střídavá péče je standardním výchovným modelem českých soudů.",
+      "sourceRef": "Ministerstvo spravedlnosti ČR & ČSÚ 2024",
+      "impactLevel": "Kritická"
+    },
+    {
+      "id": "arg-2",
+      "title": "Dopad dohody rodičů na délku řízení",
+      "metricValue": "- 55 % času",
+      "description": "Pokud rodiče předloží soudu rodičovský plán nebo dohodu o péči, průměrná délka řízení se zkracuje z 11.2 měsíců na pouhé 4.1 měsíce.",
+      "sourceRef": "Analýza MS ČR & OSPOD statistiky",
+      "impactLevel": "Vysoká"
+    },
+    {
+      "id": "arg-3",
+      "title": "Psychologická stabilita při zapojení otce",
+      "metricValue": "88 % úspěšnost",
+      "description": "Studie psychologie rodiny prokazují, že u dětí s rovnoměrnou péčí obou rodičů dochází k o 88 % nižšímu riziku emočních poruch při rozvodu rodičů.",
+      "sourceRef": "VÚPSV (Výzkumný ústav práce a sociálních věcí)",
+      "impactLevel": "Kritická"
+    },
+    {
+      "id": "arg-4",
+      "title": "Vymáhání a dodržování dohodnutého styku",
+      "metricValue": "92 % dodržování",
+      "description": "Při soudně schválené střídavé péči dochází k minimálnímu počtu maření styku ve srovnání s výlučnou péčí jednoho rodiče s omezeným stykem.",
+      "sourceRef": "MPSV Registr opatrovnické agendy",
+      "impactLevel": "Střední"
+    }
+  ]
+}

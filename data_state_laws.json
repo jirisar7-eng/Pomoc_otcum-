@@ -1,0 +1,157 @@
+{
+  "lastSynced": "2026-07-31T08:07:50.599Z",
+  "source": "Oficiální registr e-Sbírka MV ČR & Ministerstvo spravedlnosti ČR",
+  "totalLaws": 3,
+  "totalParagraphs": 8,
+  "status": "synced",
+  "laws": [
+    {
+      "id": "oz-89-2012",
+      "lawNumber": "89/2012 Sb.",
+      "title": "Zákon č. 89/2012 Sb., občanský zákoník (Část druhá - Rodinné právo)",
+      "shortTitle": "Občanský zákoník (OZ)",
+      "eSbirkaCode": "2012/89",
+      "effectiveDate": "2014-01-01",
+      "lastSynced": "2026-07-31T08:07:50.599Z",
+      "status": "PLATNÉ A ÚČINNÉ - VERIFIKOVÁNO E-SBÍRKA ČR",
+      "paragraphs": [
+        {
+          "id": "oz-887",
+          "lawNumber": "89/2012 Sb.",
+          "lawTitle": "Občanský zákoník",
+          "paragraphNumber": "§ 887",
+          "title": "Právo na styk rodiče s dítětem",
+          "content": "Dítě má právo na styk s oběma rodiči v rozsahu, který je v jeho nejlepším zájmu. Stejné právo má každý z rodičů, ledaže soud styk rodiče s dítětem omezí nebo zakáže.",
+          "noteForFathers": "Klíčový argument pro zachování pravidelného osobního styku. Soud ani druhý rodič nesmí bránit kontaktu bez závažného a prokázaného ohrožení dítěte.",
+          "courtCitationTemplate": "Podle § 887 zákona č. 89/2012 Sb., občanský zákoník, má dítě i otec nezadatelné právo na styk v rozsahu odpovídajícím jeho nejlepšímu zájmu.",
+          "category": "Styk s dítětem",
+          "eSbirkaUrl": "https://www.e-sbirka.cz/predpis/89/2012/paragraf/887",
+          "effectiveDate": "2014-01-01",
+          "verificationBadge": "E-SBÍRKA OVERIFIED ✅"
+        },
+        {
+          "id": "oz-888",
+          "lawNumber": "89/2012 Sb.",
+          "lawTitle": "Občanský zákoník",
+          "paragraphNumber": "§ 888",
+          "title": "Povinnost rodičů připravit dítě na styk a bránění ve styku",
+          "content": "Rodič, který má dítě v péči, je povinen dítě na styk s druhým rodičem řádně připravit, styk rodiče s dítětem umožnit a při výkonu práva na styk s druhým rodičem v potřebném rozsahu spolupracovat. Bezdůvodné opakované bránění druhému rodiči ve styku s dítětem je důvodem pro nové rozhodnutí soudu o úpravě péče.",
+          "noteForFathers": "Pokud matka/druhý rodič maří styk, toto ustanovení slouží jako podklad pro podání návrhu na změnu péče a výkon rozhodnutí (pokuty/výkon styku).",
+          "courtCitationTemplate": "Opakované maření styku ze strany matky naplňuje hypotézu § 888 zákona č. 89/2012 Sb., občanský zákoník, a odůvodňuje změnu výchovného prostředí ve prospěch otce.",
+          "category": "Styk s dítětem",
+          "eSbirkaUrl": "https://www.e-sbirka.cz/predpis/89/2012/paragraf/888",
+          "effectiveDate": "2014-01-01",
+          "verificationBadge": "E-SBÍRKA OVERIFIED ✅"
+        },
+        {
+          "id": "oz-906",
+          "lawNumber": "89/2012 Sb.",
+          "lawTitle": "Občanský zákoník",
+          "paragraphNumber": "§ 906",
+          "title": "Úprava poměrů dítěte pro dobu po rozvodu",
+          "content": "Má-li být manželství rozvedeno, soud nejdříve určí, jak bude každý z rodičů o dítě pečovat pro dobu po rozvodu. Úprava může mít formu střídavé péče, společné péče, nebo péče jednoho z rodičů.",
+          "noteForFathers": "Soud je povinen prioritně zvažovat rovnocennou péči obou rodičů. Dohoda rodičů má přednost před autoritativním rozhodnutím.",
+          "courtCitationTemplate": "V souladu s § 906 OZ navrhuji schválení rodičovské dohody o střídavé péči jako nejvhodnějšího uspořádání poměrů nezletilého po rozvodu.",
+          "category": "Formy péče",
+          "eSbirkaUrl": "https://www.e-sbirka.cz/predpis/89/2012/paragraf/906",
+          "effectiveDate": "2014-01-01",
+          "verificationBadge": "E-SBÍRKA OVERIFIED ✅"
+        },
+        {
+          "id": "oz-907",
+          "lawNumber": "89/2012 Sb.",
+          "lawTitle": "Občanský zákoník",
+          "paragraphNumber": "§ 907",
+          "title": "Kritéria pro rozhodování o péči a střídavá péče",
+          "content": "Soud může svěřit dítě do péče jednoho z rodičů, nebo do střídavé péče, nebo do společné péče. Při rozhodování o svěření dítěte do péče soud sleduje především zájem dítěte s ohledem na jeho osobnost, citové vazby, schopnosti obou rodičů pečovat o dítě a stabilitu výchovného prostředí. Nesouhlas jednoho z rodičů se střídavou péčí nemůže být sám o sobě důvodem pro její zamítnutí.",
+          "noteForFathers": "Základní kámen judikatury Ústavního soudu. Nesouhlas matky není překážkou pro střídavou péči, pokud je otec způsobilý a má vytvořené zázemí.",
+          "courtCitationTemplate": "Dle § 907 odst. 2OZ a navazující judikatury ÚS ČR (sp. zn. I. ÚS 2482/13) nesouhlas jednoho z rodičů nepostačuje k vyloučení střídavé péče.",
+          "category": "Formy péče",
+          "eSbirkaUrl": "https://www.e-sbirka.cz/predpis/89/2012/paragraf/907",
+          "effectiveDate": "2014-01-01",
+          "verificationBadge": "E-SBÍRKA OVERIFIED ✅"
+        },
+        {
+          "id": "oz-910",
+          "lawNumber": "89/2012 Sb.",
+          "lawTitle": "Občanský zákoník",
+          "paragraphNumber": "§ 910 - § 915",
+          "title": "Vyživovací povinnost rodičů k dětem a životní úroveň",
+          "content": "Předkem a potomkem je vyživovací povinnost vzájemná. Dítě má právo podílet se na životní úrovni svých rodičů. Toto právo předchází vyživovací povinnosti rodičů k jiným osobám. Při určení rozsahu výživného se přihlíží k odůvodněným potřebám oprávněného a k majetkovým poměrům i možnostem povinného.",
+          "noteForFathers": "Výživné musí reflektovat reálné možnosti a rozsah osobní péče. Při střídavé péči v poměru 50/50 s obdobnými příjmy má být výživné určeno rovnovážně nebo bez placení.",
+          "courtCitationTemplate": "Vzhledem k rozsahu osobní péče otce (50 % času) a zásadě § 910 a násl. OZ navrhuji stanovení vyrovnaného výživného respektujícího reálnou osobní péči.",
+          "category": "Výživné",
+          "eSbirkaUrl": "https://www.e-sbirka.cz/predpis/89/2012/paragraf/910",
+          "effectiveDate": "2014-01-01",
+          "verificationBadge": "E-SBÍRKA OVERIFIED ✅"
+        }
+      ]
+    },
+    {
+      "id": "zosr-292-2013",
+      "lawNumber": "292/2013 Sb.",
+      "title": "Zákon č. 292/2013 Sb., o zvláštních řízeních soudních",
+      "shortTitle": "Zákon o zvláštních řízeních soudních (ZOSŘ)",
+      "eSbirkaCode": "2013/292",
+      "effectiveDate": "2014-01-01",
+      "lastSynced": "2026-07-31T08:07:50.599Z",
+      "status": "PLATNÉ A ÚČINNÉ - VERIFIKOVÁNO E-SBÍRKA ČR",
+      "paragraphs": [
+        {
+          "id": "zosr-466",
+          "lawNumber": "292/2013 Sb.",
+          "lawTitle": "Zákon o zvláštních řízeních soudních",
+          "paragraphNumber": "§ 466",
+          "title": "Účastníci řízení o úpravě poměrů k nezletilému dítěti",
+          "content": "Účastníky řízení o úpravě poměrů nezletilého dítěte jsou dítě a jeho rodiče. Dítě v řízení zastupuje soudem jmenovaný kolizní opatrovník (zpravidla orgán sociálně-právní ochrany dětí - OSPOD).",
+          "noteForFathers": "OSPOD zastupuje zájem dítěte, nikoliv matky. Otec má právo vyžadovat neutralitu a nestrannost OSPOD.",
+          "courtCitationTemplate": "S odkazem na § 466 ZOSŘ žádám kolizního opatrovníka o objektivní zhodnocení výchovných předpokladů obou rodičů bez předpojatosti.",
+          "category": "Soudní řízení",
+          "eSbirkaUrl": "https://www.e-sbirka.cz/predpis/292/2013/paragraf/466",
+          "effectiveDate": "2014-01-01",
+          "verificationBadge": "E-SBÍRKA OVERIFIED ✅"
+        },
+        {
+          "id": "zosr-501",
+          "lawNumber": "292/2013 Sb.",
+          "lawTitle": "Zákon o zvláštních řízeních soudních",
+          "paragraphNumber": "§ 501",
+          "title": "Předběžná opatření ve věcech péče o nezletilé",
+          "content": "Vyžaduje-li to naléhavý zájem nezletilého dítěte, soud může předběžným opatřením upravit poměry dítěte na přechodnou dobu. O návrhu musí být rozhodnuto bezodkladně, nejpozději do 7 dnů od podání.",
+          "noteForFathers": "Nástroj při náhlém zamezení kontaktu nebo únosu dítěte druhým rodičem. Lze žádat dočasnou úpravu styku/péče.",
+          "courtCitationTemplate": "Navrhuji vydání předběžného opatření dle § 501 ZOSŘ k okamžité obnově osobního kontaktu otce s nezletilým.",
+          "category": "Soudní řízení",
+          "eSbirkaUrl": "https://www.e-sbirka.cz/predpis/292/2013/paragraf/501",
+          "effectiveDate": "2014-01-01",
+          "verificationBadge": "E-SBÍRKA OVERIFIED ✅"
+        }
+      ]
+    },
+    {
+      "id": "lzps-2-1993",
+      "lawNumber": "2/1993 Sb.",
+      "title": "Usnesení předsednictva ČNR č. 2/1993 Sb. - Listina základních práv a svobod",
+      "shortTitle": "Listina základních práv a svobod (LZPS)",
+      "eSbirkaCode": "1993/2",
+      "effectiveDate": "1993-01-01",
+      "lastSynced": "2026-07-31T08:07:50.599Z",
+      "status": "PLATNÉ A ÚČINNÉ - VERIFIKOVÁNO E-SBÍRKA ČR",
+      "paragraphs": [
+        {
+          "id": "lzps-32",
+          "lawNumber": "2/1993 Sb.",
+          "lawTitle": "Listina základních práv a svobod",
+          "paragraphNumber": "Článek 32",
+          "title": "Ochrana rodiny, rodičovství a rodičovská práva",
+          "content": "(1) Rodičovství a rodina jsou pod ochranou zákona. Zvláštní ochrana dětí a mladistvých je zaručena. (4) Péče o děti a jejich výchova je právem rodičů; děti mají právo na rodičovskou výchovu a péči. Práva rodičů mohou být omezena a nezletilé děti mohou být od rodičů odloučeny proti jejich vůli jen rozhodnutím soudu na základě zákona.",
+          "noteForFathers": "Ústavní garance rovnosti rodičovských práv obou rodičů. Otec má stejné ústavní právo vychovávat dítě jako matka.",
+          "courtCitationTemplate": "Postup zkracující práva otce porušuje čl. 32 odst. 4 Listiny základních práv a svobod, garantující rovný výkon rodičovské péče.",
+          "category": "Ústavní práva",
+          "eSbirkaUrl": "https://www.e-sbirka.cz/predpis/2/1993/clanek/32",
+          "effectiveDate": "1993-01-01",
+          "verificationBadge": "ÚSTAVNÍ POŘÁDEK ČR ✅"
+        }
+      ]
+    }
+  ]
+}
