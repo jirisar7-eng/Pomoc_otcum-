@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect, useMemo } from 'react';
+import portalLogo from '../assets/images/portal_logo.png';
 import { 
   Search, 
   Menu, 
@@ -262,10 +263,13 @@ export default function Navigation({
           <div className="flex items-center gap-2.5 cursor-pointer shrink-0" onClick={() => handleTabClick('home')}>
             <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-900 border border-slate-200 shadow-sm overflow-hidden flex items-center justify-center shrink-0">
               <img 
-                src="/src/assets/images/portal_logo.png" 
+                src={portalLogo} 
                 alt="Táta má právo Logo" 
                 className="w-full h-full object-cover"
                 referrerPolicy="no-referrer"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = "/portal_logo.png";
+                }}
               />
             </div>
             <div className="flex flex-col justify-center min-w-0">

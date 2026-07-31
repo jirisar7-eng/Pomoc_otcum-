@@ -677,6 +677,8 @@ app.all(['/api/testing-bridge', '/api/testing-bridge.ts'], async (req, res) => {
 
 // Public Static Assets (Favicons, webmanifest, docs, robots.txt, sitemap.xml)
 app.use(express.static(path.join(process.cwd(), 'public')));
+app.use('/src/assets/images', express.static(path.join(process.cwd(), 'src', 'assets', 'images')));
+app.use('/assets/images', express.static(path.join(process.cwd(), 'src', 'assets', 'images')));
 app.use('/docs', express.static(path.join(process.cwd(), 'docs')));
 app.use('/docs', express.static(path.join(process.cwd(), 'public', 'docs')));
 
