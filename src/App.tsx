@@ -36,6 +36,7 @@ import { parseInternalLink, scrollToAnchor } from './lib/navigation';
 
 // Component imports
 import Navigation from './components/Navigation';
+import PageViewTracker from './components/PageViewTracker';
 import AuthModal from './components/AuthModal';
 import CookieConsentBanner, { openCookieConsentModal } from './components/CookieConsentBanner';
 import HeroSection from './components/HeroSection';
@@ -525,6 +526,9 @@ export default function App() {
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
       />
+
+      {/* Automatic Page Views DB Tracker */}
+      <PageViewTracker activeTab={activeTab} />
 
       {/* Drobečková navigace (Breadcrumbs) */}
       <Breadcrumbs activeTab={activeTab} setActiveTab={setActiveTab} />

@@ -28,6 +28,7 @@ import AiTesterRoot from './AiTester/AiTesterRoot';
 import GitHubManager from './GitHubManager';
 import TicketSystem from './TicketSystem';
 import { ElementRegistryTable } from './ElementRegistryTable';
+import PageViewsAnalytics from './PageViewsAnalytics';
 import { logDatabaseActivity } from '../utils';
 
 interface AdminPanelProps {
@@ -4255,63 +4256,68 @@ ${cases.map(c => `Název: ${c.title}\nStav: ${c.status}\nChronologie:\n` + (c.ch
 
           {/* TAB 12: STATS */}
           {activeMenu === 'stats' && (
-            <div className="space-y-6">
-              <div className="border-b border-slate-100 pb-3">
-                <h2 className="text-base font-bold text-slate-800 font-display flex items-center gap-2">
-                  <BarChart2 className="w-5 h-5 text-indigo-500" />
-                  Statistiky stažení a návštěvnosti
-                </h2>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  Sledujte využití portálu: nejstahovanější PDF soubory, nejpopulárnější vzory podání a vývoj návštěvnosti.
-                </p>
-              </div>
+            <div className="space-y-8">
+              {/* Detailed Real-time Page Views Analytics Subsystem */}
+              <PageViewsAnalytics />
 
-              {/* Graphical simulation using simple charts */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                
-                {/* Most downloaded PDFs */}
-                <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-2xs space-y-4">
-                  <span className="text-[10px] uppercase font-mono font-bold text-slate-400 block">Nejstahovanější PDF soubory</span>
-                  
-                  <div className="space-y-3">
-                    {[
-                      { name: 'Vzor_Odvolani_Stridava.docx', downloads: '240 stažení', pct: 95 },
-                      { name: 'Smlouva_Dohoda_Rodice.pdf', downloads: '180 stažení', pct: 75 },
-                      { name: 'Prehled_Judikatury_OS.pdf', downloads: '140 stažení', pct: 55 },
-                      { name: 'Osa_pripravy_soud.pdf', downloads: '80 stažení', pct: 30 }
-                    ].map((item, i) => (
-                      <div key={i} className="space-y-1 text-xs">
-                        <div className="flex justify-between font-medium">
-                          <span className="text-slate-700">{item.name}</span>
-                          <span className="font-bold text-slate-800">{item.downloads}</span>
-                        </div>
-                        <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
-                          <div className="bg-indigo-600 h-full" style={{ width: `${item.pct}%` }} />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+              <div className="border-t border-slate-200/80 pt-6 space-y-6">
+                <div className="border-b border-slate-100 pb-3">
+                  <h2 className="text-base font-bold text-slate-800 font-display flex items-center gap-2">
+                    <BarChart2 className="w-5 h-5 text-indigo-500" />
+                    Statistiky stažení souborů & Vyhledávání
+                  </h2>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Sledujte využití portálu: nejstahovanější PDF soubory a nejčastěji vyhledávaná hesla.
+                  </p>
                 </div>
 
-                {/* Most active searches */}
-                <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-2xs space-y-4">
-                  <span className="text-[10px] uppercase font-mono font-bold text-slate-400 block">Nejčastější vyhledávané dotazy</span>
+                {/* Graphical simulation using simple charts */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   
-                  <div className="divide-y divide-slate-100 text-xs">
-                    {[
-                      { term: 'Jak vyvrátit posudek OSPOD', count: '142 hledání' },
-                      { term: 'Rozdělení sourozenců judikáty', count: '112 hledání' },
-                      { term: 'Střídavá péče miminko', count: '98 hledání' },
-                      { term: 'Dohoda o střídavé péči vzor', count: '87 hledání' }
-                    ].map((item, i) => (
-                      <div key={i} className="py-2.5 flex justify-between font-medium">
-                        <span className="text-slate-700">🔎 "{item.term}"</span>
-                        <span className="text-slate-500 font-mono text-[11px]">{item.count}</span>
-                      </div>
-                    ))}
+                  {/* Most downloaded PDFs */}
+                  <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-2xs space-y-4">
+                    <span className="text-[10px] uppercase font-mono font-bold text-slate-400 block">Nejstahovanější PDF soubory</span>
+                    
+                    <div className="space-y-3">
+                      {[
+                        { name: 'Vzor_Odvolani_Stridava.docx', downloads: '240 stažení', pct: 95 },
+                        { name: 'Smlouva_Dohoda_Rodice.pdf', downloads: '180 stažení', pct: 75 },
+                        { name: 'Prehled_Judikatury_OS.pdf', downloads: '140 stažení', pct: 55 },
+                        { name: 'Osa_pripravy_soud.pdf', downloads: '80 stažení', pct: 30 }
+                      ].map((item, i) => (
+                        <div key={i} className="space-y-1 text-xs">
+                          <div className="flex justify-between font-medium">
+                            <span className="text-slate-700">{item.name}</span>
+                            <span className="font-bold text-slate-800">{item.downloads}</span>
+                          </div>
+                          <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                            <div className="bg-indigo-600 h-full" style={{ width: `${item.pct}%` }} />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
 
+                  {/* Most active searches */}
+                  <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-2xs space-y-4">
+                    <span className="text-[10px] uppercase font-mono font-bold text-slate-400 block">Nejčastější vyhledávané dotazy</span>
+                    
+                    <div className="divide-y divide-slate-100 text-xs">
+                      {[
+                        { term: 'Jak vyvrátit posudek OSPOD', count: '142 hledání' },
+                        { term: 'Rozdělení sourozenců judikáty', count: '112 hledání' },
+                        { term: 'Střídavá péče miminko', count: '98 hledání' },
+                        { term: 'Dohoda o střídavé péči vzor', count: '87 hledání' }
+                      ].map((item, i) => (
+                        <div key={i} className="py-2.5 flex justify-between font-medium">
+                          <span className="text-slate-700">🔎 "{item.term}"</span>
+                          <span className="text-slate-500 font-mono text-[11px]">{item.count}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                </div>
               </div>
             </div>
           )}

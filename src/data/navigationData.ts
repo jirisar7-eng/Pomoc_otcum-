@@ -24,6 +24,10 @@ import {
   Compass,
   Bell, 
   Database, 
+  Calculator,
+  Activity,
+  Layers,
+  HelpCircle,
   LucideIcon
 } from 'lucide-react';
 
@@ -32,6 +36,7 @@ export interface NavSubItem {
   label: string;
   path?: string;
   desc?: string;
+  badge?: string;
 }
 
 export interface NavItem {
@@ -55,81 +60,146 @@ export interface NavSection {
   items: NavItem[];
 }
 
-// 1. HLAVNÍ TOPBAR / VISIBLE MENU (Pro všechny / Public - Max 8 hlavních sekcí)
+// ============================================================================
+// SYNTHESIS AI – NAVIGATION ARCHITECTURE v1.0 (Alpha 0.5.1)
+// 6 HLAVNÍCH OBLASTÍ PORTÁLU TÁTA MÁ PRÁVO
+// ============================================================================
+
+// 1. HLAVNÍ SLUŽBY
+export const HLAVNI_SLUZBY_ITEMS: NavSubItem[] = [
+  { id: 'ai-guide', label: 'AI Právní průvodce', desc: 'Krokový AI rádce pro zvolenou strategii sporu' },
+  { id: 'ai-case-manager', label: 'Můj případ', desc: 'Sledování spisu, časová osa, kalendář a trezor důkazů' },
+  { id: 'ke-stazeni', label: 'Dokumenty a vzory', desc: 'Oficiální vzory podání a formuláře k opatrovnickému soudu' },
+  { id: 'judikatura', label: 'Judikatura', desc: 'Přelomové nálezy Ústavního a Nejvyššího soudu ČR' },
+  { id: 'videoteka', label: 'Videotéka', desc: 'Instruktážní videa a rozhovory s právníky a psychology' },
+  { id: 'crisis', label: 'Krizová pomoc', desc: 'SOS kontakty, krizové linky a urgentní právní pomoc 24/7' }
+];
+
+// 2. ODBORNÁ KNIHOVNA (Tematické kategorie)
+export const ODBORNA_KNIHOVNA_CATEGORIES: NavSubItem[] = [
+  { id: 'pece-o-dite', label: 'Péče o dítě', desc: 'Střídavá, společná a výhradní péče, plánování' },
+  { id: 'legal-wiki', label: 'Právo', desc: 'Právní řád, občanský zákoník a paragrafy' },
+  { id: 'knihovna-studii', label: 'Psychologie', desc: 'Attachment, dětská psychologie a dopady rozvodu' },
+  { id: 'ospod', label: 'OSPOD a soudy', desc: 'Jednání s orgány sociálně-právní ochrany a soudní řízení' },
+  { id: 'vyvoj-ditete', label: 'Vývoj dítěte', desc: 'Potřeby dětí podle věkových období a adaptace' },
+  { id: 'vyzivne', label: 'Finance', desc: 'Kalkulačka výživného, mimořádné výdaje a majetek' },
+  { id: 'coparent-hub', label: 'Komunikace rodičů', desc: 'Pravidla komunikace, deeskalace konfliktu a dohody' },
+  { id: 'mediace', label: 'Mediace', desc: 'Mimosoudní řešení sporů a rodičovský plán' },
+  { id: 'vyzkumy-a-studie', label: 'Výzkumy a studie', desc: 'Empirické vědecké studie ČSÚ, VÚPSV a zahraničí' }
+];
+
+// 3. AI NÁSTROJE
+export const AI_NASTROJE_ITEMS: NavSubItem[] = [
+  { id: 'ai-assistant', label: 'AI právní asistent', desc: 'Právní konzultace v reálném čase poháněná Gemini AI' },
+  { id: 'ai-case-manager', label: 'AI analýza spisu', desc: 'Skenování dokumentů, hledání rozporů a vyhodnocení důkazů' },
+  { id: 'ke-stazeni', label: 'AI generátor podání', desc: 'Automatické generování návrhů k soudu na míru' },
+  { id: 'knihovna-studii', label: 'AI shrnutí studií', desc: 'Syntetické abstrakty vědeckých výzkumů o střídavé péči' },
+  { id: 'ai-guide', label: 'AI doporučení dalšího postupu', desc: 'Krokový návrh dalších procesních úkonů' }
+];
+
+// 4. PRAKTICKÉ NÁSTROJE
+export const PRAKTICKE_NASTROJE_ITEMS: NavSubItem[] = [
+  { id: 'plan-pece', label: 'Simulátor péče', desc: 'Interaktivní modelování střídavé a rovnocenné péče' },
+  { id: 'vyzivne', label: 'Kalkulačky', desc: 'Výpočet výživného dle metodiky MSp' },
+  { id: 'ai-case-manager', label: 'Evidence důkazů', desc: 'Zabezpečený trezor pro audia, SMS a fotodokumentaci' },
+  { id: 'sitemap-timeline', label: 'Časová osa řízení', desc: 'Harmonogram a zákonné lhůty opatrovnického sporu' },
+  { id: 'coparent-hub', label: 'Kalendář', desc: 'Sdílený kalendář střídání, prázdnin a kroužků' },
+  { id: 'opatrovnicka-agenda', label: 'Checklist řízení', desc: 'Kontrolní seznamy pro soudní jednání a OSPOD' }
+];
+
+// 5. KOMUNITA
+export const KOMUNITA_ITEMS: NavSubItem[] = [
+  { id: 'forum', label: 'Fórum', desc: 'Otevřené diskusní fórum pro sdílení rad a zkušeností' },
+  { id: 'stories', label: 'Příběhy rodičů', desc: 'Reálné příběhy otců, matek a jejich dětí' },
+  { id: 'videoteka', label: 'Videotéka', desc: 'Videorozhovory a instruktáže odborníků' },
+  { id: 'partners', label: 'Partneři', desc: 'Partnerské poradny, advokátní kanceláře a psychologové' },
+  { id: 'advice', label: 'Odborníci', desc: 'Poradní panel expertů na opatrovnická práva' }
+];
+
+// 6. O PROJEKTU
+export const O_PROJEKTU_ITEMS: NavSubItem[] = [
+  { id: 'support', label: 'Mise', desc: 'Poslání portálu a prosazování nejlepšího zájmu dítěte' },
+  { id: 'cesta-zakladatele', label: 'Zakladatel', desc: 'Příběh Jiřího Šára a osobní motivace ke vzniku' },
+  { id: 'contacts', label: 'Kontakt', desc: 'Kontaktní formulář a přímé spojení na redakci' },
+  { id: 'support', label: 'Podpora', desc: 'Jak finančně či věcně podpořit provoz portálu' },
+  { id: 'partners', label: 'Sponzoři', desc: 'Přehled technologických partnerů a dárců' },
+  { id: 'support', label: 'Transparentní rozpočet', desc: 'Otevřené účetnictví a náklady na infrastrukturu' },
+  { id: 'rights', label: 'Podmínky', desc: 'Podmínky užívání portálu a právní doložka' },
+  { id: 'rights', label: 'Ochrana osobních údajů', desc: 'Zásady zpracování dat a GDPR' },
+  { id: 'sitemap', label: 'Mapa webu', desc: 'Kompletní struktura stránek a vývojový log' }
+];
+
+// ============================================================================
+// STRUKTURA HLAVNÍHO ROZCESTNÍKU (PUBLIC TOPBAR)
+// ============================================================================
 export const PUBLIC_TOPBAR_ITEMS: NavItem[] = [
   { id: 'home', label: 'Domů', path: '/', icon: Home, desc: 'Titulní strana portálu' },
-  { id: 'opatrovnicka-agenda', label: 'Průvodce opatrovnictvím', path: '/opatrovnicka-agenda', icon: Compass, desc: 'Krokový průvodce opatrovnickým řízením, OSPOD a soudem' },
   { 
-    id: 'judikatura', 
-    label: 'Právní knihovna', 
-    path: '/judikatura', 
-    icon: Scale, 
-    desc: 'Judikatura Ústavního soudu, vědecké studie, vzory podání a právní řád',
-    subItems: [
-      { id: 'judikatura', label: 'Judikatura ÚS ČR', desc: 'Nálezy Ústavního soudu a přelomové judikáty' },
-      { id: 'state-laws', label: 'e-Sbírka (Zákony & Paragrafy)', desc: 'Aktualizovaná znění zákonů z oficiální e-Sbírky ČR' },
-      { id: 'state-statistics', label: 'Statistiky ČSÚ & MPSV', desc: 'Demografie a tvrdá data opatrovnických soudů' },
-      { id: 'knihovna-studii', label: 'Vědecké studie', desc: 'Výzkumy, attachment a střídavá péče' },
-      { id: 'ke-stazeni', label: 'Vzory podání & Dokumenty', desc: 'Připravené formuláře a podání k soudu' },
-      { id: 'legal-wiki', label: 'Právní řád & Zákoník', desc: 'Právní wiki a paragrafové znění' },
-      { id: 'news', label: 'Odborné články', desc: 'Metodické návody a redakční texty' }
-    ]
+    id: 'hlavni-sluzby', 
+    label: 'Hlavní služby', 
+    path: '/sluzby', 
+    icon: Compass, 
+    desc: 'Klíčové opatrovnické služby, AI průvodce, vzory a judikatura',
+    subItems: HLAVNI_SLUZBY_ITEMS
   },
-  { id: 'videoteka', label: 'Videotéka', path: '/videoteka', icon: Tv, desc: 'Instruktážní videa a rozhovory s odborníky' },
-  { id: 'ai-assistant', label: 'AI pomocník', path: '/ai', icon: Sparkles, desc: 'Syntetický právní poradce a rozbor spisu' },
   { 
-    id: 'forum', 
+    id: 'odborna-knihovna', 
+    label: 'Odborná knihovna', 
+    path: '/knihovna', 
+    icon: BookOpen, 
+    desc: 'Tematické kategorie: Péče o dítě, právo, psychologie, OSPOD, finance',
+    subItems: ODBORNA_KNIHOVNA_CATEGORIES
+  },
+  { 
+    id: 'ai-nastroje', 
+    label: 'AI nástroje', 
+    path: '/ai', 
+    icon: Sparkles, 
+    desc: 'Syntetický AI asistent, analýza spisu, generátor podání',
+    subItems: AI_NASTROJE_ITEMS
+  },
+  { 
+    id: 'prakticke-nastroje', 
+    label: 'Praktické nástroje', 
+    path: '/nastroje', 
+    icon: Sliders, 
+    desc: 'Simulátor péče, kalkulačka výživného, evidence důkazů',
+    subItems: PRAKTICKE_NASTROJE_ITEMS
+  },
+  { 
+    id: 'komunita', 
     label: 'Komunita', 
     path: '/komunita', 
     icon: MessageSquare, 
-    desc: 'Diskusní fórum, příběhy otců a rodičovský hub',
-    subItems: [
-      { id: 'forum', label: 'Diskusní fórum', desc: 'Otevřené diskuse k opatrovnictví a OSPOD' },
-      { id: 'stories', label: 'Příběhy otců', desc: 'Sdílená zkušenost rodičů v praxi' },
-      { id: 'coparent-hub', label: 'Rodičovský Hub', desc: 'Společný kalendář, výdaje a dohody' }
-    ]
+    desc: 'Fórum, příběhy rodičů, videotéka a partneři',
+    subItems: KOMUNITA_ITEMS
   },
   { 
-    id: 'support', 
-    label: 'Podpora projektu', 
-    path: '/podpora', 
-    icon: Heart, 
-    desc: 'Informace o poslání, sponzoři, transparentní účet a podporující organizace',
-    subItems: [
-      { id: 'support', label: 'O portálu & Podpora', desc: 'Poslání portálu, infrastruktura a finanční transparentnost' },
-      { id: 'partners', label: 'Sponzoři & Partneři', desc: 'Sponzoři (Algotech, VEDOS, FORPSI), poradny a advokáti' },
-      { id: 'crisis', label: 'Krizová pomoc 24/7', desc: 'Kontakty na SOS linky a psychologickou pomoc' }
-    ]
-  },
-  { 
-    id: 'cesta-zakladatele', 
+    id: 'o-projektu', 
     label: 'O projektu', 
-    path: '/cesta-zakladatele', 
-    icon: BookOpen, 
-    desc: 'Příběh zakladatele, podmínky užívání, kontakty a vývojový Tech Lab',
-    subItems: [
-      { id: 'cesta-zakladatele', label: 'Příběh zakladatele', desc: 'Motivace a otevřený spis boje za syna' },
-      { id: 'rights', label: 'Podmínky užívání & AI info', desc: 'Právní doložka a odpovědnost autora' },
-      { id: 'contacts', label: 'Kontakt na autora', desc: 'Přímé spojení na Jiřího Šára' },
-      { id: 'sitemap', label: 'Mapa stránek & Vývoj (Tech Lab)', desc: 'Struktura portálu, časová osa a stav systému' }
-    ]
+    path: '/o-projektu', 
+    icon: Heart, 
+    desc: 'Mise, zakladatel, kontakt, podpora a transparentní účet',
+    subItems: O_PROJEKTU_ITEMS
   }
 ];
 
-// 2. DYNAMICKÁ SEKCE - AŽ PO PŘIHLÁŠENÍ (Můj portál)
+// ============================================================================
+// DYNAMICKÁ SEKCE PO PŘIHLÁŠENÍ (MŮJ PORTÁL - SOUKROMÁ ZÓNA)
+// ============================================================================
 export const LOGGED_IN_SECTIONS: NavSection[] = [
   {
     id: 'moj-portal-section',
-    title: '👤 MŮJ PORTÁL (Osobní zóna)',
+    title: '👤 MŮJ PORTÁL (Soukromá zóna)',
     isPrivate: true,
     highlight: true,
     items: [
       {
         id: 'user-portal',
-        label: 'Přehled',
+        label: 'Dashboard',
         path: '/moj-portal',
         icon: UserCheck,
-        desc: 'Osobní dashboard, skóre připravenosti a krokový návod.',
+        desc: 'Přehled osobní situace, skóre a krokový návod',
         requiresAuth: true
       },
       {
@@ -137,99 +207,88 @@ export const LOGGED_IN_SECTIONS: NavSection[] = [
         label: 'Můj případ',
         path: '/moj-portal/pripad',
         icon: Briefcase,
-        desc: 'Časová osa sporu, kalendář předávání, trezor důkazů a poznámky.',
+        desc: 'Kompletní přehled vašeho opatrovnického sporu',
         requiresAuth: true
       },
       {
-        id: 'coparent-hub',
-        label: 'Kalendář & Rodičovský Hub',
-        path: '/moj-portal/kalendar',
-        icon: Sliders,
-        desc: 'Sdílený kalendář dětí, výdaje a plánování péče.',
+        id: 'ai-case-manager',
+        label: 'Důkazy',
+        path: '/moj-portal/dukazy',
+        icon: FolderCheck,
+        desc: 'Zabezpečený trezor fotografií, SMS a audionahrávek',
         requiresAuth: true
       },
       {
         id: 'ke-stazeni',
-        label: 'Dokumenty & Důkazy',
+        label: 'Dokumenty',
         path: '/moj-portal/dokumenty',
-        icon: FolderCheck,
-        desc: 'Generátor návrhů k soudu, uložení spisu a podkladů.',
+        icon: FileText,
+        desc: 'Vygenerované návrhy a rozpracované dokumenty',
+        requiresAuth: true
+      },
+      {
+        id: 'coparent-hub',
+        label: 'Kalendář',
+        path: '/moj-portal/kalendar',
+        icon: Sliders,
+        desc: 'Sdílený plán střídavé péče, prázdnin a kroužků',
         requiresAuth: true
       },
       {
         id: 'user-portal',
-        label: 'Uložené články & Videa',
-        path: '/moj-portal/ulozene',
+        label: 'Uložené články',
+        path: '/moj-portal/ulozene-clanky',
         icon: Bookmark,
-        desc: 'Založené studijní materiály, judikáty a rozsudky.',
+        desc: 'Založené studijní texty, judikáty a zákony',
         requiresAuth: true
       },
       {
-        id: 'ai-guide',
-        label: 'AI strategie',
-        path: '/moj-portal/strategie',
-        icon: Sparkles,
-        desc: 'Personalizovaný AI rádce pro zvolenou strategii sporu.',
+        id: 'user-portal',
+        label: 'Uložená videa',
+        path: '/moj-portal/ulozene-videa',
+        icon: Tv,
+        desc: 'Uložené videorozhovory a metodická videa',
+        requiresAuth: true
+      },
+      {
+        id: 'user-portal',
+        label: 'Oznámení',
+        path: '/moj-portal/oznameni',
+        icon: Bell,
+        desc: 'Upozornění na termíny soudů a odpovědi ve fóru',
         requiresAuth: true
       },
       {
         id: 'profile',
-        label: 'Nastavení & Profil',
+        label: 'Nastavení účtu',
         path: '/moj-portal/nastaveni',
         icon: Settings,
-        desc: 'Identitní Hub, Google OAuth, biometrika a přihlášení.',
+        desc: 'Osobní profil, biometrika a propojení účtů',
         requiresAuth: true
       }
     ]
   }
 ];
 
-// 3. ADMINISTRACE (if user.role === 'admin' || user.role === 'superadmin')
+// ============================================================================
+// ADMINISTRACE (PRO ROLE ADMIN / SUPERADMIN)
+// ============================================================================
 export const ADMIN_SECTION: NavSection = {
   id: 'admin-section',
   title: '👑 ADMINISTRACE',
   isAdmin: true,
   highlight: true,
   items: [
-    {
-      id: 'admin',
-      label: 'Dashboard',
-      path: '/admin',
-      icon: ShieldAlert,
-      desc: 'Souhrnný přehled návštěvnosti, aktivity a stavu systému.',
-      requiresAdmin: true
-    },
-    {
-      id: 'admin',
-      label: 'Obsah (Články, Studie, Judikatura)',
-      path: '/admin/redakce',
-      icon: FileText,
-      desc: 'Správa publikovaných článků, videí, judikátů a studií.',
-      requiresAdmin: true
-    },
-    {
-      id: 'admin',
-      label: 'Partneři & Fórum',
-      path: '/admin/komunita',
-      icon: Users,
-      desc: 'Moderace příspěvků, schvalování příběhů a správa partnerů.',
-      requiresAdmin: true
-    },
-    {
-      id: 'ai-admin',
-      label: 'AI Centrum & Doručování',
-      path: '/admin/ai-system',
-      icon: Database,
-      desc: 'Audit logy, AI Asistent, zálohy a nastavení LLM.',
-      requiresAdmin: true
-    },
-    {
-      id: 'sitemap',
-      label: 'Vývoj projektu (Tech Lab)',
-      path: '/admin/tech-lab',
-      icon: Compass,
-      desc: 'Architektura Synthesis OS, monitoring a stav vývoje.',
-      requiresAdmin: true
-    }
+    { id: 'admin', label: 'Dashboard', path: '/admin', icon: ShieldAlert, desc: 'Celkový stav systému a metrik', requiresAdmin: true },
+    { id: 'admin', label: 'Obsah (Články, Judikatura, Studie, Videotéka, Dokumenty)', path: '/admin/obsah', icon: FileText, desc: 'Správa publikací, videí a podání', requiresAdmin: true },
+    { id: 'admin', label: 'Uživatelé', path: '/admin/uzivatele', icon: Users, desc: 'Správa uživatelských účtů a rolí', requiresAdmin: true },
+    { id: 'ai-admin', label: 'AI', path: '/admin/ai', icon: Sparkles, desc: 'Správa LLM modelů, promptů a AI asistenta', requiresAdmin: true },
+    { id: 'admin', label: 'Databáze', path: '/admin/databaze', icon: Database, desc: 'Stav Firebase, Supabase a Drizzle ORM', requiresAdmin: true },
+    { id: 'admin', label: 'API', path: '/admin/api', icon: Layers, desc: 'Aktivní REST API endpointy a e-Sbírka sync', requiresAdmin: true },
+    { id: 'admin', label: 'Monitoring', path: '/admin/monitoring', icon: Activity, desc: 'Systémový monitoring, logy a zátěž', requiresAdmin: true },
+    { id: 'admin', label: 'AI Tester', path: '/admin/ai-tester', icon: HelpCircle, desc: 'Automatizované testování AI odpovědí', requiresAdmin: true },
+    { id: 'admin', label: 'Audit', path: '/admin/audit', icon: Compass, desc: 'Bezpečnostní audit a logy aktivních relací', requiresAdmin: true },
+    { id: 'admin', label: 'Nastavení', path: '/admin/nastaveni', icon: Settings, desc: 'Konfigurace Synthesis OS a portálu', requiresAdmin: true }
   ]
 };
+

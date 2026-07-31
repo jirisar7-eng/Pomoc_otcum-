@@ -12,6 +12,7 @@ import { GoogleGenAI } from '@google/genai';
 import { sendEmail, validateEmailFormat, generateNumericCode, verifyServerCode } from './src/services/wedosSmtpService';
 import { checkGitHubStatus, readGitHubFile, saveGitHubFile } from './src/services/githubServerService';
 import { stateDataSyncService } from './server/stateDataSyncService';
+import pageViewsService from './server/pageViewsService';
 
 dotenv.config();
 
@@ -674,7 +675,8 @@ app.all(['/api/testing-bridge', '/api/testing-bridge.ts'], async (req, res) => {
   }
 });
 
-// AI & SEO Machine Readable Routes (llms.txt, robots.txt, sitemap.xml)
+// Public Static Assets (Favicons, webmanifest, docs, robots.txt, sitemap.xml)
+app.use(express.static(path.join(process.cwd(), 'public')));
 app.use('/docs', express.static(path.join(process.cwd(), 'docs')));
 app.use('/docs', express.static(path.join(process.cwd(), 'public', 'docs')));
 
@@ -893,6 +895,39 @@ app.get('/api/audit-logs', (req, res) => {
     res.json(limitedLogs);
   } catch (err: any) {
     res.status(500).json({ error: 'Interní chyba při načítání logů', details: err.message });
+  }
+});
+
+// ==========================================
+// PAGE VIEWS & VISITOR ANALYTICS API
+// ==========================================
+
+// POST /api/page-views - Record new page view
+app.post(['/api/page-views', '/api/analytics/pageviews'], (req, res) => {
+  try {
+    const { path, visitor_id, user_agent } = req.body || {};
+    const ip = req.ip || req.headers['x-forwarded-for'] as string || '127.0.0.1';
+    
+    const record = pageViewsService.recordPageView({
+      path: path || '/',
+      visitor_id: visitor_id || 'unknown_visitor',
+      user_agent: user_agent || req.headers['user-agent'] || 'Unknown',
+      ip_address: ip
+    });
+    
+    res.status(201).json({ success: true, record });
+  } catch (err: any) {
+    res.status(500).json({ error: 'Chyba při ukládání návštěvy stránky', details: err.message });
+  }
+});
+
+// GET /api/page-views - Fetch aggregated analytics
+app.get(['/api/page-views', '/api/analytics/pageviews'], (req, res) => {
+  try {
+    const stats = pageViewsService.getPageViewsStats();
+    res.json(stats);
+  } catch (err: any) {
+    res.status(500).json({ error: 'Chyba při načítání statistik návštěvnosti', details: err.message });
   }
 });
 

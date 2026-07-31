@@ -35,7 +35,10 @@ import {
   FolderCheck,
   Layers,
   Mail,
-  Compass
+  Compass,
+  Star,
+  Clock,
+  Command
 } from 'lucide-react';
 import { User } from '../types';
 import { useLanguage } from '../lib/LanguageContext';
@@ -74,6 +77,34 @@ const CATEGORY_TAB_MAP: Record<string, { tab: string; search: string }> = {
   'statistiky-vyzkumy': { tab: 'knihovna-studii', search: 'Statistiky' }
 };
 
+const PAGE_LABELS: Record<string, string> = {
+  'home': 'Domů',
+  'ai-guide': 'AI Právní průvodce',
+  'ai-case-manager': 'Můj případ & Důkazy',
+  'ke-stazeni': 'Dokumenty a vzory',
+  'judikatura': 'Judikatura',
+  'videoteka': 'Videotéka',
+  'crisis': 'Krizová pomoc 24/7',
+  'ai-assistant': 'AI Asistent',
+  'knihovna-studii': 'Vědecké studie',
+  'legal-wiki': 'PrávníWiki',
+  'plan-pece': 'Simulátor péče',
+  'coparent-hub': 'Rodičovský Hub',
+  'opatrovnicka-agenda': 'Průvodce opatrovnictvím',
+  'forum': 'Fórum',
+  'stories': 'Příběhy rodičů',
+  'partners': 'Partneři',
+  'advice': 'Odborníci',
+  'support': 'Podpora & Mise',
+  'cesta-zakladatele': 'Příběh zakladatele',
+  'contacts': 'Kontakt',
+  'rights': 'Podmínky & GDPR',
+  'sitemap': 'Mapa webu',
+  'user-portal': 'Můj portál - Dashboard',
+  'profile': 'Nastavení profilu',
+  'admin': 'Administrace'
+};
+
 interface NavigationProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
@@ -99,6 +130,73 @@ export default function Navigation({
   const [topicsAccordionOpen, setTopicsAccordionOpen] = useState(false);
   const [quickNavAccordionOpen, setQuickNavAccordionOpen] = useState(false);
   const [aboutAccordionOpen, setAboutAccordionOpen] = useState(false);
+
+  // Smart Navigation Features State (LocalStorage persistence)
+  const [favorites, setFavorites] = useState<string[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('synthesis_favorite_pages');
+        return saved ? JSON.parse(saved) : ['ai-guide', 'judikatura', 'ke-stazeni'];
+      } catch (e) {
+        return ['ai-guide', 'judikatura', 'ke-stazeni'];
+      }
+    }
+    return ['ai-guide', 'judikatura', 'ke-stazeni'];
+  });
+
+  const [recentPages, setRecentPages] = useState<{ id: string; label: string; time: string }[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('synthesis_recent_pages');
+        return saved ? JSON.parse(saved) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+    return [];
+  });
+
+  // Track recent pages when activeTab changes
+  useEffect(() => {
+    if (!activeTab) return;
+    const label = PAGE_LABELS[activeTab] || activeTab;
+    const time = new Date().toLocaleTimeString('cs-CZ', { hour: '2-digit', minute: '2-digit' });
+
+    setRecentPages(prev => {
+      const filtered = prev.filter(p => p.id !== activeTab);
+      const updated = [{ id: activeTab, label, time }, ...filtered].slice(0, 5);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('synthesis_recent_pages', JSON.stringify(updated));
+      }
+      return updated;
+    });
+  }, [activeTab]);
+
+  // Toggle favorite page
+  const toggleFavorite = (tabId: string) => {
+    setFavorites(prev => {
+      const updated = prev.includes(tabId) ? prev.filter(id => id !== tabId) : [...prev, tabId];
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('synthesis_favorite_pages', JSON.stringify(updated));
+      }
+      return updated;
+    });
+  };
+
+  // Keyboard shortcut listener (Cmd+K / Ctrl+K for search)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        const searchInput = document.querySelector('input[type="text"]') as HTMLInputElement;
+        if (searchInput) {
+          searchInput.focus();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const filteredCategories = useMemo(() => {
     if (!categoryFilter.trim()) return HUB_CATEGORIES;
