@@ -39,7 +39,8 @@ import {
   Compass,
   Star,
   Clock,
-  Command
+  Command,
+  HelpCircle
 } from 'lucide-react';
 import { User } from '../types';
 import { useLanguage } from '../lib/LanguageContext';
@@ -108,6 +109,105 @@ const PAGE_LABELS: Record<string, string> = {
   'admin': 'Administrace'
 };
 
+interface ModuleCapsuleCardProps {
+  id: string;
+  label: string;
+  desc: string;
+  icon: React.ReactNode;
+  badge?: string;
+  accent?: 'red' | 'green' | 'teal' | 'indigo' | 'amber' | 'default';
+  requiresAuth?: boolean;
+  isLoggedIn?: boolean;
+  isActive: boolean;
+  onClick: () => void;
+}
+
+const ModuleCapsuleCard: React.FC<ModuleCapsuleCardProps> = ({ 
+  label, 
+  desc, 
+  icon, 
+  badge, 
+  accent = 'default', 
+  requiresAuth, 
+  isLoggedIn, 
+  isActive, 
+  onClick 
+}) => {
+  let containerStyles = "bg-white border-slate-200/90 hover:border-teal-400/80 hover:bg-slate-50/90 text-slate-800 shadow-2xs";
+  let iconStyles = "bg-slate-100 border-slate-200 text-slate-700 group-hover:bg-teal-50 group-hover:text-teal-700 group-hover:border-teal-200";
+  let badgeStyles = "bg-slate-100 text-slate-700 border-slate-200 font-bold";
+
+  if (accent === 'red') {
+    containerStyles = isActive 
+      ? "bg-rose-600 border-rose-700 text-white shadow-md ring-2 ring-rose-300" 
+      : "bg-rose-50/90 hover:bg-rose-100/90 border-rose-200/90 hover:border-rose-300 text-rose-950 shadow-2xs";
+    iconStyles = isActive ? "bg-rose-700 text-white border-rose-600" : "bg-rose-600 text-white border-rose-500 shadow-3xs";
+    badgeStyles = "bg-rose-600 text-white font-black animate-pulse";
+  } else if (accent === 'green') {
+    containerStyles = isActive 
+      ? "bg-emerald-600 border-emerald-700 text-white shadow-md ring-2 ring-emerald-300" 
+      : "bg-emerald-50/90 hover:bg-emerald-100/90 border-emerald-200/90 hover:border-emerald-300 text-emerald-950 shadow-2xs";
+    iconStyles = isActive ? "bg-emerald-700 text-white border-emerald-600" : "bg-emerald-600 text-white border-emerald-500 shadow-3xs";
+    badgeStyles = "bg-emerald-700 text-white font-extrabold";
+  } else if (accent === 'teal') {
+    containerStyles = isActive 
+      ? "bg-teal-600 border-teal-700 text-white shadow-md ring-2 ring-teal-300" 
+      : "bg-teal-50/90 hover:bg-teal-100/90 border-teal-200/90 hover:border-teal-300 text-teal-950 shadow-2xs";
+    iconStyles = isActive ? "bg-teal-700 text-white border-teal-600" : "bg-gradient-to-br from-teal-500 to-emerald-600 text-white border-teal-400 shadow-3xs";
+    badgeStyles = "bg-teal-600 text-white font-extrabold";
+  } else if (accent === 'indigo') {
+    containerStyles = isActive 
+      ? "bg-indigo-600 border-indigo-700 text-white shadow-md ring-2 ring-indigo-300" 
+      : "bg-indigo-50/90 hover:bg-indigo-100/90 border-indigo-200/90 hover:border-indigo-300 text-indigo-950 shadow-2xs";
+    iconStyles = isActive ? "bg-indigo-700 text-white border-indigo-600" : "bg-indigo-600 text-white border-indigo-500 shadow-3xs";
+    badgeStyles = "bg-indigo-600 text-white font-extrabold";
+  } else if (accent === 'amber') {
+    containerStyles = isActive 
+      ? "bg-amber-600 border-amber-700 text-white shadow-md ring-2 ring-amber-300" 
+      : "bg-amber-50/90 hover:bg-amber-100/90 border-amber-200/90 hover:border-amber-300 text-amber-950 shadow-2xs";
+    iconStyles = isActive ? "bg-amber-700 text-white border-amber-600" : "bg-amber-600 text-white border-amber-500 shadow-3xs";
+    badgeStyles = "bg-amber-600 text-white font-extrabold";
+  }
+
+  return (
+    <button
+      onClick={onClick}
+      className={`w-full text-left p-3 rounded-2xl border transition-all duration-200 cursor-pointer flex items-start gap-3 group relative ${containerStyles}`}
+    >
+      <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0 border transition-transform duration-200 group-hover:scale-105 ${iconStyles}`}>
+        {icon}
+      </div>
+
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center justify-between gap-1.5">
+          <span className={`font-bold text-xs sm:text-sm block truncate leading-tight ${isActive ? 'text-white' : ''}`}>
+            {label}
+          </span>
+          {badge && (
+            <span className={`text-[9px] font-mono px-1.5 py-0.2 rounded-md uppercase tracking-wider shrink-0 ${badgeStyles}`}>
+              {badge}
+            </span>
+          )}
+          {requiresAuth && !isLoggedIn && (
+            <span className="text-[9px] font-mono text-amber-800 bg-amber-100 px-1.5 py-0.2 rounded-md font-bold shrink-0 flex items-center gap-0.5" title="Vyžaduje přihlášení">
+              🔒 VIP
+            </span>
+          )}
+        </div>
+        <p className={`text-[11px] leading-snug line-clamp-2 mt-0.5 ${
+          isActive ? 'text-white/90 font-medium' : accent !== 'default' ? 'text-slate-600' : 'text-slate-500'
+        }`}>
+          {desc}
+        </p>
+      </div>
+
+      <ChevronRight className={`w-4 h-4 shrink-0 self-center transition-transform duration-200 group-hover:translate-x-0.5 ${
+        isActive ? 'text-white/80' : 'text-slate-300 group-hover:text-teal-600'
+      }`} />
+    </button>
+  );
+};
+
 interface NavigationProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
@@ -130,6 +230,7 @@ export default function Navigation({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [categoryFilter, setCategoryFilter] = useState('');
+  const [navTab, setNavTab] = useState<'public' | 'private'>('public');
   const [topicsAccordionOpen, setTopicsAccordionOpen] = useState(false);
   const [quickNavAccordionOpen, setQuickNavAccordionOpen] = useState(false);
   const [aboutAccordionOpen, setAboutAccordionOpen] = useState(false);
@@ -297,65 +398,421 @@ export default function Navigation({
           </div>
 
           {/* Responsive Desktop Navigation Topbar (XL screens 1280px+ only to prevent tablet overlaps) */}
-          <nav className="hidden xl:flex items-center justify-center gap-1 py-1">
-            {PUBLIC_TOPBAR_ITEMS.map((item) => {
-              const ItemIcon = item.icon;
-              const hasSub = item.subItems && item.subItems.length > 0;
-              const isItemActive = activeTab === item.id || (hasSub && item.subItems?.some(sub => sub.id === activeTab));
+          <nav className="hidden xl:flex items-center justify-center gap-1.5 py-1">
+            {/* 1. MAIN MEGA MENU BUTTON (2-Tab Module Directory) */}
+            <div 
+              className="relative"
+              onMouseEnter={() => setOpenDropdown('main-mega-menu')}
+              onMouseLeave={() => setOpenDropdown(null)}
+            >
+              <button
+                onClick={() => setOpenDropdown(openDropdown === 'main-mega-menu' ? null : 'main-mega-menu')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all border cursor-pointer whitespace-nowrap shadow-3xs ${
+                  openDropdown === 'main-mega-menu'
+                    ? 'bg-slate-900 border-slate-900 text-white shadow-md'
+                    : 'bg-slate-900 text-white hover:bg-slate-800 border-slate-800'
+                }`}
+                title="Kompletní rozcestník veřejné a chráněné části"
+              >
+                <Compass className="w-4 h-4 text-teal-400" />
+                <span>Rozcestník modulů</span>
+                <span className="px-1.5 py-0.2 bg-teal-500/20 text-teal-300 text-[10px] font-mono font-extrabold rounded-md">
+                  2 ZÁLOŽKY
+                </span>
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${openDropdown === 'main-mega-menu' ? 'rotate-180 text-teal-400' : 'text-slate-400'}`} />
+              </button>
 
-              if (hasSub) {
-                return (
-                  <div 
-                    key={item.id}
-                    className="relative"
-                    onMouseEnter={() => setOpenDropdown(item.id)}
-                    onMouseLeave={() => setOpenDropdown(null)}
-                  >
-                    <button
-                      onClick={() => setOpenDropdown(openDropdown === item.id ? null : item.id)}
-                      className={`flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all border cursor-pointer whitespace-nowrap ${
-                        isItemActive
-                          ? 'bg-teal-50 border-teal-200 text-teal-800 shadow-3xs'
-                          : openDropdown === item.id
-                            ? 'bg-slate-100 border-slate-200 text-slate-900'
-                            : 'bg-transparent border-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900'
-                      }`}
-                      title={item.desc}
-                    >
-                      <ItemIcon className={`w-3.5 h-3.5 ${isItemActive ? 'text-teal-600' : 'text-slate-400'}`} />
-                      <span>{item.label}</span>
-                      <ChevronDown className="w-3 h-3 text-slate-400" />
-                    </button>
+              {/* REDESIGNED 2-TAB MEGA DROPDOWN MENU */}
+              {openDropdown === 'main-mega-menu' && (
+                <div className="absolute left-0 mt-1 w-[92vw] max-w-[900px] bg-white border border-slate-200/90 rounded-3xl shadow-2xl p-4 sm:p-5 z-50 animate-in fade-in duration-150">
+                  {/* Header & Main 2-Tabs Switcher */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3 mb-4">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-xl bg-slate-900 text-teal-400 flex items-center justify-center font-bold shrink-0">
+                        <Layers className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-extrabold text-slate-900 font-display leading-tight">
+                          Rozcestník modulů a služeb
+                        </h3>
+                        <p className="text-[11px] text-slate-400">Synthesis OS • Přehled všech veřejných a neveřejných nástrojů</p>
+                      </div>
+                    </div>
 
-                    {openDropdown === item.id && (
-                      <div className="absolute left-0 mt-1 w-64 bg-white border border-slate-200 rounded-2xl shadow-xl p-2 z-50 animate-in fade-in duration-100">
-                        <div className="text-[10px] font-mono font-bold text-slate-400 px-2 py-1 uppercase tracking-wider border-b border-slate-100 mb-1 flex items-center justify-between">
-                          <span>{item.label}</span>
-                          <span className="text-[9px] text-teal-600 bg-teal-50 px-1.5 py-0.2 rounded font-mono">{item.subItems?.length} položek</span>
+                    {/* THE TWO MAIN TABS (Veřejná část vs Část pro přihlášené uživatele) */}
+                    <div className="flex items-center p-1 bg-slate-100 rounded-2xl border border-slate-200/80 self-start sm:self-auto">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setNavTab('public');
+                        }}
+                        className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                          navTab === 'public'
+                            ? 'bg-white text-slate-900 shadow-xs border border-slate-200/60 font-extrabold'
+                            : 'text-slate-600 hover:text-slate-900'
+                        }`}
+                      >
+                        <span>🌐</span>
+                        <span>Veřejná část</span>
+                      </button>
+
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setNavTab('private');
+                        }}
+                        className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                          navTab === 'private'
+                            ? 'bg-gradient-to-r from-teal-600 to-indigo-600 text-white shadow-xs font-extrabold'
+                            : 'text-slate-600 hover:text-slate-900'
+                        }`}
+                      >
+                        <span>🔒</span>
+                        <span>Část pro přihlášené</span>
+                        {isLoggedIn ? (
+                          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse ml-0.5"></span>
+                        ) : (
+                          <span className="text-[9px] font-mono bg-amber-100 text-amber-800 px-1 rounded font-bold">VIP</span>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* TAB CONTENT: 🌐 VEŘEJNÁ ČÁST */}
+                  {navTab === 'public' && (
+                    <div className="space-y-4 max-h-[460px] overflow-y-auto pr-1">
+                      {/* Category 1: Krizová pomoc & Komunita */}
+                      <div>
+                        <div className="text-[10px] font-mono font-extrabold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5 px-1">
+                          <PhoneCall className="w-3 h-3 text-rose-500" />
+                          <span>Krizová pomoc &amp; Komunita</span>
                         </div>
-                        <div className="space-y-0.5">
-                          {item.subItems!.map((sub) => (
-                            <button
-                              key={sub.id}
-                              onClick={() => {
-                                handleTabClick(sub.id);
-                                setOpenDropdown(null);
-                              }}
-                              className={`w-full text-left p-2 rounded-xl text-xs transition-colors cursor-pointer ${
-                                activeTab === sub.id ? 'bg-teal-50 text-teal-950 font-bold' : 'hover:bg-slate-50 text-slate-700'
-                              }`}
-                            >
-                              <div className="font-bold text-slate-900 block truncate">{sub.label}</div>
-                              {sub.desc && <div className="text-[10px] text-slate-400 block truncate leading-tight mt-0.5">{sub.desc}</div>}
-                            </button>
-                          ))}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-2.5">
+                          {/* SOS Action Plan (HIGHLIGHTED: Red accent) */}
+                          <ModuleCapsuleCard
+                            id="crisis"
+                            label="Krizový Akční Plán SOS"
+                            desc="Okamžitý návod krok za krokem při náhlém odebrání dětí či v tísni"
+                            icon={<ShieldAlert className="w-5 h-5 text-white" />}
+                            badge="SOS 24/7"
+                            accent="red"
+                            isActive={activeTab === 'crisis'}
+                            onClick={() => handleTabClick('crisis')}
+                          />
+
+                          <ModuleCapsuleCard
+                            id="forum"
+                            label="Komunitní Fórum"
+                            desc="Zapojení do krajských diskuzí a vzájemná komunitní pomoc tátů"
+                            icon={<MessageSquare className="w-5 h-5 text-indigo-600" />}
+                            isActive={activeTab === 'forum'}
+                            onClick={() => handleTabClick('forum')}
+                          />
+
+                          <ModuleCapsuleCard
+                            id="stories"
+                            label="Příběhy Tátů & Memento"
+                            desc="Reálná svědectví, osudy a poučení z opatrovnických bojů"
+                            icon={<Heart className="w-5 h-5 text-rose-500" />}
+                            isActive={activeTab === 'stories'}
+                            onClick={() => handleTabClick('stories')}
+                          />
+
+                          <ModuleCapsuleCard
+                            id="advice"
+                            label="Právní Poradna & Dotazy"
+                            desc="Archiv již vyřešených dotazů s doporučením advokátů"
+                            icon={<PhoneCall className="w-5 h-5 text-teal-600" />}
+                            isActive={activeTab === 'advice'}
+                            onClick={() => handleTabClick('advice')}
+                          />
                         </div>
                       </div>
-                    )}
-                  </div>
-                );
-              }
 
+                      {/* Category 2: Právo, Opatrovnictví & Judikatura */}
+                      <div>
+                        <div className="text-[10px] font-mono font-extrabold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5 px-1 border-t border-slate-100 pt-3">
+                          <Scale className="w-3 h-3 text-amber-500" />
+                          <span>Opatrovnictví, Právo &amp; Judikatura</span>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-2.5">
+                          <ModuleCapsuleCard
+                            id="opatrovnicka-agenda"
+                            label="Opatrovnický Průvodce"
+                            desc="Kompletní procesní manuál krok za krokem od návrhu po rozsudek"
+                            icon={<Compass className="w-5 h-5 text-teal-600" />}
+                            isActive={activeTab === 'opatrovnicka-agenda'}
+                            onClick={() => handleTabClick('opatrovnicka-agenda')}
+                          />
+
+                          <ModuleCapsuleCard
+                            id="judikatura"
+                            label="Judikatura & Precedenty ÚS"
+                            desc="Precedentní nálezy a judikátní argumentace pro ochranu práv"
+                            icon={<Scale className="w-5 h-5 text-amber-600" />}
+                            isActive={activeTab === 'judikatura'}
+                            onClick={() => handleTabClick('judikatura')}
+                          />
+
+                          <ModuleCapsuleCard
+                            id="rights"
+                            label="Práva Otců & Ústava ČR"
+                            desc="Garantovaná ústavní práva na rodičovskou péči podle Listiny"
+                            icon={<Shield className="w-5 h-5 text-sky-600" />}
+                            isActive={activeTab === 'rights'}
+                            onClick={() => handleTabClick('rights')}
+                          />
+
+                          <ModuleCapsuleCard
+                            id="ke-stazeni"
+                            label="Vzory Podání & Ke stažení"
+                            desc="Ověřené právní šablony a úřední dokumenty ke stažení"
+                            icon={<FolderCheck className="w-5 h-5 text-emerald-600" />}
+                            badge="DOCX/PDF"
+                            isActive={activeTab === 'ke-stazeni'}
+                            onClick={() => handleTabClick('ke-stazeni')}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Category 3: Státní Data, Edukace & Nápověda */}
+                      <div>
+                        <div className="text-[10px] font-mono font-extrabold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5 px-1 border-t border-slate-100 pt-3">
+                          <BookOpen className="w-3 h-3 text-indigo-500" />
+                          <span>Státní Data, Edukace &amp; Nápověda</span>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                          <ModuleCapsuleCard
+                            id="e-justice"
+                            label="e-Sbírka REST Portal"
+                            desc="Platné zákony a sledování novely legislativy e-Justice"
+                            icon={<Database className="w-5 h-5 text-indigo-600" />}
+                            isActive={activeTab === 'e-justice'}
+                            onClick={() => handleTabClick('e-justice')}
+                          />
+
+                          <ModuleCapsuleCard
+                            id="knihovna-studii"
+                            label="Vědecké Studie & VÚPSV"
+                            desc="Odborné výzkumy attachmentu, střídavé péče a ČSÚ data"
+                            icon={<BookOpen className="w-5 h-5 text-emerald-600" />}
+                            isActive={activeTab === 'knihovna-studii'}
+                            onClick={() => handleTabClick('knihovna-studii')}
+                          />
+
+                          <ModuleCapsuleCard
+                            id="videoteka"
+                            label="Edukační Videotéka"
+                            desc="Instruktážní videa, rozhovory a podcasty s advokáty"
+                            icon={<Tv className="w-5 h-5 text-purple-600" />}
+                            isActive={activeTab === 'videoteka'}
+                            onClick={() => handleTabClick('videoteka')}
+                          />
+
+                          <ModuleCapsuleCard
+                            id="legal-wiki"
+                            label="Právní Wiki & Slovník"
+                            desc="Srozumitelný výklad právnických a úředních termínů"
+                            icon={<Layers className="w-5 h-5 text-teal-600" />}
+                            isActive={activeTab === 'legal-wiki'}
+                            onClick={() => handleTabClick('legal-wiki')}
+                          />
+
+                          <ModuleCapsuleCard
+                            id="user-manual"
+                            label="Nápověda & Manuál"
+                            desc="Detailní průvodce veřejnou i soukromou částí a AI"
+                            icon={<HelpCircle className="w-5 h-5 text-teal-600" />}
+                            badge="NÁVOD"
+                            isActive={activeTab === 'user-manual'}
+                            onClick={() => handleTabClick('user-manual')}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* TAB CONTENT: 🔒 ČÁST PRO PŘIHLÁŠENÉ UŽIVATELE */}
+                  {navTab === 'private' && (
+                    <div className="space-y-4 max-h-[460px] overflow-y-auto pr-1">
+                      {!isLoggedIn && (
+                        <div className="p-3 bg-gradient-to-r from-teal-500/10 via-indigo-500/10 to-purple-500/10 border border-teal-200 rounded-2xl flex items-center justify-between gap-3 text-xs">
+                          <div className="flex items-center gap-2">
+                            <Sparkles className="w-4 h-4 text-teal-600 shrink-0 animate-pulse" />
+                            <span className="text-slate-700">
+                              Tyto chráněné moduly slouží pro registrované rodiče. Přihlaste se pro plný přístup.
+                            </span>
+                          </div>
+                          <button
+                            onClick={() => {
+                              setOpenDropdown(null);
+                              onOpenAuth('login');
+                            }}
+                            className="px-3 py-1 bg-slate-900 text-white font-bold rounded-xl text-xs hover:bg-slate-800 shrink-0 cursor-pointer"
+                          >
+                            Přihlásit se
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Category 1: Osobní Pracovna & Správa Případu */}
+                      <div>
+                        <div className="text-[10px] font-mono font-extrabold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5 px-1">
+                          <UserCheck className="w-3 h-3 text-emerald-500" />
+                          <span>Osobní Pracovna &amp; Správa Případu</span>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                          {/* Moje Pracovna (HIGHLIGHTED: Green/Emerald accent) */}
+                          <ModuleCapsuleCard
+                            id="user-portal"
+                            label="Moje Pracovna (Workspace)"
+                            desc="Soukromé řídicí centrum pro správu vlastních podání a termínů"
+                            icon={<UserCheck className="w-5 h-5 text-white" />}
+                            badge="PRACOVNA"
+                            accent="green"
+                            requiresAuth
+                            isLoggedIn={isLoggedIn}
+                            isActive={activeTab === 'user-portal'}
+                            onClick={() => handleTabClick('user-portal')}
+                          />
+
+                          {/* Rodičovský Hub (HIGHLIGHTED: Indigo accent) */}
+                          <ModuleCapsuleCard
+                            id="coparent-hub"
+                            label="Spolurodičovský Hub (CoParent)"
+                            desc="Sdílený kalendář předávání dětí, výdajů a správa mezi rodiči"
+                            icon={<Users className="w-5 h-5 text-white" />}
+                            badge="HUB"
+                            accent="indigo"
+                            requiresAuth
+                            isLoggedIn={isLoggedIn}
+                            isActive={activeTab === 'coparent-hub'}
+                            onClick={() => handleTabClick('coparent-hub')}
+                          />
+
+                          <ModuleCapsuleCard
+                            id="profile"
+                            label="Profil & Bezpečnost"
+                            desc="Správa přihlášení (Google OAuth), Passkey a bezpečnostní audit"
+                            icon={<Settings className="w-5 h-5 text-slate-700" />}
+                            requiresAuth
+                            isLoggedIn={isLoggedIn}
+                            isActive={activeTab === 'profile'}
+                            onClick={() => handleTabClick('profile')}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Category 2: Chytré AI Nástroje & Validace */}
+                      <div>
+                        <div className="text-[10px] font-mono font-extrabold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5 px-1 border-t border-slate-100 pt-3">
+                          <Sparkles className="w-3 h-3 text-teal-500 animate-pulse" />
+                          <span>Chytré AI Nástroje &amp; Simulátory</span>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                          {/* AI Assistant (HIGHLIGHTED: Teal accent) */}
+                          <ModuleCapsuleCard
+                            id="ai-assistant"
+                            label="AI Právní Asistent"
+                            desc="Interaktivní konverzační asistent s právním rozborem (Gemini AI)"
+                            icon={<Sparkles className="w-5 h-5 text-white" />}
+                            badge="AI GEMINI"
+                            accent="teal"
+                            requiresAuth
+                            isLoggedIn={isLoggedIn}
+                            isActive={activeTab === 'ai-assistant'}
+                            onClick={() => handleTabClick('ai-assistant')}
+                          />
+
+                          {/* Simulátor péče (HIGHLIGHTED: Amber accent) */}
+                          <ModuleCapsuleCard
+                            id="plan-pece"
+                            label="Simulátor Péče"
+                            desc="Matematická 28denní mřížka péče a generování tiskového výstupu"
+                            icon={<Sliders className="w-5 h-5 text-white" />}
+                            badge="SIMULÁTOR"
+                            accent="amber"
+                            requiresAuth
+                            isLoggedIn={isLoggedIn}
+                            isActive={activeTab === 'plan-pece'}
+                            onClick={() => handleTabClick('plan-pece')}
+                          />
+
+                          <ModuleCapsuleCard
+                            id="ai-guide"
+                            label="AI Průvodce Řízením"
+                            desc="Generování taktického plánu na míru podle fáze sporu"
+                            icon={<Compass className="w-5 h-5 text-teal-600" />}
+                            requiresAuth
+                            isLoggedIn={isLoggedIn}
+                            isActive={activeTab === 'ai-guide'}
+                            onClick={() => handleTabClick('ai-guide')}
+                          />
+
+                          <ModuleCapsuleCard
+                            id="ai-case-manager"
+                            label="AI Analýza Spisu & Důkazů"
+                            desc="Skenování, sémantický výtah z listin a časová osa důkazů"
+                            icon={<Briefcase className="w-5 h-5 text-indigo-600" />}
+                            requiresAuth
+                            isLoggedIn={isLoggedIn}
+                            isActive={activeTab === 'ai-case-manager'}
+                            onClick={() => handleTabClick('ai-case-manager')}
+                          />
+
+                          <ModuleCapsuleCard
+                            id="ke-stazeni"
+                            label="Chytrý Editor Podání"
+                            desc="Dynamický editor s automatickou kontrolou přes e-Sbírku"
+                            icon={<FileText className="w-5 h-5 text-emerald-600" />}
+                            requiresAuth
+                            isLoggedIn={isLoggedIn}
+                            isActive={activeTab === 'ke-stazeni'}
+                            onClick={() => handleTabClick('ke-stazeni')}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Category 3: Administrace & Systém */}
+                      {isAdmin && (
+                        <div>
+                          <div className="text-[10px] font-mono font-extrabold text-indigo-500 uppercase tracking-wider mb-2 flex items-center gap-1.5 px-1 border-t border-slate-100 pt-3">
+                            <ShieldAlert className="w-3 h-3 text-indigo-600" />
+                            <span>Administrace &amp; Moderace</span>
+                          </div>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                            <ModuleCapsuleCard
+                              id="admin"
+                              label="Administrace Systému"
+                              desc="Panel pro správu uživatelů, schvalování obsahu a sledování serveru"
+                              icon={<ShieldAlert className="w-5 h-5 text-indigo-600" />}
+                              badge="ADMIN"
+                              isActive={activeTab === 'admin'}
+                              onClick={() => handleTabClick('admin')}
+                            />
+
+                            <ModuleCapsuleCard
+                              id="ai-admin"
+                              label="Autonomní AI Admin"
+                              desc="Systémový nástroj pro správu obsahu, audit a rešerše na pozadí"
+                              icon={<Sparkles className="w-5 h-5 text-indigo-600" />}
+                              badge="AI ADMIN"
+                              isActive={activeTab === 'ai-admin'}
+                              onClick={() => handleTabClick('ai-admin')}
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Quick Public Topbar Direct Buttons */}
+            {PUBLIC_TOPBAR_ITEMS.slice(0, 3).map((item) => {
+              const ItemIcon = item.icon;
+              const isItemActive = activeTab === item.id;
               return (
                 <button
                   key={item.id}
@@ -453,58 +910,16 @@ export default function Navigation({
               )}
             </div>
 
-            {/* Private Zone Dropdown (for Logged In users) */}
-            {isLoggedIn && (
-              <div 
-                className="relative"
-                onMouseEnter={() => setOpenDropdown('private-zone')}
-                onMouseLeave={() => setOpenDropdown(null)}
-              >
-                <button
-                  onClick={() => setOpenDropdown(openDropdown === 'private-zone' ? null : 'private-zone')}
-                  className="flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-teal-500/10 via-indigo-500/10 to-teal-500/10 border border-teal-200/80 rounded-xl text-xs font-extrabold text-teal-900 transition-all cursor-pointer shadow-3xs hover:border-teal-300"
-                >
-                  <Sparkles className="w-3.5 h-3.5 text-teal-600 animate-pulse" />
-                  <span>MŮJ PORTÁL</span>
-                  <ChevronDown className="w-3 h-3 text-teal-600" />
-                </button>
+            {/* Private Zone Direct Access Button */}
+            <button
+              onClick={() => handleTabClick('user-portal')}
+              className="flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-teal-500/10 via-indigo-500/10 to-teal-500/10 border border-teal-200/80 rounded-xl text-xs font-extrabold text-teal-900 transition-all cursor-pointer shadow-3xs hover:border-teal-300"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-teal-600 animate-pulse" />
+              <span>MŮJ PORTÁL</span>
+            </button>
 
-                {openDropdown === 'private-zone' && (
-                  <div className="absolute right-0 mt-1 w-80 bg-white border border-teal-200 rounded-2xl shadow-2xl p-3 z-50 animate-in fade-in duration-100">
-                    {LOGGED_IN_SECTIONS.map((sec) => (
-                      <div key={sec.id} className="mb-3 last:mb-0">
-                        <div className="text-[10px] font-mono font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-md uppercase tracking-wider mb-1.5 flex items-center justify-between">
-                          <span>{sec.title}</span>
-                        </div>
-                        <div className="space-y-0.5">
-                          {sec.items.map((item) => {
-                            const ItemIcon = item.icon;
-                            const isSubActive = activeTab === item.id;
-                            return (
-                              <button
-                                key={item.id}
-                                onClick={() => handleTabClick(item.id)}
-                                className={`w-full flex items-start gap-2.5 p-2 rounded-xl text-left transition-colors cursor-pointer ${
-                                  isSubActive ? 'bg-teal-50 text-teal-950 font-bold' : 'hover:bg-slate-50 text-slate-700'
-                                }`}
-                              >
-                                <ItemIcon className={`w-3.5 h-3.5 shrink-0 mt-0.5 ${isSubActive ? 'text-teal-600' : 'text-slate-400'}`} />
-                                <div className="min-w-0">
-                                  <span className="text-xs font-bold block truncate">{item.label}</span>
-                                  <span className="text-[10px] text-slate-400 block leading-tight">{item.desc}</span>
-                                </div>
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Admin Dropdown */}
+            {/* Admin Direct Button */}
             {isAdmin && (
               <button
                 onClick={() => handleTabClick('admin')}
@@ -728,100 +1143,266 @@ export default function Navigation({
                 </button>
               </div>
 
-              {/* SCROLLABLE DRAWER BODY (RADICALLY SIMPLIFIED) */}
+              {/* SCROLLABLE DRAWER BODY (RADICALLY ENHANCED WITH 2 TABS & CAPSULE CARDS) */}
               <div className="flex-1 overflow-y-auto p-3.5 sm:p-4 space-y-4">
                 
-                {/* 1. SECTOR: 4 CORE KEY ITEMS (Clean & Minimal) */}
-                <div className="space-y-2">
-                  <div className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider px-1">
-                    Klíčové služby
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {/* 1. Krizová pomoc */}
+                {/* 1. SECTOR: 2 MAIN TABS SWITCHER (Veřejná vs Přihlášená část) */}
+                <div className="space-y-3">
+                  <div className="flex items-center p-1 bg-slate-100 rounded-2xl border border-slate-200">
                     <button
-                      onClick={() => handleTabClick('crisis')}
-                      className={`flex items-center justify-between p-3 rounded-2xl text-xs font-bold text-left transition-all border cursor-pointer ${
-                        activeTab === 'crisis'
-                          ? 'bg-rose-600 text-white border-rose-700 shadow-sm'
-                          : 'bg-rose-50/80 hover:bg-rose-100/80 text-rose-950 border-rose-200/90 shadow-3xs'
+                      onClick={() => setNavTab('public')}
+                      className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                        navTab === 'public'
+                          ? 'bg-white text-slate-900 shadow-xs border border-slate-200/80 font-black'
+                          : 'text-slate-600 hover:text-slate-900'
                       }`}
                     >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-8.5 h-8.5 rounded-xl bg-rose-600 text-white flex items-center justify-center shrink-0 shadow-3xs">
-                          <ShieldAlert className="w-4.5 h-4.5" />
-                        </div>
-                        <div className="min-w-0">
-                          <span className="text-xs font-black text-rose-950 block truncate">🚨 Krizová pomoc &amp; SOS linky</span>
-                          <span className="text-[10px] text-rose-700 block truncate font-medium">Rychlá pomoc 24/7 v nouzi</span>
-                        </div>
-                      </div>
-                      <ChevronRight className="w-4 h-4 text-rose-500 shrink-0 ml-1" />
+                      <span>🌐</span>
+                      <span>Veřejná část</span>
                     </button>
 
-                    {/* 2. Rodičovský Hub */}
                     <button
-                      onClick={() => handleTabClick('coparent-hub')}
-                      className={`flex items-center justify-between p-3 rounded-2xl text-xs font-bold text-left transition-all border cursor-pointer ${
-                        activeTab === 'coparent-hub'
-                          ? 'bg-indigo-600 text-white border-indigo-700 shadow-sm'
-                          : 'bg-indigo-50/80 hover:bg-indigo-100/80 text-indigo-950 border-indigo-200/90 shadow-3xs'
+                      onClick={() => setNavTab('private')}
+                      className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                        navTab === 'private'
+                          ? 'bg-gradient-to-r from-teal-600 to-indigo-600 text-white shadow-xs font-black'
+                          : 'text-slate-600 hover:text-slate-900'
                       }`}
                     >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-8.5 h-8.5 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-3xs">
-                          <Users className="w-4.5 h-4.5" />
-                        </div>
-                        <div className="min-w-0">
-                          <span className="text-xs font-black text-indigo-950 block truncate">👨‍👩‍👦 Rodičovský Hub (Co-Parenting)</span>
-                          <span className="text-[10px] text-indigo-700 block truncate font-medium">Sdílený kalendář, spory a párování</span>
-                        </div>
-                      </div>
-                      <ChevronRight className="w-4 h-4 text-indigo-500 shrink-0 ml-1" />
-                    </button>
-
-                    {/* 3. AI Právní Asistent */}
-                    <button
-                      onClick={() => handleTabClick('ai-assistant')}
-                      className={`flex items-center justify-between p-3 rounded-2xl text-xs font-bold text-left transition-all border cursor-pointer ${
-                        activeTab === 'ai-assistant'
-                          ? 'bg-teal-600 text-white border-teal-700 shadow-sm'
-                          : 'bg-teal-50/80 hover:bg-teal-100/80 text-teal-950 border-teal-200/90 shadow-3xs'
-                      }`}
-                    >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-8.5 h-8.5 rounded-xl bg-teal-600 text-white flex items-center justify-center shrink-0 shadow-3xs">
-                          <Sparkles className="w-4.5 h-4.5" />
-                        </div>
-                        <div className="min-w-0">
-                          <span className="text-xs font-black text-teal-950 block truncate">🤖 AI Právní Asistent</span>
-                          <span className="text-[10px] text-teal-700 block truncate font-medium">Syntetický poradce a rozbor spisu</span>
-                        </div>
-                      </div>
-                      <ChevronRight className="w-4 h-4 text-teal-500 shrink-0 ml-1" />
-                    </button>
-
-                    {/* 4. Můj portál */}
-                    <button
-                      onClick={() => handleTabClick('user-portal')}
-                      className={`flex items-center justify-between p-3 rounded-2xl text-xs font-bold text-left transition-all border cursor-pointer ${
-                        activeTab === 'user-portal'
-                          ? 'bg-emerald-600 text-white border-emerald-700 shadow-sm'
-                          : 'bg-emerald-50/80 hover:bg-emerald-100/80 text-emerald-950 border-emerald-200/90 shadow-3xs'
-                      }`}
-                    >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-8.5 h-8.5 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-3xs">
-                          <UserCheck className="w-4.5 h-4.5" />
-                        </div>
-                        <div className="min-w-0">
-                          <span className="text-xs font-black text-emerald-950 block truncate">👤 Můj portál</span>
-                          <span className="text-[10px] text-emerald-700 block truncate font-medium">Osobní kalendář, spis a uložení</span>
-                        </div>
-                      </div>
-                      <ChevronRight className="w-4 h-4 text-emerald-500 shrink-0 ml-1" />
+                      <span>🔒</span>
+                      <span>Pro přihlášené</span>
+                      {isLoggedIn && (
+                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse ml-0.5"></span>
+                      )}
                     </button>
                   </div>
+
+                  {/* TAB 1: 🌐 VEŘEJNÁ ČÁST CARDS */}
+                  {navTab === 'public' && (
+                    <div className="space-y-3 animate-in fade-in duration-150">
+                      <div className="text-[10px] font-mono font-extrabold text-slate-400 uppercase tracking-wider px-1">
+                        Veřejně přístupné moduly (Bez přihlášení)
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        {/* SOS Action Plan (HIGHLIGHTED: Red accent) */}
+                        <ModuleCapsuleCard
+                          id="crisis"
+                          label="Krizový Akční Plán SOS"
+                          desc="Okamžitý návod krok za krokem při náhlém zadržení dětí či v tísni"
+                          icon={<ShieldAlert className="w-5 h-5 text-white" />}
+                          badge="SOS 24/7"
+                          accent="red"
+                          isActive={activeTab === 'crisis'}
+                          onClick={() => {
+                            handleTabClick('crisis');
+                            setMobileMenuOpen(false);
+                          }}
+                        />
+
+                        <ModuleCapsuleCard
+                          id="opatrovnicka-agenda"
+                          label="Opatrovnický Průvodce"
+                          desc="Kompletní procesní manuál krok za krokem od návrhu po rozsudek"
+                          icon={<Compass className="w-5 h-5 text-teal-600" />}
+                          isActive={activeTab === 'opatrovnicka-agenda'}
+                          onClick={() => {
+                            handleTabClick('opatrovnicka-agenda');
+                            setMobileMenuOpen(false);
+                          }}
+                        />
+
+                        <ModuleCapsuleCard
+                          id="forum"
+                          label="Komunitní Fórum"
+                          desc="Zapojení do krajských diskuzí a vzájemná komunitní pomoc tátů"
+                          icon={<MessageSquare className="w-5 h-5 text-indigo-600" />}
+                          isActive={activeTab === 'forum'}
+                          onClick={() => {
+                            handleTabClick('forum');
+                            setMobileMenuOpen(false);
+                          }}
+                        />
+
+                        <ModuleCapsuleCard
+                          id="judikatura"
+                          label="Judikatura ÚS"
+                          desc="Precedentní nálezy a argumentace pro ochranu práv otců"
+                          icon={<Scale className="w-5 h-5 text-amber-600" />}
+                          isActive={activeTab === 'judikatura'}
+                          onClick={() => {
+                            handleTabClick('judikatura');
+                            setMobileMenuOpen(false);
+                          }}
+                        />
+
+                        <ModuleCapsuleCard
+                          id="ke-stazeni"
+                          label="Vzory Podání & Ke stažení"
+                          desc="Ověřené právní šablony a úřední dokumenty ke stažení"
+                          icon={<FolderCheck className="w-5 h-5 text-emerald-600" />}
+                          badge="DOCX/PDF"
+                          isActive={activeTab === 'ke-stazeni'}
+                          onClick={() => {
+                            handleTabClick('ke-stazeni');
+                            setMobileMenuOpen(false);
+                          }}
+                        />
+
+                        <ModuleCapsuleCard
+                          id="advice"
+                          label="Právní Poradna & Q&A"
+                          desc="Archiv zodpovězených dotazů s doporučením advokátů"
+                          icon={<PhoneCall className="w-5 h-5 text-teal-600" />}
+                          isActive={activeTab === 'advice'}
+                          onClick={() => {
+                            handleTabClick('advice');
+                            setMobileMenuOpen(false);
+                          }}
+                        />
+
+                        <ModuleCapsuleCard
+                          id="user-manual"
+                          label="Nápověda & Manuál"
+                          desc="Detailní průvodce veřejnou i soukromou částí a AI"
+                          icon={<HelpCircle className="w-5 h-5 text-teal-600" />}
+                          badge="NÁVOD"
+                          isActive={activeTab === 'user-manual'}
+                          onClick={() => {
+                            handleTabClick('user-manual');
+                            setMobileMenuOpen(false);
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* TAB 2: 🔒 ČÁST PRO PŘIHLÁŠENÉ CARDS */}
+                  {navTab === 'private' && (
+                    <div className="space-y-3 animate-in fade-in duration-150">
+                      <div className="text-[10px] font-mono font-extrabold text-slate-400 uppercase tracking-wider px-1">
+                        Chráněná Pracovna &amp; AI Nástroje
+                      </div>
+
+                      {!isLoggedIn && (
+                        <div className="p-3 bg-gradient-to-r from-teal-500/10 via-indigo-500/10 to-purple-500/10 border border-teal-200 rounded-2xl flex flex-col gap-2 text-xs">
+                          <div className="flex items-center gap-2">
+                            <Sparkles className="w-4 h-4 text-teal-600 shrink-0" />
+                            <span className="text-slate-700 font-medium">
+                              Tyto moduly slouží pro registrované rodiče. Přihlaste se pro přístup.
+                            </span>
+                          </div>
+                          <button
+                            onClick={() => {
+                              setMobileMenuOpen(false);
+                              onOpenAuth('login');
+                            }}
+                            className="w-full py-2 bg-slate-900 text-white font-extrabold rounded-xl text-xs hover:bg-slate-800 cursor-pointer text-center"
+                          >
+                            Přihlásit se do účtu
+                          </button>
+                        </div>
+                      )}
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        {/* Moje Pracovna (HIGHLIGHTED: Green accent) */}
+                        <ModuleCapsuleCard
+                          id="user-portal"
+                          label="Moje Pracovna (Workspace)"
+                          desc="Soukromé řídicí centrum pro správu vlastních podání a termínů"
+                          icon={<UserCheck className="w-5 h-5 text-white" />}
+                          badge="PRACOVNA"
+                          accent="green"
+                          requiresAuth
+                          isLoggedIn={isLoggedIn}
+                          isActive={activeTab === 'user-portal'}
+                          onClick={() => {
+                            handleTabClick('user-portal');
+                            setMobileMenuOpen(false);
+                          }}
+                        />
+
+                        {/* Rodičovský Hub (HIGHLIGHTED: Indigo accent) */}
+                        <ModuleCapsuleCard
+                          id="coparent-hub"
+                          label="Rodičovský Hub (CoParent)"
+                          desc="Sdílený kalendář předávání dětí, výdajů a komunikace"
+                          icon={<Users className="w-5 h-5 text-white" />}
+                          badge="HUB"
+                          accent="indigo"
+                          requiresAuth
+                          isLoggedIn={isLoggedIn}
+                          isActive={activeTab === 'coparent-hub'}
+                          onClick={() => {
+                            handleTabClick('coparent-hub');
+                            setMobileMenuOpen(false);
+                          }}
+                        />
+
+                        {/* AI Assistant (HIGHLIGHTED: Teal accent) */}
+                        <ModuleCapsuleCard
+                          id="ai-assistant"
+                          label="AI Právní Asistent"
+                          desc="Interaktivní konverzační asistent s právním rozborem (Gemini AI)"
+                          icon={<Sparkles className="w-5 h-5 text-white" />}
+                          badge="AI GEMINI"
+                          accent="teal"
+                          requiresAuth
+                          isLoggedIn={isLoggedIn}
+                          isActive={activeTab === 'ai-assistant'}
+                          onClick={() => {
+                            handleTabClick('ai-assistant');
+                            setMobileMenuOpen(false);
+                          }}
+                        />
+
+                        {/* Simulátor péče (HIGHLIGHTED: Amber accent) */}
+                        <ModuleCapsuleCard
+                          id="plan-pece"
+                          label="Simulátor Péče"
+                          desc="Matematická 28denní mřížka péče a tiskový výstup"
+                          icon={<Sliders className="w-5 h-5 text-white" />}
+                          badge="SIMULÁTOR"
+                          accent="amber"
+                          requiresAuth
+                          isLoggedIn={isLoggedIn}
+                          isActive={activeTab === 'plan-pece'}
+                          onClick={() => {
+                            handleTabClick('plan-pece');
+                            setMobileMenuOpen(false);
+                          }}
+                        />
+
+                        <ModuleCapsuleCard
+                          id="ai-guide"
+                          label="AI Průvodce Řízením"
+                          desc="Generování taktického plánu podle fáze sporu"
+                          icon={<Compass className="w-5 h-5 text-teal-600" />}
+                          requiresAuth
+                          isLoggedIn={isLoggedIn}
+                          isActive={activeTab === 'ai-guide'}
+                          onClick={() => {
+                            handleTabClick('ai-guide');
+                            setMobileMenuOpen(false);
+                          }}
+                        />
+
+                        <ModuleCapsuleCard
+                          id="ai-case-manager"
+                          label="AI Analýza Spisu & Důkazů"
+                          desc="Skenování listin, sémantika a časová osa spisu"
+                          icon={<Briefcase className="w-5 h-5 text-indigo-600" />}
+                          requiresAuth
+                          isLoggedIn={isLoggedIn}
+                          isActive={activeTab === 'ai-case-manager'}
+                          onClick={() => {
+                            handleTabClick('ai-case-manager');
+                            setMobileMenuOpen(false);
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* 2. SECTOR: SBALITELNÉ KATEGORIE & SEKCE (Accordions - Closed by default) */}

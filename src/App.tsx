@@ -93,6 +93,7 @@ import { SynthesisAperioHub } from './components/SynthesisAperioHub';
 import AiContextView from './components/AiContextView';
 import StateLawsSection from './components/StateLawsSection';
 import StateStatisticsSection from './components/StateStatisticsSection';
+import UserManualView from './components/UserManualView';
 
 export default function App() {
   const { t } = useLanguage();
@@ -797,6 +798,17 @@ export default function App() {
               />
             )}
 
+            {(activeTab === 'user-manual' || activeTab === 'manual' || activeTab === 'napoveda') && (
+              <UserManualView
+                setActiveTab={(tab) => {
+                  setActiveTab(tab);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                onOpenAuth={() => setAuthModalOpen(true)}
+                currentUser={currentUser}
+              />
+            )}
+
             {activeTab === 'sitemap' && (
               <SitemapTimeline
                 setActiveTab={(tab) => {
@@ -878,6 +890,7 @@ export default function App() {
               <div className="grid grid-cols-2 gap-2 text-xs text-slate-400">
                 <button onClick={() => setActiveTab('opatrovnicka-agenda')} className="text-left hover:text-teal-400 transition-colors cursor-pointer">{t('nav_opatrovnicka_agenda', 'Opatrovnická agenda')}</button>
                 <button onClick={() => setActiveTab('ke-stazeni')} className="text-left hover:text-teal-400 transition-colors cursor-pointer">{t('nav_ke_stazeni', 'Vzory podání')}</button>
+                <button onClick={() => setActiveTab('user-manual')} className="text-left hover:text-teal-400 font-bold text-teal-300 transition-colors cursor-pointer">📖 Nápověda & Manuál</button>
                 <button onClick={() => setActiveTab('plan-pece')} className="text-left hover:text-teal-400 transition-colors cursor-pointer">{t('nav_plan_pece', 'Plán péče')}</button>
                 <button onClick={() => setActiveTab('user-portal')} className="text-left hover:text-teal-400 transition-colors cursor-pointer">{t('nav_user_portal', 'Můj portál')}</button>
                 <button onClick={() => setActiveTab('contacts')} className="text-left hover:text-teal-400 transition-colors cursor-pointer">Kontakt na autora</button>

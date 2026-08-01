@@ -100,6 +100,7 @@ export const EDUKACNI_AKADEMIE_ITEMS: NavSubItem[] = [
 
 // 1. VEŘEJNÁ ČÁST - KATEGORIE 5: ⚙️ Systémové stránky
 export const SYSTEMOVE_STRANKY_ITEMS: NavSubItem[] = [
+  { id: 'user-manual', label: '📖 Nápověda & Uživatelský manuál', desc: 'Detailní průvodce veřejnou i soukromou částí portálu a AI nástroji' },
   { id: 'news', label: 'Novinky & Systémové Aktualizace (Changelog)', desc: 'Veřejný přehled verzí a změn v systému' },
   { id: 'sitemap', label: 'Architektura & Vývoj Synthesis OS (Sitemap)', desc: 'Kompletní vývojový deník, inventář stránek a technický přehled' }
 ];

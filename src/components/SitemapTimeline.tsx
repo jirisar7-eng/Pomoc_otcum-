@@ -619,6 +619,18 @@ export default function SitemapTimeline({ setActiveTab, onOpenGlossary, currentU
       keyFeatures: ['LLM indexation', 'JSON-LD strukturovaná data', 'Schema.org metadata', 'Crawlery API']
     },
     {
+      id: 'page-user-manual',
+      tab: 'user-manual',
+      name: 'Nápověda & Uživatelský manuál',
+      category: '🛠️ Administrace & Systém',
+      desc: 'Detailní průvodce veřejnou i soukromou částí portálu, bezpečí dat a AI auditora.',
+      version: 'V1.8',
+      status: 'Plně funkční',
+      icon: <HelpCircle className="w-4 h-4 text-teal-600" />,
+      apiDependencies: ['UserManualView Component', 'Help Search Index'],
+      keyFeatures: ['Průvodce veřejnou částí', 'Průvodce pro přihlášené', 'Bezpečnostní pravidla', 'Návody krok za krokem']
+    },
+    {
       id: 'page-sitemap',
       tab: 'sitemap',
       name: 'Architektura & Vývoj Synthesis OS (Sitemap)',
