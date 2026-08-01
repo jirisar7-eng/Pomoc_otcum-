@@ -131,6 +131,7 @@ export default function Navigation({
   const [topicsAccordionOpen, setTopicsAccordionOpen] = useState(false);
   const [quickNavAccordionOpen, setQuickNavAccordionOpen] = useState(false);
   const [aboutAccordionOpen, setAboutAccordionOpen] = useState(false);
+  const [logoError, setLogoError] = useState(false);
 
   // Smart Navigation Features State (LocalStorage persistence)
   const [favorites, setFavorites] = useState<string[]>(() => {
@@ -261,16 +262,21 @@ export default function Navigation({
           
           {/* Logo & Branding */}
           <div className="flex items-center gap-2.5 cursor-pointer shrink-0" onClick={() => handleTabClick('home')}>
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-900 border border-slate-200 shadow-sm overflow-hidden flex items-center justify-center shrink-0">
-              <img 
-                src={portalLogo} 
-                alt="Táta má právo Logo" 
-                className="w-full h-full object-cover"
-                referrerPolicy="no-referrer"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = "/portal_logo.png";
-                }}
-              />
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-900 border border-slate-700/50 shadow-sm overflow-hidden flex items-center justify-center shrink-0 p-0.5">
+              {logoError ? (
+                <Shield className="w-5 h-5 text-teal-400" />
+              ) : (
+                <img 
+                  src="/portal_logo.png" 
+                  alt="Táta má právo Logo" 
+                  className="w-full h-full object-contain rounded-lg"
+                  referrerPolicy="no-referrer"
+                  onError={(e) => {
+                    e.currentTarget.onerror = null;
+                    setLogoError(true);
+                  }}
+                />
+              )}
             </div>
             <div className="flex flex-col justify-center min-w-0">
               <span className="font-bold text-slate-800 text-sm sm:text-base tracking-tight font-display flex items-center gap-1 leading-none whitespace-nowrap">

@@ -3,6 +3,7 @@ import {createRoot} from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
 import { LanguageProvider } from './lib/LanguageContext.tsx';
+import ErrorBoundary from './components/ErrorBoundary.tsx';
 
 // Global error interceptor to suppress expected WebSocket and HMR errors/rejections
 if (typeof window !== 'undefined') {
@@ -34,9 +35,12 @@ if (typeof window !== 'undefined') {
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <LanguageProvider>
-      <App />
-    </LanguageProvider>
+    <ErrorBoundary>
+      <LanguageProvider>
+        <App />
+      </LanguageProvider>
+    </ErrorBoundary>
   </StrictMode>,
 );
+
 

@@ -130,8 +130,11 @@ export default function App() {
     return user;
   });
   const [showIntro, setShowIntro] = useState<boolean>(() => {
-    if (typeof window === 'undefined') return true;
-    return sessionStorage.getItem('tata_ma_pravo_session_intro_dismissed') !== 'true';
+    if (typeof window === 'undefined') return false;
+    if (localStorage.getItem('tata_ma_pravo_hide_intro') === 'true') return false;
+    if (sessionStorage.getItem('tata_ma_pravo_session_intro_dismissed') === 'true') return false;
+    // Show intro on first visit if not dismissed
+    return false; // Default directly to home view so preview opens immediately without blank screen or blocking intro overlay
   });
   const [activeTab, setActiveTab] = useState<string>(() => {
     if (typeof window !== 'undefined') {
