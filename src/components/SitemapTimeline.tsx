@@ -67,7 +67,7 @@ interface PageModuleItem {
   id: string;
   tab: string;
   name: string;
-  category: 'Opatrovnictví & Právo' | 'Státní Data & Registry' | 'Chytré AI Nástroje' | 'Edukační Akademie' | 'Komunita & SOS' | 'Pracovna & Systém';
+  category: '🚨 Krizová pomoc & Komunita' | '⚖️ Opatrovnictví, Právo & Judikatura' | '🏛️ Státní Data & Registry' | '🎓 Edukační Akademie' | '📂 Osobní Pracovna & Správa Případu' | '🤖 Chytré AI Nástroje & Validace' | '🛠️ Administrace & Systém';
   desc: string;
   version: string;
   status: 'Plně funkční' | 'Beta Test' | 'REST API Ready';
@@ -233,261 +233,25 @@ export default function SitemapTimeline({ setActiveTab, onOpenGlossary, currentU
   // 2. COMPLETE 36-PAGE SYSTEM CATALOG (Všechny stránky a moduly)
   // -------------------------------------------------------------
   const allPageModules: PageModuleItem[] = [
-    // --- 1. Opatrovnictví & Právo ---
+    // --- 🚨 1. Krizová pomoc & Komunita ---
     {
-      id: 'page-opatrovnicka-agenda',
-      tab: 'opatrovnicka-agenda',
-      name: 'Opatrovnická agenda krok za krokem',
-      category: 'Opatrovnictví & Právo',
-      desc: 'Kompletní průvodce opatrovnickým řízením, příprava na soudní jednání, OSPOD a psychologická strategie.',
+      id: 'page-crisis',
+      tab: 'crisis',
+      name: 'Krizový Akční Plán SOS (První Pomoc)',
+      category: '🚨 Krizová pomoc & Komunita',
+      desc: 'Okamžitý návod krok za krokem při náhlém zadržení dětí či v tísni.',
       version: 'V1.8',
       status: 'Plně funkční',
-      icon: <Scale className="w-4 h-4 text-indigo-600" />,
-      apiDependencies: ['e-Sbírka REST API', 'Firestore /state_laws'],
-      keyFeatures: ['Fáze řízení', 'Příprava na soud', 'Strategie pro OSPOD', 'Právní doporučení']
+      icon: <Activity className="w-4 h-4 text-rose-600" />,
+      apiDependencies: ['Crisis Emergency Engine'],
+      keyFeatures: ['24/7 Akční krok za krokem', 'Tísňové kontakty', 'Protokol o neodpovídání', 'Okamžité podání']
     },
-    {
-      id: 'page-plan-pece',
-      tab: 'plan-pece',
-      name: 'Simulátor Péče & Sourozenecké Soudržnosti',
-      category: 'Opatrovnictví & Právo',
-      desc: '5-krokový interaktivní průvodce střídání péče, výpočtu intervalů a hodnocení emoční vazby dětí dle judikatury ÚS ČR (sp. zn. I. ÚS 2482/13).',
-      version: 'V1.8',
-      status: 'Plně funkční',
-      icon: <Sliders className="w-4 h-4 text-teal-600" />,
-      apiDependencies: ['CareSimulatorWizard Engine', 'Print Layout Generator'],
-      keyFeatures: ['28-denní mřížka péče', 'Posouzení sourozenců', 'Tiskový výstup pro soud/OSPOD', 'Emoční index']
-    },
-    {
-      id: 'page-rights',
-      tab: 'rights',
-      name: 'Práva Otců & Ústava ČR (LZPS)',
-      category: 'Opatrovnictví & Právo',
-      desc: 'Přehled ústavních práv garantovaných Listinou základních práv a svobod a Evropskou úmluvou o lidských právech.',
-      version: 'V1.8',
-      status: 'Plně funkční',
-      icon: <Shield className="w-4 h-4 text-amber-600" />,
-      apiDependencies: ['e-Sbírka REST API (Zákon č. 2/1993 Sb.)'],
-      keyFeatures: ['Článek 32 LZPS', 'Právo na rodinný život', 'Mezinárodní úmluvy', 'Argumentace k soudu']
-    },
-    {
-      id: 'page-documents',
-      tab: 'documents',
-      name: 'Vzory Dokumentů & Právní Podání',
-      category: 'Opatrovnictví & Právo',
-      desc: 'Profesionální vzory žalob, vyjádření k soudu, odvolání a stížností na OSPOD v editovatelném formátu.',
-      version: 'V1.8',
-      status: 'Plně funkční',
-      icon: <FileText className="w-4 h-4 text-indigo-600" />,
-      apiDependencies: ['Local State Engine', 'Firebase Storage'],
-      keyFeatures: ['Návrh na střídavou péči', 'Stížnost na OSPOD', 'Odvolání proti rozsudku', 'Předběžné opatření']
-    },
-    {
-      id: 'page-judikatura',
-      tab: 'judikatura',
-      name: 'Precedenty & Judikatura ÚS/NS ČR',
-      category: 'Opatrovnictví & Právo',
-      desc: 'Katalog klíčových nálezů Ústavního a Nejvyššího soudu ČR pro ochranu práv otců na střídavou péči.',
-      version: 'V1.8',
-      status: 'Plně funkční',
-      icon: <BookOpen className="w-4 h-4 text-teal-600" />,
-      apiDependencies: ['Judikatura Search API', 'Firestore /precedents'],
-      keyFeatures: ['Sp. zn. I. ÚS 2482/13', 'Sp. zn. III. ÚS 1206/09', 'Přímé citace do podání', 'Sémantické štítky']
-    },
-    {
-      id: 'page-ke-stazeni',
-      tab: 'ke-stazeni',
-      name: 'Ke Stažení (Právní Šablony v DOCX)',
-      category: 'Opatrovnictví & Právo',
-      desc: 'Rychlé stahování právních dokumentů a oficiálních formulářů pro okamžité použití bez registrací.',
-      version: 'V1.8',
-      status: 'Plně funkční',
-      icon: <FileText className="w-4 h-4 text-slate-700" />,
-      apiDependencies: ['Static File Repository'],
-      keyFeatures: ['DOCX formát', 'Okamžité stažení', 'Předpřipravená pole', 'Ověřené právníky']
-    },
-
-    // --- 2. Státní Data & Registry ---
-    {
-      id: 'page-state-laws',
-      tab: 'state-laws',
-      name: 'e-Sbírka & e-Legislativa REST API Portal',
-      category: 'Státní Data & Registry',
-      desc: 'Vyhledávání v platných zákonech (Občanský zákoník, ZOSŘ), sledování chystaných novel v e-Legislativě a vývojářská REST API konzole.',
-      version: 'V1.8',
-      status: 'Plně funkční',
-      icon: <Gavel className="w-4 h-4 text-teal-600" />,
-      apiDependencies: ['/api/laws', '/api/state-data/e-sbirka/register', '/api/state-data/e-legislativa/drafts'],
-      keyFeatures: ['e-Sbírka REST API', 'e-Legislativa návrhy novel', 'Generátor citací k soudu', 'REST API Test Bench']
-    },
-    {
-      id: 'page-state-statistics',
-      tab: 'state-statistics',
-      name: 'ČSÚ & MPSV Demografické & Soudní Statistiky',
-      category: 'Státní Data & Registry',
-      desc: 'Oficiální statistická data Ministerstva spravedlnosti a Českého statistického úřadu o délkách soudních řízení a typech péče.',
-      version: 'V1.8',
-      status: 'Plně funkční',
-      icon: <Activity className="w-4 h-4 text-indigo-600" />,
-      apiDependencies: ['/api/statistics', 'ČSÚ DataStat API', 'MPSV Open Data'],
-      keyFeatures: ['Průměrná délka řízení', 'Podíl střídavé péče v ČR', 'Grafy vývoje 2018–2026', 'Regionální srovnání']
-    },
-    {
-      id: 'page-centrum-formularu',
-      tab: 'centrum-formularu',
-      name: 'Centrum Formulářů & Chytrý Editor',
-      category: 'Státní Data & Registry',
-      desc: 'Interaktivní průvodce sestavením bezchybného podání nebo odvolání s automatickou kontrolou náležitostí.',
-      version: 'V1.8',
-      status: 'Plně funkční',
-      icon: <FileCode className="w-4 h-4 text-purple-600" />,
-      apiDependencies: ['Form Engine', 'Firestore /user_forms'],
-      keyFeatures: ['Dynamický editor', 'Kontrola náležitostí', 'Export do PDF', 'Uložení konceptu']
-    },
-    {
-      id: 'page-pripadova-databaze',
-      tab: 'pripadova-databaze',
-      name: 'Případová Databáze Rozsudků',
-      category: 'Státní Data & Registry',
-      desc: 'Katalog reálných opatrovnických rozsudků seřazených podle soudů, věku dětí a zvolené právní taktiky.',
-      version: 'V1.8',
-      status: 'Plně funkční',
-      icon: <Database className="w-4 h-4 text-indigo-600" />,
-      apiDependencies: ['Firestore /court_cases'],
-      keyFeatures: ['Anonymizované rozsudky', 'Filtrování dle krajských soudů', 'Úspěšné argumenty', 'Statistika vyhovění']
-    },
-
-    // --- 3. Chytré AI Nástroje ---
-    {
-      id: 'page-ai-assistant',
-      tab: 'ai-assistant',
-      name: 'AI Právní Asistent (Gemini 1.5 Flash)',
-      category: 'Chytré AI Nástroje',
-      desc: 'Chytrý konverzační asistent pro rychlé dotazy na opatrovnické právo, lhůty, výživné a jednání s OSPOD.',
-      version: 'V1.8',
-      status: 'Plně funkční',
-      icon: <Sparkles className="w-4 h-4 text-amber-500" />,
-      apiDependencies: ['/api/chat', 'Gemini 1.5 Flash SDK'],
-      keyFeatures: ['Okamžité odpovedi', 'Citace paragrafů', 'Ochrana osobních údajů', 'Kontextová paměť']
-    },
-    {
-      id: 'page-ai-guide',
-      tab: 'ai-guide',
-      name: 'Sémantický AI Průvodce Řízením',
-      category: 'Chytré AI Nástroje',
-      desc: 'AI generátor opatrovnické strategie na základě specifického zadání a stavu vašeho soudního sporu.',
-      version: 'V1.8',
-      status: 'Plně funkční',
-      icon: <Cpu className="w-4 h-4 text-purple-600" />,
-      apiDependencies: ['/api/chat', 'Gemini Strategy Prompt Engine'],
-      keyFeatures: ['Analýza rizik', 'Krok za krokem plán', 'Doporučené důkazy', 'Příprava na výslech']
-    },
-    {
-      id: 'page-ai-case-manager',
-      tab: 'ai-case-manager',
-      name: 'Osobní Složka Případu & AI Strategický Asistent',
-      category: 'Chytré AI Nástroje',
-      desc: 'Sada nástrojů pro ukládání dokumentů případu s AI sémantickým výtahem, typováním poznámek a chronologií.',
-      version: 'V1.8',
-      status: 'Plně funkční',
-      icon: <FolderTree className="w-4 h-4 text-indigo-600" />,
-      apiDependencies: ['Firestore /case_files', 'Gemini Document Analysis'],
-      keyFeatures: ['Sémantický výtah z listin', 'Vylepšené AI skenování', 'Časová osa důkazů', 'Ukládání do složky']
-    },
-    {
-      id: 'page-coparent-hub',
-      tab: 'coparent-hub',
-      name: 'Spolurodičovský Hub (CoParent)',
-      category: 'Chytré AI Nástroje',
-      desc: 'Sdílený kalendář pro plynulé předávání dětí, přehled mimořádných výdajů, zpráv a úkolů bez zbytečných konfliktů.',
-      version: 'V1.8',
-      status: 'Plně funkční',
-      icon: <Network className="w-4 h-4 text-teal-600" />,
-      apiDependencies: ['Firestore /coparent_schedules'],
-      keyFeatures: ['Kalendář předávání', 'Evidence výdajů', 'Osvědčení o předání', 'Export pro soud']
-    },
-    {
-      id: 'page-ai-admin',
-      tab: 'ai-admin',
-      name: 'Autonomní AI Admin & Moderátor',
-      category: 'Chytré AI Nástroje',
-      desc: 'Správcovské rozhraní pro spouštění autonomního AI moderátora, webový audit, kontrolu fóra a diagnostiku.',
-      version: 'V1.8',
-      status: 'Plně funkční',
-      icon: <BotIcon className="w-4 h-4 text-emerald-600" />,
-      apiDependencies: ['/api/ai-admin/execute', 'System Audit Ledger'],
-      keyFeatures: ['Autonomní audit fóra', 'Webový rešeršní bot', 'Diagnostika databáze', 'Automatický log']
-    },
-
-    // --- 4. Edukační Akademie ---
-    {
-      id: 'page-knihovna-studii',
-      tab: 'knihovna-studii',
-      name: 'Knihovna Vědeckých Studií & Psychologie',
-      category: 'Edukační Akademie',
-      desc: 'Kompletní argumentační zdroje z oborů psychologie, dětského lékařství, sociologie a výzkumů střídavé péče.',
-      version: 'V1.8',
-      status: 'Plně funkční',
-      icon: <BookOpen className="w-4 h-4 text-indigo-600" />,
-      apiDependencies: ['Studies Repository API'],
-      keyFeatures: ['Vědecké citace', 'Výzkumy attachmentu', 'Argumenty pro OSPOD', 'PDF výtahy ke stažení']
-    },
-    {
-      id: 'page-videoteka',
-      tab: 'videoteka',
-      name: 'Edukační Videotéka & SmartVideoEmbed',
-      category: 'Edukační Akademie',
-      desc: 'Instruktážní videa ze soudních síní, rozhovory s dětskými psychology, advokáty a zkušenými táty.',
-      version: 'V1.8',
-      status: 'Plně funkční',
-      icon: <Eye className="w-4 h-4 text-purple-600" />,
-      apiDependencies: ['SmartVideoEmbed Engine'],
-      keyFeatures: ['Simulace soudního výslechu', 'Rozhovory s odborníky', 'Přehrávač bez reklam', 'Kapitoly videí']
-    },
-    {
-      id: 'page-vzdelavani',
-      tab: 'vzdelavani',
-      name: 'Akademie Tátů & Interaktivní Kvízy',
-      category: 'Edukační Akademie',
-      desc: 'Edukační kvízy, zátěžové scénáře a nácvik verbální obhajoby u soudního jednání a šetření OSPOD.',
-      version: 'V1.8',
-      status: 'Plně funkční',
-      icon: <Sliders className="w-4 h-4 text-emerald-600" />,
-      apiDependencies: ['Interactive Quiz Engine'],
-      keyFeatures: ['Zátěžové otázky', 'Hodnocení reakcí', 'Zpětná vazba právníků', 'Certifikát akademie']
-    },
-    {
-      id: 'page-legal-wiki',
-      tab: 'legal-wiki',
-      name: 'Právní Wiki & Slovník Pojmů',
-      category: 'Edukační Akademie',
-      desc: 'Srozumitelné vysvětlení právnických termínů jako kolizní opatrovník, syndrom zavrženého rodiče, výživné, ZOSŘ.',
-      version: 'V1.8',
-      status: 'Plně funkční',
-      icon: <HelpCircle className="w-4 h-4 text-teal-600" />,
-      apiDependencies: ['Glossary Index Engine'],
-      keyFeatures: ['Sémantické vyhledávání', 'Propojení s paragrafy', 'Právní přehled', 'Výkladová hesla']
-    },
-    {
-      id: 'page-cesta-zakladatele',
-      tab: 'cesta-zakladatele',
-      name: 'Příběh Zakladatele Synthesis OS',
-      category: 'Edukační Akademie',
-      desc: 'Osobní memento a motivace vzniku celého systému Táta má právo od prvního sporu po vývoj AI platforem.',
-      version: 'V1.8',
-      status: 'Plně funkční',
-      icon: <Heart className="w-4 h-4 text-rose-500" />,
-      apiDependencies: ['Static Story Engine'],
-      keyFeatures: ['Osobní výpověď', 'Historie projektu', 'Filosofie Synthesis OS', 'Manifest dětí']
-    },
-
-    // --- 5. Komunita & SOS ---
     {
       id: 'page-forum',
       tab: 'forum',
       name: 'Komunitní Diskuzní Fórum',
-      category: 'Komunita & SOS',
-      desc: 'Bezpečné a moderované fórum s dělením témat podle krajů, soudů a fází opatrovnického řízení.',
+      category: '🚨 Krizová pomoc & Komunita',
+      desc: 'Prohlížení a zapojení do moderovaných diskuzí rozdělených podle krajů a fází řízení.',
       version: 'V1.8',
       status: 'Plně funkční',
       icon: <MessageSquare className="w-4 h-4 text-teal-600" />,
@@ -498,7 +262,7 @@ export default function SitemapTimeline({ setActiveTab, onOpenGlossary, currentU
       id: 'page-stories',
       tab: 'stories',
       name: 'Osobní Příběhy Tátů',
-      category: 'Komunita & SOS',
+      category: '🚨 Krizová pomoc & Komunita',
       desc: 'Nefiltrovaná mementa a reálné zkušenosti otců z opatrovnických bojů pro povzbuzení ostatních.',
       version: 'V1.8',
       status: 'Plně funkční',
@@ -510,7 +274,7 @@ export default function SitemapTimeline({ setActiveTab, onOpenGlossary, currentU
       id: 'page-memento',
       tab: 'memento',
       name: 'Memento Opatrovnických Bojů',
-      category: 'Komunita & SOS',
+      category: '🚨 Krizová pomoc & Komunita',
       desc: 'Památník a svědectví o systémových selháních s cílem prosadit legislativní změny v ČR.',
       version: 'V1.8',
       status: 'Plně funkční',
@@ -522,8 +286,8 @@ export default function SitemapTimeline({ setActiveTab, onOpenGlossary, currentU
       id: 'page-advice',
       tab: 'advice',
       name: 'Právní Poradna & Zodpovězené Dotazy',
-      category: 'Komunita & SOS',
-      desc: 'Archiv ověřených právních dotazů s odpověďmi advokátů a specialistů na rodinné právo.',
+      category: '🚨 Krizová pomoc & Komunita',
+      desc: 'Veřejný archiv již vyřešených dotazů s odpověďmi specialistů.',
       version: 'V1.8',
       status: 'Plně funkční',
       icon: <HelpCircle className="w-4 h-4 text-amber-600" />,
@@ -531,61 +295,175 @@ export default function SitemapTimeline({ setActiveTab, onOpenGlossary, currentU
       keyFeatures: ['Katalog dotazů', 'Kategorizace dle témat', 'Klíčová slova', 'Doporučené postupy']
     },
     {
-      id: 'page-crisis',
-      tab: 'crisis',
-      name: 'Krizový Akční Plán SOS (První Pomoc)',
-      category: 'Komunita & SOS',
-      desc: 'Okamžitá krizová pomoc při odepření styku s dítětem, psychickém nátlaku nebo protiprávním jednání.',
-      version: 'V1.8',
-      status: 'Plně funkční',
-      icon: <Activity className="w-4 h-4 text-rose-600" />,
-      apiDependencies: ['Crisis Emergency Engine'],
-      keyFeatures: ['24/7 Akční krok za krokem', 'Tísňové kontakty', 'Protokol o neodpovídání', 'Okamžité podání']
-    },
-    {
       id: 'page-support',
       tab: 'support',
       name: 'Podpora Projektu & Transparentní Dary',
-      category: 'Komunita & SOS',
-      desc: 'Integrovaný panel pro finanční a dobrovolnickou podporu rozvoje otevřené platformy Táta má právo.',
+      category: '🚨 Krizová pomoc & Komunita',
+      desc: 'Informace o financování, QR platby a seznam partnerů/sponzorů.',
       version: 'V1.8',
       status: 'Plně funkční',
       icon: <Heart className="w-4 h-4 text-rose-500" />,
       apiDependencies: ['Payment QR Code Engine', 'Firestore /donations'],
       keyFeatures: ['QR Platby', 'Seznam podporovatelů', 'Transparentní rozpočet', 'Dobrovolnická síť']
     },
+
+    // --- ⚖️ 2. Opatrovnictví, Právo & Judikatura ---
     {
-      id: 'page-news',
-      tab: 'news',
-      name: 'Novinky & Systémové Aktualizace',
-      category: 'Komunita & SOS',
-      desc: 'Přehled vydaných verzí, změn v legislativě a plánovaných vylepšení Synthesis OS.',
+      id: 'page-opatrovnicka-agenda',
+      tab: 'opatrovnicka-agenda',
+      name: 'Opatrovnická agenda krok za krokem',
+      category: '⚖️ Opatrovnictví, Právo & Judikatura',
+      desc: 'Kompletní veřejný manuál celým opatrovnickým procesem.',
       version: 'V1.8',
       status: 'Plně funkční',
-      icon: <Globe className="w-4 h-4 text-teal-600" />,
-      apiDependencies: ['Firestore /news_updates'],
-      keyFeatures: ['Changelog verzí', 'Legislativní novinky', 'Rychlé zprávy', 'Oznámení pro uživatele']
+      icon: <Scale className="w-4 h-4 text-indigo-600" />,
+      apiDependencies: ['e-Sbírka REST API', 'Firestore /state_laws'],
+      keyFeatures: ['Fáze řízení', 'Příprava na soud', 'Strategie pro OSPOD', 'Právní doporučení']
+    },
+    {
+      id: 'page-rights',
+      tab: 'rights',
+      name: 'Práva Otců & Ústava ČR (LZPS)',
+      category: '⚖️ Opatrovnictví, Právo & Judikatura',
+      desc: 'Přehled ústavních práv a mezinárodních úmluv.',
+      version: 'V1.8',
+      status: 'Plně funkční',
+      icon: <Shield className="w-4 h-4 text-amber-600" />,
+      apiDependencies: ['e-Sbírka REST API (Zákon č. 2/1993 Sb.)'],
+      keyFeatures: ['Článek 32 LZPS', 'Právo na rodinný život', 'Mezinárodní úmluvy', 'Argumentace k soudu']
+    },
+    {
+      id: 'page-judikatura',
+      tab: 'judikatura',
+      name: 'Precedenty & Judikatura ÚS/NS ČR',
+      category: '⚖️ Opatrovnictví, Právo & Judikatura',
+      desc: 'Veřejný katalog klíčových nálezů soudů pro ochranu práv otců.',
+      version: 'V1.8',
+      status: 'Plně funkční',
+      icon: <BookOpen className="w-4 h-4 text-teal-600" />,
+      apiDependencies: ['Judikatura Search API', 'Firestore /precedents'],
+      keyFeatures: ['Sp. zn. I. ÚS 2482/13', 'Sp. zn. III. ÚS 1206/09', 'Přímé citace do podání', 'Sémantické štítky']
+    },
+    {
+      id: 'page-ke-stazeni',
+      tab: 'ke-stazeni',
+      name: 'Ke Stažení & Oficiální Dokumenty',
+      category: '⚖️ Opatrovnictví, Právo & Judikatura',
+      desc: 'Stahování ověřených dokumentů z lokální DB s denní automatickou cache ze státního API e-Sbírky (MV ČR).',
+      version: 'V1.8',
+      status: 'Plně funkční',
+      icon: <FileText className="w-4 h-4 text-slate-700" />,
+      apiDependencies: ['/api/esbirka/official-forms', '/api/esbirka/sync-daily-cache'],
+      keyFeatures: ['Lokální DB vyrovnávací paměť', 'Bez zatěžování státního API', 'Formuláře v DOCX/PDF', 'Denní cron sync']
     },
 
-    // --- 6. Pracovna & Systém ---
+    // --- 🏛️ 3. Státní Data & Registry ---
     {
-      id: 'page-synthesis-hub',
-      tab: 'synthesis-hub',
-      name: 'Synthesis OS Rozcestník & Central Hub',
-      category: 'Pracovna & Systém',
-      desc: 'Hlavní velitelské rozhraní pro přístup ke všem subsystémům, AI modulům a datovým tokům.',
+      id: 'page-state-laws',
+      tab: 'state-laws',
+      name: 'e-Sbírka & e-Legislativa REST API Portal',
+      category: '🏛️ Státní Data & Registry',
+      desc: 'Veřejný přehled platných zákonů a sledování chystaných novel.',
       version: 'V1.8',
       status: 'Plně funkční',
-      icon: <Cpu className="w-4 h-4 text-indigo-600" />,
-      apiDependencies: ['System Router Engine'],
-      keyFeatures: ['Rychlé spuštění modulů', 'Systémová diagnostika', 'Uživatelský stav', 'Právní zkratky']
+      icon: <Gavel className="w-4 h-4 text-teal-600" />,
+      apiDependencies: ['/api/laws', '/api/state-data/e-sbirka/register', '/api/state-data/e-legislativa/drafts'],
+      keyFeatures: ['e-Sbírka REST API', 'e-Legislativa návrhy novel', 'Generátor citací k soudu', 'REST API Test Bench']
     },
+    {
+      id: 'page-state-statistics',
+      tab: 'state-statistics',
+      name: 'ČSÚ & MPSV Demografické & Soudní Statistiky',
+      category: '🏛️ Státní Data & Registry',
+      desc: 'Oficiální statistická data o délkách řízení a střídavé péči.',
+      version: 'V1.8',
+      status: 'Plně funkční',
+      icon: <Activity className="w-4 h-4 text-indigo-600" />,
+      apiDependencies: ['/api/statistics', 'ČSÚ DataStat API', 'MPSV Open Data'],
+      keyFeatures: ['Průměrná délka řízení', 'Podíl střídavé péče v ČR', 'Grafy vývoje 2018–2026', 'Regionální srovnání']
+    },
+    {
+      id: 'page-pripadova-databaze',
+      tab: 'pripadova-databaze',
+      name: 'Případová Databáze Rozsudků',
+      category: '🏛️ Státní Data & Registry',
+      desc: 'Anonymizovaný přehled reálných rozhodnutí českých soudů.',
+      version: 'V1.8',
+      status: 'Plně funkční',
+      icon: <Database className="w-4 h-4 text-indigo-600" />,
+      apiDependencies: ['Firestore /court_cases'],
+      keyFeatures: ['Anonymizované rozsudky', 'Filtrování dle krajských soudů', 'Úspěšné argumenty', 'Statistika vyhovění']
+    },
+
+    // --- 🎓 4. Edukační Akademie ---
+    {
+      id: 'page-knihovna-studii',
+      tab: 'knihovna-studii',
+      name: 'Knihovna Vědeckých Studií & Psychologie',
+      category: '🎓 Edukační Akademie',
+      desc: 'Odborné texty, výzkumy attachmentu a argumenty pro OSPOD.',
+      version: 'V1.8',
+      status: 'Plně funkční',
+      icon: <BookOpen className="w-4 h-4 text-indigo-600" />,
+      apiDependencies: ['Studies Repository API'],
+      keyFeatures: ['Vědecké citace', 'Výzkumy attachmentu', 'Argumenty pro OSPOD', 'PDF výtahy ke stažení']
+    },
+    {
+      id: 'page-videoteka',
+      tab: 'videoteka',
+      name: 'Edukační Videotéka & SmartVideoEmbed',
+      category: '🎓 Edukační Akademie',
+      desc: 'Instruktážní videa, rozhovory a záznamy.',
+      version: 'V1.8',
+      status: 'Plně funkční',
+      icon: <Eye className="w-4 h-4 text-purple-600" />,
+      apiDependencies: ['SmartVideoEmbed Engine'],
+      keyFeatures: ['Simulace soudního výslechu', 'Rozhovory s odborníky', 'Přehrávač bez reklam', 'Kapitoly videí']
+    },
+    {
+      id: 'page-vzdelavani',
+      tab: 'vzdelavani',
+      name: 'Akademie Tátů & Interaktivní Kvízy',
+      category: '🎓 Edukační Akademie',
+      desc: 'Zátěžové testy a nácvik verbální obhajoby.',
+      version: 'V1.8',
+      status: 'Plně funkční',
+      icon: <Sliders className="w-4 h-4 text-emerald-600" />,
+      apiDependencies: ['Interactive Quiz Engine'],
+      keyFeatures: ['Zátěžové otázky', 'Hodnocení reakcí', 'Zpětná vazba právníků', 'Certifikát akademie']
+    },
+    {
+      id: 'page-legal-wiki',
+      tab: 'legal-wiki',
+      name: 'Právní Wiki & Slovník Pojmů',
+      category: '🎓 Edukační Akademie',
+      desc: 'Srozumitelný výklad právnických a úředních termínů.',
+      version: 'V1.8',
+      status: 'Plně funkční',
+      icon: <HelpCircle className="w-4 h-4 text-teal-600" />,
+      apiDependencies: ['Glossary Index Engine'],
+      keyFeatures: ['Sémantické vyhledávání', 'Propojení s paragrafy', 'Právní přehled', 'Výkladová hesla']
+    },
+    {
+      id: 'page-cesta-zakladatele',
+      tab: 'cesta-zakladatele',
+      name: 'Příběh Zakladatele Synthesis OS',
+      category: '🎓 Edukační Akademie',
+      desc: 'Osobní memento a filosofie vzniku celého portálu.',
+      version: 'V1.8',
+      status: 'Plně funkční',
+      icon: <Heart className="w-4 h-4 text-rose-500" />,
+      apiDependencies: ['Static Story Engine'],
+      keyFeatures: ['Osobní výpověď', 'Historie projektu', 'Filosofie Synthesis OS', 'Manifest dětí']
+    },
+
+    // --- 📂 5. Osobní Pracovna & Správa Případu ---
     {
       id: 'page-user-portal',
       tab: 'user-portal',
       name: 'Moje Pracovna & Osobní Složka',
-      category: 'Pracovna & Systém',
-      desc: 'Privátní řídicí centrum uživatele pro správu osobních podání, uložených dokumentů a harmonogramu.',
+      category: '📂 Osobní Pracovna & Správa Případu',
+      desc: 'Soukromé řídicí centrum pro správu vlastních podání, poznámek a termínů soudních jednání.',
       version: 'V1.8',
       status: 'Plně funkční',
       icon: <Compass className="w-4 h-4 text-teal-600" />,
@@ -596,8 +474,8 @@ export default function SitemapTimeline({ setActiveTab, onOpenGlossary, currentU
       id: 'page-profile',
       tab: 'profile',
       name: 'Profil Hráče / Uživatele & Identity Hub',
-      category: 'Pracovna & Systém',
-      desc: 'Centrální správa identity s podporou Google OAuth, Passkey biometrie a propojení více e-mailů.',
+      category: '📂 Osobní Pracovna & Správa Případu',
+      desc: 'Správa přihlášení (Google OAuth, Passkey biometrie), propojení e-mailů a bezpečnostní audit.',
       version: 'V1.8',
       status: 'Plně funkční',
       icon: <Users className="w-4 h-4 text-indigo-600" />,
@@ -605,11 +483,123 @@ export default function SitemapTimeline({ setActiveTab, onOpenGlossary, currentU
       keyFeatures: ['Passkey biometrie', 'Multi-email linkage', 'Bezpečnostní audit', 'Správa profilu']
     },
     {
+      id: 'page-coparent-hub',
+      tab: 'coparent-hub',
+      name: 'Spolurodičovský Hub (CoParent)',
+      category: '📂 Osobní Pracovna & Správa Případu',
+      desc: 'Sdílený kalendář pro předávání dětí, evidenci výdajů a správu mezi rodiči.',
+      version: 'V1.8',
+      status: 'Plně funkční',
+      icon: <Network className="w-4 h-4 text-teal-600" />,
+      apiDependencies: ['Firestore /coparent_schedules'],
+      keyFeatures: ['Kalendář předávání', 'Evidence výdajů', 'Osvědčení o předání', 'Export pro soud']
+    },
+
+    // --- 🤖 6. Chytré AI Nástroje & Validace ---
+    {
+      id: 'page-ai-assistant',
+      tab: 'ai-assistant',
+      name: 'AI Právní Asistent (Gemini 1.5 Flash)',
+      category: '🤖 Chytré AI Nástroje & Validace',
+      desc: 'Interaktivní konverzační asistent pro personalizované dotazy.',
+      version: 'V1.8',
+      status: 'Plně funkční',
+      icon: <Sparkles className="w-4 h-4 text-amber-500" />,
+      apiDependencies: ['/api/chat', 'Gemini 1.5 Flash SDK'],
+      keyFeatures: ['Okamžité odpovedi', 'Citace paragrafů', 'Ochrana osobních údajů', 'Kontextová paměť']
+    },
+    {
+      id: 'page-ai-guide',
+      tab: 'ai-guide',
+      name: 'Sémantický AI Průvodce Řízením',
+      category: '🤖 Chytré AI Nástroje & Validace',
+      desc: 'Generování taktického plánu na míru podle konkrétní fáze probíhajícího sporu.',
+      version: 'V1.8',
+      status: 'Plně funkční',
+      icon: <Cpu className="w-4 h-4 text-purple-600" />,
+      apiDependencies: ['/api/chat', 'Gemini Strategy Prompt Engine'],
+      keyFeatures: ['Analýza rizik', 'Krok za krokem plán', 'Doporučené důkazy', 'Příprava na výslek']
+    },
+    {
+      id: 'page-ai-case-manager',
+      tab: 'ai-case-manager',
+      name: 'Osobní Složka Případu & AI Strategický Asistent',
+      category: '🤖 Chytré AI Nástroje & Validace',
+      desc: 'Skenování, sémantický výtah z vlastních soudních listin a budování časové osy důkazů.',
+      version: 'V1.8',
+      status: 'Plně funkční',
+      icon: <FolderTree className="w-4 h-4 text-indigo-600" />,
+      apiDependencies: ['Firestore /case_files', 'Gemini Document Analysis'],
+      keyFeatures: ['Sémantický výtah z listin', 'Vylepšené AI skenování', 'Časová osa důkazů', 'Ukládání do složky']
+    },
+    {
+      id: 'page-plan-pece',
+      tab: 'plan-pece',
+      name: 'Simulátor Péče & Sourozenecké Soudržnosti',
+      category: '🤖 Chytré AI Nástroje & Validace',
+      desc: 'Nástroj pro tvorbu 28denní mřížky péče a tisk výstupu pro soud.',
+      version: 'V1.8',
+      status: 'Plně funkční',
+      icon: <Sliders className="w-4 h-4 text-teal-600" />,
+      apiDependencies: ['CareSimulatorWizard Engine', 'Print Layout Generator'],
+      keyFeatures: ['28-denní mřížka péče', 'Posouzení sourozenců', 'Tiskový výstup pro soud/OSPOD', 'Emoční index']
+    },
+    {
+      id: 'page-centrum-formularu',
+      tab: 'centrum-formularu',
+      name: 'Centrum Formulářů & Chytrý Editor',
+      category: '🤖 Chytré AI Nástroje & Validace',
+      desc: 'Dynamický editor právních podání s automatickou kontrolou náležitostí a validací přes státní API e-Sbírky.',
+      version: 'V1.8',
+      status: 'Plně funkční',
+      icon: <FileCode className="w-4 h-4 text-purple-600" />,
+      apiDependencies: ['Form Engine', 'Firestore /user_forms', '/api/esbirka/official-forms'],
+      keyFeatures: ['Dynamický editor', 'Kontrola náležitostí', 'Validace e-Sbírka', 'Uložení konceptu']
+    },
+
+    // --- 🛠️ 7. Administrace & Systém ---
+    {
+      id: 'page-news',
+      tab: 'news',
+      name: 'Novinky & Systémové Aktualizace (Changelog)',
+      category: '🛠️ Administrace & Systém',
+      desc: 'Veřejný přehled verzí a změn v systému.',
+      version: 'V1.8',
+      status: 'Plně funkční',
+      icon: <Globe className="w-4 h-4 text-teal-600" />,
+      apiDependencies: ['Firestore /news_updates'],
+      keyFeatures: ['Changelog verzí', 'Legislativní novinky', 'Rychlé zprávy', 'Oznámení pro uživatele']
+    },
+    {
+      id: 'page-synthesis-hub',
+      tab: 'synthesis-hub',
+      name: 'Synthesis OS Rozcestník & Central Hub',
+      category: '🛠️ Administrace & Systém',
+      desc: 'Rychlý rozcestník a přehled stavu systému pro přihlášeného uživatele.',
+      version: 'V1.8',
+      status: 'Plně funkční',
+      icon: <Cpu className="w-4 h-4 text-indigo-600" />,
+      apiDependencies: ['System Router Engine'],
+      keyFeatures: ['Rychlé spuštění modulů', 'Systémová diagnostika', 'Uživatelský stav', 'Právní zkratky']
+    },
+    {
+      id: 'page-ai-admin',
+      tab: 'ai-admin',
+      name: 'Autonomní AI Admin & Moderátor',
+      category: '🛠️ Administrace & Systém',
+      desc: 'Systémový nástroj pro správu obsahu, audit a rešerše na pozadí.',
+      version: 'V1.8',
+      status: 'Plně funkční',
+      icon: <BotIcon className="w-4 h-4 text-emerald-600" />,
+      apiDependencies: ['/api/ai-admin/execute', 'System Audit Ledger'],
+      keyFeatures: ['Autonomní audit fóra', 'Webový rešeršní bot', 'Diagnostika databáze', 'Automatický log']
+    },
+    {
       id: 'page-admin',
       tab: 'admin',
       name: 'Administrace & Systémový Monitoring',
-      category: 'Pracovna & Systém',
-      desc: 'Administrátorský řídicí panel pro správu obsahu, moderaci uživatelů, auditní logy a monitoring serveru.',
+      category: '🛠️ Administrace & Systém',
+      desc: 'Panel pro správu uživatelů, schvalování obsahu a sledování stavu serveru.',
       version: 'V1.8',
       status: 'Plně funkční',
       icon: <Shield className="w-4 h-4 text-slate-900" />,
@@ -620,8 +610,8 @@ export default function SitemapTimeline({ setActiveTab, onOpenGlossary, currentU
       id: 'page-ai-context',
       tab: 'ai-context',
       name: 'AI Context & Strojový Index',
-      category: 'Pracovna & Systém',
-      desc: 'Strojově čitelný rozcestník a kontextový index pro AI vyhledávače, GPTBot, ClaudeBot a LLM crawlery.',
+      category: '🛠️ Administrace & Systém',
+      desc: 'Strojově čitelná data a metadata pro LLM crawlery a externí integrace.',
       version: 'V1.8',
       status: 'Plně funkční',
       icon: <Code className="w-4 h-4 text-teal-600" />,
@@ -631,9 +621,9 @@ export default function SitemapTimeline({ setActiveTab, onOpenGlossary, currentU
     {
       id: 'page-sitemap',
       tab: 'sitemap',
-      name: 'Architektura & Vývoj Synthesis OS (Tato Stránka)',
-      category: 'Pracovna & Systém',
-      desc: 'Kompletní architektonický přehled, krok za krokem vývojový deník, inventář 36 stránek a REST API konzole.',
+      name: 'Architektura & Vývoj Synthesis OS (Sitemap)',
+      category: '🛠️ Administrace & Systém',
+      desc: 'Kompletní vývojový deník, inventář stránek a technický přehled.',
       version: 'V1.8',
       status: 'Plně funkční',
       icon: <Map className="w-4 h-4 text-indigo-600" />,
@@ -664,12 +654,13 @@ export default function SitemapTimeline({ setActiveTab, onOpenGlossary, currentU
 
   const categoriesList = [
     'all',
-    'Opatrovnictví & Právo',
-    'Státní Data & Registry',
-    'Chytré AI Nástroje',
-    'Edukační Akademie',
-    'Komunita & SOS',
-    'Pracovna & Systém'
+    '🚨 Krizová pomoc & Komunita',
+    '⚖️ Opatrovnictví, Právo & Judikatura',
+    '🏛️ Státní Data & Registry',
+    '🎓 Edukační Akademie',
+    '📂 Osobní Pracovna & Správa Případu',
+    '🤖 Chytré AI Nástroje & Validace',
+    '🛠️ Administrace & Systém'
   ];
 
   return (

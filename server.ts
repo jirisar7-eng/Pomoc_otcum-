@@ -1084,6 +1084,73 @@ app.post(['/api/validate-form', '/api/esbirka/validate-form'], async (req, res) 
   }
 });
 
+// GET / POST /api/esbirka/audit-content - Full legal compliance audit of app items against e-Sbírka
+app.all(['/api/esbirka/audit-content', '/api/esbirka/audit'], async (req, res) => {
+  try {
+    const customItems = req.body?.items || req.body?.customItems;
+    const report = await esbirkaService.auditLegalContent(customItems);
+    return res.status(200).json({ success: true, report });
+  } catch (err: any) {
+    console.error('[e-Sbírka Audit API] Audit failed:', err);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// GET /api/esbirka/official-forms - List of cached family law forms with daily sync timestamp
+app.get(['/api/esbirka/official-forms', '/api/esbirka/forms-cache'], async (req, res) => {
+  try {
+    const cacheState = await esbirkaService.getOfficialFormsCache();
+    return res.status(200).json({ success: true, cacheState });
+  } catch (err: any) {
+    console.error('[e-Sbírka Official Forms API] Failed to fetch cache:', err);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// POST /api/esbirka/sync-daily-cache - Manual or cron trigger to refresh official forms daily cache
+app.post(['/api/esbirka/sync-daily-cache', '/api/esbirka/daily-cron'], async (req, res) => {
+  try {
+    const cacheState = await esbirkaService.syncDailyFormCache();
+    return res.status(200).json({ 
+      success: true, 
+      message: 'Denní vyrovnávací paměť formulářů byla úspěšně aktualizována z e-Sbírky MV ČR.', 
+      cacheState 
+    });
+  } catch (err: any) {
+    console.error('[e-Sbírka Daily Cron] Manual sync failed:', err);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// GET /api/esbirka/download-form/:formId - Instant download of official verified form from local cache
+app.get('/api/esbirka/download-form/:formId', async (req, res) => {
+  try {
+    const formId = req.params.formId;
+    const file = await esbirkaService.getFormDownloadFile(formId);
+    if (!file) {
+      return res.status(404).json({ success: false, error: 'Formulář nebyl v lokální vyrovnávací paměti nalezen.' });
+    }
+
+    res.setHeader('Content-Type', file.mimeType);
+    res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(file.filename)}"`);
+    return res.status(200).send(file.content);
+  } catch (err: any) {
+    console.error('[e-Sbírka Download API] Failed:', err);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Initialize Daily Forms Cron Job on Server Startup
+esbirkaService.syncDailyFormCache().catch(err => {
+  console.warn('[e-Sbírka Startup Cron] Initial form cache sync notice:', err.message);
+});
+setInterval(() => {
+  console.log('[e-Sbírka Background Cron] Running 24-hour daily cache update from e-Sbírka...');
+  esbirkaService.syncDailyFormCache().catch(err => {
+    console.error('[e-Sbírka Background Cron] Daily update failed:', err.message);
+  });
+}, 24 * 60 * 60 * 1000);
+
 // GET /api/statistics - Fetch ČSÚ & MPSV custody & family statistics
 app.get(['/api/statistics', '/api/state-data/statistics'], (req, res) => {
   try {
