@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { FileText, Search, Edit2, Check, Download, Printer, Eye, X, RefreshCw, AlertTriangle, ChevronRight } from 'lucide-react';
+import EsbirkaFormValidator from './EsbirkaFormValidator';
 
 interface Template {
   id: string;
@@ -386,6 +387,18 @@ export default function CentrumFormularu() {
                     </div>
                   )}
                 </div>
+              </div>
+
+              {/* Live e-Sbírka Validation Bar */}
+              <div className="print:hidden">
+                <EsbirkaFormValidator
+                  formId={editorTemplate.id}
+                  formTitle={editorTemplate.title}
+                  formData={{
+                    ...inputs,
+                    fullText: getCompiledText(editorTemplate)
+                  }}
+                />
               </div>
 
               {/* Dynamic Live Print Preview Paper (A4 size formatted) */}

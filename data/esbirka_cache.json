@@ -1,0 +1,712 @@
+{
+  "law_89-2012": {
+    "data": {
+      "id": "89-2012",
+      "lawNumber": "89/2012 Sb.",
+      "title": "Zákon č. 89/2012 Sb., občanský zákoník (Část druhá - Rodinné právo)",
+      "shortTitle": "Občanský zákoník (OZ)",
+      "eSbirkaCode": "89/2012",
+      "effectiveDate": "2014-01-01",
+      "lastSynced": "2026-08-01T07:10:47.724Z",
+      "status": "cached",
+      "paragraphs": [
+        {
+          "id": "oz-887",
+          "lawNumber": "89/2012 Sb.",
+          "lawTitle": "Občanský zákoník",
+          "paragraphNumber": "§ 887",
+          "title": "Právo dítěte na péči obou rodičů",
+          "content": "Dítě má právo na péči obou rodičů a udržování osobitého styku s nimi v rozsahu odpovídajícím jeho zájmům. Rodič, který nemá dítě v péči, má právo s ním být v pravidelném osobním styku.",
+          "noteForFathers": "Základní pilíř střídavé a rovnocenné péče. Soud musí primárně hájit právo dítěte na oba rodiče.",
+          "courtCitationTemplate": "V souladu s § 887 občanského zákoníku má nezletilé dítě nezadatelné právo na péči obou rodičů a udržování pravidelného osobního styku s oběma rodiči.",
+          "category": "Formy péče",
+          "eSbirkaUrl": "https://www.e-sbirka.cz/sb/2012/89#p887"
+        },
+        {
+          "id": "oz-907",
+          "lawNumber": "89/2012 Sb.",
+          "lawTitle": "Občanský zákoník",
+          "paragraphNumber": "§ 907",
+          "title": "Formy péče o dítě",
+          "content": "Soud může svěřit dítě do péče jednoho z rodičů, nebo do střídavé péče, anebo do společné péče. Soud při rozhodování přihlíží k zájmu dítěte, jeho citovým vazbám a výchovným schopnostem rodičů.",
+          "noteForFathers": "Střídavá péče je rovnocennou formou péče. Soud musí odůvodnit, pokud střídavou péči neuloží.",
+          "courtCitationTemplate": "Podle § 907 odst. 2 občanského zákoníku je střídavá péče preferovaným modelem rodinněprávního uspořádání, pokud jsou oba rodiče způsobilí dítě vychovávat.",
+          "category": "Formy péče",
+          "eSbirkaUrl": "https://www.e-sbirka.cz/sb/2012/89#p907"
+        },
+        {
+          "id": "oz-913",
+          "lawNumber": "89/2012 Sb.",
+          "lawTitle": "Občanský zákoník",
+          "paragraphNumber": "§ 913",
+          "title": "Kritéria určování výživného",
+          "content": "Pro určení rozsahu výživného jsou rozhodné odůvodněné potřeby oprávněného a jeho majetkové poměry, jakož i schopnosti, možnosti a majetkové poměry povinného.",
+          "noteForFathers": "Výživné musí zohlednit i reálné náklady spojené s péčí během osobního styku otce s dítětem.",
+          "courtCitationTemplate": "Dle § 913 občanského zákoníku je nutné posoudit odůvodněné potřeby dítěte ve vztahu k reálným možnostem a majetkovým poměrům obou rodičů.",
+          "category": "Výživné",
+          "eSbirkaUrl": "https://www.e-sbirka.cz/sb/2012/89#p913"
+        },
+        {
+          "id": "oz-888",
+          "lawNumber": "89/2012 Sb.",
+          "lawTitle": "Občanský zákoník",
+          "paragraphNumber": "§ 888",
+          "title": "Právo na osobní styk a bránění ve styku",
+          "content": "Rodič, který má dítě v péči, je povinen dítě na styk s druhým rodičem řádně připravit a styk umožnit. Bezdůvodné bránění ve styku je důvodem pro změnu rozhodnutí o péči.",
+          "noteForFathers": "Opakované bezdůvodné maření styku matkou je zákonným důvodem k přehodnocení péče v neprospěch bránícího rodiče.",
+          "courtCitationTemplate": "Jak stanoví § 888 OZ, bezdůvodné bránění ve styku je závažným porušením rodičovské odpovědnosti odůvodňujícím změnu výchovného prostředí.",
+          "category": "Styk s dítětem",
+          "eSbirkaUrl": "https://www.e-sbirka.cz/sb/2012/89#p888"
+        }
+      ]
+    },
+    "timestamp": 1785568254091,
+    "ttl": 86400000
+  },
+  "paragraph_89-2012_907": {
+    "data": {
+      "id": "oz-907",
+      "lawNumber": "89/2012 Sb.",
+      "lawTitle": "Občanský zákoník",
+      "paragraphNumber": "§ 907",
+      "title": "Formy péče o dítě",
+      "content": "Soud může svěřit dítě do péče jednoho z rodičů, nebo do střídavé péče, anebo do společné péče. Soud při rozhodování přihlíží k zájmu dítěte, jeho citovým vazbám a výchovným schopnostem rodičů.",
+      "noteForFathers": "Střídavá péče je rovnocennou formou péče. Soud musí odůvodnit, pokud střídavou péči neuloží.",
+      "courtCitationTemplate": "Podle § 907 odst. 2 občanského zákoníku je střídavá péče preferovaným modelem rodinněprávního uspořádání, pokud jsou oba rodiče způsobilí dítě vychovávat.",
+      "category": "Formy péče",
+      "eSbirkaUrl": "https://www.e-sbirka.cz/sb/2012/89#p907"
+    },
+    "timestamp": 1785568254118,
+    "ttl": 86400000
+  },
+  "search_střídavá": {
+    "data": {
+      "totalCount": 1,
+      "query": "střídavá",
+      "source": "local-cache",
+      "cachedAt": "2026-08-01T07:10:54.247Z",
+      "laws": [
+        {
+          "id": "89-2012",
+          "lawNumber": "89/2012 Sb.",
+          "title": "Zákon č. 89/2012 Sb., občanský zákoník (Část druhá - Rodinné právo)",
+          "shortTitle": "Občanský zákoník (OZ)",
+          "eSbirkaCode": "89/2012",
+          "effectiveDate": "2014-01-01",
+          "lastSynced": "2026-08-01T07:10:47.724Z",
+          "status": "cached",
+          "paragraphs": [
+            {
+              "id": "oz-887",
+              "lawNumber": "89/2012 Sb.",
+              "lawTitle": "Občanský zákoník",
+              "paragraphNumber": "§ 887",
+              "title": "Právo dítěte na péči obou rodičů",
+              "content": "Dítě má právo na péči obou rodičů a udržování osobitého styku s nimi v rozsahu odpovídajícím jeho zájmům. Rodič, který nemá dítě v péči, má právo s ním být v pravidelném osobním styku.",
+              "noteForFathers": "Základní pilíř střídavé a rovnocenné péče. Soud musí primárně hájit právo dítěte na oba rodiče.",
+              "courtCitationTemplate": "V souladu s § 887 občanského zákoníku má nezletilé dítě nezadatelné právo na péči obou rodičů a udržování pravidelného osobního styku s oběma rodiči.",
+              "category": "Formy péče",
+              "eSbirkaUrl": "https://www.e-sbirka.cz/sb/2012/89#p887"
+            },
+            {
+              "id": "oz-907",
+              "lawNumber": "89/2012 Sb.",
+              "lawTitle": "Občanský zákoník",
+              "paragraphNumber": "§ 907",
+              "title": "Formy péče o dítě",
+              "content": "Soud může svěřit dítě do péče jednoho z rodičů, nebo do střídavé péče, anebo do společné péče. Soud při rozhodování přihlíží k zájmu dítěte, jeho citovým vazbám a výchovným schopnostem rodičů.",
+              "noteForFathers": "Střídavá péče je rovnocennou formou péče. Soud musí odůvodnit, pokud střídavou péči neuloží.",
+              "courtCitationTemplate": "Podle § 907 odst. 2 občanského zákoníku je střídavá péče preferovaným modelem rodinněprávního uspořádání, pokud jsou oba rodiče způsobilí dítě vychovávat.",
+              "category": "Formy péče",
+              "eSbirkaUrl": "https://www.e-sbirka.cz/sb/2012/89#p907"
+            },
+            {
+              "id": "oz-913",
+              "lawNumber": "89/2012 Sb.",
+              "lawTitle": "Občanský zákoník",
+              "paragraphNumber": "§ 913",
+              "title": "Kritéria určování výživného",
+              "content": "Pro určení rozsahu výživného jsou rozhodné odůvodněné potřeby oprávněného a jeho majetkové poměry, jakož i schopnosti, možnosti a majetkové poměry povinného.",
+              "noteForFathers": "Výživné musí zohlednit i reálné náklady spojené s péčí během osobního styku otce s dítětem.",
+              "courtCitationTemplate": "Dle § 913 občanského zákoníku je nutné posoudit odůvodněné potřeby dítěte ve vztahu k reálným možnostem a majetkovým poměrům obou rodičů.",
+              "category": "Výživné",
+              "eSbirkaUrl": "https://www.e-sbirka.cz/sb/2012/89#p913"
+            },
+            {
+              "id": "oz-888",
+              "lawNumber": "89/2012 Sb.",
+              "lawTitle": "Občanský zákoník",
+              "paragraphNumber": "§ 888",
+              "title": "Právo na osobní styk a bránění ve styku",
+              "content": "Rodič, který má dítě v péči, je povinen dítě na styk s druhým rodičem řádně připravit a styk umožnit. Bezdůvodné bránění ve styku je důvodem pro změnu rozhodnutí o péči.",
+              "noteForFathers": "Opakované bezdůvodné maření styku matkou je zákonným důvodem k přehodnocení péče v neprospěch bránícího rodiče.",
+              "courtCitationTemplate": "Jak stanoví § 888 OZ, bezdůvodné bránění ve styku je závažným porušením rodičovské odpovědnosti odůvodňujícím změnu výchovného prostředí.",
+              "category": "Styk s dítětem",
+              "eSbirkaUrl": "https://www.e-sbirka.cz/sb/2012/89#p888"
+            }
+          ]
+        },
+        {
+          "id": "359-1999",
+          "lawNumber": "359/1999 Sb.",
+          "title": "Zákon č. 359/1999 Sb., o sociálně-právní ochraně dětí (ZOSPO)",
+          "shortTitle": "Zákon o SPOD",
+          "eSbirkaCode": "359/1999",
+          "effectiveDate": "2000-04-01",
+          "lastSynced": "2026-08-01T07:10:47.724Z",
+          "status": "cached",
+          "paragraphs": [
+            {
+              "id": "zospo-5",
+              "lawNumber": "359/1999 Sb.",
+              "lawTitle": "Zákon o SPOD",
+              "paragraphNumber": "§ 5",
+              "title": "Přednostní zájem dítěte a nestrannost OSPOD",
+              "content": "Předním hlediskem sociálně-právní ochrany je zájem a blaho dítěte, ochrana jeho rodičovství a rodiny a právo dítěte na rodičovskou péči.",
+              "noteForFathers": "OSPOD má povinnost vystupovat jako nestranný kolizní opatrovník bez předsudků vůči pohlaví rodiče.",
+              "courtCitationTemplate": "Na základě § 5 zákona č. 359/1999 Sb. je OSPOD povinen postupovat zcela nestranně v zájmu zachování vazeb dítěte k oběma rodičům.",
+              "category": "Soudní řízení",
+              "eSbirkaUrl": "https://www.e-sbirka.cz/sb/1999/359#p5"
+            }
+          ]
+        },
+        {
+          "id": "2-1993",
+          "lawNumber": "2/1993 Sb.",
+          "title": "Usnesení předsednictva ČNR č. 2/1993 Sb., o vyhlášení Listiny základních práv a svobod",
+          "shortTitle": "Listina základních práv a svobod (LZPS)",
+          "eSbirkaCode": "2/1993",
+          "effectiveDate": "1993-01-01",
+          "lastSynced": "2026-08-01T07:10:47.724Z",
+          "status": "cached",
+          "paragraphs": [
+            {
+              "id": "lzps-32",
+              "lawNumber": "2/1993 Sb.",
+              "lawTitle": "Listina základních práv a svobod",
+              "paragraphNumber": "Čl. 32",
+              "title": "Ochrana rodičovství a rodiny",
+              "content": "Rodičovství a rodina jsou pod ochranou zákona. Péče o děti a jejich výchova je právem rodičů; děti mají právo na rodičovskou výchovu a péči. Práva rodičů mohou být omezena a nezletilé děti mohou být od rodičů odloučeny proti jejich vůli jen rozhodnutím soudu na základě zákona.",
+              "noteForFathers": "Ústavně garantované právo otce vychovávat své dítě na rovnoprávném základě s matkou.",
+              "courtCitationTemplate": "Dle čl. 32 odst. 4 Listiny základních práv a svobod je péče o děti a jejich výchova ústavním právem obou rodičů.",
+              "category": "Ústavní práva",
+              "eSbirkaUrl": "https://www.e-sbirka.cz/sb/1993/2#cl32"
+            }
+          ]
+        }
+      ],
+      "paragraphs": [
+        {
+          "id": "oz-907",
+          "lawNumber": "89/2012 Sb.",
+          "lawTitle": "Občanský zákoník",
+          "paragraphNumber": "§ 907",
+          "title": "Formy péče o dítě",
+          "content": "Soud může svěřit dítě do péče jednoho z rodičů, nebo do střídavé péče, anebo do společné péče. Soud při rozhodování přihlíží k zájmu dítěte, jeho citovým vazbám a výchovným schopnostem rodičů.",
+          "noteForFathers": "Střídavá péče je rovnocennou formou péče. Soud musí odůvodnit, pokud střídavou péči neuloží.",
+          "courtCitationTemplate": "Podle § 907 odst. 2 občanského zákoníku je střídavá péče preferovaným modelem rodinněprávního uspořádání, pokud jsou oba rodiče způsobilí dítě vychovávat.",
+          "category": "Formy péče",
+          "eSbirkaUrl": "https://www.e-sbirka.cz/sb/2012/89#p907"
+        }
+      ]
+    },
+    "timestamp": 1785568254247,
+    "ttl": 86400000
+  },
+  "paragraph_89-2012_855": {
+    "data": {
+      "id": "oz-855",
+      "lawNumber": "89/2012 Sb.",
+      "lawTitle": "Občanský zákoník",
+      "paragraphNumber": "§ 855",
+      "title": "Vznik a trvání rodičovské odpovědnosti",
+      "content": "Rodičovská odpovědnost vzniká narozením dítěte a zaniká nabytím plné svéprávnosti dítěte. Trvání rodičovské odpovědnosti nezávisí na tom, zda rodiče žijí spolu nebo odděleně.",
+      "noteForFathers": "Rozvod ani rozchod rodičů neruší rodičovskou odpovědnost otce.",
+      "courtCitationTemplate": "Z ustanovení § 855 občanského zákoníku vyplývá, že rozpad partnerství rodičů nemá žádný vliv na trvání rodičovské odpovědnosti otce.",
+      "category": "Rodičovská odpovědnost",
+      "eSbirkaUrl": "https://www.e-sbirka.cz/sb/2012/89#p855"
+    },
+    "timestamp": 1785569446812,
+    "ttl": 2592000000
+  },
+  "paragraph_89-2012_856": {
+    "data": {
+      "id": "oz-856",
+      "lawNumber": "89/2012 Sb.",
+      "lawTitle": "Občanský zákoník",
+      "paragraphNumber": "§ 856",
+      "title": "Obsah rodičovské odpovědnosti",
+      "content": "Rodičovská odpovědnost zahrnuje povinnosti a práva rodičů, která spočívají v péči o dítě, zahrnující zejména péči o jeho zdraví, jeho tělesný, citový, rozumový a mravní vývoj, v jeho zastupování a ve spravování jeho jmění.",
+      "noteForFathers": "Otec má stejné zákonné právo a povinnost pečovat o zdraví a vývoj dítěte jako matka.",
+      "courtCitationTemplate": "V souladu s § 856 občanského zákoníku zahrnuje rodičovská odpovědnost rovnoprávnou péči obou rodičů o citový a rozumový vývoj dítěte.",
+      "category": "Rodičovská odpovědnost",
+      "eSbirkaUrl": "https://www.e-sbirka.cz/sb/2012/89#p856"
+    },
+    "timestamp": 1785569446812,
+    "ttl": 2592000000
+  },
+  "paragraph_89-2012_885": {
+    "data": {
+      "id": "oz-885",
+      "lawNumber": "89/2012 Sb.",
+      "lawTitle": "Občanský zákoník",
+      "paragraphNumber": "§ 885",
+      "title": "Právo na udržování osobitého vztahu k dítěti",
+      "content": "Rodič, který nemá dítě v osobní péči, má právo s ním udržovat osobitý vztah a stýkat se s ním v rozsahu odpovídajícím zájmům dítěte.",
+      "noteForFathers": "Osobní styk otce s dítětem je nezadatelným právem dítěte i rodiče.",
+      "courtCitationTemplate": "Dle § 885 občanského zákoníku je styk otce s dítětem klíčovým prvkem pro zachování osobitého rodinného vztahu.",
+      "category": "Styk s dítětem",
+      "eSbirkaUrl": "https://www.e-sbirka.cz/sb/2012/89#p885"
+    },
+    "timestamp": 1785569446812,
+    "ttl": 2592000000
+  },
+  "paragraph_89-2012_886": {
+    "data": {
+      "id": "oz-886",
+      "lawNumber": "89/2012 Sb.",
+      "lawTitle": "Občanský zákoník",
+      "paragraphNumber": "§ 886",
+      "title": "Právo na informace o dítěti",
+      "content": "Rodič, který nemá dítě v péči, má právo být informován druhým rodičem o podstatných věcech dítěte, zejména o jeho zdravotním stavu, školních výsledcích a mimoškolních aktivitách.",
+      "noteForFathers": "Matka je povinna otce bezodkladně informovat o nemocech, úrazech i školních událostech.",
+      "courtCitationTemplate": "Podle § 886 OZ je pečující rodič povinen poskytovat druhému rodiči kompletní informace o zdravotním a vzdělávacím stavu nezletilého.",
+      "category": "Informační povinnost",
+      "eSbirkaUrl": "https://www.e-sbirka.cz/sb/2012/89#p886"
+    },
+    "timestamp": 1785569446812,
+    "ttl": 2592000000
+  },
+  "paragraph_89-2012_887": {
+    "data": {
+      "id": "oz-887",
+      "lawNumber": "89/2012 Sb.",
+      "lawTitle": "Občanský zákoník",
+      "paragraphNumber": "§ 887",
+      "title": "Právo dítěte na péči obou rodičů",
+      "content": "Dítě má právo na péči obou rodičů a udržování osobitého styku s nimi v rozsahu odpovídajícím jeho zájmům. Rodič, který nemá dítě v péči, má právo s ním být v pravidelném osobním styku.",
+      "noteForFathers": "Základní pilíř střídavé a rovnocenné péče. Soud musí primárně hájit právo dítěte na oba rodiče.",
+      "courtCitationTemplate": "V souladu s § 887 občanského zákoníku má nezletilé dítě nezadatelné právo na péči obou rodičů a udržování pravidelného osobního styku s oběma rodiči.",
+      "category": "Formy péče",
+      "eSbirkaUrl": "https://www.e-sbirka.cz/sb/2012/89#p887"
+    },
+    "timestamp": 1785569446812,
+    "ttl": 2592000000
+  },
+  "paragraph_89-2012_888": {
+    "data": {
+      "id": "oz-888",
+      "lawNumber": "89/2012 Sb.",
+      "lawTitle": "Občanský zákoník",
+      "paragraphNumber": "§ 888",
+      "title": "Právo na osobní styk a bránění ve styku",
+      "content": "Rodič, který má dítě v péči, je povinen dítě na styk s druhým rodičem řádně připravit a styk umožnit. Bezdůvodné bránění ve styku je důvodem pro změnu rozhodnutí o péči.",
+      "noteForFathers": "Opakované bezdůvodné maření styku matkou je zákonným důvodem k přehodnocení péče v neprospěch bránícího rodiče.",
+      "courtCitationTemplate": "Jak stanoví § 888 OZ, bezdůvodné bránění ve styku je závažným porušením rodičovské odpovědnosti odůvodňujícím změnu výchovného prostředí.",
+      "category": "Styk s dítětem",
+      "eSbirkaUrl": "https://www.e-sbirka.cz/sb/2012/89#p888"
+    },
+    "timestamp": 1785569446812,
+    "ttl": 2592000000
+  },
+  "paragraph_89-2012_889": {
+    "data": {
+      "id": "oz-889",
+      "lawNumber": "89/2012 Sb.",
+      "lawTitle": "Občanský zákoník",
+      "paragraphNumber": "§ 889",
+      "title": "Podpora vztahu k druhému rodiči",
+      "content": "Rodiče jsou povinni zdržet se všeho, co narušuje vztah dítěte k druhému rodiči nebo co ztěžuje jeho výchovu.",
+      "noteForFathers": "Popuzování dítěte proti otci nebo psychické navádění je porušením § 889 OZ a syndromem zavržení rodiče.",
+      "courtCitationTemplate": "Podle § 889 občanského zákoníku je manipulace dítěte proti druhému rodiči nezákonným jednáním zakládajícím zásah opatrovnického soudu.",
+      "category": "Výchova dítěte",
+      "eSbirkaUrl": "https://www.e-sbirka.cz/sb/2012/89#p889"
+    },
+    "timestamp": 1785569446812,
+    "ttl": 2592000000
+  },
+  "paragraph_89-2012_908": {
+    "data": {
+      "id": "oz-908",
+      "lawNumber": "89/2012 Sb.",
+      "lawTitle": "Občanský zákoník",
+      "paragraphNumber": "§ 908",
+      "title": "Zjišťování názoru nezletilého dítěte",
+      "content": "Před rozhodnutím o péči poskytne soud dítěti potřebné informace, aby si mohlo vytvořit vlastní názor a tento názor soudu sdělit. K názoru dítěte soud přihlédne s ohledem na jeho věk a rozumovou vyspělost.",
+      "noteForFathers": "Názor dítěte nesmí být výsledkem manipulace jednoho z rodičů.",
+      "courtCitationTemplate": "Zjišťování názoru dítěte dle § 908 OZ musí probíhat v prostředí prostém tlaku pečujícího rodiče.",
+      "category": "Soudní řízení",
+      "eSbirkaUrl": "https://www.e-sbirka.cz/sb/2012/89#p908"
+    },
+    "timestamp": 1785569446812,
+    "ttl": 2592000000
+  },
+  "paragraph_89-2012_909": {
+    "data": {
+      "id": "oz-909",
+      "lawNumber": "89/2012 Sb.",
+      "lawTitle": "Občanský zákoník",
+      "paragraphNumber": "§ 909",
+      "title": "Změna rozhodnutí při změně poměrů",
+      "content": "Změní-li se poměry, může soud změnit i bez návrhu rozhodnutí týkající se výkonu povinností a práv vyplývajících z rodičovské odpovědnosti.",
+      "noteForFathers": "Nástup dítěte do školy, změna bydliště či zvýšení příjmů jsou změnou poměrů pro nový návrh na péči/výživné.",
+      "courtCitationTemplate": "Vzhledem k podstatné změně poměrů na straně účastníků navrhujeme dle § 909 OZ úpravu dosavadního rozsudku.",
+      "category": "Změna péče",
+      "eSbirkaUrl": "https://www.e-sbirka.cz/sb/2012/89#p909"
+    },
+    "timestamp": 1785569446812,
+    "ttl": 2592000000
+  },
+  "paragraph_89-2012_910": {
+    "data": {
+      "id": "oz-910",
+      "lawNumber": "89/2012 Sb.",
+      "lawTitle": "Občanský zákoník",
+      "paragraphNumber": "§ 910",
+      "title": "Všeobecná vyživovací povinnost rodičů",
+      "content": "Předci a potomci mají vzájemnou vyživovací povinnost. Vyživovací povinnost rodičů k dětem předchází vyživovací povinnosti jiných osob.",
+      "noteForFathers": "Oba rodiče přispívají na výživu podle svých schopností a možností.",
+      "courtCitationTemplate": "Vyživovací povinnost obou rodičů vychází z § 910 a násl. občanského zákoníku.",
+      "category": "Výživné",
+      "eSbirkaUrl": "https://www.e-sbirka.cz/sb/2012/89#p910"
+    },
+    "timestamp": 1785569446812,
+    "ttl": 2592000000
+  },
+  "paragraph_89-2012_913": {
+    "data": {
+      "id": "oz-913",
+      "lawNumber": "89/2012 Sb.",
+      "lawTitle": "Občanský zákoník",
+      "paragraphNumber": "§ 913",
+      "title": "Kritéria určování výživného",
+      "content": "Pro určení rozsahu výživného jsou rozhodné odůvodněné potřeby oprávněného a jeho majetkové poměry, jakož i schopnosti, možnosti a majetkové poměry povinného.",
+      "noteForFathers": "Výživné musí zohlednit i reálné náklady spojené s péčí během osobního styku otce s dítětem.",
+      "courtCitationTemplate": "Dle § 913 občanského zákoníku je nutné posoudit odůvodněné potřeby dítěte ve vztahu k reálným možnostem a majetkovým poměrům obou rodičů.",
+      "category": "Výživné",
+      "eSbirkaUrl": "https://www.e-sbirka.cz/sb/2012/89#p913"
+    },
+    "timestamp": 1785569446812,
+    "ttl": 2592000000
+  },
+  "paragraph_89-2012_915": {
+    "data": {
+      "id": "oz-915",
+      "lawNumber": "89/2012 Sb.",
+      "lawTitle": "Občanský zákoník",
+      "paragraphNumber": "§ 915",
+      "title": "Zásada shodné životní úrovně",
+      "content": "Životní úroveň dítěte má být zásadně shodná s životní úrovní rodičů. Toto hledisko předchází hledisku odůvodněných potřeb dítěte.",
+      "noteForFathers": "Dítě má právo sdílet životní úroveň s oběma rodiči.",
+      "courtCitationTemplate": "Zásada shodné životní úrovně zakotvená v § 915 OZ garantuje dítěti participaci na životním standardu rodiče.",
+      "category": "Výživné",
+      "eSbirkaUrl": "https://www.e-sbirka.cz/sb/2012/89#p915"
+    },
+    "timestamp": 1785569446812,
+    "ttl": 2592000000
+  },
+  "paragraph_89-2012_921": {
+    "data": {
+      "id": "oz-921",
+      "lawNumber": "89/2012 Sb.",
+      "lawTitle": "Občanský zákoník",
+      "paragraphNumber": "§ 921",
+      "title": "Styk dítěte s prarodiči a příbuznými",
+      "content": "Právo stýkat se s dítětem mají i osoby dítěti příbuzné, zejména prarodiče a sourozenci, pokud k nim dítě má citový vztah.",
+      "noteForFathers": "Babičky a dědečkové z otcovy strany mají samostatné zákonné právo na styk s vnoučetem.",
+      "courtCitationTemplate": "Dle § 921 OZ navrhujeme rovněž úpravu styku nezletilého s prarodiči ze strany otce.",
+      "category": "Styk s příbuznými",
+      "eSbirkaUrl": "https://www.e-sbirka.cz/sb/2012/89#p921"
+    },
+    "timestamp": 1785569446812,
+    "ttl": 2592000000
+  },
+  "paragraph_89-2012_927": {
+    "data": {
+      "id": "oz-927",
+      "lawNumber": "89/2012 Sb.",
+      "lawTitle": "Občanský zákoník",
+      "paragraphNumber": "§ 927",
+      "title": "Ochrana rodinných vazeb a citového pouta",
+      "content": "Právo na styk s dítětem mají i jiné osoby, jestliže to vyžaduje zájem dítěte a jestliže mezi nimi a dítětem existuje dlouhodobé citové pouto.",
+      "noteForFathers": "Zákon chrání rodinné vazby dítěte i vůči širší rodině.",
+      "courtCitationTemplate": "Ustanovení § 927 OZ šetří citové vazby nezletilého k jeho blízským osobám.",
+      "category": "Styk s příbuznými",
+      "eSbirkaUrl": "https://www.e-sbirka.cz/sb/2012/89#p927"
+    },
+    "timestamp": 1785569446812,
+    "ttl": 2592000000
+  },
+  "law_359-1999": {
+    "data": {
+      "id": "359-1999",
+      "lawNumber": "359/1999 Sb.",
+      "title": "Zákon č. 359/1999 Sb., o sociálně-právní ochraně dětí (ZOSPO)",
+      "shortTitle": "Zákon o SPOD",
+      "eSbirkaCode": "359/1999",
+      "effectiveDate": "2000-04-01",
+      "lastSynced": "2026-08-01T07:30:46.811Z",
+      "status": "cached",
+      "paragraphs": [
+        {
+          "id": "zospo-1",
+          "lawNumber": "359/1999 Sb.",
+          "lawTitle": "Zákon o SPOD",
+          "paragraphNumber": "§ 1",
+          "title": "Předmět sociálně-právní ochrany dětí",
+          "content": "Sociálně-právní ochranou dětí se rozumí zejména ochrana práva dítěte na příznivý vývoj a řádnou výchovu a protection rodinného prostředí.",
+          "noteForFathers": "OSPOD je povinen podporovat přirozené rodinné prostředí obou rodičů.",
+          "courtCitationTemplate": "V souladu s § 1 zákona č. 359/1999 Sb. má OSPOD zabezpečit právo dítěte na zdárný vývoj u obou rodičů.",
+          "category": "OSPOD a SPOD",
+          "eSbirkaUrl": "https://www.e-sbirka.cz/sb/1999/359#p1"
+        },
+        {
+          "id": "zospo-5",
+          "lawNumber": "359/1999 Sb.",
+          "lawTitle": "Zákon o SPOD",
+          "paragraphNumber": "§ 5",
+          "title": "Přednostní zájem dítěte a nestrannost OSPOD",
+          "content": "Předním hlediskem sociálně-právní ochrany je zájem a blaho dítěte, ochrana jeho rodičovství a rodiny a právo dítěte na rodičovskou péči.",
+          "noteForFathers": "OSPOD má povinnost vystupovat jako nestranný kolizní opatrovník bez předsudků vůči pohlaví rodiče.",
+          "courtCitationTemplate": "Na základě § 5 zákona č. 359/1999 Sb. je OSPOD povinen postupovat zcela nestranně v zájmu zachování vazeb dítěte k oběma rodičům.",
+          "category": "Soudní řízení",
+          "eSbirkaUrl": "https://www.e-sbirka.cz/sb/1999/359#p5"
+        },
+        {
+          "id": "zospo-9",
+          "lawNumber": "359/1999 Sb.",
+          "lawTitle": "Zákon o SPOD",
+          "paragraphNumber": "§ 9",
+          "title": "Právo dítěte požádat o pomoc OSPOD",
+          "content": "Dítě má právo požádat orgán sociálně-právní ochrany o pomoc při ochraně svých práv bez vědomí rodičů.",
+          "noteForFathers": "OSPOD je povinen vyslechnout dítě objektivně bez přítomnosti matky.",
+          "courtCitationTemplate": "Dle § 9 zákona o SPOD má dítě právo na přímou komunikaci s opatrovníkem.",
+          "category": "OSPOD a SPOD",
+          "eSbirkaUrl": "https://www.e-sbirka.cz/sb/1999/359#p9"
+        },
+        {
+          "id": "zospo-14",
+          "lawNumber": "359/1999 Sb.",
+          "lawTitle": "Zákon o SPOD",
+          "paragraphNumber": "§ 14",
+          "title": "Preventivní a poradenská činnost OSPOD",
+          "content": "Orgán sociálně-právní ochrany pomáhá rodičům při řešení výchovných problémů a zprostředkovává rodinnou terapii a odbornou pomoc.",
+          "noteForFathers": "Rodiče mohou požádat OSPOD o odbornou mediaci před soudem.",
+          "courtCitationTemplate": "Poradenská činnost OSPOD dle § 14 zákona č. 359/1999 Sb. má předcházet hlubokým rodičovským konfliktům.",
+          "category": "OSPOD a SPOD",
+          "eSbirkaUrl": "https://www.e-sbirka.cz/sb/1999/359#p14"
+        }
+      ]
+    },
+    "timestamp": 1785569446812,
+    "ttl": 2592000000
+  },
+  "paragraph_359-1999_1": {
+    "data": {
+      "id": "zospo-1",
+      "lawNumber": "359/1999 Sb.",
+      "lawTitle": "Zákon o SPOD",
+      "paragraphNumber": "§ 1",
+      "title": "Předmět sociálně-právní ochrany dětí",
+      "content": "Sociálně-právní ochranou dětí se rozumí zejména ochrana práva dítěte na příznivý vývoj a řádnou výchovu a protection rodinného prostředí.",
+      "noteForFathers": "OSPOD je povinen podporovat přirozené rodinné prostředí obou rodičů.",
+      "courtCitationTemplate": "V souladu s § 1 zákona č. 359/1999 Sb. má OSPOD zabezpečit právo dítěte na zdárný vývoj u obou rodičů.",
+      "category": "OSPOD a SPOD",
+      "eSbirkaUrl": "https://www.e-sbirka.cz/sb/1999/359#p1"
+    },
+    "timestamp": 1785569446812,
+    "ttl": 2592000000
+  },
+  "paragraph_359-1999_5": {
+    "data": {
+      "id": "zospo-5",
+      "lawNumber": "359/1999 Sb.",
+      "lawTitle": "Zákon o SPOD",
+      "paragraphNumber": "§ 5",
+      "title": "Přednostní zájem dítěte a nestrannost OSPOD",
+      "content": "Předním hlediskem sociálně-právní ochrany je zájem a blaho dítěte, ochrana jeho rodičovství a rodiny a právo dítěte na rodičovskou péči.",
+      "noteForFathers": "OSPOD má povinnost vystupovat jako nestranný kolizní opatrovník bez předsudků vůči pohlaví rodiče.",
+      "courtCitationTemplate": "Na základě § 5 zákona č. 359/1999 Sb. je OSPOD povinen postupovat zcela nestranně v zájmu zachování vazeb dítěte k oběma rodičům.",
+      "category": "Soudní řízení",
+      "eSbirkaUrl": "https://www.e-sbirka.cz/sb/1999/359#p5"
+    },
+    "timestamp": 1785569446812,
+    "ttl": 2592000000
+  },
+  "paragraph_359-1999_9": {
+    "data": {
+      "id": "zospo-9",
+      "lawNumber": "359/1999 Sb.",
+      "lawTitle": "Zákon o SPOD",
+      "paragraphNumber": "§ 9",
+      "title": "Právo dítěte požádat o pomoc OSPOD",
+      "content": "Dítě má právo požádat orgán sociálně-právní ochrany o pomoc při ochraně svých práv bez vědomí rodičů.",
+      "noteForFathers": "OSPOD je povinen vyslechnout dítě objektivně bez přítomnosti matky.",
+      "courtCitationTemplate": "Dle § 9 zákona o SPOD má dítě právo na přímou komunikaci s opatrovníkem.",
+      "category": "OSPOD a SPOD",
+      "eSbirkaUrl": "https://www.e-sbirka.cz/sb/1999/359#p9"
+    },
+    "timestamp": 1785569446812,
+    "ttl": 2592000000
+  },
+  "paragraph_359-1999_14": {
+    "data": {
+      "id": "zospo-14",
+      "lawNumber": "359/1999 Sb.",
+      "lawTitle": "Zákon o SPOD",
+      "paragraphNumber": "§ 14",
+      "title": "Preventivní a poradenská činnost OSPOD",
+      "content": "Orgán sociálně-právní ochrany pomáhá rodičům při řešení výchovných problémů a zprostředkovává rodinnou terapii a odbornou pomoc.",
+      "noteForFathers": "Rodiče mohou požádat OSPOD o odbornou mediaci před soudem.",
+      "courtCitationTemplate": "Poradenská činnost OSPOD dle § 14 zákona č. 359/1999 Sb. má předcházet hlubokým rodičovským konfliktům.",
+      "category": "OSPOD a SPOD",
+      "eSbirkaUrl": "https://www.e-sbirka.cz/sb/1999/359#p14"
+    },
+    "timestamp": 1785569446812,
+    "ttl": 2592000000
+  },
+  "law_2-1993": {
+    "data": {
+      "id": "2-1993",
+      "lawNumber": "2/1993 Sb.",
+      "title": "Usnesení předsednictva ČNR č. 2/1993 Sb., o vyhlášení Listiny základních práv a svobod",
+      "shortTitle": "Listina základních práv a svobod (LZPS)",
+      "eSbirkaCode": "2/1993",
+      "effectiveDate": "1993-01-01",
+      "lastSynced": "2026-08-01T07:30:46.811Z",
+      "status": "cached",
+      "paragraphs": [
+        {
+          "id": "lzps-32",
+          "lawNumber": "2/1993 Sb.",
+          "lawTitle": "Listina základních práv a svobod",
+          "paragraphNumber": "Čl. 32",
+          "title": "Ochrana rodičovství a rodiny",
+          "content": "Rodičovství a rodina jsou pod ochranou zákona. Péče o děti a jejich výchova je právem rodičů; děti mají právo na rodičovskou výchovu a péči. Práva rodičů mohou být omezena a nezletilé děti mohou být od rodičů odloučeny proti jejich vůli jen rozhodnutím soudu na základě zákona.",
+          "noteForFathers": "Ústavně garantované právo otce vychovávat své dítě na rovnoprávném základě s matkou.",
+          "courtCitationTemplate": "Dle čl. 32 odst. 4 Listiny základních práv a svobod je péče o děti a jejich výchova ústavním právem obou rodičů.",
+          "category": "Ústavní práva",
+          "eSbirkaUrl": "https://www.e-sbirka.cz/sb/1993/2#cl32"
+        }
+      ]
+    },
+    "timestamp": 1785569446812,
+    "ttl": 2592000000
+  },
+  "paragraph_2-1993_32": {
+    "data": {
+      "id": "lzps-32",
+      "lawNumber": "2/1993 Sb.",
+      "lawTitle": "Listina základních práv a svobod",
+      "paragraphNumber": "Čl. 32",
+      "title": "Ochrana rodičovství a rodiny",
+      "content": "Rodičovství a rodina jsou pod ochranou zákona. Péče o děti a jejich výchova je právem rodičů; děti mají právo na rodičovskou výchovu a péči. Práva rodičů mohou být omezena a nezletilé děti mohou být od rodičů odloučeny proti jejich vůli jen rozhodnutím soudu na základě zákona.",
+      "noteForFathers": "Ústavně garantované právo otce vychovávat své dítě na rovnoprávném základě s matkou.",
+      "courtCitationTemplate": "Dle čl. 32 odst. 4 Listiny základních práv a svobod je péče o děti a jejich výchova ústavním právem obou rodičů.",
+      "category": "Ústavní práva",
+      "eSbirkaUrl": "https://www.e-sbirka.cz/sb/1993/2#cl32"
+    },
+    "timestamp": 1785569446812,
+    "ttl": 2592000000
+  },
+  "law_99-1963": {
+    "data": {
+      "id": "99-1963",
+      "lawNumber": "99/1963 Sb.",
+      "title": "Zákon č. 99/1963 Sb., občanský soudní řád (OSŘ)",
+      "shortTitle": "Občanský soudní řád (OSŘ)",
+      "eSbirkaCode": "99/1963",
+      "effectiveDate": "1964-04-01",
+      "lastSynced": "2026-08-01T07:30:46.811Z",
+      "status": "cached",
+      "paragraphs": [
+        {
+          "id": "osr-466",
+          "lawNumber": "99/1963 Sb.",
+          "lawTitle": "Občanský soudní řád",
+          "paragraphNumber": "§ 466",
+          "title": "Řízení ve věcech péče soudu o nezletilé",
+          "content": "V řízení ve věcech péče soudu o nezletilé rozhoduje soud s odbornou péčí a rychlostí tak, aby byl chráněn zájem nezletilého.",
+          "noteForFathers": "Opatrovnické řízení musí probíhat bez zbytečných průtahů.",
+          "courtCitationTemplate": "Rychlost a plynulost řízení dle § 466 OSŘ je podmínkou pro zachování vazeb dítěte s otcem.",
+          "category": "Soudní řízení",
+          "eSbirkaUrl": "https://www.e-sbirka.cz/sb/1963/99#p466"
+        },
+        {
+          "id": "osr-471",
+          "lawNumber": "99/1963 Sb.",
+          "lawTitle": "Občanský soudní řád",
+          "paragraphNumber": "§ 471",
+          "title": "Jmenování kolizního opatrovníka",
+          "content": "Hrozí-li střet zájmů mezi rodiči a dítětem nebo mezi dětmi téhož rodiče, jmenuje soud dítěti kolizního opatrovníka, zpravidla orgán sociálně-právní ochrany dětí.",
+          "noteForFathers": "OSPOD vystupuje v řízení jako samostatný účastník zastupující dítě.",
+          "courtCitationTemplate": "Jmenovaný kolizní opatrovník dle § 471 OSŘ musí hájit výhradně prospěch nezletilého.",
+          "category": "Soudní řízení",
+          "eSbirkaUrl": "https://www.e-sbirka.cz/sb/1963/99#p471"
+        },
+        {
+          "id": "osr-500",
+          "lawNumber": "99/1963 Sb.",
+          "lawTitle": "Občanský soudní řád",
+          "paragraphNumber": "§ 500",
+          "title": "Výkon rozhodnutí o péči a styku (pokuty)",
+          "content": "Neplní-li povinný dobrovolně soudní rozhodnutí o péči nebo styku, soud uloží pokutu až do výše 50 000 Kč nebo nařídí výkon rozhodnutí odnětím dítěte.",
+          "noteForFathers": "Při maření styku matkou má otec právo navrhnout uložení pokuty nebo výkon rozhodnutí.",
+          "courtCitationTemplate": "Vzhledem k opakovanému maření styku navrhujeme dle § 500 OSŘ uložení pokuty pečujícímu rodiči.",
+          "category": "Výkon rozhodnutí",
+          "eSbirkaUrl": "https://www.e-sbirka.cz/sb/1963/99#p500"
+        }
+      ]
+    },
+    "timestamp": 1785569446812,
+    "ttl": 2592000000
+  },
+  "paragraph_99-1963_466": {
+    "data": {
+      "id": "osr-466",
+      "lawNumber": "99/1963 Sb.",
+      "lawTitle": "Občanský soudní řád",
+      "paragraphNumber": "§ 466",
+      "title": "Řízení ve věcech péče soudu o nezletilé",
+      "content": "V řízení ve věcech péče soudu o nezletilé rozhoduje soud s odbornou péčí a rychlostí tak, aby byl chráněn zájem nezletilého.",
+      "noteForFathers": "Opatrovnické řízení musí probíhat bez zbytečných průtahů.",
+      "courtCitationTemplate": "Rychlost a plynulost řízení dle § 466 OSŘ je podmínkou pro zachování vazeb dítěte s otcem.",
+      "category": "Soudní řízení",
+      "eSbirkaUrl": "https://www.e-sbirka.cz/sb/1963/99#p466"
+    },
+    "timestamp": 1785569446812,
+    "ttl": 2592000000
+  },
+  "paragraph_99-1963_471": {
+    "data": {
+      "id": "osr-471",
+      "lawNumber": "99/1963 Sb.",
+      "lawTitle": "Občanský soudní řád",
+      "paragraphNumber": "§ 471",
+      "title": "Jmenování kolizního opatrovníka",
+      "content": "Hrozí-li střet zájmů mezi rodiči a dítětem nebo mezi dětmi téhož rodiče, jmenuje soud dítěti kolizního opatrovníka, zpravidla orgán sociálně-právní ochrany dětí.",
+      "noteForFathers": "OSPOD vystupuje v řízení jako samostatný účastník zastupující dítě.",
+      "courtCitationTemplate": "Jmenovaný kolizní opatrovník dle § 471 OSŘ musí hájit výhradně prospěch nezletilého.",
+      "category": "Soudní řízení",
+      "eSbirkaUrl": "https://www.e-sbirka.cz/sb/1963/99#p471"
+    },
+    "timestamp": 1785569446812,
+    "ttl": 2592000000
+  },
+  "paragraph_99-1963_500": {
+    "data": {
+      "id": "osr-500",
+      "lawNumber": "99/1963 Sb.",
+      "lawTitle": "Občanský soudní řád",
+      "paragraphNumber": "§ 500",
+      "title": "Výkon rozhodnutí o péči a styku (pokuty)",
+      "content": "Neplní-li povinný dobrovolně soudní rozhodnutí o péči nebo styku, soud uloží pokutu až do výše 50 000 Kč nebo nařídí výkon rozhodnutí odnětím dítěte.",
+      "noteForFathers": "Při maření styku matkou má otec právo navrhnout uložení pokuty nebo výkon rozhodnutí.",
+      "courtCitationTemplate": "Vzhledem k opakovanému maření styku navrhujeme dle § 500 OSŘ uložení pokuty pečujícímu rodiči.",
+      "category": "Výkon rozhodnutí",
+      "eSbirkaUrl": "https://www.e-sbirka.cz/sb/1963/99#p500"
+    },
+    "timestamp": 1785569446812,
+    "ttl": 2592000000
+  }
+}

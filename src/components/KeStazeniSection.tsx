@@ -5,6 +5,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { Download, Search, FileText, Copy, Check, Filter, Info, ShieldAlert, Printer, Edit, RefreshCw, FileDown, Scale, BarChart3, Paperclip, CheckSquare, Square } from 'lucide-react';
+import EsbirkaFormValidator from './EsbirkaFormValidator';
 
 export const AVAILABLE_E_LAWS = [
   { id: 'oz-907', code: '§ 907 NOZ', title: 'Kritéria střídavé péče', text: 'Dle § 907 odst. 2 o.z. a konstantní judikatury Ústavního soudu ČR nesouhlas jednoho z rodičů se střídavou péčí nemůže být sám o sobě důvodem pro její zamítnutí, jsou-li oba rodiče k péči způsobilí.' },
@@ -1255,6 +1256,17 @@ export default function KeStazeniSection() {
                 </button>
               </div>
             </div>
+
+            {/* Live e-Sbírka Validation Status */}
+            <EsbirkaFormValidator
+              formId={activeDoc.id}
+              formTitle={activeDoc.title}
+              formData={{
+                fullText: currentText,
+                docVals: formValues[activeDoc.id] || {},
+                laws: selectedLawIds[activeDoc.id] || []
+              }}
+            />
 
             {/* Structured meta information */}
             <div className="bg-slate-50/80 border border-slate-100 rounded-xl p-4.5 space-y-3 text-xs shadow-3xs">

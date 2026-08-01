@@ -18,6 +18,46 @@ import {
 
 export const INITIAL_ARTICLES: Article[] = [
   {
+    id: 'art-esbirka-api-integration',
+    title: 'Síla přímého propojení: Proč platforma Táta má právo integruje státní API e-Sbírky',
+    summary: 'V opatrovnických sporech rozhodují detaily. Zjistěte, jak přímá integrace oficiálního REST API e-Sbírky MV ČR a automatická validace formulářů chrání tátu před zastaralými paragrafy a chybným podáním u soudu.',
+    content: `V opatrovnických sporech a rodinném právu rozhodují detaily, přesné lhůty a bezchybná citace platných zákonů. Každá procesní chyba nebo zastaralý paragraf v návrzích na soud může otce stát cenný čas a oddálit shledání s dětmi.
+
+Proto projekt Táta má právo (Synthesis OS) přichází s klíčovou technologickou novinkou – přímým napojením na oficiální státní REST API e-Sbírky a e-Legislativy od Ministerstva vnitra ČR.
+
+Co toto propojení znamená, jak funguje pod kapotou a v čem konkrétně pomůže táta v praxi?
+
+1. Co znamená napojení na státní API?
+Tradiční webové stránky a právní blogy fungují tak, že autor jednou napíše článek nebo vzor smlouvy, a ten tam visí třeba roky – i když se zákon mezitím dvakrát zmodernizoval nebo zněl jinak.
+Napojení na e-Sbírku REST API znamená, že aplikace Táta má právo komunikuje se státem v reálném čase:
+• Okamžitá aktualizace: Jakmile úřady vydají novelu zákona nebo změnu v občanském zákoníku, systém ji bezpečně zaregistruje.
+• Autentická data: Všechny texty, paragrafy a odkazy pocházejí přímo z primárního zdroje státní správy, nikoliv z druhotných, potenciálně chybových výtahů.
+• Bezpečná autorizace: Komunikace probíhá přes šifrovaná rozhraní chráněná specifickým přístupovým klíčem (ESEL_API_ACCESS_KEY), což zaručuje maximální bezpečnost a soulad s technickými standardy státu.
+
+2. Jak to pomůže otcům v praxi?
+Hlavním cílem portálu je dát otcům do rukou silné, srozumitelné a hlavně bezchybné nástroje pro obhajobu jejich práv u soudu a OSPODu. Přímá integrace přináší tyto výhody:
+• 100% jistota platných paragrafů: Když si otcové v aplikaci prohlížejí judikaturu nebo generují podání, mají jistotu, že odkazují na aktuálně platné znění zákona. Odpadá riziko, že použijí zrušený paragraf.
+• Automatická validace formulářů: Každý formulář či návrh podání prochází kontrolou náležitostí přímo proti státnímu registru. Systém včas upozorní na chybějící či nesprávné náležitosti, dřív než dokument odejde k soudu.
+• Úspora času a nervů: Místo zdlouhavého ručního proklikávání úředních stránek a hledání v rozsáhlých sbírkách zákonů mají uživatelé vše pohromadě, přehledně seřazené a okamžitě k dispozici.
+
+3. Chytrá technologie pod kapotou: Jak šetříme systém i peníze
+Stahovat celou e-Sbírku se všemi historickými novelami najednou by zatěžovalo server i státní infrastrukturu. Proto je systém postaven chytře a efektivně:
+• On-demand caching (Načtení na vyžádání): Když uživatel otevře konkrétní paragraf, systém ho jednorázově stáhne z e-Sbírky, uloží do zabezpečené lokální vyrovnávací paměti (cache) a dalším uživatelům ho servíruje okamžitě bez čekání.
+• Předpřipravený výběr pro rodinné právo: Klíčové paragrafy týkající se péče o děti, výživného a kontaktů má systém předpřipravené, takže fungují bleskově a bez prodlev.
+• Dvojitá kontrola (AI + Státní dáta): Vygenerované dokumenty kromě státních registrů hlídá také sekundární kontrolní AI auditor, který ověřuje logiku textu a chrání uživatele před emocionálními formulacemi, jež by u soudu mohly uškodit.
+
+Závěr
+Projekt Táta má právo ukazuje, že moderní technologie a umělá inteligence mohou sloužit dobré věci – pomáhat rodičům orientovat se ve složitém právním prostředí. Dzięki přímému propojení se státními registry se stává spolehlivým digitálním partnerem pro každého tátu, který bojuje za právo být součástí života svého dítěte.`,
+    category: 'Aktuality',
+    date: '2026-08-01',
+    author: 'Redakce & Vývojový tým Táta má právo',
+    likes: 142,
+    commentsCount: 19,
+    readTime: '4 min',
+    tags: ['e-Sbírka', 'REST API', 'Digitalizace', 'Technologie', 'Validace', 'MV ČR'],
+    imageUrl: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=1200'
+  },
+  {
     id: 'art-forpsi-milestone',
     title: 'FORPSI se stává sponzorem doménové infrastruktury projektu „Táta má právo“',
     summary: 'S radostí oznamujeme nového oficiálního sponzora infrastruktury. Společnost FORPSI (Internet CZ, a.s.) věnovala a zaregistrovala doménu tatovacesta.cz pro náš projekt.',

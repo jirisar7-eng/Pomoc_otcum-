@@ -68,6 +68,7 @@ import UserProfile from './components/UserProfile';
 import SitemapTimeline from './components/SitemapTimeline';
 import CareSimulator from './components/CareSimulator';
 import TicketSystem from './components/TicketSystem';
+import EJusticeSection from './components/EJusticeSection';
 
 // Combined structured sections and partners
 import OpatrovnickaAgenda from './components/OpatrovnickaAgenda';
@@ -171,12 +172,9 @@ export default function App() {
   // Lifed States for full Back-Office Synchronizations
   const [articles, setLocalArticles] = useState<Article[]>(() => {
     const loaded = getStoredState<Article[]>('articles', INITIAL_ARTICLES);
-    const milestoneArt = INITIAL_ARTICLES.find(a => a.id.includes('milestone'));
-    if (milestoneArt) {
-      const rest = loaded.filter(a => !a.id.includes('milestone'));
-      return [milestoneArt, ...rest];
-    }
-    return loaded;
+    const initialIds = new Set(INITIAL_ARTICLES.map(a => a.id));
+    const customUserArticles = loaded.filter(a => !initialIds.has(a.id));
+    return [...INITIAL_ARTICLES, ...customUserArticles];
   });
   const [stories, setLocalStories] = useState<ExperienceStory[]>(() => {
     const loaded = getStoredState<ExperienceStory[]>('stories', INITIAL_STORIES);
@@ -591,6 +589,15 @@ export default function App() {
 
             {activeTab === 'judikatura' && (
               <JudikaturaSection />
+            )}
+
+            {activeTab === 'e-justice' && (
+              <EJusticeSection 
+                onOpenAiAssistant={() => {
+                  setActiveTab('ai-assistant');
+                }}
+                setActiveTab={setActiveTab}
+              />
             )}
 
             {(activeTab === 'state-laws' || activeTab === 'laws') && (

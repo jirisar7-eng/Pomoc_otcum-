@@ -30,6 +30,7 @@ import {
 } from 'lucide-react';
 import { Ticket, TicketCategory, TicketStatus, TicketPriority, User } from '../types';
 import { getStoredTickets, createTicket, updateTicketStatus, addTicketComment } from '../services/ticketService';
+import EsbirkaFormValidator from './EsbirkaFormValidator';
 
 interface TicketSystemProps {
   currentUser?: User | null;
@@ -620,6 +621,23 @@ export default function TicketSystem({
                   className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-500 leading-relaxed resize-y"
                 />
               </div>
+
+              {/* e-Sbírka Legislative Check for Support / Legal Tickets */}
+              {(category === 'support' || category === 'general') && (
+                <div className="pt-2">
+                  <EsbirkaFormValidator
+                    formId="ticket-legal-help"
+                    formTitle={title || 'Právní dotaz'}
+                    formData={{
+                      fatherName: userName,
+                      userEmail,
+                      topicCategory,
+                      title,
+                      fullText: description
+                    }}
+                  />
+                </div>
+              )}
 
               {/* Action Buttons */}
               <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-100">

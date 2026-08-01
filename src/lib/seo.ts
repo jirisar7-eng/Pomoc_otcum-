@@ -31,6 +31,15 @@ export const SEO_CONFIGS: Record<string, PageSeoConfig> = {
     category: 'Právní pomoc',
     parentLabel: 'Právní pomoc'
   },
+  'e-justice': {
+    title: 'e-Justice ČR & Digitalizované soudnictví | Táta má právo',
+    h1: 'Portal e-Justice, InfoSoud, Datové schránky a e-Podání v opatrovnických sporech',
+    description: 'Kompletní průvodce oficiálními elektronickými nástroji české justice (InfoSoud, InfoDeska, Datové schránky, e-Podání, e-Sbírka). Jak šetřit čas, peníze a získat oficiální důkazy pro soud.',
+    keywords: 'e-justice, infosoud, datová schránka, e-podání, infodeska, e-sbírka, portal.justice.cz, elektronický soudní spis',
+    canonicalPath: '/e-justice',
+    category: 'Právní pomoc',
+    parentLabel: 'Právní pomoc'
+  },
   'opatrovnicka-agenda': {
     title: 'Opatrovnická agenda krok za krokem | Táta má právo',
     h1: 'Opatrovnická agenda a postup v řízení',

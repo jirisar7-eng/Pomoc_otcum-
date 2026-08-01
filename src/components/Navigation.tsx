@@ -74,6 +74,7 @@ const CATEGORY_TAB_MAP: Record<string, { tab: string; search: string }> = {
   'znalecke-posudky': { tab: 'soudni-rizeni', search: 'Znalecké posudky' },
   'kritika-studii': { tab: 'knihovna-studii', search: 'Kritika' },
   'technologie-ai': { tab: 'ai-assistant', search: 'AI' },
+  'e-justice': { tab: 'e-justice', search: 'e-Justice' },
   'komunita-zkusenosti': { tab: 'forum', search: 'Diskuze' },
   'statistiky-vyzkumy': { tab: 'knihovna-studii', search: 'Statistiky' }
 };
@@ -82,6 +83,7 @@ const PAGE_LABELS: Record<string, string> = {
   'home': 'Domů',
   'ai-guide': 'AI Právní průvodce',
   'ai-case-manager': 'Můj případ & Důkazy',
+  'e-justice': 'e-Justice & Digitalizace',
   'ke-stazeni': 'Dokumenty a vzory',
   'judikatura': 'Judikatura',
   'videoteka': 'Videotéka',

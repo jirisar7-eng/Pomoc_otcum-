@@ -69,6 +69,7 @@ export interface NavSection {
 export const HLAVNI_SLUZBY_ITEMS: NavSubItem[] = [
   { id: 'ai-guide', label: 'AI Právní průvodce', desc: 'Krokový AI rádce pro zvolenou strategii sporu' },
   { id: 'ai-case-manager', label: 'Můj případ', desc: 'Sledování spisu, časová osa, kalendář a trezor důkazů' },
+  { id: 'e-justice', label: 'e-Justice & Digitalizace', desc: 'Průvodce InfoSoud, Datovými schránkami a e-Podáním' },
   { id: 'ke-stazeni', label: 'Dokumenty a vzory', desc: 'Oficiální vzory podání a formuláře k opatrovnickému soudu' },
   { id: 'judikatura', label: 'Judikatura', desc: 'Přelomové nálezy Ústavního a Nejvyššího soudu ČR' },
   { id: 'videoteka', label: 'Videotéka', desc: 'Instruktážní videa a rozhovory s právníky a psychology' },
@@ -101,6 +102,7 @@ export const AI_NASTROJE_ITEMS: NavSubItem[] = [
 export const PRAKTICKE_NASTROJE_ITEMS: NavSubItem[] = [
   { id: 'plan-pece', label: 'Simulátor péče', desc: 'Interaktivní modelování střídavé a rovnocenné péče' },
   { id: 'vyzivne', label: 'Kalkulačky', desc: 'Výpočet výživného dle metodiky MSp' },
+  { id: 'e-justice', label: 'Portál e-Justice', desc: 'InfoSoud, Datové schránky, e-Podání a InfoDeska' },
   { id: 'ai-case-manager', label: 'Evidence důkazů', desc: 'Zabezpečený trezor pro audia, SMS a fotodokumentaci' },
   { id: 'sitemap-timeline', label: 'Časová osa řízení', desc: 'Harmonogram a zákonné lhůty opatrovnického sporu' },
   { id: 'coparent-hub', label: 'Kalendář', desc: 'Sdílený kalendář střídání, prázdnin a kroužků' },

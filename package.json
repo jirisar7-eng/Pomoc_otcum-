@@ -11,6 +11,7 @@
     "test:qa": "tsx scripts/synthesis-tester.ts",
     "test:bridge": "tsx scripts/synthesis-tester.ts",
     "sync-state-data": "tsx scripts/sync-state-open-data.ts",
+    "prefetch:esbirka": "tsx scripts/prefetchEsbirka.ts",
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit"
   },
@@ -23,6 +24,7 @@
     "@types/node": "^22.14.0",
     "@types/nodemailer": "^6.4.17",
     "@vitejs/plugin-react": "^5.0.4",
+    "axios": "^1.19.0",
     "dotenv": "^17.2.3",
     "express": "^4.21.2",
     "firebase": "^12.16.0",

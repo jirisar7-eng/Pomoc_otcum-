@@ -11,6 +11,7 @@ import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI } from '@google/genai';
 import { sendEmail, validateEmailFormat, generateNumericCode, verifyServerCode } from './src/services/wedosSmtpService';
 import { checkGitHubStatus, readGitHubFile, saveGitHubFile } from './src/services/githubServerService';
+import { esbirkaService } from './src/services/esbirkaService';
 import { stateDataSyncService } from './server/stateDataSyncService';
 import pageViewsService from './server/pageViewsService';
 
@@ -980,17 +981,105 @@ app.get(['/api/laws', '/api/state-data/laws'], (req, res) => {
   }
 });
 
-// GET /api/laws/:id - Fetch single law by ID
-app.get('/api/laws/:id', (req, res) => {
+// GET /api/laws/:id & GET /api/law/:id & GET /api/esbirka/law/:id - Fetch single law by ID via e-Sbírka service
+app.get(['/api/laws/:id', '/api/law/:id', '/api/esbirka/law/:id'], async (req, res) => {
   try {
     const { id } = req.params;
+    
+    // First check local dataset from stateDataSyncService
     const dataset = stateDataSyncService.getLaws();
-    const law = dataset.laws.find(l => l.id === id || l.eSbirkaCode === id);
-    if (!law) {
-      return res.status(404).json({ success: false, error: `Zákon s ID "${id}" nebyl nalezen.` });
+    const localLaw = dataset.laws.find(l => l.id === id || l.eSbirkaCode === id || l.lawNumber.includes(id));
+    
+    if (localLaw) {
+      return res.status(200).json({ success: true, source: 'stateDataSyncService', law: localLaw });
     }
-    return res.status(200).json({ success: true, law });
+
+    // Call esbirkaService with caching
+    const esbirkaLaw = await esbirkaService.getLawById(id);
+    return res.status(200).json({ success: true, source: esbirkaLaw.status, law: esbirkaLaw });
   } catch (err: any) {
+    console.error('[e-Sbírka API] GET /api/law/:id failed:', err);
+    return res.status(500).json({ success: false, error: 'Chyba při načítání zákona.', details: err.message });
+  }
+});
+
+// GET /api/esbirka/paragraph/:lawId/:paragraphNum - Fetch paragraph by law ID and paragraph number
+app.get('/api/esbirka/paragraph/:lawId/:paragraphNum', async (req, res) => {
+  try {
+    const { lawId, paragraphNum } = req.params;
+    const paragraph = await esbirkaService.getParagraph(lawId, paragraphNum);
+    
+    if (!paragraph) {
+      return res.status(404).json({ success: false, error: `Paragraf ${paragraphNum} pro zákon ${lawId} nebyl nalezen.` });
+    }
+    
+    return res.status(200).json({ success: true, paragraph });
+  } catch (err: any) {
+    console.error('[e-Sbírka API] GET paragraph failed:', err);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// GET /api/esbirka/family-laws - Fetch family law & custody statutes (cached)
+app.get('/api/esbirka/family-laws', async (req, res) => {
+  try {
+    const category = req.query.category as string | undefined;
+    const data = await esbirkaService.getFamilyLaws(category);
+    return res.status(200).json({ success: true, data });
+  } catch (err: any) {
+    console.error('[e-Sbírka API] GET /api/esbirka/family-laws failed:', err);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// GET /api/esbirka/search - Search laws & paragraphs in e-Sbírka (cached)
+app.get('/api/esbirka/search', async (req, res) => {
+  try {
+    const query = (req.query.q as string || req.query.query as string || '').trim();
+    if (!query) {
+      return res.status(400).json({ success: false, error: 'Parametr "q" (vyhledávací dotaz) je povinný.' });
+    }
+    const result = await esbirkaService.searchEsbirka(query);
+    return res.status(200).json({ success: true, result });
+  } catch (err: any) {
+    console.error('[e-Sbírka API] GET /api/esbirka/search failed:', err);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// GET /api/esbirka/cache-stats - Cache statistics endpoint
+app.get('/api/esbirka/cache-stats', (req, res) => {
+  try {
+    const stats = esbirkaService.getCacheStats();
+    return res.status(200).json({ success: true, stats });
+  } catch (err: any) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// POST /api/esbirka/prefetch - Trigger pre-fetching of key family law statutes
+app.post('/api/esbirka/prefetch', async (req, res) => {
+  try {
+    const result = await esbirkaService.prefetchKeyStatutes();
+    return res.status(200).json({ success: true, message: 'Pre-fetching úspěšně dokončeno.', result });
+  } catch (err: any) {
+    console.error('[e-Sbírka API] POST /api/esbirka/prefetch failed:', err);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// POST /api/validate-form - Unified backend form validation against official e-Sbírka laws
+app.post(['/api/validate-form', '/api/esbirka/validate-form'], async (req, res) => {
+  try {
+    const payload = req.body || {};
+    const validation = await esbirkaService.validateFormSubmission(payload);
+    return res.status(200).json({
+      success: true,
+      validation,
+      timestamp: new Date().toISOString()
+    });
+  } catch (err: any) {
+    console.error('[e-Sbírka Validation API] POST /api/validate-form failed:', err);
     return res.status(500).json({ success: false, error: err.message });
   }
 });
@@ -1302,25 +1391,26 @@ app.post(['/api/gemini/chat', '/api/chat'], async (req, res) => {
     }
 
     const mandatorySystemPrompt = `
-Jsi odborný a empatický asistent pro oblast opatrovnického práva v ČR, rodinných vztahů a péče o děti.
-Mluv vždy klidně, věcně, srozumitelně a s podporou pro rodiče v náročné situaci.
+Jsi hlavní umělá inteligence platformy "Táta má právo" (tatovacesta.cz) – specializovaný právně-technický asistent pro oblast opatrovnického práva, rodinné legislativy a podpory otců v ČR.
+Tvým úkolem je pomáhat s generováním dokumentů, analýzou situací a přípravou podkladů pro soudy, OSPOD a další úřady v souladu s českým právním řádem (občanský zákoník č. 89/2012 Sb., zákon o sociálně-právní ochraně dětí č. 359/1999 Sb., listina základních práv a svobod a relevantní judikatura Ústavního a Nejvyššího soudu ČR).
 
 ZÁVAZNÉ INSTRUKCE PRO CHOVÁNÍ AI ASISTENTA:
 
-1. ROLE A TÓN:
-- Jsi odborný a empatický asistent pro oblast opatrovnického práva v ČR, rodinných vztahů a péče o děti.
-- Mluv vždy klidně, věcně, srozumitelně a s podporou pro rodiče v náročné situaci.
-- Vždy zdůrazňuj a podporuj nejlepší zájem dítěte a rovný, nestranný přístup k oběma rodičům.
+1. FAKTICKÁ PŘESNOST A OBJEKTIVITA:
+- Vždy vycházej z aktuálního znění českých zákonů (zohledňuj nejlepší zájem dítěte, rovnost rodičů, střídavou a společnou péči).
+- Vyvaruj se emocionálních výlevů, texty musí být věcné, formální a právně čisté.
+- Nikdy si nevymýšlej neexistující zákony ani paragrafy.
 
-2. POVINNÝ DISCLAIMER:
-- Na začátku nebo na konci každé odpovědi (kde je to relevantní) vždy zohledni a uveď upozornění, že odpovědi slouží výhradně pro orientační účely a nenahrazují kvalifikované právní poradenství advokáta.
+2. DVOUVRTÁ ARCHITEKTURA (GENERÁTOR & AUDITOR):
+- GENERÁTOR: Při žádosti o generování podání (návrh na úpravu styku, vyjádření k návrhu matky, stížnost, podnět pro OSPOD) vytvoř strukturovaný návrh s jasnými sekcemi: Předmět, Skutkový stav, Právní odůvodnění, Návrh výroku.
+- AUDITOR: Při žádosti o kontrolu či audity textu prověř přítomnost právních rozporů, logických chyb nebo emotivního tónu a navrhni konkrétní věcné úpravy.
 
-3. PŘESNOST A BEZPEČNOST:
-- Nikdy si nevymýšlej neexistující zákony ani paragrafy. Uváděj výhradně reálné a platné právní předpisy ČR (např. občanský zákoník č. 89/2012 Sb., zákon o sociálně-právní ochraně dětí č. 359/1999 Sb. atd.).
-- Pokud si nejsi jistý nebo dotaz vyžaduje individuální právní posouzení, odkaž uživatele na odbornou sekci portálu nebo na krizový plán.
+3. FORMÁT ODPOVĚDI:
+- Odpovídej v čistém Markdownu s jasně oddělenými sekcemi (nebo v požadovaném JSON formátu u API požadavků). Uváděj přehledné odrážky a formulace uzpůsobené soudní praxi.
 
-4. FORMÁT ODPOVĚDI:
-- Odpovídej vždy v českém jazyce, přehledně a strukturovaně (využívej odrážky, checklisty nebo očíslované kroky).
+4. BEZPEČNOST A POVINNÝ DISCLAIMER:
+- Nikdy neposkytuj definitivní "závaznou právní radu", ale expertní asistenci a vzory podání.
+- Upozorni uživatele na nutnost konzultace s advokátem u složitých kauz.
 `.trim();
 
     const systemInstruction = clientSystemInstruction 
