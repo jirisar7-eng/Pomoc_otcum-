@@ -40,7 +40,10 @@ import {
   Star,
   Clock,
   Command,
-  HelpCircle
+  HelpCircle,
+  HeartHandshake,
+  Building,
+  ShieldCheck
 } from 'lucide-react';
 import { User } from '../types';
 import { useLanguage } from '../lib/LanguageContext';
@@ -116,7 +119,7 @@ interface ModuleCapsuleCardProps {
   desc: string;
   icon: React.ReactNode;
   badge?: string;
-  accent?: 'red' | 'green' | 'teal' | 'indigo' | 'amber' | 'default';
+  accent?: 'red' | 'green' | 'teal' | 'indigo' | 'amber' | 'rose' | 'sky' | 'purple' | 'default';
   requiresAuth?: boolean;
   isLoggedIn?: boolean;
   isActive: boolean;
@@ -144,6 +147,12 @@ const ModuleCapsuleCard: React.FC<ModuleCapsuleCardProps> = ({
       : "bg-rose-50/90 hover:bg-rose-100/90 border-rose-200/90 hover:border-rose-300 text-rose-950 shadow-2xs";
     iconStyles = isActive ? "bg-rose-700 text-white border-rose-600" : "bg-rose-600 text-white border-rose-500 shadow-3xs";
     badgeStyles = "bg-rose-600 text-white font-black animate-pulse";
+  } else if (accent === 'rose') {
+    containerStyles = isActive 
+      ? "bg-rose-600 border-rose-700 text-white shadow-md ring-2 ring-rose-300" 
+      : "bg-rose-50/90 hover:bg-rose-100/90 border-rose-200/90 hover:border-rose-300 text-rose-950 shadow-2xs";
+    iconStyles = isActive ? "bg-rose-700 text-white border-rose-600" : "bg-rose-600 text-white border-rose-500 shadow-3xs";
+    badgeStyles = "bg-rose-600 text-white font-extrabold";
   } else if (accent === 'green') {
     containerStyles = isActive 
       ? "bg-emerald-600 border-emerald-700 text-white shadow-md ring-2 ring-emerald-300" 
@@ -168,6 +177,18 @@ const ModuleCapsuleCard: React.FC<ModuleCapsuleCardProps> = ({
       : "bg-amber-50/90 hover:bg-amber-100/90 border-amber-200/90 hover:border-amber-300 text-amber-950 shadow-2xs";
     iconStyles = isActive ? "bg-amber-700 text-white border-amber-600" : "bg-amber-600 text-white border-amber-500 shadow-3xs";
     badgeStyles = "bg-amber-600 text-white font-extrabold";
+  } else if (accent === 'sky') {
+    containerStyles = isActive 
+      ? "bg-sky-600 border-sky-700 text-white shadow-md ring-2 ring-sky-300" 
+      : "bg-sky-50/90 hover:bg-sky-100/90 border-sky-200/90 hover:border-sky-300 text-sky-950 shadow-2xs";
+    iconStyles = isActive ? "bg-sky-700 text-white border-sky-600" : "bg-sky-600 text-white border-sky-500 shadow-3xs";
+    badgeStyles = "bg-sky-600 text-white font-extrabold";
+  } else if (accent === 'purple') {
+    containerStyles = isActive 
+      ? "bg-purple-600 border-purple-700 text-white shadow-md ring-2 ring-purple-300" 
+      : "bg-purple-50/90 hover:bg-purple-100/90 border-purple-200/90 hover:border-purple-300 text-purple-950 shadow-2xs";
+    iconStyles = isActive ? "bg-purple-700 text-white border-purple-600" : "bg-purple-600 text-white border-purple-500 shadow-3xs";
+    badgeStyles = "bg-purple-600 text-white font-extrabold";
   }
 
   return (
@@ -481,15 +502,153 @@ export default function Navigation({
 
                   {/* TAB CONTENT: 🌐 VEŘEJNÁ ČÁST */}
                   {navTab === 'public' && (
-                    <div className="space-y-4 max-h-[460px] overflow-y-auto pr-1">
-                      {/* Category 1: Krizová pomoc & Komunita */}
+                    <div className="space-y-4 max-h-[480px] overflow-y-auto pr-1">
+                      
+                      {/* Category 1: Opatrovnictví & Práva Otce */}
                       <div>
                         <div className="text-[10px] font-mono font-extrabold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5 px-1">
+                          <Scale className="w-3 h-3 text-amber-500" />
+                          <span>Opatrovnictví &amp; Práva Otce</span>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                          <ModuleCapsuleCard
+                            id="opatrovnicka-agenda"
+                            label="Opatrovnický Průvodce"
+                            desc="Kompletní procesní manuál krok za krokem od návrhu po rozsudek"
+                            icon={<Compass className="w-5 h-5 text-teal-600" />}
+                            badge="NÁVOD"
+                            accent="teal"
+                            isActive={activeTab === 'opatrovnicka-agenda'}
+                            onClick={() => handleTabClick('opatrovnicka-agenda')}
+                          />
+
+                          <ModuleCapsuleCard
+                            id="plan-pece"
+                            label="Střídavá Péče & Simulátor"
+                            desc="Matematická 28denní mřížka péče a harmonogram úpravy styků"
+                            icon={<Sliders className="w-5 h-5 text-amber-600" />}
+                            badge="PÉČE"
+                            accent="amber"
+                            isActive={activeTab === 'plan-pece'}
+                            onClick={() => handleTabClick('plan-pece')}
+                          />
+
+                          <ModuleCapsuleCard
+                            id="judikatura"
+                            label="Judikatura ÚS & Precedenty"
+                            desc="Precedentní nálezy a judikátní argumentace pro ochranu práv otce"
+                            icon={<Scale className="w-5 h-5 text-amber-600" />}
+                            badge="ÚS ČR"
+                            accent="amber"
+                            isActive={activeTab === 'judikatura'}
+                            onClick={() => handleTabClick('judikatura')}
+                          />
+
+                          <ModuleCapsuleCard
+                            id="ke-stazeni"
+                            label="Vzory Podání & Dokumenty"
+                            desc="Ověřené právní šablony, žaloby a úřední dokumenty ke stažení"
+                            icon={<FolderCheck className="w-5 h-5 text-emerald-600" />}
+                            badge="DOCX/PDF"
+                            accent="green"
+                            isActive={activeTab === 'ke-stazeni'}
+                            onClick={() => handleTabClick('ke-stazeni')}
+                          />
+
+                          <ModuleCapsuleCard
+                            id="rights"
+                            label="Práva Otců & Ústava ČR"
+                            desc="Garantovaná ústavní práva na rodičovskou péči podle Listiny"
+                            icon={<Shield className="w-5 h-5 text-sky-600" />}
+                            accent="sky"
+                            isActive={activeTab === 'rights'}
+                            onClick={() => handleTabClick('rights')}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Category 2: Životní situace & Zázemí po rozchodu (NEW SUPPORT SECTION) */}
+                      <div>
+                        <div className="text-[10px] font-mono font-extrabold text-teal-600 uppercase tracking-wider mb-2 flex items-center gap-1.5 px-1 border-t border-slate-100 pt-3">
+                          <HeartHandshake className="w-3.5 h-3.5 text-teal-600" />
+                          <span>Životní situace &amp; Zázemí po rozchodu</span>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                          <ModuleCapsuleCard
+                            id="majetek-sjm"
+                            label="SJM & Majetkové vypořádání"
+                            desc="Vypořádání majetku, hypotéky, dluhů a krizový rozpočet po rozchodu"
+                            icon={<Briefcase className="w-5 h-5 text-indigo-600" />}
+                            badge="SJM"
+                            accent="indigo"
+                            isActive={activeTab === 'life-situation' || activeTab === 'majetek-sjm'}
+                            onClick={() => handleTabClick('majetek-sjm')}
+                          />
+
+                          <ModuleCapsuleCard
+                            id="psychicka-podpora"
+                            label="Psychická podpora & Prevence"
+                            desc="Psychologická první pomoc, zvládání syndromu vyhoření a tlaku"
+                            icon={<Heart className="w-5 h-5 text-rose-600" />}
+                            badge="PODPORA"
+                            accent="rose"
+                            isActive={activeTab === 'psychicka-podpora'}
+                            onClick={() => handleTabClick('psychicka-podpora')}
+                          />
+
+                          <ModuleCapsuleCard
+                            id="rozhovor-dite"
+                            label="Jak mluvit s dítětem"
+                            desc="Komunikace s dětmi o rozchodu citlivě, věkově přiměřeně a bez traumatu"
+                            icon={<Users className="w-5 h-5 text-teal-600" />}
+                            badge="DĚTI"
+                            accent="teal"
+                            isActive={activeTab === 'rozhovor-dite'}
+                            onClick={() => handleTabClick('rozhovor-dite')}
+                          />
+
+                          <ModuleCapsuleCard
+                            id="ochrana-manipulace"
+                            label="Ochrana před manipulací (PAS)"
+                            desc="Rozpoznání syndromu zavržení rodiče, narativů a psychického tlaku"
+                            icon={<ShieldAlert className="w-5 h-5 text-amber-600" />}
+                            badge="OBRANA"
+                            accent="amber"
+                            isActive={activeTab === 'ochrana-manipulace'}
+                            onClick={() => handleTabClick('ochrana-manipulace')}
+                          />
+
+                          <ModuleCapsuleCard
+                            id="bydleni-zazemi"
+                            label="Nové bydlení & OSPOD"
+                            desc="Stabilizace nového domova pro děti, inspekce a součinnost s OSPOD"
+                            icon={<Home className="w-5 h-5 text-emerald-600" />}
+                            badge="DOMOV"
+                            accent="green"
+                            isActive={activeTab === 'bydleni-zazemi'}
+                            onClick={() => handleTabClick('bydleni-zazemi')}
+                          />
+
+                          <ModuleCapsuleCard
+                            id="rodinna-mediace"
+                            label="Rodinná mediace & Dohoda"
+                            desc="Mimosoudní dohoda rodičů, mezinárodní mediace a rodičovský plán"
+                            icon={<Scale className="w-5 h-5 text-indigo-600" />}
+                            badge="MEDIACE"
+                            accent="indigo"
+                            isActive={activeTab === 'rodinna-mediace'}
+                            onClick={() => handleTabClick('rodinna-mediace')}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Category 3: Krizová pomoc & Komunita */}
+                      <div>
+                        <div className="text-[10px] font-mono font-extrabold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5 px-1 border-t border-slate-100 pt-3">
                           <PhoneCall className="w-3 h-3 text-rose-500" />
                           <span>Krizová pomoc &amp; Komunita</span>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-2.5">
-                          {/* SOS Action Plan (HIGHLIGHTED: Red accent) */}
                           <ModuleCapsuleCard
                             id="crisis"
                             label="Krizový Akční Plán SOS"
@@ -530,53 +689,7 @@ export default function Navigation({
                         </div>
                       </div>
 
-                      {/* Category 2: Právo, Opatrovnictví & Judikatura */}
-                      <div>
-                        <div className="text-[10px] font-mono font-extrabold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5 px-1 border-t border-slate-100 pt-3">
-                          <Scale className="w-3 h-3 text-amber-500" />
-                          <span>Opatrovnictví, Právo &amp; Judikatura</span>
-                        </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-2.5">
-                          <ModuleCapsuleCard
-                            id="opatrovnicka-agenda"
-                            label="Opatrovnický Průvodce"
-                            desc="Kompletní procesní manuál krok za krokem od návrhu po rozsudek"
-                            icon={<Compass className="w-5 h-5 text-teal-600" />}
-                            isActive={activeTab === 'opatrovnicka-agenda'}
-                            onClick={() => handleTabClick('opatrovnicka-agenda')}
-                          />
-
-                          <ModuleCapsuleCard
-                            id="judikatura"
-                            label="Judikatura & Precedenty ÚS"
-                            desc="Precedentní nálezy a judikátní argumentace pro ochranu práv"
-                            icon={<Scale className="w-5 h-5 text-amber-600" />}
-                            isActive={activeTab === 'judikatura'}
-                            onClick={() => handleTabClick('judikatura')}
-                          />
-
-                          <ModuleCapsuleCard
-                            id="rights"
-                            label="Práva Otců & Ústava ČR"
-                            desc="Garantovaná ústavní práva na rodičovskou péči podle Listiny"
-                            icon={<Shield className="w-5 h-5 text-sky-600" />}
-                            isActive={activeTab === 'rights'}
-                            onClick={() => handleTabClick('rights')}
-                          />
-
-                          <ModuleCapsuleCard
-                            id="ke-stazeni"
-                            label="Vzory Podání & Ke stažení"
-                            desc="Ověřené právní šablony a úřední dokumenty ke stažení"
-                            icon={<FolderCheck className="w-5 h-5 text-emerald-600" />}
-                            badge="DOCX/PDF"
-                            isActive={activeTab === 'ke-stazeni'}
-                            onClick={() => handleTabClick('ke-stazeni')}
-                          />
-                        </div>
-                      </div>
-
-                      {/* Category 3: Státní Data, Edukace & Nápověda */}
+                      {/* Category 4: Státní Data, Edukace & Nápověda */}
                       <div>
                         <div className="text-[10px] font-mono font-extrabold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5 px-1 border-t border-slate-100 pt-3">
                           <BookOpen className="w-3 h-3 text-indigo-500" />
@@ -635,13 +748,13 @@ export default function Navigation({
 
                   {/* TAB CONTENT: 🔒 ČÁST PRO PŘIHLÁŠENÉ UŽIVATELE */}
                   {navTab === 'private' && (
-                    <div className="space-y-4 max-h-[460px] overflow-y-auto pr-1">
+                    <div className="space-y-4 max-h-[480px] overflow-y-auto pr-1">
                       {!isLoggedIn && (
                         <div className="p-3 bg-gradient-to-r from-teal-500/10 via-indigo-500/10 to-purple-500/10 border border-teal-200 rounded-2xl flex items-center justify-between gap-3 text-xs">
                           <div className="flex items-center gap-2">
                             <Sparkles className="w-4 h-4 text-teal-600 shrink-0 animate-pulse" />
-                            <span className="text-slate-700">
-                              Tyto chráněné moduly slouží pro registrované rodiče. Přihlaste se pro plný přístup.
+                            <span className="text-slate-700 font-medium">
+                              Tyto chráněné moduly a AI nástroje slouží pro registrované rodiče.
                             </span>
                           </div>
                           <button
@@ -656,61 +769,27 @@ export default function Navigation({
                         </div>
                       )}
 
-                      {/* Category 1: Osobní Pracovna & Správa Případu */}
+                      {/* Category 1: Chytré AI Nástroje & Generátory */}
                       <div>
-                        <div className="text-[10px] font-mono font-extrabold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5 px-1">
-                          <UserCheck className="w-3 h-3 text-emerald-500" />
-                          <span>Osobní Pracovna &amp; Správa Případu</span>
+                        <div className="text-[10px] font-mono font-extrabold text-teal-600 uppercase tracking-wider mb-2 flex items-center gap-1.5 px-1">
+                          <Sparkles className="w-3.5 h-3.5 text-teal-500 animate-pulse" />
+                          <span>Chytré AI Nástroje &amp; Generátory</span>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
-                          {/* Moje Pracovna (HIGHLIGHTED: Green/Emerald accent) */}
+                          {/* NEW TOOL: Konstruktivní Komunikátor (BIFF) */}
                           <ModuleCapsuleCard
-                            id="user-portal"
-                            label="Moje Pracovna (Workspace)"
-                            desc="Soukromé řídicí centrum pro správu vlastních podání a termínů"
-                            icon={<UserCheck className="w-5 h-5 text-white" />}
-                            badge="PRACOVNA"
-                            accent="green"
+                            id="biff-communicator"
+                            label="Konstruktivní Komunikátor"
+                            desc="Generátor věcných zpráv bez emocí (BIFF metoda) pro komunikaci s druhým rodičem"
+                            icon={<MessageSquare className="w-5 h-5 text-white" />}
+                            badge="BIFF / AI"
+                            accent="teal"
                             requiresAuth
                             isLoggedIn={isLoggedIn}
-                            isActive={activeTab === 'user-portal'}
-                            onClick={() => handleTabClick('user-portal')}
+                            isActive={activeTab === 'biff-communicator' || activeTab === 'biff-komunikace' || activeTab === 'konstruktivni-komunikator'}
+                            onClick={() => handleTabClick('biff-communicator')}
                           />
 
-                          {/* Rodičovský Hub (HIGHLIGHTED: Indigo accent) */}
-                          <ModuleCapsuleCard
-                            id="coparent-hub"
-                            label="Spolurodičovský Hub (CoParent)"
-                            desc="Sdílený kalendář předávání dětí, výdajů a správa mezi rodiči"
-                            icon={<Users className="w-5 h-5 text-white" />}
-                            badge="HUB"
-                            accent="indigo"
-                            requiresAuth
-                            isLoggedIn={isLoggedIn}
-                            isActive={activeTab === 'coparent-hub'}
-                            onClick={() => handleTabClick('coparent-hub')}
-                          />
-
-                          <ModuleCapsuleCard
-                            id="profile"
-                            label="Profil & Bezpečnost"
-                            desc="Správa přihlášení (Google OAuth), Passkey a bezpečnostní audit"
-                            icon={<Settings className="w-5 h-5 text-slate-700" />}
-                            requiresAuth
-                            isLoggedIn={isLoggedIn}
-                            isActive={activeTab === 'profile'}
-                            onClick={() => handleTabClick('profile')}
-                          />
-                        </div>
-                      </div>
-
-                      {/* Category 2: Chytré AI Nástroje & Validace */}
-                      <div>
-                        <div className="text-[10px] font-mono font-extrabold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5 px-1 border-t border-slate-100 pt-3">
-                          <Sparkles className="w-3 h-3 text-teal-500 animate-pulse" />
-                          <span>Chytré AI Nástroje &amp; Simulátory</span>
-                        </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
                           {/* AI Assistant (HIGHLIGHTED: Teal accent) */}
                           <ModuleCapsuleCard
                             id="ai-assistant"
@@ -770,6 +849,54 @@ export default function Navigation({
                             isLoggedIn={isLoggedIn}
                             isActive={activeTab === 'ke-stazeni'}
                             onClick={() => handleTabClick('ke-stazeni')}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Category 2: Osobní Pracovna & Správa Případu */}
+                      <div>
+                        <div className="text-[10px] font-mono font-extrabold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5 px-1 border-t border-slate-100 pt-3">
+                          <UserCheck className="w-3 h-3 text-emerald-500" />
+                          <span>Osobní Pracovna &amp; Správa Případu</span>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                          {/* Moje Pracovna (HIGHLIGHTED: Green/Emerald accent) */}
+                          <ModuleCapsuleCard
+                            id="user-portal"
+                            label="Moje Pracovna (Workspace)"
+                            desc="Soukromé řídicí centrum pro správu vlastních podání a termínů"
+                            icon={<UserCheck className="w-5 h-5 text-white" />}
+                            badge="PRACOVNA"
+                            accent="green"
+                            requiresAuth
+                            isLoggedIn={isLoggedIn}
+                            isActive={activeTab === 'user-portal'}
+                            onClick={() => handleTabClick('user-portal')}
+                          />
+
+                          {/* Rodičovský Hub (HIGHLIGHTED: Indigo accent) */}
+                          <ModuleCapsuleCard
+                            id="coparent-hub"
+                            label="Spolurodičovský Hub (CoParent)"
+                            desc="Sdílený kalendář předávání dětí, výdajů a správa mezi rodiči"
+                            icon={<Users className="w-5 h-5 text-white" />}
+                            badge="HUB"
+                            accent="indigo"
+                            requiresAuth
+                            isLoggedIn={isLoggedIn}
+                            isActive={activeTab === 'coparent-hub'}
+                            onClick={() => handleTabClick('coparent-hub')}
+                          />
+
+                          <ModuleCapsuleCard
+                            id="profile"
+                            label="Profil & Bezpečnost"
+                            desc="Správa přihlášení (Google OAuth), Passkey a bezpečnostní audit"
+                            icon={<Settings className="w-5 h-5 text-slate-700" />}
+                            requiresAuth
+                            isLoggedIn={isLoggedIn}
+                            isActive={activeTab === 'profile'}
+                            onClick={() => handleTabClick('profile')}
                           />
                         </div>
                       </div>
@@ -1110,107 +1237,301 @@ export default function Navigation({
 
                   {/* TAB 1: 🌐 VEŘEJNÁ ČÁST CARDS */}
                   {navTab === 'public' && (
-                    <div className="space-y-3 animate-in fade-in duration-150">
-                      <div className="text-[10px] font-mono font-extrabold text-slate-400 uppercase tracking-wider px-1">
-                        Veřejně přístupné moduly (Bez přihlášení)
+                    <div className="space-y-4 animate-in fade-in duration-150">
+                      
+                      {/* Category 1: Opatrovnictví & Práva Otce */}
+                      <div>
+                        <div className="text-[10px] font-mono font-extrabold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5 px-1">
+                          <Scale className="w-3 h-3 text-amber-500" />
+                          <span>Opatrovnictví &amp; Práva Otce</span>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                          <ModuleCapsuleCard
+                            id="opatrovnicka-agenda"
+                            label="Opatrovnický Průvodce"
+                            desc="Kompletní procesní manuál krok za krokem od návrhu po rozsudek"
+                            icon={<Compass className="w-5 h-5 text-teal-600" />}
+                            badge="NÁVOD"
+                            accent="teal"
+                            isActive={activeTab === 'opatrovnicka-agenda'}
+                            onClick={() => {
+                              handleTabClick('opatrovnicka-agenda');
+                              setMobileMenuOpen(false);
+                            }}
+                          />
+
+                          <ModuleCapsuleCard
+                            id="plan-pece"
+                            label="Střídavá Péče & Simulátor"
+                            desc="Matematická 28denní mřížka péče a harmonogram úpravy styků"
+                            icon={<Sliders className="w-5 h-5 text-amber-600" />}
+                            badge="PÉČE"
+                            accent="amber"
+                            isActive={activeTab === 'plan-pece'}
+                            onClick={() => {
+                              handleTabClick('plan-pece');
+                              setMobileMenuOpen(false);
+                            }}
+                          />
+
+                          <ModuleCapsuleCard
+                            id="judikatura"
+                            label="Judikatura ÚS & Precedenty"
+                            desc="Precedentní nálezy a judikátní argumentace pro ochranu práv otce"
+                            icon={<Scale className="w-5 h-5 text-amber-600" />}
+                            badge="ÚS ČR"
+                            accent="amber"
+                            isActive={activeTab === 'judikatura'}
+                            onClick={() => {
+                              handleTabClick('judikatura');
+                              setMobileMenuOpen(false);
+                            }}
+                          />
+
+                          <ModuleCapsuleCard
+                            id="ke-stazeni"
+                            label="Vzory Podání & Dokumenty"
+                            desc="Ověřené právní šablony, žaloby a úřední dokumenty ke stažení"
+                            icon={<FolderCheck className="w-5 h-5 text-emerald-600" />}
+                            badge="DOCX/PDF"
+                            accent="green"
+                            isActive={activeTab === 'ke-stazeni'}
+                            onClick={() => {
+                              handleTabClick('ke-stazeni');
+                              setMobileMenuOpen(false);
+                            }}
+                          />
+
+                          <ModuleCapsuleCard
+                            id="rights"
+                            label="Práva Otců & Ústava ČR"
+                            desc="Garantovaná ústavní práva na rodičovskou péči podle Listiny"
+                            icon={<Shield className="w-5 h-5 text-sky-600" />}
+                            accent="sky"
+                            isActive={activeTab === 'rights'}
+                            onClick={() => {
+                              handleTabClick('rights');
+                              setMobileMenuOpen(false);
+                            }}
+                          />
+                        </div>
                       </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                        {/* SOS Action Plan (HIGHLIGHTED: Red accent) */}
-                        <ModuleCapsuleCard
-                          id="crisis"
-                          label="Krizový Akční Plán SOS"
-                          desc="Okamžitý návod krok za krokem při náhlém zadržení dětí či v tísni"
-                          icon={<ShieldAlert className="w-5 h-5 text-white" />}
-                          badge="SOS 24/7"
-                          accent="red"
-                          isActive={activeTab === 'crisis'}
-                          onClick={() => {
-                            handleTabClick('crisis');
-                            setMobileMenuOpen(false);
-                          }}
-                        />
+                      {/* Category 2: Životní situace & Zázemí po rozchodu (NEW SUPPORT SECTION) */}
+                      <div>
+                        <div className="text-[10px] font-mono font-extrabold text-teal-600 uppercase tracking-wider mb-2 flex items-center gap-1.5 px-1 border-t border-slate-100 pt-3">
+                          <HeartHandshake className="w-3.5 h-3.5 text-teal-600" />
+                          <span>Životní situace &amp; Zázemí po rozchodu</span>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                          <ModuleCapsuleCard
+                            id="majetek-sjm"
+                            label="SJM & Majetkové vypořádání"
+                            desc="Vypořádání majetku, hypotéky, dluhů a krizový rozpočet po rozchodu"
+                            icon={<Briefcase className="w-5 h-5 text-indigo-600" />}
+                            badge="SJM"
+                            accent="indigo"
+                            isActive={activeTab === 'life-situation' || activeTab === 'majetek-sjm'}
+                            onClick={() => {
+                              handleTabClick('majetek-sjm');
+                              setMobileMenuOpen(false);
+                            }}
+                          />
 
-                        <ModuleCapsuleCard
-                          id="opatrovnicka-agenda"
-                          label="Opatrovnický Průvodce"
-                          desc="Kompletní procesní manuál krok za krokem od návrhu po rozsudek"
-                          icon={<Compass className="w-5 h-5 text-teal-600" />}
-                          isActive={activeTab === 'opatrovnicka-agenda'}
-                          onClick={() => {
-                            handleTabClick('opatrovnicka-agenda');
-                            setMobileMenuOpen(false);
-                          }}
-                        />
+                          <ModuleCapsuleCard
+                            id="psychicka-podpora"
+                            label="Psychická podpora & Prevence"
+                            desc="Psychologická první pomoc, zvládání syndromu vyhoření a tlaku"
+                            icon={<Heart className="w-5 h-5 text-rose-600" />}
+                            badge="PODPORA"
+                            accent="rose"
+                            isActive={activeTab === 'psychicka-podpora'}
+                            onClick={() => {
+                              handleTabClick('psychicka-podpora');
+                              setMobileMenuOpen(false);
+                            }}
+                          />
 
-                        <ModuleCapsuleCard
-                          id="forum"
-                          label="Komunitní Fórum"
-                          desc="Zapojení do krajských diskuzí a vzájemná komunitní pomoc tátů"
-                          icon={<MessageSquare className="w-5 h-5 text-indigo-600" />}
-                          isActive={activeTab === 'forum'}
-                          onClick={() => {
-                            handleTabClick('forum');
-                            setMobileMenuOpen(false);
-                          }}
-                        />
+                          <ModuleCapsuleCard
+                            id="rozhovor-dite"
+                            label="Jak mluvit s dítětem"
+                            desc="Komunikace s dětmi o rozchodu citlivě, věkově přiměřeně a bez traumatu"
+                            icon={<Users className="w-5 h-5 text-teal-600" />}
+                            badge="DĚTI"
+                            accent="teal"
+                            isActive={activeTab === 'rozhovor-dite'}
+                            onClick={() => {
+                              handleTabClick('rozhovor-dite');
+                              setMobileMenuOpen(false);
+                            }}
+                          />
 
-                        <ModuleCapsuleCard
-                          id="judikatura"
-                          label="Judikatura ÚS"
-                          desc="Precedentní nálezy a argumentace pro ochranu práv otců"
-                          icon={<Scale className="w-5 h-5 text-amber-600" />}
-                          isActive={activeTab === 'judikatura'}
-                          onClick={() => {
-                            handleTabClick('judikatura');
-                            setMobileMenuOpen(false);
-                          }}
-                        />
+                          <ModuleCapsuleCard
+                            id="ochrana-manipulace"
+                            label="Ochrana před manipulací (PAS)"
+                            desc="Rozpoznání syndromu zavržení rodiče, narativů a psychického tlaku"
+                            icon={<ShieldAlert className="w-5 h-5 text-amber-600" />}
+                            badge="OBRANA"
+                            accent="amber"
+                            isActive={activeTab === 'ochrana-manipulace'}
+                            onClick={() => {
+                              handleTabClick('ochrana-manipulace');
+                              setMobileMenuOpen(false);
+                            }}
+                          />
 
-                        <ModuleCapsuleCard
-                          id="ke-stazeni"
-                          label="Vzory Podání & Ke stažení"
-                          desc="Ověřené právní šablony a úřední dokumenty ke stažení"
-                          icon={<FolderCheck className="w-5 h-5 text-emerald-600" />}
-                          badge="DOCX/PDF"
-                          isActive={activeTab === 'ke-stazeni'}
-                          onClick={() => {
-                            handleTabClick('ke-stazeni');
-                            setMobileMenuOpen(false);
-                          }}
-                        />
+                          <ModuleCapsuleCard
+                            id="bydleni-zazemi"
+                            label="Nové bydlení & OSPOD"
+                            desc="Stabilizace nového domova pro děti, inspekce a součinnost s OSPOD"
+                            icon={<Home className="w-5 h-5 text-emerald-600" />}
+                            badge="DOMOV"
+                            accent="green"
+                            isActive={activeTab === 'bydleni-zazemi'}
+                            onClick={() => {
+                              handleTabClick('bydleni-zazemi');
+                              setMobileMenuOpen(false);
+                            }}
+                          />
 
-                        <ModuleCapsuleCard
-                          id="advice"
-                          label="Právní Poradna & Q&A"
-                          desc="Archiv zodpovězených dotazů s doporučením advokátů"
-                          icon={<PhoneCall className="w-5 h-5 text-teal-600" />}
-                          isActive={activeTab === 'advice'}
-                          onClick={() => {
-                            handleTabClick('advice');
-                            setMobileMenuOpen(false);
-                          }}
-                        />
+                          <ModuleCapsuleCard
+                            id="rodinna-mediace"
+                            label="Rodinná mediace & Dohoda"
+                            desc="Mimosoudní dohoda rodičů, mezinárodní mediace a rodičovský plán"
+                            icon={<Scale className="w-5 h-5 text-indigo-600" />}
+                            badge="MEDIACE"
+                            accent="indigo"
+                            isActive={activeTab === 'rodinna-mediace'}
+                            onClick={() => {
+                              handleTabClick('rodinna-mediace');
+                              setMobileMenuOpen(false);
+                            }}
+                          />
+                        </div>
+                      </div>
 
-                        <ModuleCapsuleCard
-                          id="user-manual"
-                          label="Nápověda & Manuál"
-                          desc="Detailní průvodce veřejnou i soukromou částí a AI"
-                          icon={<HelpCircle className="w-5 h-5 text-teal-600" />}
-                          badge="NÁVOD"
-                          isActive={activeTab === 'user-manual'}
-                          onClick={() => {
-                            handleTabClick('user-manual');
-                            setMobileMenuOpen(false);
-                          }}
-                        />
+                      {/* Category 3: Krizová pomoc & Komunita */}
+                      <div>
+                        <div className="text-[10px] font-mono font-extrabold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5 px-1 border-t border-slate-100 pt-3">
+                          <PhoneCall className="w-3 h-3 text-rose-500" />
+                          <span>Krizová pomoc &amp; Komunita</span>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                          <ModuleCapsuleCard
+                            id="crisis"
+                            label="Krizový Akční Plán SOS"
+                            desc="Okamžitý návod krok za krokem při náhlém odebrání dětí či v tísni"
+                            icon={<ShieldAlert className="w-5 h-5 text-white" />}
+                            badge="SOS 24/7"
+                            accent="red"
+                            isActive={activeTab === 'crisis'}
+                            onClick={() => {
+                              handleTabClick('crisis');
+                              setMobileMenuOpen(false);
+                            }}
+                          />
+
+                          <ModuleCapsuleCard
+                            id="forum"
+                            label="Komunitní Fórum"
+                            desc="Zapojení do krajských diskuzí a vzájemná komunitní pomoc tátů"
+                            icon={<MessageSquare className="w-5 h-5 text-indigo-600" />}
+                            isActive={activeTab === 'forum'}
+                            onClick={() => {
+                              handleTabClick('forum');
+                              setMobileMenuOpen(false);
+                            }}
+                          />
+
+                          <ModuleCapsuleCard
+                            id="stories"
+                            label="Příběhy Tátů & Memento"
+                            desc="Reálná svědectví, osudy a poučení z opatrovnických bojů"
+                            icon={<Heart className="w-5 h-5 text-rose-500" />}
+                            isActive={activeTab === 'stories'}
+                            onClick={() => {
+                              handleTabClick('stories');
+                              setMobileMenuOpen(false);
+                            }}
+                          />
+
+                          <ModuleCapsuleCard
+                            id="advice"
+                            label="Právní Poradna & Q&A"
+                            desc="Archiv zodpovězených dotazů s doporučením advokátů"
+                            icon={<PhoneCall className="w-5 h-5 text-teal-600" />}
+                            isActive={activeTab === 'advice'}
+                            onClick={() => {
+                              handleTabClick('advice');
+                              setMobileMenuOpen(false);
+                            }}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Category 4: Státní Data, Edukace & Nápověda */}
+                      <div>
+                        <div className="text-[10px] font-mono font-extrabold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5 px-1 border-t border-slate-100 pt-3">
+                          <BookOpen className="w-3 h-3 text-indigo-500" />
+                          <span>Státní Data &amp; Edukace</span>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                          <ModuleCapsuleCard
+                            id="e-justice"
+                            label="e-Sbírka REST Portal"
+                            desc="Platné zákony a sledování novely legislativy e-Justice"
+                            icon={<Database className="w-5 h-5 text-indigo-600" />}
+                            isActive={activeTab === 'e-justice'}
+                            onClick={() => {
+                              handleTabClick('e-justice');
+                              setMobileMenuOpen(false);
+                            }}
+                          />
+
+                          <ModuleCapsuleCard
+                            id="knihovna-studii"
+                            label="Vědecké Studie & VÚPSV"
+                            desc="Odborné výzkumy attachmentu, střídavé péče a ČSÚ data"
+                            icon={<BookOpen className="w-5 h-5 text-emerald-600" />}
+                            isActive={activeTab === 'knihovna-studii'}
+                            onClick={() => {
+                              handleTabClick('knihovna-studii');
+                              setMobileMenuOpen(false);
+                            }}
+                          />
+
+                          <ModuleCapsuleCard
+                            id="videoteka"
+                            label="Edukační Videotéka"
+                            desc="Instruktážní videa, rozhovory a podcasty s advokáty"
+                            icon={<Tv className="w-5 h-5 text-purple-600" />}
+                            isActive={activeTab === 'videoteka'}
+                            onClick={() => {
+                              handleTabClick('videoteka');
+                              setMobileMenuOpen(false);
+                            }}
+                          />
+
+                          <ModuleCapsuleCard
+                            id="user-manual"
+                            label="Nápověda & Manuál"
+                            desc="Detailní průvodce veřejnou i soukromou částí a AI"
+                            icon={<HelpCircle className="w-5 h-5 text-teal-600" />}
+                            badge="NÁVOD"
+                            isActive={activeTab === 'user-manual'}
+                            onClick={() => {
+                              handleTabClick('user-manual');
+                              setMobileMenuOpen(false);
+                            }}
+                          />
+                        </div>
                       </div>
                     </div>
                   )}
 
                   {/* TAB 2: 🔒 ČÁST PRO PŘIHLÁŠENÉ CARDS */}
                   {navTab === 'private' && (
-                    <div className="space-y-3 animate-in fade-in duration-150">
+                    <div className="space-y-4 animate-in fade-in duration-150">
                       <div className="text-[10px] font-mono font-extrabold text-slate-400 uppercase tracking-wider px-1">
                         Chráněná Pracovna &amp; AI Nástroje
                       </div>
@@ -1220,7 +1541,7 @@ export default function Navigation({
                           <div className="flex items-center gap-2">
                             <Sparkles className="w-4 h-4 text-teal-600 shrink-0" />
                             <span className="text-slate-700 font-medium">
-                              Tyto moduly slouží pro registrované rodiče. Přihlaste se pro přístup.
+                              Tyto moduly a AI generátory slouží pro registrované rodiče. Přihlaste se pro přístup.
                             </span>
                           </div>
                           <button
@@ -1235,102 +1556,149 @@ export default function Navigation({
                         </div>
                       )}
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                        {/* Moje Pracovna (HIGHLIGHTED: Green accent) */}
-                        <ModuleCapsuleCard
-                          id="user-portal"
-                          label="Moje Pracovna (Workspace)"
-                          desc="Soukromé řídicí centrum pro správu vlastních podání a termínů"
-                          icon={<UserCheck className="w-5 h-5 text-white" />}
-                          badge="PRACOVNA"
-                          accent="green"
-                          requiresAuth
-                          isLoggedIn={isLoggedIn}
-                          isActive={activeTab === 'user-portal'}
-                          onClick={() => {
-                            handleTabClick('user-portal');
-                            setMobileMenuOpen(false);
-                          }}
-                        />
+                      {/* Category 1: Chytré AI Nástroje & Generátory */}
+                      <div>
+                        <div className="text-[10px] font-mono font-extrabold text-teal-600 uppercase tracking-wider mb-2 flex items-center gap-1.5 px-1">
+                          <Sparkles className="w-3.5 h-3.5 text-teal-500 animate-pulse" />
+                          <span>Chytré AI Nástroje &amp; Generátory</span>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                          {/* NEW TOOL: Konstruktivní Komunikátor (BIFF) */}
+                          <ModuleCapsuleCard
+                            id="biff-communicator"
+                            label="Konstruktivní Komunikátor"
+                            desc="Generátor věcných zpráv bez emocí (BIFF metoda) pro komunikaci s druhým rodičem"
+                            icon={<MessageSquare className="w-5 h-5 text-white" />}
+                            badge="BIFF / AI"
+                            accent="teal"
+                            requiresAuth
+                            isLoggedIn={isLoggedIn}
+                            isActive={activeTab === 'biff-communicator' || activeTab === 'biff-komunikace' || activeTab === 'konstruktivni-komunikator'}
+                            onClick={() => {
+                              handleTabClick('biff-communicator');
+                              setMobileMenuOpen(false);
+                            }}
+                          />
 
-                        {/* Rodičovský Hub (HIGHLIGHTED: Indigo accent) */}
-                        <ModuleCapsuleCard
-                          id="coparent-hub"
-                          label="Rodičovský Hub (CoParent)"
-                          desc="Sdílený kalendář předávání dětí, výdajů a komunikace"
-                          icon={<Users className="w-5 h-5 text-white" />}
-                          badge="HUB"
-                          accent="indigo"
-                          requiresAuth
-                          isLoggedIn={isLoggedIn}
-                          isActive={activeTab === 'coparent-hub'}
-                          onClick={() => {
-                            handleTabClick('coparent-hub');
-                            setMobileMenuOpen(false);
-                          }}
-                        />
+                          {/* AI Assistant (HIGHLIGHTED: Teal accent) */}
+                          <ModuleCapsuleCard
+                            id="ai-assistant"
+                            label="AI Právní Asistent"
+                            desc="Interaktivní konverzační asistent s právním rozborem (Gemini AI)"
+                            icon={<Sparkles className="w-5 h-5 text-white" />}
+                            badge="AI GEMINI"
+                            accent="teal"
+                            requiresAuth
+                            isLoggedIn={isLoggedIn}
+                            isActive={activeTab === 'ai-assistant'}
+                            onClick={() => {
+                              handleTabClick('ai-assistant');
+                              setMobileMenuOpen(false);
+                            }}
+                          />
 
-                        {/* AI Assistant (HIGHLIGHTED: Teal accent) */}
-                        <ModuleCapsuleCard
-                          id="ai-assistant"
-                          label="AI Právní Asistent"
-                          desc="Interaktivní konverzační asistent s právním rozborem (Gemini AI)"
-                          icon={<Sparkles className="w-5 h-5 text-white" />}
-                          badge="AI GEMINI"
-                          accent="teal"
-                          requiresAuth
-                          isLoggedIn={isLoggedIn}
-                          isActive={activeTab === 'ai-assistant'}
-                          onClick={() => {
-                            handleTabClick('ai-assistant');
-                            setMobileMenuOpen(false);
-                          }}
-                        />
+                          {/* Simulátor péče (HIGHLIGHTED: Amber accent) */}
+                          <ModuleCapsuleCard
+                            id="plan-pece"
+                            label="Simulátor Péče"
+                            desc="Matematická 28denní mřížka péče a tiskový výstup"
+                            icon={<Sliders className="w-5 h-5 text-white" />}
+                            badge="SIMULÁTOR"
+                            accent="amber"
+                            requiresAuth
+                            isLoggedIn={isLoggedIn}
+                            isActive={activeTab === 'plan-pece'}
+                            onClick={() => {
+                              handleTabClick('plan-pece');
+                              setMobileMenuOpen(false);
+                            }}
+                          />
 
-                        {/* Simulátor péče (HIGHLIGHTED: Amber accent) */}
-                        <ModuleCapsuleCard
-                          id="plan-pece"
-                          label="Simulátor Péče"
-                          desc="Matematická 28denní mřížka péče a tiskový výstup"
-                          icon={<Sliders className="w-5 h-5 text-white" />}
-                          badge="SIMULÁTOR"
-                          accent="amber"
-                          requiresAuth
-                          isLoggedIn={isLoggedIn}
-                          isActive={activeTab === 'plan-pece'}
-                          onClick={() => {
-                            handleTabClick('plan-pece');
-                            setMobileMenuOpen(false);
-                          }}
-                        />
+                          <ModuleCapsuleCard
+                            id="ai-guide"
+                            label="AI Průvodce Řízením"
+                            desc="Generování taktického plánu podle fáze sporu"
+                            icon={<Compass className="w-5 h-5 text-teal-600" />}
+                            requiresAuth
+                            isLoggedIn={isLoggedIn}
+                            isActive={activeTab === 'ai-guide'}
+                            onClick={() => {
+                              handleTabClick('ai-guide');
+                              setMobileMenuOpen(false);
+                            }}
+                          />
 
-                        <ModuleCapsuleCard
-                          id="ai-guide"
-                          label="AI Průvodce Řízením"
-                          desc="Generování taktického plánu podle fáze sporu"
-                          icon={<Compass className="w-5 h-5 text-teal-600" />}
-                          requiresAuth
-                          isLoggedIn={isLoggedIn}
-                          isActive={activeTab === 'ai-guide'}
-                          onClick={() => {
-                            handleTabClick('ai-guide');
-                            setMobileMenuOpen(false);
-                          }}
-                        />
+                          <ModuleCapsuleCard
+                            id="ai-case-manager"
+                            label="AI Analýza Spisu & Důkazů"
+                            desc="Skenování listin, sémantika a časová osa spisu"
+                            icon={<Briefcase className="w-5 h-5 text-indigo-600" />}
+                            requiresAuth
+                            isLoggedIn={isLoggedIn}
+                            isActive={activeTab === 'ai-case-manager'}
+                            onClick={() => {
+                              handleTabClick('ai-case-manager');
+                              setMobileMenuOpen(false);
+                            }}
+                          />
+                        </div>
+                      </div>
 
-                        <ModuleCapsuleCard
-                          id="ai-case-manager"
-                          label="AI Analýza Spisu & Důkazů"
-                          desc="Skenování listin, sémantika a časová osa spisu"
-                          icon={<Briefcase className="w-5 h-5 text-indigo-600" />}
-                          requiresAuth
-                          isLoggedIn={isLoggedIn}
-                          isActive={activeTab === 'ai-case-manager'}
-                          onClick={() => {
-                            handleTabClick('ai-case-manager');
-                            setMobileMenuOpen(false);
-                          }}
-                        />
+                      {/* Category 2: Osobní Pracovna & Správa Případu */}
+                      <div>
+                        <div className="text-[10px] font-mono font-extrabold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5 px-1 border-t border-slate-100 pt-3">
+                          <UserCheck className="w-3 h-3 text-emerald-500" />
+                          <span>Osobní Pracovna &amp; Správa Případu</span>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                          {/* Moje Pracovna (HIGHLIGHTED: Green accent) */}
+                          <ModuleCapsuleCard
+                            id="user-portal"
+                            label="Moje Pracovna (Workspace)"
+                            desc="Soukromé řídicí centrum pro správu vlastních podání a termínů"
+                            icon={<UserCheck className="w-5 h-5 text-white" />}
+                            badge="PRACOVNA"
+                            accent="green"
+                            requiresAuth
+                            isLoggedIn={isLoggedIn}
+                            isActive={activeTab === 'user-portal'}
+                            onClick={() => {
+                              handleTabClick('user-portal');
+                              setMobileMenuOpen(false);
+                            }}
+                          />
+
+                          {/* Rodičovský Hub (HIGHLIGHTED: Indigo accent) */}
+                          <ModuleCapsuleCard
+                            id="coparent-hub"
+                            label="Spolurodičovský Hub (CoParent)"
+                            desc="Sdílený kalendář předávání dětí, výdajů a komunikace"
+                            icon={<Users className="w-5 h-5 text-white" />}
+                            badge="HUB"
+                            accent="indigo"
+                            requiresAuth
+                            isLoggedIn={isLoggedIn}
+                            isActive={activeTab === 'coparent-hub'}
+                            onClick={() => {
+                              handleTabClick('coparent-hub');
+                              setMobileMenuOpen(false);
+                            }}
+                          />
+
+                          <ModuleCapsuleCard
+                            id="profile"
+                            label="Profil & Bezpečnost"
+                            desc="Správa přihlášení (Google OAuth) a bezpečnostní audit"
+                            icon={<Settings className="w-5 h-5 text-slate-700" />}
+                            requiresAuth
+                            isLoggedIn={isLoggedIn}
+                            isActive={activeTab === 'profile'}
+                            onClick={() => {
+                              handleTabClick('profile');
+                              setMobileMenuOpen(false);
+                            }}
+                          />
+                        </div>
                       </div>
                     </div>
                   )}

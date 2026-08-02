@@ -38,6 +38,7 @@ import Breadcrumbs from './Breadcrumbs';
 interface LifeSituationSectionProps {
   setActiveTab: (tab: string) => void;
   onOpenAuth?: () => void;
+  initialSubTab?: LifeSubTab;
 }
 
 export type LifeSubTab = 
@@ -50,8 +51,8 @@ export type LifeSubTab =
   | 'bydleni-zazemi'
   | 'statni-podpora';
 
-export default function LifeSituationSection({ setActiveTab }: LifeSituationSectionProps) {
-  const [activeSubTab, setActiveSubTab] = useState<LifeSubTab>('majetek-sjm');
+export default function LifeSituationSection({ setActiveTab, initialSubTab = 'majetek-sjm' }: LifeSituationSectionProps) {
+  const [activeSubTab, setActiveSubTab] = useState<LifeSubTab>(initialSubTab);
 
   // Interactive Tool States
   // 1. Budget Calculator

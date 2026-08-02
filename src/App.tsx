@@ -692,8 +692,37 @@ export default function App() {
               <OpatrovnickaAgenda />
             )}
 
-            {(activeTab === 'life-situation' || activeTab === 'zivotni-situace' || activeTab === 'zazemi-majetek') && (
-              <LifeSituationSection setActiveTab={setActiveTab} onOpenAuth={() => setAuthModalOpen(true)} />
+            {(activeTab === 'life-situation' || 
+              activeTab === 'zivotni-situace' || 
+              activeTab === 'zazemi-majetek' || 
+              activeTab === 'biff-communicator' || 
+              activeTab === 'biff-komunikace' || 
+              activeTab === 'konstruktivni-komunikator' ||
+              activeTab === 'majetek-sjm' ||
+              activeTab === 'psychicka-podpora' ||
+              activeTab === 'rozhovor-dite' ||
+              activeTab === 'ochrana-manipulace' ||
+              activeTab === 'rodinna-mediace' ||
+              activeTab === 'bydleni-zazemi') && (
+              <LifeSituationSection 
+                setActiveTab={setActiveTab} 
+                onOpenAuth={() => setAuthModalOpen(true)}
+                initialSubTab={
+                  activeTab === 'biff-communicator' || activeTab === 'biff-komunikace' || activeTab === 'konstruktivni-komunikator'
+                    ? 'biff-komunikace'
+                    : activeTab === 'psychicka-podpora'
+                    ? 'psychicka-podpora'
+                    : activeTab === 'rozhovor-dite'
+                    ? 'rozhovor-dite'
+                    : activeTab === 'ochrana-manipulace'
+                    ? 'ochrana-manipulace'
+                    : activeTab === 'rodinna-mediace'
+                    ? 'rodinna-mediace'
+                    : activeTab === 'bydleni-zazemi'
+                    ? 'bydleni-zazemi'
+                    : 'majetek-sjm'
+                }
+              />
             )}
 
             {activeTab === 'plan-pece' && (
