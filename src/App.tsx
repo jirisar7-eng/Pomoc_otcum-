@@ -88,6 +88,7 @@ import CentrumFormularu from './components/CentrumFormularu';
 import AiCaseManager from './components/AiCaseManager';
 import LegalWiki from './components/LegalWiki';
 import AiAdmin from './components/AiAdmin';
+import LifeSituationSection from './components/LifeSituationSection';
 import CategoryDetailView from './components/CategoryDetailView';
 import { SynthesisAperioHub } from './components/SynthesisAperioHub';
 import AiContextView from './components/AiContextView';
@@ -689,6 +690,10 @@ export default function App() {
 
             {activeTab === 'opatrovnicka-agenda' && (
               <OpatrovnickaAgenda />
+            )}
+
+            {(activeTab === 'life-situation' || activeTab === 'zivotni-situace' || activeTab === 'zazemi-majetek') && (
+              <LifeSituationSection setActiveTab={setActiveTab} onOpenAuth={() => setAuthModalOpen(true)} />
             )}
 
             {activeTab === 'plan-pece' && (

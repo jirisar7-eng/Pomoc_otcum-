@@ -95,6 +95,7 @@ const PAGE_LABELS: Record<string, string> = {
   'plan-pece': 'Simulátor péče',
   'coparent-hub': 'Rodičovský Hub',
   'opatrovnicka-agenda': 'Průvodce opatrovnictvím',
+  'life-situation': 'Životní situace & Zázemí po rozchodu',
   'forum': 'Fórum',
   'stories': 'Příběhy rodičů',
   'partners': 'Partneři',

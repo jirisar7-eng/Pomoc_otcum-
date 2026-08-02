@@ -77,6 +77,7 @@ export const KRIZOVA_POMOC_KOMUNITA_ITEMS: NavSubItem[] = [
 // 1. VEŘEJNÁ ČÁST - KATEGORIE 2: ⚖️ Opatrovnictví, Právo & Judikatura
 export const OPATROVNICTVI_PRAVO_ITEMS: NavSubItem[] = [
   { id: 'opatrovnicka-agenda', label: 'Opatrovnická agenda krok za krokem', desc: 'Kompletní veřejný manuál celým opatrovnickým procesem' },
+  { id: 'life-situation', label: 'Životní situace & Zázemí po rozchodu', desc: 'Majetkové vypořádání SJM, krizový rozpočet, psychická příprava, nové bydlení a BIFF komunikace' },
   { id: 'rights', label: 'Práva Otců & Ústava ČR (LZPS)', desc: 'Přehled ústavních práv a mezinárodních úmluv' },
   { id: 'judikatura', label: 'Precedenty & Judikatura ÚS/NS ČR', desc: 'Veřejný katalog klíčových nálezů soudů pro ochranu práv otců' },
   { id: 'ke-stazeni', label: 'Ke Stažení & Oficiální Dokumenty', desc: 'Stahování ověřených dokumentů přímo z lokální DB (aktualizované denně přes státní API cache)' }
