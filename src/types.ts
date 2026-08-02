@@ -41,6 +41,7 @@ export interface User {
   email: string;
   name: string;
   role: UserRole;
+  isDemoAdmin?: boolean;
   avatar?: string;
   createdAt: string;
   // Extra profile fields

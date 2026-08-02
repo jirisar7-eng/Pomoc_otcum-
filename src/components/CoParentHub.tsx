@@ -127,12 +127,10 @@ function CoParentHubContent({ currentUser, onOpenAuth }: CoParentHubProps) {
   useEffect(() => {
     const interval = setInterval(() => {
       const tok = getCachedAccessToken();
-      if (tok !== googleToken) {
-        setGoogleToken(tok);
-      }
-    }, 1000);
+      setGoogleToken((prev) => (prev !== tok ? tok : prev));
+    }, 5000);
     return () => clearInterval(interval);
-  }, [googleToken]);
+  }, []);
 
   useEffect(() => {
     if (hubTab === 'chat') {

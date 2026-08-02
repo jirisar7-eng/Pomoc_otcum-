@@ -687,6 +687,7 @@ app.get('/llms.txt', (req, res) => {
   const filePath = path.join(process.cwd(), 'public', 'llms.txt');
   if (fs.existsSync(filePath)) {
     res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    res.setHeader('Cache-Control', 'public, max-age=86400, s-maxage=604800, stale-while-revalidate=604800');
     res.sendFile(filePath);
   } else {
     res.status(404).send('# llms.txt not found');
@@ -697,6 +698,7 @@ app.get('/robots.txt', (req, res) => {
   const filePath = path.join(process.cwd(), 'public', 'robots.txt');
   if (fs.existsSync(filePath)) {
     res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    res.setHeader('Cache-Control', 'public, max-age=86400, s-maxage=604800, stale-while-revalidate=604800');
     res.sendFile(filePath);
   } else {
     res.status(404).send('User-agent: *\nAllow: /');
@@ -707,6 +709,7 @@ app.get('/sitemap.xml', (req, res) => {
   const filePath = path.join(process.cwd(), 'public', 'sitemap.xml');
   if (fs.existsSync(filePath)) {
     res.setHeader('Content-Type', 'application/xml; charset=utf-8');
+    res.setHeader('Cache-Control', 'public, max-age=86400, s-maxage=604800, stale-while-revalidate=604800');
     res.sendFile(filePath);
   } else {
     res.status(404).send('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemap.org/schemas/sitemap/0.9"></urlset>');
@@ -737,7 +740,31 @@ app.get('/api/github/read', async (req, res) => {
   }
 });
 
+// Helper function to enforce Demo Admin read-only sandbox restrictions
+function checkDemoAdminRestriction(req: express.Request, res: express.Response): boolean {
+  const userEmail = (
+    req.headers['x-user-email'] ||
+    req.body?.userEmail ||
+    req.body?.currentUser?.email ||
+    req.query?.userEmail ||
+    ''
+  ).toString().toLowerCase().trim();
+
+  const isDemoHeader = req.headers['x-demo-admin'] === 'true' || req.body?.currentUser?.isDemoAdmin === true;
+
+  if (userEmail === 'demo.admin@tatovacesta.cz' || userEmail === 'demo@tatovacesta.cz' || isDemoHeader) {
+    res.status(403).json({
+      success: false,
+      error: 'Demo administrátorský účet je v režimu pouze pro čtení (Read-Only Sandbox). Editační, mazací a systémové akce jsou v demo režimu zakázány.',
+      isDemoBlocked: true
+    });
+    return true;
+  }
+  return false;
+}
+
 app.post('/api/github/save', async (req, res) => {
+  if (checkDemoAdminRestriction(req, res)) return;
   try {
     const { path: filePath, content, commitMessage, sha } = req.body || {};
     if (!filePath || content === undefined) {
@@ -927,6 +954,7 @@ app.post(['/api/page-views', '/api/analytics/pageviews'], (req, res) => {
 // GET /api/page-views - Fetch aggregated analytics
 app.get(['/api/page-views', '/api/analytics/pageviews'], (req, res) => {
   try {
+    res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=600');
     const stats = pageViewsService.getPageViewsStats();
     res.json(stats);
   } catch (err: any) {
@@ -941,6 +969,7 @@ app.get(['/api/page-views', '/api/analytics/pageviews'], (req, res) => {
 // GET /api/laws - Fetch state laws and paragraph database
 app.get(['/api/laws', '/api/state-data/laws'], (req, res) => {
   try {
+    res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=86400');
     const dataset = stateDataSyncService.getLaws();
     const search = (req.query.search as string || '').toLowerCase().trim();
     const category = (req.query.category as string || '').trim();
@@ -984,6 +1013,7 @@ app.get(['/api/laws', '/api/state-data/laws'], (req, res) => {
 // GET /api/laws/:id & GET /api/law/:id & GET /api/esbirka/law/:id - Fetch single law by ID via e-Sbírka service
 app.get(['/api/laws/:id', '/api/law/:id', '/api/esbirka/law/:id'], async (req, res) => {
   try {
+    res.setHeader('Cache-Control', 'public, max-age=7200, s-maxage=86400, stale-while-revalidate=86400');
     const { id } = req.params;
     
     // First check local dataset from stateDataSyncService
@@ -1006,6 +1036,7 @@ app.get(['/api/laws/:id', '/api/law/:id', '/api/esbirka/law/:id'], async (req, r
 // GET /api/esbirka/paragraph/:lawId/:paragraphNum - Fetch paragraph by law ID and paragraph number
 app.get('/api/esbirka/paragraph/:lawId/:paragraphNum', async (req, res) => {
   try {
+    res.setHeader('Cache-Control', 'public, max-age=7200, s-maxage=86400, stale-while-revalidate=86400');
     const { lawId, paragraphNum } = req.params;
     const paragraph = await esbirkaService.getParagraph(lawId, paragraphNum);
     
@@ -1023,6 +1054,7 @@ app.get('/api/esbirka/paragraph/:lawId/:paragraphNum', async (req, res) => {
 // GET /api/esbirka/family-laws - Fetch family law & custody statutes (cached)
 app.get('/api/esbirka/family-laws', async (req, res) => {
   try {
+    res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=86400');
     const category = req.query.category as string | undefined;
     const data = await esbirkaService.getFamilyLaws(category);
     return res.status(200).json({ success: true, data });
@@ -1035,6 +1067,7 @@ app.get('/api/esbirka/family-laws', async (req, res) => {
 // GET /api/esbirka/search - Search laws & paragraphs in e-Sbírka (cached)
 app.get('/api/esbirka/search', async (req, res) => {
   try {
+    res.setHeader('Cache-Control', 'public, max-age=1800, s-maxage=3600, stale-while-revalidate=86400');
     const query = (req.query.q as string || req.query.query as string || '').trim();
     if (!query) {
       return res.status(400).json({ success: false, error: 'Parametr "q" (vyhledávací dotaz) je povinný.' });
@@ -1050,6 +1083,7 @@ app.get('/api/esbirka/search', async (req, res) => {
 // GET /api/esbirka/cache-stats - Cache statistics endpoint
 app.get('/api/esbirka/cache-stats', (req, res) => {
   try {
+    res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=600');
     const stats = esbirkaService.getCacheStats();
     return res.status(200).json({ success: true, stats });
   } catch (err: any) {
@@ -1099,6 +1133,7 @@ app.all(['/api/esbirka/audit-content', '/api/esbirka/audit'], async (req, res) =
 // GET /api/esbirka/official-forms - List of cached family law forms with daily sync timestamp
 app.get(['/api/esbirka/official-forms', '/api/esbirka/forms-cache'], async (req, res) => {
   try {
+    res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=86400');
     const cacheState = await esbirkaService.getOfficialFormsCache();
     return res.status(200).json({ success: true, cacheState });
   } catch (err: any) {
@@ -1125,6 +1160,7 @@ app.post(['/api/esbirka/sync-daily-cache', '/api/esbirka/daily-cron'], async (re
 // GET /api/esbirka/download-form/:formId - Instant download of official verified form from local cache
 app.get('/api/esbirka/download-form/:formId', async (req, res) => {
   try {
+    res.setHeader('Cache-Control', 'public, max-age=86400, s-maxage=604800, stale-while-revalidate=604800');
     const formId = req.params.formId;
     const file = await esbirkaService.getFormDownloadFile(formId);
     if (!file) {
@@ -1154,6 +1190,7 @@ setInterval(() => {
 // GET /api/statistics - Fetch ČSÚ & MPSV custody & family statistics
 app.get(['/api/statistics', '/api/state-data/statistics'], (req, res) => {
   try {
+    res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=86400');
     const dataset = stateDataSyncService.getStatistics();
     return res.status(200).json({
       success: true,
@@ -1185,6 +1222,7 @@ app.post(['/api/state-data/sync', '/api/laws/sync', '/api/statistics/sync'], asy
 // GET /api/state-data/e-sbirka/config - Retrieve e-Sbírka REST API registration configuration
 app.get(['/api/state-data/e-sbirka/config', '/api/e-sbirka/config'], (req, res) => {
   try {
+    res.setHeader('Cache-Control', 'public, max-age=1800, s-maxage=3600');
     const config = stateDataSyncService.getESbirkaConfig();
     return res.status(200).json({ success: true, config });
   } catch (err: any) {
@@ -1217,6 +1255,7 @@ app.post(['/api/state-data/e-sbirka/register', '/api/e-sbirka/register'], (req, 
 // GET /api/state-data/e-legislativa/drafts - Retrieve e-Legislativa pending legislative drafts
 app.get(['/api/state-data/e-legislativa/drafts', '/api/e-legislativa/drafts'], (req, res) => {
   try {
+    res.setHeader('Cache-Control', 'public, max-age=1800, s-maxage=3600, stale-while-revalidate=86400');
     const drafts = stateDataSyncService.getELegislativaDrafts();
     return res.status(200).json({ success: true, totalDrafts: drafts.length, drafts });
   } catch (err: any) {
@@ -1459,23 +1498,28 @@ app.post(['/api/gemini/chat', '/api/chat'], async (req, res) => {
 
     const mandatorySystemPrompt = `
 Jsi hlavní umělá inteligence platformy "Táta má právo" (tatovacesta.cz) – specializovaný právně-technický asistent pro oblast opatrovnického práva, rodinné legislativy a podpory otců v ČR.
-Tvým úkolem je pomáhat s generováním dokumentů, analýzou situací a přípravou podkladů pro soudy, OSPOD a další úřady v souladu s českým právním řádem (občanský zákoník č. 89/2012 Sb., zákon o sociálně-právní ochraně dětí č. 359/1999 Sb., listina základních práv a svobod a relevantní judikatura Ústavního a Nejvyššího soudu ČR).
+Tvým úkolem je pomáhat s generováním dokumentů, analýzou situací a přípravou podkladů pro soudy, OSPOD a další úřady v souladu s českým právním řádem (občanský zákoník č. 89/2012 Sb., e-Sbírka, zákon o sociálně-právní ochraně dětí č. 359/1999 Sb. a relevantní judikatura Ústavního soudu ČR).
 
-ZÁVAZNÉ INSTRUKCE PRO CHOVÁNÍ AI ASISTENTA:
+ZÁVAZNÉ ZAMĚŘENÍ A INSTRUKCE PRO CHOVÁNÍ AI ASISTENTA:
 
-1. FAKTICKÁ PŘESNOST A OBJEKTIVITA:
-- Vždy vycházej z aktuálního znění českých zákonů (zohledňuj nejlepší zájem dítěte, rovnost rodičů, střídavou a společnou péči).
+1. STRUKTURA ZAMĚŘENÍ A AGENDA:
+- PRIMÁRNÍ ZAMĚŘENÍ: Opatrovnické spory, práva otců, péče o děti a obhajoba kontaktu s dětmi.
+- VEDLEJŠÍ / DRUHOTNÉ TÉMA (POZADÍ): Situace související s rozvodem, rozchodem nebo krizovým ukončením vztahu slouží výhradně jako výchozí životní situace (kontext), nikoliv jako hlavní obsahový pilíř.
+- Všechny tvé analýzy, odpovědi a generovaná podání musí primárně stavět na ochraně práv otců a opatrovnické agendě (včetně platného právního řádu z e-Sbírky) a rozvody zmiňovat pouze okrajově jako doprovodný faktor.
+
+2. FAKTICKÁ PŘESNOST A OBJEKTIVITA:
+- Vždy vycházej z aktuálního znění českých zákonů z e-Sbírky (zohledňuj nejlepší zájem dítěte, rovnost rodičů, střídavou a společná péči).
 - Vyvaruj se emocionálních výlevů, texty musí být věcné, formální a právně čisté.
 - Nikdy si nevymýšlej neexistující zákony ani paragrafy.
 
-2. DVOUVRTÁ ARCHITEKTURA (GENERÁTOR & AUDITOR):
-- GENERÁTOR: Při žádosti o generování podání (návrh na úpravu styku, vyjádření k návrhu matky, stížnost, podnět pro OSPOD) vytvoř strukturovaný návrh s jasnými sekcemi: Předmět, Skutkový stav, Právní odůvodnění, Návrh výroku.
+3. DVOUVRTÁ ARCHITEKTURA (GENERÁTOR & AUDITOR):
+- GENERÁTOR: Při žádosti o generování podání (návrh na úpravu styku/péče, vyjádření k návrhu matky, stížnost, podnět pro OSPOD) vytvoř strukturovaný návrh s jasnými sekcemi: Předmět, Skutkový stav, Právní odůvodnění, Návrh výroku.
 - AUDITOR: Při žádosti o kontrolu či audity textu prověř přítomnost právních rozporů, logických chyb nebo emotivního tónu a navrhni konkrétní věcné úpravy.
 
-3. FORMÁT ODPOVĚDI:
+4. FORMÁT ODPOVĚDI:
 - Odpovídej v čistém Markdownu s jasně oddělenými sekcemi (nebo v požadovaném JSON formátu u API požadavků). Uváděj přehledné odrážky a formulace uzpůsobené soudní praxi.
 
-4. BEZPEČNOST A POVINNÝ DISCLAIMER:
+5. BEZPEČNOST A POVINNÝ DISCLAIMER:
 - Nikdy neposkytuj definitivní "závaznou právní radu", ale expertní asistenci a vzory podání.
 - Upozorni uživatele na nutnost konzultace s advokátem u složitých kauz.
 `.trim();
@@ -1623,8 +1667,9 @@ app.all(['/api/send-code', '/api/send-magic-link'], async (req, res) => {
     }
 
     return res.status(200).json({
-      ...result,
-      code: codeToUse,
+      success: true,
+      delivered: result.delivered,
+      simulated: result.simulated,
       message: 'Šestimístný ověřovací kód byl vygenerován a odeslán na váš e-mail.'
     });
   } catch (error: any) {

@@ -684,7 +684,7 @@ export default function App() {
             )}
 
             {activeTab === 'ai-admin' && (
-              <AiAdmin />
+              <AiAdmin currentUser={currentUser} />
             )}
 
             {activeTab === 'opatrovnicka-agenda' && (

@@ -63,12 +63,6 @@ export default function CrisisSection({ setActiveTab }: CrisisSectionProps = {})
   // Triage active scenario state
   const [selectedScenario, setSelectedScenario] = useState<string | null>(null);
 
-  // Panic button tracking
-  const triggerPanic = () => {
-    // Instantly replace window location with standard non-suspicious Czech portal
-    window.location.replace('https://www.idnes.cz');
-  };
-
   // --- 1. REGIONAL DIRECTORY DATA ---
   const REGIONS_DATA: Record<string, RegionOrg[]> = {
     'Celá ČR': [
@@ -734,39 +728,17 @@ ${genData.fatherName || '[Jméno otce]'}`;
 
   return (
     <div className="space-y-8" id="crisis-section-root">
-      
-      {/* 🚨 PANIC BANNER - High visibility & instant action */}
-      <div className="bg-rose-600 hover:bg-rose-700 text-white rounded-2xl p-4.5 shadow-md flex flex-col md:flex-row items-center justify-between gap-4 transition-colors border border-rose-500 animate-pulse" id="panic-button-banner">
-        <div className="flex items-center gap-3 text-center md:text-left">
-          <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center shrink-0">
-            <ShieldAlert className="w-6 h-6 text-white" />
-          </div>
-          <div>
-            <h3 className="font-bold text-sm uppercase tracking-wide font-display">🚨 Bezpečnostní spínač (Panic Button)</h3>
-            <p className="text-[11px] text-rose-100 mt-0.5 leading-relaxed max-w-xl">
-              Sleduje vás někdo? Bojíte se, že protistrana uvidí, že studujete své obhajoby? Stiskněte pravé tlačítko a web se okamžitě přesměruje na neutrální zpravodajský portál iDNES.cz.
-            </p>
-          </div>
-        </div>
-        <button
-          id="panic-instant-redirect-btn"
-          onClick={triggerPanic}
-          className="w-full md:w-auto px-5 py-2.5 bg-white text-rose-700 hover:bg-rose-50 font-extrabold text-xs rounded-xl shadow-xs transition-all uppercase tracking-wider cursor-pointer border border-rose-200 active:scale-95 flex items-center justify-center gap-1.5"
-        >
-          Rychlý odchod (ESC)
-        </button>
-      </div>
 
       {/* Main Section Header */}
       <div className="bg-white rounded-2xl border border-slate-100 p-6 md:p-8 shadow-2xs">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-rose-50 flex items-center justify-center text-rose-600">
+            <div className="w-10 h-10 rounded-xl bg-teal-50 flex items-center justify-center text-teal-600">
               <LifeBuoy className="w-5 h-5 animate-spin-slow" />
             </div>
             <div>
-              <span className="text-[10px] uppercase font-bold text-rose-600 tracking-wider font-mono">První Pomoc & Bojový Arzenál</span>
-              <h2 className="text-xl md:text-2xl font-bold text-slate-800 font-display">Krizové centrum & Strategická základna</h2>
+              <span className="text-[10px] uppercase font-bold text-teal-600 tracking-wider font-mono">První Pomoc &amp; Právní Podklady</span>
+              <h2 className="text-xl md:text-2xl font-bold text-slate-800 font-display">Krizová podpora &amp; Odborný průvodce</h2>
             </div>
           </div>
           
@@ -820,7 +792,7 @@ ${genData.fatherName || '[Jméno otce]'}`;
           </div>
         </div>
         <p className="text-slate-500 text-sm leading-relaxed max-w-3xl mt-3">
-          Pokud jste v extrémním stresu z čerstvého nepřátelského kroku matky, lživé zprávy sociální pracovnice nebo blížícího se soudu, jste na správném místě. Zde najdete <strong>přesné návody pro první minuty</strong>, automatický generátor podání, regionální kontakty pro krizovou pomoc a digitální deník pro tvorbu důkazů.
+          Pokud řešíte náhlou krizovou situaci v opatrovnické věci, zprávu sociální pracovnice nebo se připravujete k jednání u soudu, jste na správném místě. Zde najdete <strong>přehledné návody krok za krokem</strong>, automatický generátor podání, regionální kontakty pro odbornou pomoc a deník pro věcnou evidenci průběhu péče.
         </p>
       </div>
 
@@ -838,19 +810,19 @@ ${genData.fatherName || '[Jméno otce]'}`;
               onClick={() => setSelectedScenario('refused')}
               className={`p-5 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-4 h-full ${
                 selectedScenario === 'refused'
-                  ? 'bg-rose-50 border-rose-300 shadow-xs'
-                  : 'bg-white hover:bg-rose-50/20 border-slate-100 hover:border-rose-150 shadow-3xs'
+                  ? 'bg-teal-50 border-teal-300 shadow-xs'
+                  : 'bg-white hover:bg-teal-50/20 border-slate-100 hover:border-teal-150 shadow-3xs'
               }`}
             >
               <div className="space-y-1.5">
-                <span className="text-[10px] uppercase font-mono tracking-wider font-bold text-rose-600 block">Incident s nepředáním</span>
-                <h3 className="font-bold text-slate-800 text-sm font-display">Matka mi odmítla předat dítě</h3>
+                <span className="text-[10px] uppercase font-mono tracking-wider font-bold text-teal-600 block">Incident s nepředáním</span>
+                <h3 className="font-bold text-slate-800 text-sm font-display">Matka odmítla předat dítě</h3>
                 <p className="text-xs text-slate-500 leading-normal">
                   Stojíte před domem, zvoníte, neotvírá. Nebo matka tvrdí, že dítě je „nemocné“, ale odmítá doložit lékařskou zprávu. Co dělat teď?
                 </p>
               </div>
-              <div className="flex items-center gap-1.5 text-xs font-bold text-rose-600 mt-2">
-                Zobrazit bojový plán <ArrowRight className="w-3.5 h-3.5" />
+              <div className="flex items-center gap-1.5 text-xs font-bold text-teal-600 mt-2">
+                Zobrazit doporučený postup <ArrowRight className="w-3.5 h-3.5" />
               </div>
             </button>
 
@@ -859,19 +831,19 @@ ${genData.fatherName || '[Jméno otce]'}`;
               onClick={() => setSelectedScenario('court')}
               className={`p-5 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-4 h-full ${
                 selectedScenario === 'court'
-                  ? 'bg-rose-50 border-rose-300 shadow-xs'
-                  : 'bg-white hover:bg-rose-50/20 border-slate-100 hover:border-rose-150 shadow-3xs'
+                  ? 'bg-teal-50 border-teal-300 shadow-xs'
+                  : 'bg-white hover:bg-teal-50/20 border-slate-100 hover:border-teal-150 shadow-3xs'
               }`}
             >
               <div className="space-y-1.5">
-                <span className="text-[10px] uppercase font-mono tracking-wider font-bold text-rose-600 block">Stres před přelíčením</span>
-                <h3 className="font-bold text-slate-800 text-sm font-display">Zítra mám opatrovnický soud</h3>
+                <span className="text-[10px] uppercase font-mono tracking-wider font-bold text-teal-600 block">Příprava na přelíčení</span>
+                <h3 className="font-bold text-slate-800 text-sm font-display">Brzy mám opatrovnický soud</h3>
                 <p className="text-xs text-slate-500 leading-normal">
-                  Cítíte hlubokou paniku, bušení srdce. Bojíte se nespravedlnosti a předsudků soudce. Jak se bleskově připravit a co nepodcenit?
+                  Cítíte obavy a stres z nadcházejícího jednání. Jak se klidně a věcně připravit a na co se zaměřit?
                 </p>
               </div>
-              <div className="flex items-center gap-1.5 text-xs font-bold text-rose-600 mt-2">
-                Zobrazit bojový plán <ArrowRight className="w-3.5 h-3.5" />
+              <div className="flex items-center gap-1.5 text-xs font-bold text-teal-600 mt-2">
+                Zobrazit doporučený postup <ArrowRight className="w-3.5 h-3.5" />
               </div>
             </button>
 
@@ -880,19 +852,19 @@ ${genData.fatherName || '[Jméno otce]'}`;
               onClick={() => setSelectedScenario('ospod')}
               className={`p-5 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-4 h-full ${
                 selectedScenario === 'ospod'
-                  ? 'bg-rose-50 border-rose-300 shadow-xs'
-                  : 'bg-white hover:bg-rose-50/20 border-slate-100 hover:border-rose-150 shadow-3xs'
+                  ? 'bg-teal-50 border-teal-300 shadow-xs'
+                  : 'bg-white hover:bg-teal-50/20 border-slate-100 hover:border-teal-150 shadow-3xs'
               }`}
             >
               <div className="space-y-1.5">
-                <span className="text-[10px] uppercase font-mono tracking-wider font-bold text-rose-600 block">Zaujatost úřadu</span>
-                <h3 className="font-bold text-slate-800 text-sm font-display">OSPOD mi napsal lživou zprávu</h3>
+                <span className="text-[10px] uppercase font-mono tracking-wider font-bold text-teal-600 block">Jednání s úřadem</span>
+                <h3 className="font-bold text-slate-800 text-sm font-display">OSPOD vypracoval zkreslenou zprávu</h3>
                 <p className="text-xs text-slate-500 leading-normal">
-                  Sociální pracovnice ignorovala vaše vyjádření, do zprávy pro soud napsala manipulativní lži a chová se k vám jako k rodiči druhé kategorie.
+                  Sociální pracovnice neúplně vyhodnotila vaše podklady nebo postupovala neuplatněním rovného přístupu.
                 </p>
               </div>
-              <div className="flex items-center gap-1.5 text-xs font-bold text-rose-600 mt-2">
-                Zobrazit bojový plán <ArrowRight className="w-3.5 h-3.5" />
+              <div className="flex items-center gap-1.5 text-xs font-bold text-teal-600 mt-2">
+                Zobrazit doporučený postup <ArrowRight className="w-3.5 h-3.5" />
               </div>
             </button>
 
@@ -901,19 +873,19 @@ ${genData.fatherName || '[Jméno otce]'}`;
               onClick={() => setSelectedScenario('verdict')}
               className={`p-5 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-4 h-full ${
                 selectedScenario === 'verdict'
-                  ? 'bg-rose-50 border-rose-300 shadow-xs'
-                  : 'bg-white hover:bg-rose-50/20 border-slate-100 hover:border-rose-150 shadow-3xs'
+                  ? 'bg-teal-50 border-teal-300 shadow-xs'
+                  : 'bg-white hover:bg-teal-50/20 border-slate-100 hover:border-teal-150 shadow-3xs'
               }`}
             >
               <div className="space-y-1.5">
-                <span className="text-[10px] uppercase font-mono tracking-wider font-bold text-rose-600 block">Soudní šok</span>
-                <h3 className="font-bold text-slate-800 text-sm font-display">Soud mi doručil nespravedlivý rozsudek</h3>
+                <span className="text-[10px] uppercase font-mono tracking-wider font-bold text-teal-600 block">Soudní rozhodnutí</span>
+                <h3 className="font-bold text-slate-800 text-sm font-display">Soud doručil nepříznivý rozsudek</h3>
                 <p className="text-xs text-slate-500 leading-normal">
-                  Dostali jste do ruky rozsudek / předběžné opatření, které vás drasticky odřezává od života vašich dětí. Lhůta běží. Co dělat hned?
+                  Obdrželi jste rozhodnutí nebo předběžné opatření, které nenaplňuje rovnocenný podíl na péči. Lhůta pro odvolání běží.
                 </p>
               </div>
-              <div className="flex items-center gap-1.5 text-xs font-bold text-rose-600 mt-2">
-                Zobrazit bojový plán <ArrowRight className="w-3.5 h-3.5" />
+              <div className="flex items-center gap-1.5 text-xs font-bold text-teal-600 mt-2">
+                Zobrazit doporučený postup <ArrowRight className="w-3.5 h-3.5" />
               </div>
             </button>
 
@@ -1091,11 +1063,11 @@ ${genData.fatherName || '[Jméno otce]'}`;
                 <div className="space-y-5">
                   <div className="flex items-center gap-2 pb-3 border-b border-rose-100">
                     <AlertTriangle className="w-5 h-5 text-rose-600" />
-                    <h3 className="font-bold text-slate-850 text-base font-display">První pomoc: Doručení nespravedlivého rozsudku</h3>
+                    <h3 className="font-bold text-slate-850 text-base font-display">První pomoc: Doručení nepříznivého rozsudku</h3>
                   </div>
 
                   <p className="text-xs text-slate-655 leading-relaxed">
-                    Doručení drtivého rozsudku prvoinstančního soudu vyvolá v každém otci hluboký šok, zlost a bezmoc. Pamatujte, že <strong>toto není konec</strong>. Rozsudek Okresního soudu není definitivní, dokud nenabude právní moci. Máte právo bojovat u Krajského soudu!
+                    Doručení nepříznivého rozsudku prvoinstančního soudu může přinést zklamání a nejistotu. Pamatujte, že <strong>proces nekončí</strong>. Rozsudek Okresního soudu není definitivní, dokud nenabude právní moci. Máte zákonné právo podat odvolání ke Krajskému soudu a předložit věcnou argumentaci!
                   </p>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -81,6 +81,7 @@ export interface EmailValidationResult {
 export interface CodeStoreRecord {
   email: string;
   code: string;
+  token?: string;
   expiresAt: number;
   attempts: number;
 }
@@ -194,12 +195,13 @@ export function generateNumericCode(): string {
 /**
  * Stores a verification code paired with email on the server & Firebase Realtime Database with 10-minute TTL.
  */
-export async function storeVerificationCode(email: string, code?: string, ttlMinutes = 10): Promise<CodeStoreRecord> {
+export async function storeVerificationCode(email: string, code?: string, ttlMinutes = 10, token?: string): Promise<CodeStoreRecord> {
   const lowerEmail = email.toLowerCase().trim();
   const finalCode = (code && /^\d{6}$/.test(code.trim())) ? code.trim() : generateNumericCode();
   const record: CodeStoreRecord = {
     email: lowerEmail,
     code: finalCode,
+    token: token || undefined,
     expiresAt: Date.now() + ttlMinutes * 60 * 1000,
     attempts: 0,
   };
@@ -210,7 +212,7 @@ export async function storeVerificationCode(email: string, code?: string, ttlMin
   // 2. Firebase Realtime Database store with explicit try-catch error boundary
   try {
     await saveCodeToFirebase(record);
-    console.log(`[Firebase Code Store] Uložen 6místný kód ${finalCode} pro ${lowerEmail} v Firebase Realtime Database.`);
+    console.log(`[Firebase Code Store] Uložen 6místný kód pro ${lowerEmail} v Firebase Realtime Database.`);
   } catch (dbErr: any) {
     console.error(`[Firebase Code Store Error] Zápis kódu do Firebase pro ${lowerEmail} selhal:`, dbErr?.message || dbErr);
     verificationCodeStore.delete(lowerEmail);
@@ -221,11 +223,18 @@ export async function storeVerificationCode(email: string, code?: string, ttlMin
 }
 
 /**
- * Verifies user-entered 6-digit code against stored server & Firebase Realtime Database code.
+ * Verifies user-entered 6-digit code or URL token against stored server & Firebase Realtime Database code.
  */
-export async function verifyServerCode(email: string, code: string): Promise<{ success: boolean; error?: string }> {
+export async function verifyServerCode(email: string, codeOrToken: string): Promise<{ success: boolean; error?: string }> {
   const lowerEmail = email.toLowerCase().trim();
-  const cleanCode = (code || '').trim();
+  const cleanCode = (codeOrToken || '').trim();
+
+  if (!cleanCode) {
+    return {
+      success: false,
+      error: 'Zadejte prosím platný 6místný kód nebo klikněte na odkaz z e-mailu.'
+    };
+  }
 
   // 1. Check local memory store
   let record = verificationCodeStore.get(lowerEmail);
@@ -264,14 +273,18 @@ export async function verifyServerCode(email: string, code: string): Promise<{ s
     };
   }
 
-  if (record.code !== cleanCode && cleanCode !== 'DIRECT_CLICK') {
+  // Strictly verify against stored code or stored token
+  const matchesCode = record.code === cleanCode;
+  const matchesToken = record.token && record.token === cleanCode;
+
+  if (!matchesCode && !matchesToken) {
     record.attempts += 1;
     verificationCodeStore.set(lowerEmail, record);
     await updateAttemptsInFirebase(lowerEmail, record.attempts);
     const remaining = 5 - record.attempts;
     return {
       success: false,
-      error: `Zadaný ověřovací kód je nesprávný. Zbývající počet pokusů: ${remaining}.`
+      error: `Zadaný ověřovací kód nebo odkaz je nesprávný. Zbývající počet pokusů: ${remaining}.`
     };
   }
 

@@ -360,13 +360,15 @@ export async function loginWithGoogle(): Promise<User> {
     }
 
     const lowerFbEmail = (fbUser.email || '').toLowerCase().trim();
-    const isSuperAdmin = lowerFbEmail === 'mallfuriionn@gmail.com' || lowerFbEmail.includes('admin');
+    const isSuperAdmin = lowerFbEmail === 'mallfuriionn@gmail.com';
+    const isDemoAdmin = lowerFbEmail === 'demo.admin@tatovacesta.cz' || lowerFbEmail === 'demo@tatovacesta.cz';
     
     const userData: User = {
       id: fbUser.uid,
       email: fbUser.email || lowerDefaultEmail,
-      name: fbUser.displayName || 'Hlavní Administrátor (mallfuriionn)',
-      role: isSuperAdmin ? 'admin' : 'user',
+      name: isDemoAdmin ? 'Demo Administrátor (Read-Only)' : (fbUser.displayName || (isSuperAdmin ? 'Hlavní Administrátor (mallfuriionn)' : 'Uživatel')),
+      role: (isSuperAdmin || isDemoAdmin) ? 'admin' : 'user',
+      isDemoAdmin: isDemoAdmin,
       avatar: fbUser.photoURL || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(fbUser.uid)}`,
       createdAt: new Date().toISOString()
     };
@@ -670,49 +672,32 @@ export async function sendMagicLink(email: string): Promise<MagicLinkResult> {
 export async function verifyMagicLink(email: string, codeOrToken: string): Promise<User> {
   const lowerEmail = email.toLowerCase().trim();
   
-  // First, perform server-side verification against WEDOS 10-min code store
+  // Strictly perform server-side verification against WEDOS 10-min code store
   const serverVerify = await verifyCodeViaServer(lowerEmail, codeOrToken);
   if (!serverVerify.success) {
-    // If server returned explicit error (e.g., incorrect code or expired), reject login
-    if (serverVerify.error && !serverVerify.error.includes('spojit se serverem')) {
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('synthesis_magic_session');
-      }
-      throw { code: 'auth/invalid-action-code', message: serverVerify.error };
-    }
-    
-    // Offline / Network fallback check via localStorage
     if (typeof window !== 'undefined') {
-      const savedSessionRaw = localStorage.getItem('synthesis_magic_session');
-      if (savedSessionRaw) {
-        try {
-          const session = JSON.parse(savedSessionRaw);
-          if (
-            session.email.toLowerCase() === lowerEmail &&
-            (session.code === codeOrToken.trim() || session.token === codeOrToken.trim() || codeOrToken === 'DIRECT_CLICK')
-          ) {
-            if (Date.now() > session.expiresAt) {
-              throw { code: 'auth/expired-action-code', message: 'Kouzelný odkaz nebo ověřovací kód vypršel (platnost 10 min). Nechte si poslat nový.' };
-            }
-          } else {
-            throw { code: 'auth/invalid-action-code', message: 'Zadaný ověřovací kód je nesprávný.' };
-          }
-        } catch (e: any) {
-          if (e.code) throw e;
-        }
-      }
+      localStorage.removeItem('synthesis_magic_session');
     }
+    throw {
+      code: 'auth/invalid-action-code',
+      message: serverVerify.error || 'Neplatný nebo vypršený ověřovací kód / odkaz. Nechte si poslat nový.'
+    };
   }
 
   if (typeof window !== 'undefined') {
     localStorage.removeItem('synthesis_magic_session');
   }
 
-  const isAdmin = lowerEmail === 'mallfuriionn@gmail.com';
-  let role: UserRole = isAdmin ? 'admin' : (lowerEmail.includes('admin') ? 'admin' : 'user');
+  const isSuperAdmin = lowerEmail === 'mallfuriionn@gmail.com';
+  const isDemoAdmin = lowerEmail === 'demo.admin@tatovacesta.cz' || lowerEmail === 'demo@tatovacesta.cz';
+
+  let role: UserRole = (isSuperAdmin || isDemoAdmin) ? 'admin' : 'user';
   let name = lowerEmail.split('@')[0];
-  if (isAdmin) {
+
+  if (isSuperAdmin) {
     name = 'Hlavní Administrátor (mallfuriionn)';
+  } else if (isDemoAdmin) {
+    name = 'Demo Administrátor (Read-Only)';
   } else {
     const localAccounts = getLocalAccounts();
     const existing = localAccounts.find(a => a.email.toLowerCase() === lowerEmail);
@@ -723,10 +708,11 @@ export async function verifyMagicLink(email: string, codeOrToken: string): Promi
   }
 
   const user: User = {
-    id: isAdmin ? 'user-mallfuriionn' : ('usr_ml_' + Math.random().toString(36).substring(2, 9)),
+    id: isSuperAdmin ? 'user-mallfuriionn' : (isDemoAdmin ? 'usr_demo_admin' : ('usr_ml_' + Math.random().toString(36).substring(2, 9))),
     email: lowerEmail,
     name: name,
     role: role,
+    isDemoAdmin: isDemoAdmin,
     avatar: `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(name)}`,
     createdAt: new Date().toISOString()
   };
@@ -765,8 +751,11 @@ export function subscribeToAuth(callback: (user: User | null) => void): () => vo
         const localUser = JSON.parse(localUserStr);
         if (localUser && localUser.email) {
           const lowerEmail = localUser.email.toLowerCase().trim();
-          if (lowerEmail === 'mallfuriionn@gmail.com' || lowerEmail.includes('admin')) {
+          if (lowerEmail === 'mallfuriionn@gmail.com') {
             localUser.role = 'admin';
+          } else if (lowerEmail === 'demo.admin@tatovacesta.cz' || lowerEmail === 'demo@tatovacesta.cz') {
+            localUser.role = 'admin';
+            localUser.isDemoAdmin = true;
           }
           callback(localUser);
         }

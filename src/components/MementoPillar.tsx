@@ -62,7 +62,7 @@ export default function MementoPillar({ currentUser, onOpenAuth }: MementoPillar
           <div className="bg-white/5 border border-white/10 backdrop-blur-xs p-5 rounded-2xl space-y-2 mt-4">
             <span className="text-[9px] uppercase font-bold text-rose-300 tracking-wider font-mono">Slovo zakladatele</span>
             <p className="text-white text-xs md:text-sm leading-relaxed font-semibold italic">
-              „Já Jiří Šár jsem zakladatel. A důvod, proč tento portál tvořím, je ten, aby žádný otec nemusel podstupovat boje s úřady jako já.“
+              „Já Jiří Šár jsem zakladatel. A důvod, proč tento portál tvořím, je ten, aby žádný otec nemusel procházet složitými opatrovnickými řízeními bez odborné opory.“
             </p>
           </div>
 
@@ -152,7 +152,7 @@ export default function MementoPillar({ currentUser, onOpenAuth }: MementoPillar
               <div className="space-y-1">
                 <strong className="font-bold text-rose-950 text-xs">Mise tohoto portálu:</strong>
                 <p className="leading-relaxed text-[11px] text-slate-700">
-                  Tento web nevznikl z hořkosti, ale z hlubokého přesvědčení, že <strong>systémové bezpráví na dětech a otcích nesmí zůstat utajeno za zavřenými dveřmi soudních síní</strong>. Zveřejňuji tyto plně anonymizované dokumenty jako klíčový důkaz a návod pro ostatní aktivní otce. Bojujte za svá rodičovská práva a práva svých dětí na základě faktů, vědy a nejnovější judikatury.
+                  Tento web nevznikl z hořkosti, ale z hlubokého přesvědčení, že <strong>systémové bezpráví na dětech a otcích nesmí zůstat utajeno za zavřenými dveřmi soudních síní</strong>. Zveřejňuji tyto plně anonymizované dokumenty jako klíčový důkaz a návod pro ostatní aktivní otce. Obhajujte svá rodičovská práva a práva svých dětí na základě faktů, věcné argumentace a nejnovější judikatury.
                 </p>
               </div>
             </div>
@@ -312,7 +312,7 @@ export default function MementoPillar({ currentUser, onOpenAuth }: MementoPillar
                 <span className="text-[9px] font-mono uppercase text-rose-600 font-bold block">4. Zneužití konfliktu protistranou</span>
                 <strong className="text-slate-800 text-xs block font-display">Konflikt není důvodem pro omezení</strong>
                 <p className="text-slate-500 text-[11px] leading-relaxed">
-                  Nemá-li rodič sníženou výchovnou způsobilost, soud nesmí odmítnout střídavou péči jen proto, že mezi rodiči panuje napětí nebo že matka střídavku bojkotuje. Pokud to soud udělá, nepřímo tím matku odměňuje za agresivní, nekompromisní postoj a konflikt prohlubuje.
+                  Nemá-li rodič sníženou výchovnou způsobilost, soud nesmí odmítnout střídavou péči jen proto, že mezi rodiči panuje napětí nebo že druhý rodič střídavou péči odmítá. Pokud to soud udělá, nepřímo tím podporuje nesoustředěnost na zájem dítěte a konflikt prohlubuje.
                 </p>
               </div>
             </div>
@@ -361,7 +361,7 @@ export default function MementoPillar({ currentUser, onOpenAuth }: MementoPillar
                   <span className="text-[9px] uppercase font-bold text-rose-500 tracking-wider font-mono">Zakladatel portálu</span>
                   <h3 className="text-base font-bold text-slate-850 font-display">Jiří Šár</h3>
                   <p className="text-xs text-slate-500 leading-relaxed font-sans">
-                    Autor iniciativy <strong>Táta má právo</strong>, aktivní otec bojující za práva svých dětí a rovnocennou péči.
+                    Autor iniciativy <strong>Táta má právo</strong>, aktivní otec obhajující práva svých dětí a rovnocennou péči.
                   </p>
                 </div>
               </div>

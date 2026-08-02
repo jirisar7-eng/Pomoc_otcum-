@@ -652,46 +652,45 @@ export default function AuthModal({ isOpen, onClose, onLogin, initialMode = 'log
     }
   };
 
-  // E. Quick Demo Admin Login
-  const setDemoUser = async () => {
+  // E. Safe Demo Admin Login (Read-Only Sandbox)
+  const handleDemoAdminLogin = async () => {
     if (loading) return;
 
-    const targetEmail = 'mallfuriionn@gmail.com';
-    const targetName = 'Hlavní Administrátor (mallfuriionn)';
+    const demoUser: User = {
+      id: 'usr_demo_admin',
+      email: 'demo.admin@tatovacesta.cz',
+      name: 'Demo Administrátor (Read-Only)',
+      role: 'admin',
+      isDemoAdmin: true,
+      avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=DemoAdmin',
+      createdAt: new Date().toISOString()
+    };
 
     setLoading(true);
     setCurrentStep(2);
     setStatus({
       type: 'loading',
-      title: 'Přihlašuji správce (mallfuriionn)...',
-      text: 'Ověřuji administrátorská práva a načítám systémovou konzoli...'
+      title: 'Načítám Demo Administraci...',
+      text: 'Připravuji bezpečné prostředí s omezenými právomocemi (Read-Only Sandbox)...'
     });
 
-    try {
-      const loggedInUser = await loginWithEmail(targetEmail, '159753');
+    setTimeout(() => {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('synthesis_hub_local_user', JSON.stringify(demoUser));
+      }
+      setAuthenticatedUser(demoUser);
       setCurrentStep(3);
       setStatus({
         type: 'success',
-        title: 'Správcovský přístup schválen!',
-        text: `Vítáme vás, ${targetName}. Načítám administrátorské rozhraní...`
+        title: 'Demo administrátorský přístup schválen ✨',
+        text: 'Vítáme vás v ukázkové administrátorské konzoli (Režim pouze pro čtení).'
       });
 
       setTimeout(() => {
-        setAuthenticatedUser(loggedInUser);
         setMode('welcome');
         setLoading(false);
-      }, 800);
-    } catch (err: any) {
-      setLoading(false);
-      setCurrentStep(1);
-      console.warn("Demo login notice:", err);
-      setEmail(targetEmail);
-      setPassword('159753');
-      setName(targetName);
-      setRole('admin');
-      setMode('login');
-      setErrorNotice('Nepodařilo se automaticky přihlásit.', 'Formulář byl předvyplněn, klikněte níže na "Přihlásit se".');
-    }
+      }, 600);
+    }, 500);
   };
 
   const generateRandomPassword = () => {
@@ -1174,16 +1173,6 @@ export default function AuthModal({ isOpen, onClose, onLogin, initialMode = 'log
 
                       <button
                         type="button"
-                        disabled={loading}
-                        onClick={() => handleVerifyMagicLinkSubmit('DIRECT_CLICK')}
-                        className="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-teal-300 font-bold text-xs rounded-xl border border-slate-700 transition-all flex items-center justify-center gap-2 cursor-pointer"
-                      >
-                        <Wand2 className="w-4 h-4 text-teal-400" />
-                        <span>Přihlásit 1-kliknutím na Kouzelný odkaz ✨</span>
-                      </button>
-
-                      <button
-                        type="button"
                         onClick={() => {
                           setMagicSent(false);
                           setStatus({ type: 'idle', text: '' });
@@ -1283,27 +1272,30 @@ export default function AuthModal({ isOpen, onClose, onLogin, initialMode = 'log
                   )}
                 </div>
 
-                {/* Quick Admin Access Bar - ONLY shown on local development (hidden on Vercel / production) */}
-                {typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && (
-                  <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2" id="admin-quick-access-panel">
+                {/* Safe Demo Admin Sandbox Option */}
+                <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl space-y-2" id="demo-admin-access-panel">
+                  <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1.5">
-                      <Shield className="w-3.5 h-3.5 text-teal-600" />
-                      <span className="text-[9px] uppercase font-black text-slate-500 tracking-wider font-mono">
-                        Rychlé přihlášení správce (Pouze Localhost)
+                      <Shield className="w-3.5 h-3.5 text-amber-600" />
+                      <span className="text-[9px] uppercase font-black text-amber-800 tracking-wider font-mono">
+                        Ukázka Administrace (Sandbox)
                       </span>
                     </div>
-                    <button
-                      type="button"
-                      disabled={loading}
-                      onClick={() => setDemoUser()}
-                      className="w-full py-1.5 px-3 bg-slate-900 hover:bg-slate-800 text-white font-bold text-[10px] rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
-                      title="Přihlásit se jako Administrátor (mallfuriionn@gmail.com)"
-                    >
-                      <Shield className="w-3.5 h-3.5 text-teal-400" />
-                      <span>Administrátor (mallfuriionn@gmail.com)</span>
-                    </button>
+                    <span className="text-[9px] font-bold px-1.5 py-0.5 bg-amber-200 text-amber-900 rounded font-mono">
+                      READ-ONLY
+                    </span>
                   </div>
-                )}
+                  <button
+                    type="button"
+                    disabled={loading}
+                    onClick={handleDemoAdminLogin}
+                    className="w-full py-2 px-3 bg-slate-900 hover:bg-slate-800 text-amber-300 font-bold text-xs rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+                    title="Vstoupit do administrace v bezpečném režimu pouze pro čtení"
+                  >
+                    <Shield className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Vyzkoušet Demo Administraci (Pouze pro čtení)</span>
+                  </button>
+                </div>
 
                 <div className="relative flex py-1 items-center">
                   <div className="flex-grow border-t border-slate-200"></div>

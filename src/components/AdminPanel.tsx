@@ -716,6 +716,10 @@ export default function AdminPanel({
   };
 
   const handleDeleteUser = async (id: string) => {
+    if (currentUser?.isDemoAdmin) {
+      alert("Akce zamítnuta: Demo administrátorský účet je v režimu pouze pro čtení (Read-Only Sandbox). Mazání uživatelů je zakázáno.");
+      return;
+    }
     if (id === 'user-mallfuriionn' || (currentUser && id === currentUser.id)) {
       alert("Nemůžete smazat hlavního administrátora nebo sami sebe!");
       return;
@@ -734,6 +738,10 @@ export default function AdminPanel({
   };
 
   const handleUpdateUserRole = async (id: string, newRole: 'user' | 'admin', newSubRole?: string) => {
+    if (currentUser?.isDemoAdmin) {
+      alert("Akce zamítnuta: Demo administrátorský účet je v režimu pouze pro čtení (Read-Only Sandbox). Změny uživatelských rolí jsou zakázány.");
+      return;
+    }
     setUserSyncStatus('saving');
     const updatedUsers = usersList.map(u => {
       if (u.id === id) {
@@ -1527,20 +1535,21 @@ ${cases.map(c => `Název: ${c.title}\nStav: ${c.status}\nChronologie:\n` + (c.ch
                   currentUser?.email?.toLowerCase().trim() === 'sarji@seznam.cz';
 
   if (!isAdmin) {
-    const handleQuickSuperAdminLogin = () => {
-      const superAdminUser: User = {
-        id: 'usr_superadmin',
-        email: 'admin@synthesis.cz',
-        name: 'SuperAdmin Synthesis',
+    const handleDemoAdminSandboxLogin = () => {
+      const demoUser: User = {
+        id: 'usr_demo_admin',
+        email: 'demo.admin@tatovacesta.cz',
+        name: 'Demo Administrátor (Read-Only)',
         role: 'admin',
-        avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=SuperAdmin',
+        isDemoAdmin: true,
+        avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=DemoAdmin',
         createdAt: new Date().toISOString()
       };
       if (onQuickSuperAdmin) {
-        onQuickSuperAdmin(superAdminUser);
+        onQuickSuperAdmin(demoUser);
       } else if (typeof window !== 'undefined') {
         localStorage.setItem('synthesis_remember_me_flag', 'true');
-        localStorage.setItem('synthesis_hub_local_user', JSON.stringify(superAdminUser));
+        localStorage.setItem('synthesis_hub_local_user', JSON.stringify(demoUser));
         window.location.reload();
       }
     };
@@ -1573,7 +1582,7 @@ ${cases.map(c => `Název: ${c.title}\nStav: ${c.status}\nChronologie:\n` + (c.ch
         {/* Card Content Body */}
         <div className="p-6 sm:p-8 space-y-6">
           <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-            {t('rbac_access_denied_desc', 'Pro přístup do správy portálu \'Táta má právo\' a administrace Synthesis OS je vyžadován účet s rolí SuperAdmin. Jako vývojář nebo testující se můžete jedním kliknutím přepnout do testovacího administrátorského profilu.')}
+            {t('rbac_access_denied_desc', 'Pro Přístup do plné správy portálu je vyžadován ověřený administrátorský účet. Pro ukázku rozhraní se můžete jedním kliknutím přepnout do bezpečného Demo administrátorského profilu (Read-Only Sandbox).')}
           </p>
 
           {/* User Status Box */}
@@ -1589,14 +1598,14 @@ ${cases.map(c => `Název: ${c.title}\nStav: ${c.status}\nChronologie:\n` + (c.ch
 
           {/* Action Buttons */}
           <div className="space-y-3 pt-2">
-            {/* Quick SuperAdmin Button */}
+            {/* Safe Demo Admin Sandbox Button */}
             <button
-              id="rbac-quick-superadmin-btn"
-              onClick={handleQuickSuperAdminLogin}
-              className="w-full py-3.5 px-5 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-500 hover:to-emerald-500 text-white font-bold text-sm rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95 group"
+              id="rbac-demo-admin-btn"
+              onClick={handleDemoAdminSandboxLogin}
+              className="w-full py-3.5 px-5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-sm rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95 group"
             >
-              <Sparkles className="w-4 h-4 text-teal-200 group-hover:rotate-12 transition-transform" />
-              <span>Přihlásit jako SuperAdmin (Testovací účet)</span>
+              <Shield className="w-4 h-4 text-slate-950" />
+              <span>Vstoupit do Demo Administrace (Pouze pro čtení / Sandbox)</span>
             </button>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -1638,6 +1647,30 @@ ${cases.map(c => `Název: ${c.title}\nStav: ${c.status}\nChronologie:\n` + (c.ch
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6" id="synthesis-os-admin-root">
       
+      {/* Demo Admin Read-Only Sandbox Warning Banner */}
+      {currentUser?.isDemoAdmin && (
+        <div className="bg-amber-500/10 border border-amber-500/30 p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-amber-950 shadow-sm" id="demo-admin-warning-banner">
+          <div className="flex items-start sm:items-center gap-3.5">
+            <div className="p-2.5 bg-amber-500/20 rounded-xl text-amber-700 shrink-0 mt-0.5 sm:mt-0">
+              <ShieldCheck className="w-6 h-6 text-amber-600" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2 mb-0.5">
+                <span className="font-extrabold text-xs uppercase tracking-wider font-mono text-amber-800">
+                  Demo Administrátorský Účet (Read-Only Sandbox)
+                </span>
+              </div>
+              <p className="text-xs text-amber-800 leading-relaxed">
+                Jste přihlášeni v ukázkovém režimu pro prezentaci rozhraní. Osobní údaje uživatelů a citlivé právní spisy jsou anonymizovány. Editační akce, mazání a systémové operace jsou z bezpečnostních důvodů blokovány.
+              </p>
+            </div>
+          </div>
+          <span className="px-3 py-1 bg-amber-600 text-white font-extrabold text-[10px] rounded-lg uppercase tracking-wider font-mono shrink-0 shadow-xs">
+            READ-ONLY
+          </span>
+        </div>
+      )}
+
       {/* Top Brand Banner */}
       <div className="bg-slate-900 text-white rounded-3xl p-6 md:p-8 relative overflow-hidden border border-slate-800 shadow-xl">
         <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -3978,7 +4011,11 @@ ${cases.map(c => `Název: ${c.title}\nStav: ${c.status}\nChronologie:\n` + (c.ch
                                   )}
                                 </div>
                               </td>
-                              <td className="p-3 text-slate-500 font-mono text-[11px]">{user.email}</td>
+                              <td className="p-3 text-slate-500 font-mono text-[11px]">
+                                {currentUser?.isDemoAdmin
+                                  ? user.email.replace(/^([^@]{1,3})[^@]*(@.*)$/, "$1***$2")
+                                  : user.email}
+                              </td>
                               <td className="p-3">
                                 <select
                                   value={user.role}

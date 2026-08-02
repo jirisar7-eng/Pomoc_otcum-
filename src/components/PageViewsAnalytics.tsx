@@ -87,8 +87,10 @@ export default function PageViewsAnalytics() {
   const [filterPath, setFilterPath] = useState('');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  const fetchStats = async () => {
-    setLoading(true);
+  const fetchStats = async (isBackground = false) => {
+    if (!isBackground) {
+      setLoading(true);
+    }
     setError(null);
     try {
       const res = await fetch('/api/page-views');
@@ -125,16 +127,18 @@ export default function PageViewsAnalytics() {
         setError('Nepodařilo se načíst statistiky návštěvnosti.');
       }
     } finally {
-      setLoading(false);
+      if (!isBackground) {
+        setLoading(false);
+      }
     }
   };
 
   useEffect(() => {
-    fetchStats();
-    // Auto refresh every 30 seconds
+    fetchStats(false);
+    // Optimized background refresh every 5 minutes (300,000 ms) instead of aggressive 30s polling
     const interval = setInterval(() => {
-      fetchStats();
-    }, 30000);
+      fetchStats(true);
+    }, 300000);
     return () => clearInterval(interval);
   }, []);
 
@@ -232,7 +236,7 @@ export default function PageViewsAnalytics() {
 
           <button
             type="button"
-            onClick={fetchStats}
+            onClick={() => fetchStats(false)}
             disabled={loading}
             className="px-3 py-1.5 rounded-xl bg-slate-900 text-white hover:bg-slate-800 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
           >
