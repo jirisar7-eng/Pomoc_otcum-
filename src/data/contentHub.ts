@@ -556,6 +556,243 @@ Při podávání návrhu doložte své reálné náklady na bydlení, kroužky, 
     relatedTemplates: ['tpl-4'],
     viewCount: 2100,
     wordCount: 170
+  },
+  {
+    id: 'art-majetek-sjm',
+    title: 'Společné jmění manželů, vyrovnání majetku a osobná rozpočet po rozchodu',
+    category: 'vyzivne-majetek',
+    tags: ['SJM', 'majetek', 'vypořádání', 'dluhy', 'výživné na manžela', 'krizový rozpočet', 'občanský zákoník'],
+    excerpt: 'Detailní rozbor vypořádání SJM (§ 736–742 OZ), pravidel pro hypotéky, společné závazky, výživné na rozvedeného manžela (§ 760 OZ) a sestavení udržitelného krizového rozpočtu.',
+    content: `Právní úprava Společného jmění manželů (SJM) a jeho vypořádání představuje klíčový krok při rozvodu. Neujasněné majetkové poměry často zpětně komplikují dohody o dětech a vytvářejí sekundární napětí.
+
+### 1. Základní principy vypořádání SJM (§ 736–742 OZ)
+Podle občanského zákoníku se při vypořádání SJM vychází z principu rovnosti podílů obou manželů (50/50), pokud smlouvou o zúžení nebo předmanželskou smlouvou nebylo stanoveno jinak.
+- **Tříletá prekluzivní lhůta:** Pokud nedojde ke sjednání dohody o vypořádání nebo k podání žaloby k soudu do 3 let od právní moci rozsudku o rozvodu, nastupuje zákonná domněnka (§ 741 OZ):
+  - Hmotné movité věci užívané výhradně jedním z manželů připadají tomuto manželovi.
+  - Ostatní movité i nemovité věci a závazky přecházejí do podílového spoluvlastnictví obou manželů s rovnými podíly.
+
+### 2. Hypotéky, závazky a ochrana před dluhy
+- **Společné dluhy:** Dluhy vzniklé za trvání manželství zavazují oba manžele společně a nerozdílně. Převzetí hypotéky jedním z manželů vyžaduje výslovný souhlas financující banky (vyvázání druhého manžela).
+- **Závazky vzniklé bez souhlasu:** Pokud druhý manžel převzal dluh bez vědomí a souhlasu prvního a tento dluh přesahuje běžné potřeby rodiny, lze uplatnit námitku vůči věřiteli dle § 710 OZ.
+
+### 3. Výživné na rozvedeného manžela (§ 760 OZ)
+- Rozvedený manžel, který není schopen se sám živit a tato neschopnost má původ v manželství, může požadovat přiměřené výživné od druhého manžela.
+- **Test dobrých mravů:** Soud nepřizná výživné rozvedenému manželovi, pokud by to bylo v rozporu s dobrými mravy (např. při psychickém či fyzickém týrání nebo bezdůvodném odmítání pracovat).
+- **Sankční výživné (§ 762 OZ):** Může být přiznáno až na 3 roky manželovi, který rozvod nezpůsobil a byla mu způsobena závažná újma.
+
+### 4. Sestavení osobního krizového rozpočtu
+Při zařizování druhé domácnosti doporučujeme:
+1. Oddělit bankovní účty a zrušit dispoziční práva.
+2. Započítat fixní náklady na nájem, energie, výživné na děti a splátky půjček.
+3. Vytvořit krizovou finanční rezervu odpovídající 3–6 měsíčním fixním výdajům.
+
+*Upozornění: Tento text má výhradně informativní charakter a nepředstavuje oficiální právní ani finanční poradenství. Pro konkrétní případ doporučujeme konzultaci s advokátem.*`,
+    lastUpdated: '2026-08-01',
+    relatedJudgments: ['jud-1', 'jud-3'],
+    relatedStudies: ['std-lom-vupsv'],
+    relatedTemplates: ['tpl-1'],
+    viewCount: 1950,
+    wordCount: 420
+  },
+  {
+    id: 'art-psychologie-stres',
+    title: 'Zvládání psychického stresu a emočně věcné jednání v prvních týdnech rozchodu',
+    category: 'psychologie-attachment',
+    tags: ['stres', 'duševní zdraví', 'seberegulace', 'pravidlo 24 hodin', 'soudní řízení', 'psychologie'],
+    excerpt: 'Praktické strategie pro ochranu duševního zdraví otce, zvládnutí akutního šoku z rozpadu rodiny a zachování klidného, věcného vystupování před OSPOD a soudem.',
+    content: `Rozpad rodiny a hrozba ztráty každodenního kontaktu s dětmi patří k nejzávažnějším životním stresorům. Schopnost otce zachovat si chladnou hlavu a stabilní emoce je však klíčová nejen pro jeho vlastní zdraví, ale přímo podmiňuje jeho úspěch v opatrovnickém řízení.
+
+### 1. Akutní fáze rozchodu a zpracování emociálního šoku
+- **Fyziologické reakce:** Úzkost, nespavost, hněv a pocit bezmoci jsou přirozenou reakcí. Pamatujte, že emoce jsou špatný rádce při tvorbě právních dokumentů.
+- **Prevence impulzivního jednání:** Využívejte "Pravidlo 24 hodin". Na konfrontační SMS, e-maily či slovní provokace neodpovídejte v afektu. Dopřejte si čas na zklidnění.
+
+### 2. Vystupování před OSPOD a opatrovnickým soudem
+- **Dojem stabilního rodiče:** Soudci a pracovníci OSPOD posuzují, zda je otec emočně zralý a schopen poskytnout dítěti klidné prostředí. Jakékoliv výbuchy hněvu či vulgární výpady (i na sociálních sítích) budou použity jako důkaz emocionální nestability.
+- **Fokus na potřeby dítěte:** Při jednání nehovořte o svých pocitech vůči bývalé partnerce, ale výhradně o potřebách, zájmech a denním režimu vašich dětí.
+
+### 3. Vyhledání odborné psychologické podpory
+- Návštěva psychologa, terapeuta či krizového centra pro otce není projev slabosti, ale naopak důkaz zodpovědného přístupu ke zdraví.
+- Vyžádejte si zprávu z terapie – doložení aktivní péče o své duševní zdraví působí u soudu velmi pozitivně.`,
+    lastUpdated: '2026-08-01',
+    relatedJudgments: ['jud-2', 'jud-3'],
+    relatedStudies: ['std-fucik-2018', 'std-lom-vupsv'],
+    relatedTemplates: ['tpl-3'],
+    viewCount: 1620,
+    wordCount: 330
+  },
+  {
+    id: 'art-rozhovor-dite',
+    title: 'Jak šetrně komunikovat rozchod s dítětem podle jeho věku',
+    category: 'psychologie-attachment',
+    tags: ['komunikace s dítětem', 'attachment', 'předškolní', 'školní', 'dospívající', 'vývojová psychologie'],
+    excerpt: 'Odborná doporučení podložená výzkumy citové vazby (attachmentu). Přesné formulace a zásady pro šetrné oznámení rozchodu dospělých bez poškození psychiky dítěte.',
+    content: `Způsob, jakým rodiče oznámí dětem svůj rozchod, zásadním způsobem ovlivňuje jejich pocit bezpečí a budoucí psychický vývoj. Vědecké výzkumy (Warshak 2014, Fabricius & Suh 2017) prokazují, že děti nepotřebují znát detaily partnerských sporů, ale potřebují absolutní jistotu, že neztrácejí ani jednoho z rodičů.
+
+### 1. Základní univerzální pravidla rozhovoru
+- **Oznámení bez obviňování:** Nikdy neoznačujte druhého rodiče za viníka rozchodu. Dítě vnímá sebe jako součást obou rodičů; kritika jednoho rodiče zraňuje identitu dítěte.
+- **Ujištění o bezpodmínečné lásce:** Opakovaně zdůrazňujte: *"Dospělí se někdy přestanou mít rádi jako partneři, ale rodiči zůstávají navždy. Ty za nic nemůžeš."*
+- **Aktivní naslouchání:** Dejte dítěti prostor vyjádřit smutek, vztek i obavy bez toho, abyste jeho pocity zlehčovali.
+
+### 2. Specifika komunikace podle věkových skupin
+
+#### Předškolní věk (3–6 let)
+- Děti v tomto věku mají sklon ke kognitivnímu egocentrismu a mohou si myslet, že rozchod zavinily neposlušností.
+- **Vhodné věty:** *"Budeš mít dva domovy a v obou svou postýlku a hračky. Máma i táta tě moc milují a budou tu pro tebe každý den."*
+- **Čemu se vyhnout:** Abstraktním pojmům o rozvodu a dohadování o rozvrhu dětí před dítětem.
+
+#### Školní věk (7–11 let)
+- Děti již rozumí konceptu rozchodu, ale často pociťují strach ze ztráty zázemí a změny školy.
+- **Vhodné věty:** *"O věcech ohledně školy a kroužků se s mámou domlouváme tak, aby to pro tebe bylo nejlepší. Ty se soustřeď na své kamarády a školu."*
+- **Čemu se vyhnout:** Používání dítěte jako "posla zpráv" mezi rodiči nebo řešení výživného v jeho přítomnosti.
+
+#### Dospívající (12–16 let)
+- Dospívající mohou reagovat cynismem, stažením se do sebe nebo snahou manipulovat s rodiči.
+- **Vhodné věty:** *"Respektujeme tvůj věk i tvé zájmy. Můj domov je ti plně otevřený a vždy v něm najdeš bezpečné zázemí."*
+- **Čemu se vyhnout:** Tlaku na to, aby si adolescent "vybral" jednoho z rodičů.`,
+    lastUpdated: '2026-08-01',
+    relatedJudgments: ['jud-2', 'jud-6'],
+    relatedStudies: ['std-fabricius-2017', 'std-warshak-2014', 'std-bauserman-2002'],
+    relatedTemplates: ['tpl-1'],
+    viewCount: 2210,
+    wordCount: 450
+  },
+  {
+    id: 'art-ochrana-manipulace',
+    title: 'Ochrana dítěte před rodičovskou manipulací a konfliktem loajality',
+    category: 'rodicovska-alienace',
+    tags: ['PAS', 'rodičovská alienace', 'konflikt loajality', 'manipulace', 'judikatura ÚS', 'výzkum'],
+    excerpt: 'Jak rozpoznat symptomy rodinné alienace (popouzení), jak bránit dítě před loajalitním konfliktem a jaké právní i psychologické kroky podniknout na základě judikatury ÚS a NS ČR.',
+    content: `Rodičovská alienace (zavrhování rodiče / PAS) představuje patologický proces, při kterém jeden z rodičů vědomě či podvědomě manipuluje dítě proti druhému rodiči. Dítě je vystaveno takzvanému konfliktu loajality – pocitu, že láska k otci znamená zradu matky.
+
+### 1. Varovné signály rodičovské manipulace
+- Dítě používá nepřirozený, "dospělý" jazyk plný frází, které neodpovídají jeho věku (např. *"Otec neplatí a zničil nám život"*).
+- Dítě zničehonic odmítá kontakt s otcem bez jakéhokoliv objektivního negativního zážitku.
+- Manipulující rodič vytváří překážky při předávání, zkracuje styk nebo dítě v průběhu pobytu u otce neustále telefonicky kontorluje.
+
+### 2. Právní obrana na základě judikatury Ústavního soudu
+- **Povinnost státu zasáhnout (Nález IV. ÚS 1921/17):** Ústavní soud výslovně potvrdil, že soudy a OSPOD mají povinnost aktivně bránit maření péče a odcizování dítěte.
+- **Hodnocení výchovné způsobilosti (Nález III. ÚS 149/20):** Rodič, který brání dítěti ve vztahu k druhému rodiči a popouzí jej, vykazuje sníženou výchovnou způsobilost.
+
+### 3. Správná reakce otce v praxi
+1. **Zůstaňte klidní a milující:** Nikdy nevracejte útoky a nekritizujte matku. Buďte pro dítě ostrůvkem jistoty.
+2. **Vedťe si objektivní deník:** Zapisujte si přesná data předání, reakce dítěte a případná maření bez emotivních komentářů.
+3. **Navrhněte odbornou terapii:** Požádejte soud o uložení povinnosti odborné rodinné terapie nebo krizové intervence pro dítě a rodiče.`,
+    lastUpdated: '2026-08-01',
+    relatedJudgments: ['jud-3', 'jud-4', 'jud-5'],
+    relatedStudies: ['std-warshak-2014', 'std-bauserman-2002', 'std-nielsen-2018'],
+    relatedTemplates: ['tpl-2', 'tpl-4'],
+    viewCount: 2840,
+    wordCount: 410
+  },
+  {
+    id: 'art-pruvodce-mediaci',
+    title: 'Průvodce rodinnou mediací: Jak funguje mimosoudní dohoda o dětech a majetku',
+    category: 'komunikace-rodice',
+    tags: ['mediace', 'zapsaný mediátor', 'rodičovská dohoda', '§ 100 o.s.ř.', 'mimosoudní řešení'],
+    excerpt: 'Průvodce procesem rodinné mediace podle zákona o mediaci. Jak probíhá první soudem nařízené setkání (§ 100 odst. 3 o.s.ř.), kdy má mediace smysl a jak dosáhnout vykonatelné dohody.',
+    content: `Rodinná mediace je neformální, dobrovolný proces, ve kterém nezávislý a nestranný odborník (zapsaný mediátor) pomáhá rodičům nalézt oboustranně přijatelné řešení opatrovnických a majetkových otázek.
+
+### 1. Soudem nařízené první setkání s mediátorem (§ 100 odst. 3 o.s.ř.)
+Opatrovnický soud může rodičům nařídit první setkání se zapsaným mediátorem v rozsahu 3 hodin. 
+- Účelem tohoto setkání není vynutit dohodu, ale seznámit rodiče s možnostmi mimosoudního vyjednávání a snížit hladinu konfliktu.
+- Po absolvování setkání vydá mediátor potvrzení pro soud.
+
+### 2. Kdy má mediace smysl a kdy je nevhodná
+- **Vhodné případy:** Obvyklé komunikační bloky po rozchodu, nejasnosti v organizaci střídání, nastavení výživného nebo pravidla pro kroužky.
+- **Nevhodné případy:** Přítomnost domácího násilí, závislost jednoho z partnerů, závažná psychická porucha nebo aktivní maření styku spojené se skrýváním dítěte.
+
+### 3. Výstup z mediace – Schválená rodičovská dohoda
+Výsledkem úspěšné mediace je písemná Rodičovská dohoda. Aby získala právní váhu rozsudku (vykonatelnost), předkládá se opatrovnickému soudu ke schválení. Soud dohodu schválí, pokud je v souladu s nejlepším zájmem nezletilého dítěte.`,
+    lastUpdated: '2026-08-01',
+    relatedJudgments: ['jud-1', 'jud-3'],
+    relatedStudies: ['std-fucik-2018'],
+    relatedTemplates: ['tpl-1'],
+    viewCount: 1420,
+    wordCount: 320
+  },
+  {
+    id: 'art-biff-komunikace',
+    title: 'Konstruktivní komunikace s druhým rodičem: Pravidla BIFF v praxi',
+    category: 'komunikace-rodice',
+    tags: ['BIFF', 'deeskalace', 'SMS', 'WhatsApp', 'e-mail', 'soudní důkazy', 'srovnání'],
+    excerpt: 'Praktické vedení písemné komunikace podle celosvětově uznávané metodiky BIFF (Brief, Informative, Friendly, Firm). Ukázky správných a špatných zpráv pro soudní dokazování.',
+    content: `Každá SMS zpráva, e-mail nebo komunikace přes WhatsApp, kterou odešlete druhému rodiči, se v opatrovnickém řízení může stát soudním důkazem. Použití metodiky BIFF (Bill Eddy, High Conflict Institute) zaručuje, že vaše zprávy budou věcné, deeskalující a u soudu neprůstřelné.
+
+### 1. Čtyři pilíře metody BIFF
+1. **B – Brief (Stručná):** Pište krátce. Max. 2 až 4 věty. Čím delší text, tím více prostoru pro konflikt.
+2. **I – Informative (Faktická):** Uvádějte pouze fakta (časy, místa, platby). Žádné hodnocení, výčitky ani osobní názory.
+3. **F – Friendly (Mírná):** Zachovejte slušný pozdrav a neutrální, zdvořilý tón (*"Dobrý den"*, *"Děkuji"*).
+4. **F – Firm (Pevná):** Jasně formulujte požadavek a stanovte rozumný termín pro odpověď.
+
+### 2. Názorné porovnání komunikačních ukázek
+
+#### Přiklad 1: Organizace kroužku pro syna
+- ✖ **Špatná komunikace (emoční, útočná):**
+  *"Proč jsi mi zase neodpověděla na zprávu ohledně fotbalu? Vždycky všechno komplikuješ a doplácím na tvůj chaotický přístup! Pokud mi do večera nenapíšeš, nahlásím te na OSPOD!"*
+- ✔ **Správná BIFF komunikace:**
+  *"Dobrý den, prosím o potvrzení, zda syn bude navštěvovat fotbalový kroužek i v tomto pololetí. Potřebuji informaci do středy 18:00 pro úhradu příspěvku. Děkuji, [Jméno]."*
+
+#### Přiklad 2: Změna termínu předání
+- ✖ **Špatná komunikace (defenzivní, hádavá):**
+  *"Uvědomuješ si vůbec, že mi ničíš plány? Nemůžu za to, že je zácpa na dálnici! Ty taky věčně chodíš pozdě a já ti nic nevyčítám!"*
+- ✔ **Správná BIFF komunikace:**
+  *"Dobrý den, z důvodu kolony na dálnici se předání dětí posune o 20 minut. Přijedu v 17:20 hod. Děkuji za pochopení, [Jméno]."*`,
+    lastUpdated: '2026-08-01',
+    relatedJudgments: ['jud-3', 'jud-7'],
+    relatedStudies: ['std-fucik-2018'],
+    relatedTemplates: ['tpl-2'],
+    viewCount: 3100,
+    wordCount: 380
+  },
+  {
+    id: 'art-bydleni-ospod',
+    title: 'Stabilizace nového bydlení pro děti a příprava na šetření OSPOD',
+    category: 'jednani-ospod',
+    tags: ['bydlení', 'dětský pokoj', 'OSPOD', 'místní šetření', 'střídavá péče', 'zázemí'],
+    excerpt: 'Co přesně zjišťuje sociální pracovnice OSPOD při místním šetření v bytě otce. Podrobný checklist vybavení a přípravy domova pro potřeby střídavé péče.',
+    content: `Při posuzování návrhu na střídavou nebo společnou péči provádí OSPOD místní šetření v bydlišti obou rodičů. Cílem OSPOD není hodnocení materiálního luxusu, ale ověření, zda je prostředí pro dítě **bezpečné, hygienické, stabilní a poskytuje mu vlastní osobní prostor**.
+
+### 1. Klíčové požadavky na zázemí dítěte
+- **Lůžko a spánek:** Dítě musí mít vlastní kvalitní postel s čistým povlečením. Rozkládací pohovka v obývacím pokoji je akceptovatelná pouze jako dočasné řešení.
+- **Studijní a hrací kout:** Stůl s osvětlením pro přípravu do školy a věkově odpovídající hračky, knížky a školní potřeby.
+- **Úložné prostory:** Skříň či poličky vyhrazené výhradně pro oblečení a osobní věci dítěte.
+- **Hygiena a bezpečnost:** Čisté sociální zařízení, zabezpečené elektrické zásuvky a absence nebezpečných předmětů v dosahu malých dětí.
+
+### 2. Průběh návštěvy OSPOD a protokol
+- Pracovnice si prohlédne byt, vyfotografuje dětský pokoj a provede krátký pohovor s otcem.
+- Z návštěvy se vyhotovuje Zpráva z místního šetření. Otec má právo do ní nahlédnout a požadovat doplnění svých připomínek.`,
+    lastUpdated: '2026-08-01',
+    relatedJudgments: ['jud-1', 'jud-7'],
+    relatedStudies: ['std-lom-vupsv', 'std-fucik-2018'],
+    relatedTemplates: ['tpl-3'],
+    viewCount: 1890,
+    wordCount: 310
+  },
+  {
+    id: 'art-statni-podpora',
+    title: 'Finanční stabilita po rozchodu: Dávky, příspěvek na bydlení a pomoc MPSV',
+    category: 'vyzivne-majetek',
+    tags: ['MPSV', 'dávky', 'příspěvek na bydlení', 'MOP', 'státní podpora', 'krizová pomoc'],
+    excerpt: 'Přehled státní sociální pomoci od Ministerstva práce a sociálních věcí (MPSV) pro rodiče v přechodné finanční tísni po rozchodu či rozvodu.',
+    content: `Rozdělení jedné domácnosti na dvě samostatná obydlí přináší skokový nárůst životních nákladů. Ministerstvo práce a sociálních věcí (MPSV) poskytuje systém dávek státní sociální podpory a hmotné nouze, které pomáhají překlenout nejkritičtější období.
+
+### 1. Příspěvek na bydlení (Státní sociální podpora)
+- **Podmínky nároku:** Nárok vzniká, pokud 30 % (v Praze 30 %) rozhodného příjmu rodiny/domácnosti nestačí k pokrytí normativních nákladů na bydlení.
+- O příspěvek může požádat nájemce i vlastník bytu na základě doložených nákladů za předchozí kalendářní čtvrtletí.
+
+### 2. Mimořádná okamžitá pomoc (MOP)
+- Dávka hmotné nouze určená pro akutní krizové situace (např. náhlá ztráta bydlení, úhrada kauce na nájemní byt, výdaje spojené se začátkem školního roku dětí).
+
+### 3. Přídavek na dítě
+- Testovaná dávka pro rodiny s příjmem do 3,4násobku životního minima. Vyplácí se měsíčně podle věku nezaopatřeného dítěte.
+
+*Proces vyřízení: Žádosti se podávají online přes klientský portál MPSV (JENDA) nebo osobně na kontaktních pracovištích Úřadu práce ČR.*`,
+    lastUpdated: '2026-08-01',
+    relatedJudgments: ['jud-1'],
+    relatedStudies: ['std-lom-vupsv'],
+    relatedTemplates: ['tpl-1'],
+    viewCount: 1560,
+    wordCount: 290
   }
 ];
 

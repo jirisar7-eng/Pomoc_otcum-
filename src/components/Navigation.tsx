@@ -361,8 +361,8 @@ export default function Navigation({
       </div>
 
       {/* Main Header Bar (Logo, XL Navigation, Search & User Profile) */}
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 border-b border-slate-100/80">
-        <div className="flex items-center justify-between min-h-[56px] md:min-h-[64px] py-2 gap-2 sm:gap-3">
+      <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 border-b border-slate-100/80">
+        <div className="flex items-center justify-between w-full max-w-7xl mx-auto min-h-[56px] md:min-h-[64px] py-2 gap-2 sm:gap-3">
           
           {/* Logo & Branding */}
           <div className="flex items-center gap-2.5 cursor-pointer shrink-0" onClick={() => handleTabClick('home')}>
@@ -945,7 +945,7 @@ export default function Navigation({
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
               onNavigate={handleTabClick}
-              className="hidden sm:block w-36 md:w-48 lg:w-56"
+              className="hidden sm:block w-28 sm:w-36 md:w-44 lg:w-48 xl:w-56 shrink-0"
             />
 
             {/* Notification Center */}
@@ -954,7 +954,7 @@ export default function Navigation({
             {/* Glossary Button */}
             <button
               onClick={() => window.dispatchEvent(new CustomEvent('open-glossary', { detail: '' }))}
-              className="hidden xl:flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 font-bold text-[11px] rounded-xl transition-all cursor-pointer shadow-3xs"
+              className="hidden xl:flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 font-bold text-[11px] rounded-xl transition-all cursor-pointer shadow-3xs shrink-0"
               title="Slovník odborných pojmů"
             >
               <BookOpen className="w-3.5 h-3.5 text-teal-600" />
@@ -964,7 +964,7 @@ export default function Navigation({
             {/* Support Button */}
             <button
               onClick={() => handleTabClick('support')}
-              className={`hidden xl:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border font-bold text-[11px] transition-all cursor-pointer ${
+              className={`hidden xl:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border font-bold text-[11px] transition-all cursor-pointer shrink-0 ${
                 activeTab === 'support'
                   ? 'bg-teal-50 border-teal-200 text-teal-800'
                   : 'bg-teal-50/40 hover:bg-teal-50 border-teal-100/50 text-teal-700 hover:border-teal-200 shadow-3xs'
@@ -976,7 +976,7 @@ export default function Navigation({
 
             {/* User Authentication Profile Badge */}
             {currentUser ? (
-              <div className="flex items-center gap-1.5 sm:gap-2 bg-slate-50 pl-1.5 sm:pl-2 pr-1.5 sm:pr-2 py-1 rounded-full border border-slate-200">
+              <div className="flex items-center gap-1.5 sm:gap-2 bg-slate-50 pl-1.5 sm:pl-2 pr-1.5 sm:pr-2 py-1 rounded-full border border-slate-200 shrink-0">
                 <button
                   onClick={() => handleTabClick('profile')}
                   className="flex items-center gap-1.5 sm:gap-2 text-left cursor-pointer hover:opacity-85 transition-opacity outline-none"
@@ -1014,7 +1014,7 @@ export default function Navigation({
                 </button>
                 <button
                   onClick={() => onOpenAuth('register')}
-                  className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-500 hover:to-emerald-500 text-white font-extrabold text-[11px] rounded-xl shadow-xs hover:shadow-md transition-all cursor-pointer shrink-0 border border-teal-400/30"
+                  className="hidden xl:flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-500 hover:to-emerald-500 text-white font-extrabold text-[11px] rounded-xl shadow-xs hover:shadow-md transition-all cursor-pointer shrink-0 border border-teal-400/30"
                   title="Vytvořit nový účet zdarma"
                 >
                   <UserPlus className="w-3.5 h-3.5 text-teal-100" />

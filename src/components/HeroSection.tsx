@@ -17,7 +17,8 @@ import {
   ExternalLink, 
   Heart,
   Compass,
-  CheckCircle2
+  CheckCircle2,
+  Home
 } from 'lucide-react';
 import { HUB_JUDGMENTS } from '../data/contentHub';
 import { useLanguage } from '../lib/LanguageContext';
@@ -40,7 +41,7 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn }: Hero
     }
   };
 
-  // 6 Main Feature Cards for "Co zde najdete"
+  // Feature Cards for "Co zde najdete" (8 cards for 4-column responsive grid on desktop)
   const featureCards = [
     {
       id: 'opatrovnicka-agenda',
@@ -83,6 +84,22 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn }: Hero
       badge: translateText('FORMULÁŘE', language)
     },
     {
+      id: 'life-situation',
+      title: translateText('Životní situace', language),
+      desc: translateText('Bydlení, finance, majetek a praktické zázemí po rozchodu či rozvodu.', language),
+      icon: Home,
+      color: 'bg-purple-50 text-purple-700 border-purple-200 hover:border-purple-400',
+      badge: translateText('ZÁZEMÍ', language)
+    },
+    {
+      id: 'e-justice',
+      title: translateText('e-Justice REST', language),
+      desc: translateText('Státní REST API napojení na e-Sbírku a aktuální platnou legislativu.', language),
+      icon: ExternalLink,
+      color: 'bg-sky-50 text-sky-700 border-sky-200 hover:border-sky-400',
+      badge: translateText('STÁTNÍ API', language)
+    },
+    {
       id: 'forum',
       title: translateText('Komunita', language),
       desc: translateText('Diskusní fórum, reálné příběhy otců a rodičovský hub pro sdílenou péči.', language),
@@ -121,67 +138,104 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn }: Hero
   const latestJudgments = HUB_JUDGMENTS.slice(0, 3);
 
   return (
-    <div className="space-y-10 sm:space-y-12 font-sans max-w-7xl mx-auto" id="homepage-root">
+    <div className="w-full space-y-10 sm:space-y-12 font-sans max-w-7xl mx-auto" id="homepage-root">
       
       {/* ========================================================================= */}
       {/* 1. HERO SEKCE                                                             */}
       {/* ========================================================================= */}
       <section 
-        className="relative bg-gradient-to-br from-slate-900 via-slate-850 to-teal-950 text-white rounded-3xl p-6 sm:p-8 md:p-10 lg:p-12 overflow-hidden border border-teal-800/30 shadow-xl"
+        className="relative w-full bg-gradient-to-br from-slate-900 via-slate-850 to-teal-950 text-white rounded-3xl p-6 sm:p-8 md:p-10 lg:p-12 overflow-hidden border border-teal-800/30 shadow-xl"
         id="home-hero-banner"
       >
         <div className="absolute -top-24 -right-24 w-80 h-80 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -bottom-24 -left-24 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="max-w-3xl space-y-6 relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2 px-3 py-1 bg-amber-400/10 border border-amber-400/30 text-amber-300 rounded-full text-xs font-semibold"
-          >
-            <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-            <span className="font-mono text-[11px] uppercase tracking-wider">Alpha 0.5.1</span>
-            <span className="text-amber-400/50">•</span>
-            <span className="text-slate-200">Táta má právo</span>
-          </motion.div>
-
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight font-display leading-[1.15]" id="hero-title">
-            Táta má právo – <br className="hidden sm:inline" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-300 via-emerald-200 to-amber-200">
-              Nezávislý portál pro rodiče v opatrovnických řízeních.
-            </span>
-          </h1>
-
-          <p className="text-slate-300 text-sm sm:text-base leading-relaxed max-w-2xl" id="hero-description">
-            Pevná opora, ověřené právní rozbory, judikatura Ústavního soudu, vzory podání zdarma a AI průvodce pro spravedlivou rovnocennou péči o děti.
-          </p>
-
-          <div className="flex flex-wrap items-center gap-3 pt-2">
-            <button
-              id="hero-cta-start"
-              onClick={() => onNavigate(isLoggedIn ? 'user-portal' : 'opatrovnicka-agenda')}
-              className="px-6 py-3.5 bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-400 hover:to-emerald-400 text-slate-950 font-extrabold text-xs sm:text-sm rounded-2xl shadow-lg hover:shadow-teal-500/20 transition-all flex items-center gap-2 cursor-pointer transform hover:-translate-y-0.5 active:translate-y-0"
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10 w-full">
+          <div className="lg:col-span-7 xl:col-span-8 space-y-6">
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="inline-flex items-center gap-2 px-3 py-1 bg-amber-400/10 border border-amber-400/30 text-amber-300 rounded-full text-xs font-semibold"
             >
-              <span>{isLoggedIn ? 'Můj portál' : 'Začít'}</span>
-              <ArrowRight className="w-4 h-4 text-slate-950" />
-            </button>
+              <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+              <span className="font-mono text-[11px] uppercase tracking-wider">Alpha 0.5.1</span>
+              <span className="text-amber-400/50">•</span>
+              <span className="text-slate-200">Táta má právo</span>
+            </motion.div>
 
-            <button
-              id="hero-cta-explore"
-              onClick={() => scrollToSection('co-zde-najdete')}
-              className="px-6 py-3.5 bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 border border-slate-700 font-bold text-xs sm:text-sm rounded-2xl transition-all flex items-center gap-2 cursor-pointer"
-            >
-              <span>Prozkoumat portál</span>
-              <Compass className="w-4 h-4 text-teal-400" />
-            </button>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight font-display leading-[1.15]" id="hero-title">
+              Táta má právo – <br className="hidden sm:inline" />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-300 via-emerald-200 to-amber-200">
+                Nezávislý portál a právní opora pro otce.
+              </span>
+            </h1>
+
+            <p className="text-slate-300 text-sm sm:text-base leading-relaxed max-w-2xl" id="hero-description">
+              Pevná opora pro táty v opatrovnických řízeních, při rozchodu i boji o rovnocennou péči. Ověřené právní rozbory, judikatura Ústavního soudu, vzory podání a AI průvodce přímo pro otce.
+            </p>
+
+            <div className="flex flex-wrap items-center gap-3 pt-2">
+              <button
+                id="hero-cta-start"
+                onClick={() => onNavigate(isLoggedIn ? 'user-portal' : 'opatrovnicka-agenda')}
+                className="px-6 py-3.5 bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-400 hover:to-emerald-400 text-slate-950 font-extrabold text-xs sm:text-sm rounded-2xl shadow-lg hover:shadow-teal-500/20 transition-all flex items-center gap-2 cursor-pointer transform hover:-translate-y-0.5 active:translate-y-0"
+              >
+                <span>{isLoggedIn ? 'Můj portál' : 'Začít'}</span>
+                <ArrowRight className="w-4 h-4 text-slate-950" />
+              </button>
+
+              <button
+                id="hero-cta-explore"
+                onClick={() => scrollToSection('co-zde-najdete')}
+                className="px-6 py-3.5 bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 border border-slate-700 font-bold text-xs sm:text-sm rounded-2xl transition-all flex items-center gap-2 cursor-pointer"
+              >
+                <span>Prozkoumat portál</span>
+                <Compass className="w-4 h-4 text-teal-400" />
+              </button>
+            </div>
+          </div>
+
+          {/* Desktop & Wide screen highlights card filling full banner width */}
+          <div className="lg:col-span-5 xl:col-span-4 hidden lg:flex flex-col gap-3.5 bg-slate-900/60 border border-teal-500/20 rounded-2xl p-5 backdrop-blur-xs shadow-inner">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+              <span className="text-[11px] font-mono font-bold text-teal-400 uppercase tracking-wider flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-pulse" />
+                Klíčové metriky portálu
+              </span>
+              <span className="text-[10px] font-mono text-slate-400">2026</span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2.5">
+              <div className="p-3 bg-slate-800/70 border border-slate-700/50 rounded-xl">
+                <span className="block text-xl font-extrabold text-teal-300 font-display">350+</span>
+                <span className="text-[11px] text-slate-300 leading-tight block mt-0.5">Ověřených judikátů</span>
+              </div>
+              <div className="p-3 bg-slate-800/70 border border-slate-700/50 rounded-xl">
+                <span className="block text-xl font-extrabold text-amber-300 font-display">24/7</span>
+                <span className="text-[11px] text-slate-300 leading-tight block mt-0.5">AI Právní asistent</span>
+              </div>
+              <div className="p-3 bg-slate-800/70 border border-slate-700/50 rounded-xl">
+                <span className="block text-xl font-extrabold text-emerald-300 font-display">100%</span>
+                <span className="text-[11px] text-slate-300 leading-tight block mt-0.5">Zdarma ke stažení</span>
+              </div>
+              <div className="p-3 bg-slate-800/70 border border-slate-700/50 rounded-xl">
+                <span className="block text-xl font-extrabold text-indigo-300 font-display">e-Sbírka</span>
+                <span className="text-[11px] text-slate-300 leading-tight block mt-0.5">REST API napojení</span>
+              </div>
+            </div>
+
+            <div className="p-3 bg-teal-950/40 border border-teal-800/40 rounded-xl text-xs text-teal-200 flex items-center gap-2">
+              <ShieldAlert className="w-4 h-4 text-teal-400 shrink-0" />
+              <span>Garantovaná nezávislá právní opora pro otce a jejich děti.</span>
+            </div>
           </div>
         </div>
       </section>
 
       {/* ========================================================================= */}
-      {/* 2. CO ZDE NAJDETE (6 Karet)                                               */}
+      {/* 2. CO ZDE NAJDETE (Rozcestník nástrojů - 4 sloupce na desktopu)          */}
       {/* ========================================================================= */}
-      <section className="space-y-6 scroll-mt-6" id="co-zde-najdete">
+      <section className="space-y-6 scroll-mt-6 w-full" id="co-zde-najdete">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 border-b border-slate-200/80 pb-4">
           <div>
             <span className="text-[11px] font-mono font-bold text-teal-700 uppercase tracking-wider block mb-1">ROZCESTNÍK NÁSTROJŮ</span>
@@ -194,7 +248,7 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn }: Hero
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full">
           {featureCards.map((card) => {
             const CardIcon = card.icon;
             return (
@@ -345,7 +399,7 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn }: Hero
             <div className="space-y-2 text-xs sm:text-sm text-slate-300 leading-relaxed">
               <p className="flex items-start gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                <span><strong>Proč projekt existuje:</strong> Nezávislá osvěta a pomoc rodičům v opatrovnických řízeních pro zachování rovnocenného vztahu dětí s oběma rodiči.</span>
+                <span><strong>Proč projekt existuje:</strong> Nezávislá osvěta a právní opora pro otce v opatrovnických řízeních pro zachování plnohodnotné péče obou rodičů o dítě.</span>
               </p>
               <p className="flex items-start gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
