@@ -60,10 +60,10 @@ export default function IntroScreen({ onDismiss }: IntroScreenProps) {
           <div className="space-y-3 text-center sm:text-left border-b border-slate-100 pb-6">
             <div className="inline-flex items-center gap-2 bg-rose-50 border border-rose-100 px-3.5 py-1.5 rounded-full text-rose-700 font-mono text-[10px] uppercase font-bold tracking-wider mb-2">
               <Sparkles className="w-3.5 h-3.5 text-rose-500 animate-pulse" />
-              Projekt ve vývoji • Beta Verze 0.0.1
+              PROJEKT VE VÝVOJI • VERZE ALPHA 0.5.1
             </div>
             <h1 className="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight font-display leading-tight">
-              📢 Oznámení k beta verzi 0.0.1 portálu <br />
+              📢 Oznámení k verzi 0.5.1 portálu <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-600 via-emerald-600 to-rose-500">
                 Táta má právo
               </span>
@@ -73,34 +73,34 @@ export default function IntroScreen({ onDismiss }: IntroScreenProps) {
           {/* Main Manifesto Body text */}
           <div className="text-slate-650 text-xs sm:text-sm leading-relaxed space-y-5 text-justify">
             <p className="font-semibold text-slate-800 text-sm sm:text-base border-l-4 border-teal-500 pl-4 py-1">
-              Rád bych se s vámi podělil o několik informací k aktuálnímu stavu projektu.
+              Rád bych se s vámi podělil o několik informací k aktuálnímu stavu a rozvoji celého projektu.
             </p>
             
             <p>
-              Portál <strong>Táta má právo</strong> je v aktivní fázi vývoje (beta verze 0.0.1). Systém přihlašování je již plně funkční a 100% bezpečný. Využíváme moderní biometrické ověření Passkeys (otisk prstu / FaceID) a přihlášení přes Google, takže vaše účty i citlivá data jsou v maximálním bezpečí bez nutnosti ukládat klasická hesla. Po obsahové i funkční stránce je většina hlavních sekcí připravena a další interaktivní nástroje postupně rozšiřujeme.
+              Portál <strong>Táta má právo</strong> se posunul do fáze <strong>Alpha 0.5.1</strong>. Systém přihlašování je již plně funkční a 100% bezpečný – využíváme moderní biometrické ověření <strong>Passkeys (otisk prstu / FaceID)</strong> a přihlášení přes Google. Vaše účty i citlivá data jsou v maximálním bezpečí bez nutnosti ukládat klasická hesla. Po obsahové i funkční stránce postupně rozšiřujeme další interaktivní nástroje a moduly.
             </p>
 
             <p>
-              Rozhodl jsem se web zveřejnit už nyní, protože mi záleží na názorech lidí, kterým je určen. Vaše připomínky, nápady a zpětná vazba jsou pro mě velmi cenné a pomohou určit směr dalšího vývoje.
+              Hlavním posláním portálu zůstává nekompromisně <strong>dítě, jeho nejlepší zájem a právo na péči obou rodičů</strong>. Abychom vám ale pomohli zvládnout celou tuto náročnou etapu, rozšířili jsme obsah o praktickou podpůrnou sekci <strong>„Životní situace po rozchodu“</strong>. Najdete v ní návody pro řešení majetku (SJM), finanční stabilizaci, psychickou pohodu i přípravu nového zázemí pro děti.
+            </p>
+
+            <p>
+              Rozhodl jsem se web zveřejňovat postupně už během vývoje, protože mi záleží na názorech lidí, kterým je určen – tedy samotných tátech. Vaše připomínky, nápady a zpětná vazba jsou pro mě velmi cenné a pomohou určovat směr dalšího vývoje.
             </p>
 
             {/* AI and Vibecoding disclaimer block */}
             <div className="bg-slate-50 border border-slate-150 p-5 rounded-2xl space-y-2.5">
               <h3 className="font-bold text-slate-850 flex items-center gap-2 text-xs font-mono uppercase tracking-wider">
                 <Code className="w-4 h-4 text-teal-600" />
-                Vibecoding & Google AI Studio
+                &lt;/&gt; VIBECODING &amp; GOOGLE AI STUDIO
               </h3>
               <p className="text-slate-600 text-xs">
-                Zároveň chci otevřeně říct, že je projekt vytvářen také s pomocí <strong>Google AI Studio</strong> a metodou známou jako <strong>vibecoding</strong>. Beru to jako moderní vývojový nástroj – podobně jako někdo využije WordPress nebo jiný redakční systém. AI za mě nerozhoduje, ale pomáhá mi převést moje nápady do funkční podoby rychleji a efektivněji. Celou koncepci, obsah, funkce i směr projektu navrhuji a řídím já.
+                Zároveň chci otevřeně říct, že je projekt vytvářen také s pomocí <strong>Google AI Studio</strong> a metodou známou jako <strong>vibecoding</strong>. Beru to jako moderní vývojový nástroj – podobně jako někdo využije WordPress nebo jiný redakční systém. AI za mě nerozhoduje, ale pomáhá mi převést moje nápady a reálné potřeby otců do funkční podoby rychleji a efektivněji. Celou koncepci, obsah, funkce a právní směr projektu navrhuji a řídím já.
               </p>
             </div>
 
             <p>
-              Na projektu pracuji každý den. Opravuji chyby, přidávám nové funkce a vylepšuji uživatelské prostředí. A upřímně – nemyslím si, že tento web bude někdy „hotový“. Stejně jako každý kvalitní projekt se bude neustále vyvíjet, rozšiřovat a přizpůsobovat potřebám lidí, kteří ho používají.
-            </p>
-
-            <p>
-              Děkuji každému, kdo si portál vyzkouší a podělí se o svůj názor. Právě díky vám může vzniknout místo, které bude skutečně pomáhat rodičům orientovat se v opatrovnickém řízení a poskytne jim užitečné informace i praktické nástroje.
+              Na projektu pracuji každý den. Opravuji chyby, rozšiřuji databázi e-Sbírky, judikatury i návodů a přidávám další funkce. Pokud narazíte na cokoliv, co nefunguje, nebo máte nápad na zlepšení, neváhejte mi napsat přes formulář nebo v komunitní sekci.
             </p>
 
             <div className="bg-rose-50/40 border border-rose-100/50 p-4.5 rounded-2xl text-rose-950 font-serif italic text-center text-xs sm:text-sm flex items-center justify-center gap-2">
