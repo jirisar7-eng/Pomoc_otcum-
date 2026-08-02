@@ -18,6 +18,63 @@ import {
 
 export const INITIAL_ARTICLES: Article[] = [
   {
+    id: 'art-release-alpha-051',
+    title: '🚀 Alpha 0.5.1: Rozšiřujeme portál Táta má právo o komplexní oporu při rozchodu a stabilizaci zázemí',
+    summary: 'Vydáváme aktualizaci Alpha 0.5.1 s 8 novými specializovanými moduly pro řešení životních situací po rozchodu. Hlavním pilířem nadále zůstává dítě a jeho nejlepší zájem.',
+    content: `Každý otec, který čelí opatrovnickému sporu, si prošel momentem, kdy se mu ze dne na den změnil celý svět. Opatrovnická řízení a boj o zachování rovnocenné péče o děti totiž nevznikají ve vzduchoprázdnu — téměř vždy jim předchází náročná životní etapa v podobě rozpadu vztahu, rozchodu nebo rozvodu.
+
+V reakci na vaše podněty a reálné potřeby z praxe vydáváme aktualizaci Alpha 0.5.1, která přináší zásadní rozšíření obsahu portálu Táta má právo (Synthesis OS).
+
+🎯 Hlavní pilíř zůstává netknut: Dítě a jeho právo na oba rodiče
+Chceme vás ubezpečit, že se základní DNA našeho projektu nijak nemění. Ústředním motivem portálu nadále zůstává dítě, jeho nejlepší zájem a právo na plnohodnotnou péči tátu i mámy.
+
+Nejsme a nechceme být obecnou rozvodovou poradnou. Všechny nové moduly a články jsme vytvořili jako sekundární podpůrné zázemí. Jejich cílem je pomoci vám stabilizovat vaši osobní, finanční a psychickou situaci tak, abyste u opatrovnického soudu vystupovali jako vyrovnaní, připravení a sebejistí otcové, kteří dokáží dětem zajistit bezpečný domov.
+
+📖 Co nového najdete v sekci „Životní situace po rozchodu“?
+Připravili jsme 8 nových specializovaných modulů, které vás krok za krokem provedou kritickým obdobím od prvních dnů rozpadu vztahu až po vytvoření stabilního zázemí:
+
+1. 💰 Majetek, finance a SJM po rozchodu
+Jak zvládnout vypořádání společného jmění manželů (SJM), řešení dluhů nebo bydlení, aniž byste odešli s prázdnou? Přinášíme věcný přehled zákonných postupů, výživného mezi manžely a návod na sestavení krizového osobního rozpočtu.
+
+2. 🧠 Psychická podpora otce a klid v krizi
+Emoce u soudu škodí. Praktické návody a doporučení psychologů vám pomohou zvládnout obrovský tlak prvních týdnů, nejednat v afektu a ochránit své duševní zdraví — což je klíčový předpoklad pro úspěšnou obhajobu u soudu.
+
+3. 👶 Jak mluvit s dítětem o rozpadu vztahu
+Odborná doporučení podložená psychologickými výzkumy (attachmentu a vývojové psychologie). Dozvíte se, jak dítěti šetrně vysvětlit situaci podle jeho věku a čemu se v komunikaci vyvarovat.
+
+4. 🛡️ Ochrana před manipulací a konflikt loajality
+Co dělat, pokud dochází k popouzení dítěte proti otci? Nabízíme odborné rozbory syndromu zavrženého rodiče, návody na správnou reakci a odkazy na přelomovou judikaturu Ústavního soudu.
+
+5. 🤝 Průvodce rodinnou mediací
+Kdy má smysl pokusit se o mimosoudní dohodu přes mediátora, jak se na jednání připravit a v jakých situacích je naopak mediace nefunkční.
+
+6. 📱 Konstruktivní komunikace s druhým rodičem
+Ukázky správné a špatné komunikace přes E-mail, SMS či WhatsApp. Naučíme vás psát strohé, věcné a bezemoční zprávy, které vám u soudu neuškodí.
+
+7. 🏠 Nové bydlení a zázemí pro dítě
+Jak připravit dětský pokoj u táty, co konkrétně sleduje OSPOD při místním šetření a jaké bezpečnostní i vybavovací nároky vyžaduje střídavá péče.
+
+8. 🏛️ Finanční stabilita a státní podpora
+Přehledný a ověřený průvodce dávkami státní sociální podpory, příspěvky na bydlení a krizovou pomocí od MPSV pro otce v tísni.
+
+🔗 Propojení se státními daty a AI asistencí
+Veškeré nové články a návody jsou:
+• Právně podloženy: Využívají denně aktualizovanou cache ze státního API e-Sbírky a oficiální metodiky Ministerstva spravedlnosti a MPSV.
+• Propojeny s judikaturou: U každého tématu najdete přímé odkazy na nálezy Ústavního a Nejvyššího soudu ČR.
+• Integrace s AI Průvodcem: Náš AI Právní Asistent (Gemini) byl vyškolen na tyto nové moduly a dokáže vám s nimi okamžitě poradit v kontextu vaší osobní složky.
+
+Věříme, že tyto nové nástroje vám dodají potřebný klid, jistotu a právní oporu.
+Portál Táta má právo je tu proto, aby žádný táta nezůstal na řešení svých práv a budoucnosti svých dětí sám.`,
+    category: 'Aktuality',
+    date: '2026-08-02',
+    author: 'Redakce & Vývojový tým Táta má právo',
+    likes: 185,
+    commentsCount: 24,
+    readTime: '5 min',
+    tags: ['Alpha 0.5.1', 'Aktualizace', 'SJM', 'Životní situace', 'BIFF Komunikace', 'Gemini AI'],
+    imageUrl: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&q=80&w=1200'
+  },
+  {
     id: 'art-esbirka-api-integration',
     title: 'Síla přímého propojení: Proč platforma Táta má právo integruje státní API e-Sbírky',
     summary: 'V opatrovnických sporech rozhodují detaily. Zjistěte, jak přímá integrace oficiálního REST API e-Sbírky MV ČR a automatická validace formulářů chrání tátu před zastaralými paragrafy a chybným podáním u soudu.',

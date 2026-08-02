@@ -112,6 +112,13 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn }: Hero
   // Latest news items
   const latestArticles = [
     {
+      id: 'art-release-alpha-051',
+      title: '🚀 Alpha 0.5.1: Rozšiřujeme portál o komplexní oporu při rozchodu',
+      date: '2. 8. 2026',
+      pills: 'VERZE ALPHA 0.5.1',
+      excerpt: 'Vydáváme aktualizaci Alpha 0.5.1 s 8 novými specializovanými moduly pro řešení životních situací po rozchodu a stabilizaci zázemí pro děti.'
+    },
+    {
       id: 'art-forpsi-milestone',
       title: 'FORPSI: Sponzor doménové infrastruktury tatovacesta.cz',
       date: '28. 7. 2026',
@@ -124,13 +131,6 @@ export default function HeroSection({ onNavigate, onOpenAuth, isLoggedIn }: Hero
       date: '27. 7. 2026',
       pills: 'TECHNOLOGICKÝ PARTNER',
       excerpt: 'Poskytnutí bezplatného webhostingu NoLimit společností VEDOS Internet, a.s. pro bleskový a stabilní chod portálu.'
-    },
-    {
-      id: 'art-vop-ospod-2026',
-      title: 'Metodické stanovisko Ombudsmana k neutralitě OSPOD',
-      date: '15. 7. 2026',
-      pills: 'PRÁVNÍ ROZBOR',
-      excerpt: 'Doporučení Veřejného ochránce práv k zamezení jednostranného zvýhodňování v opatrovnickém řízení.'
     }
   ];
 
