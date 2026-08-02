@@ -57,6 +57,8 @@ interface AuthModalProps {
   onClose: () => void;
   onLogin: (user: User, rememberMe?: boolean) => void;
   initialMode?: AuthMode;
+  onOpenTerms?: () => void;
+  onOpenPrivacy?: () => void;
 }
 
 type AuthMode = 'login' | 'register' | 'forgot_password' | 'password_setup' | 'welcome' | 'magic_link';
@@ -68,7 +70,7 @@ interface StatusState {
   details?: string;
 }
 
-export default function AuthModal({ isOpen, onClose, onLogin, initialMode = 'login' }: AuthModalProps) {
+export default function AuthModal({ isOpen, onClose, onLogin, initialMode = 'login', onOpenTerms, onOpenPrivacy }: AuthModalProps) {
   // Navigation & Mode
   const [mode, setMode] = useState<AuthMode>(initialMode);
   const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1);
@@ -1491,7 +1493,7 @@ export default function AuthModal({ isOpen, onClose, onLogin, initialMode = 'log
                     <span>{mode === 'register' ? 'Vytvořit nový účet' : 'Přihlásit se do systému'}</span>
                   </button>
 
-                  <div className="text-center pt-2">
+                  <div className="text-center pt-2 space-y-2">
                     <button
                       id="auth-toggle-mode"
                       type="button"
@@ -1506,6 +1508,39 @@ export default function AuthModal({ isOpen, onClose, onLogin, initialMode = 'log
                         ? 'Máte již účet? Přihlaste se' 
                         : 'Nemáte účet? Zaregistrujte se zdarma'}
                     </button>
+
+                    <p className="text-[10px] text-slate-400 leading-tight">
+                      Přihlášením nebo registrací souhlasíte s naší{' '}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          onClose();
+                          if (onOpenTerms) {
+                            onOpenTerms();
+                          } else {
+                            window.location.hash = '#terms';
+                          }
+                        }}
+                        className="text-teal-600 hover:underline font-semibold cursor-pointer"
+                      >
+                        Podmínkami užívání
+                      </button>{' '}
+                      a{' '}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          onClose();
+                          if (onOpenPrivacy) {
+                            onOpenPrivacy();
+                          } else {
+                            window.location.hash = '#privacy';
+                          }
+                        }}
+                        className="text-teal-600 hover:underline font-semibold cursor-pointer"
+                      >
+                        Zásadami ochrany osobních údajů (GDPR)
+                      </button>.
+                    </p>
                   </div>
                 </form>
               </div>

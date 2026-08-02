@@ -105,7 +105,16 @@ const TAB_ALIASES: Record<string, string> = {
   'ai-asistent': 'ai-assistant',
   'ai-context': 'ai-context',
   'llms': 'ai-context',
-  'llms-txt': 'ai-context'
+  'llms-txt': 'ai-context',
+  'terms': 'terms',
+  'podminky-uzivani': 'terms',
+  'privacy': 'privacy',
+  'ochrana-udaju': 'privacy',
+  'gdpr': 'privacy',
+  'zapoj-se': 'zapoj-se',
+  'kariera': 'zapoj-se',
+  'hledame-kolegy': 'zapoj-se',
+  'join-team': 'zapoj-se'
 };
 
 export interface ParsedLink {

@@ -157,6 +157,33 @@ export const SEO_CONFIGS: Record<string, PageSeoConfig> = {
     category: 'Studijní centrum',
     parentLabel: 'Studijní centrum'
   },
+  terms: {
+    title: 'Podmínky užívání portálu (Terms of Service) | Táta má právo',
+    h1: 'Podmínky užívání portálu (Terms of Service)',
+    description: 'Všeobecné podmínky užívání, právní výhrady a pravidla komunity portálu Táta má právo (Synthesis OS).',
+    keywords: 'podmínky užívání, pravidla portálu, vymezení odpovědnosti, Táta má právo',
+    canonicalPath: '/podminky-uzivani',
+    category: 'Právní dokumentace',
+    parentLabel: 'Právní dokumentace'
+  },
+  privacy: {
+    title: 'Zásady ochrany osobních údajů (GDPR & Privacy Policy) | Táta má právo',
+    h1: 'Zásady ochrany osobních údajů (GDPR)',
+    description: 'Informace o zpracování a zabezpečení osobních údajů v souladu s Nařízením EU 2016/679 (GDPR).',
+    keywords: 'GDPR, ochrana osobních údajů, soukromí, Passkeys, bezpečnost dat',
+    canonicalPath: '/ochrana-osobnich-udaju',
+    category: 'Právní dokumentace',
+    parentLabel: 'Právní dokumentace'
+  },
+  'zapoj-se': {
+    title: 'Hledáme kolegy a dobrovolníky | Táta má právo',
+    h1: 'Stavěj s námi systém, který chrání práva dětí a podporuje táty',
+    description: 'Hledáme dobrovolníky, právní rešeršisty, moderátory, vývojáře a psychology do neziskového projektu Táta má právo.',
+    keywords: 'dobrovolnictví, kariéra, pomáhejme tátům, neziskový projekt, zapoj se',
+    canonicalPath: '/zapoj-se',
+    category: 'Zapojte se',
+    parentLabel: 'O projektu'
+  },
   forum: {
     title: 'Komunitní fórum a poradna rodičů | Táta má právo',
     h1: 'Diskusní fórum a sdílení zkušeností',

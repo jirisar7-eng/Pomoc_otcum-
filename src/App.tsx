@@ -95,6 +95,9 @@ import AiContextView from './components/AiContextView';
 import StateLawsSection from './components/StateLawsSection';
 import StateStatisticsSection from './components/StateStatisticsSection';
 import UserManualView from './components/UserManualView';
+import TermsOfService from './components/TermsOfService';
+import PrivacyPolicy from './components/PrivacyPolicy';
+import JoinTeamSection from './components/JoinTeamSection';
 
 export default function App() {
   const { t } = useLanguage();
@@ -858,6 +861,30 @@ export default function App() {
               <AiContextView />
             )}
 
+            {activeTab === 'terms' && (
+              <TermsOfService setActiveTab={(tab) => {
+                setActiveTab(tab);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }} />
+            )}
+
+            {(activeTab === 'privacy' || activeTab === 'gdpr' || activeTab === 'ochrana-udaju') && (
+              <PrivacyPolicy setActiveTab={(tab) => {
+                setActiveTab(tab);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }} />
+            )}
+
+            {(activeTab === 'zapoj-se' || activeTab === 'kariera' || activeTab === 'hledame-kolegy' || activeTab === 'join-team') && (
+              <JoinTeamSection
+                setActiveTab={(tab) => {
+                  setActiveTab(tab);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                currentUser={currentUser}
+              />
+            )}
+
             {activeTab === 'admin' && (
               <AdminPanel
                 currentUser={currentUser}
@@ -922,13 +949,16 @@ export default function App() {
             <div className="space-y-3">
               <h4 className="text-xs uppercase font-bold tracking-wider text-slate-300">{t('footer_useful_sections', 'Užitečné sekce & Právní info')}</h4>
               <div className="grid grid-cols-2 gap-2 text-xs text-slate-400">
-                <button onClick={() => setActiveTab('opatrovnicka-agenda')} className="text-left hover:text-teal-400 transition-colors cursor-pointer">{t('nav_opatrovnicka_agenda', 'Opatrovnická agenda')}</button>
-                <button onClick={() => setActiveTab('ke-stazeni')} className="text-left hover:text-teal-400 transition-colors cursor-pointer">{t('nav_ke_stazeni', 'Vzory podání')}</button>
-                <button onClick={() => setActiveTab('user-manual')} className="text-left hover:text-teal-400 font-bold text-teal-300 transition-colors cursor-pointer">📖 Nápověda & Manuál</button>
-                <button onClick={() => setActiveTab('plan-pece')} className="text-left hover:text-teal-400 transition-colors cursor-pointer">{t('nav_plan_pece', 'Plán péče')}</button>
-                <button onClick={() => setActiveTab('user-portal')} className="text-left hover:text-teal-400 transition-colors cursor-pointer">{t('nav_user_portal', 'Můj portál')}</button>
-                <button onClick={() => setActiveTab('contacts')} className="text-left hover:text-teal-400 transition-colors cursor-pointer">Kontakt na autora</button>
-                <button onClick={() => openCookieConsentModal()} className="text-left hover:text-teal-400 transition-colors cursor-pointer">GDPR & Cookies</button>
+                <button onClick={() => { setActiveTab('opatrovnicka-agenda'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="text-left hover:text-teal-400 transition-colors cursor-pointer">{t('nav_opatrovnicka_agenda', 'Opatrovnická agenda')}</button>
+                <button onClick={() => { setActiveTab('ke-stazeni'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="text-left hover:text-teal-400 transition-colors cursor-pointer">{t('nav_ke_stazeni', 'Vzory podání')}</button>
+                <button onClick={() => { setActiveTab('terms'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="text-left hover:text-teal-400 font-bold text-teal-300 transition-colors cursor-pointer">📜 Podmínky užívání</button>
+                <button onClick={() => { setActiveTab('privacy'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="text-left hover:text-teal-400 font-bold text-teal-300 transition-colors cursor-pointer">🛡️ Ochrana údajů (GDPR)</button>
+                <button onClick={() => { setActiveTab('zapoj-se'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="text-left hover:text-teal-400 font-bold text-emerald-300 transition-colors cursor-pointer col-span-2">🤝 Hledáme kolegy (Dobrovolnictví)</button>
+                <button onClick={() => { setActiveTab('user-manual'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="text-left hover:text-teal-400 font-bold text-slate-300 transition-colors cursor-pointer">📖 Nápověda & Manuál</button>
+                <button onClick={() => { setActiveTab('plan-pece'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="text-left hover:text-teal-400 transition-colors cursor-pointer">{t('nav_plan_pece', 'Plán péče')}</button>
+                <button onClick={() => { setActiveTab('user-portal'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="text-left hover:text-teal-400 transition-colors cursor-pointer">{t('nav_user_portal', 'Můj portál')}</button>
+                <button onClick={() => { setActiveTab('contacts'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="text-left hover:text-teal-400 transition-colors cursor-pointer">Kontakt na autora</button>
+                <button onClick={() => openCookieConsentModal()} className="text-left hover:text-teal-400 transition-colors cursor-pointer col-span-2 text-slate-400 hover:text-amber-300">🍪 Nastavení Cookie preferencí</button>
                 <button onClick={() => { setActiveTab('sitemap'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="text-left hover:text-teal-400 font-bold text-teal-400 transition-colors cursor-pointer flex items-center gap-1 mt-1 col-span-2">
                   📂 {t('btn_sitemap', 'Vývoj projektu (Tech Lab)')}
                 </button>
@@ -941,6 +971,20 @@ export default function App() {
               <p className="text-slate-400 text-[11px] leading-relaxed">
                 {t('footer_disclaimer_text')}
               </p>
+              <div className="flex flex-wrap gap-2 pt-1">
+                <button
+                  onClick={() => { setActiveTab('terms'); window.scrollTo({top: 0, behavior: 'smooth'}); }}
+                  className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-teal-300 text-[11px] font-bold rounded-lg border border-slate-700 transition-colors cursor-pointer"
+                >
+                  📜 Podmínky užívání
+                </button>
+                <button
+                  onClick={() => { setActiveTab('privacy'); window.scrollTo({top: 0, behavior: 'smooth'}); }}
+                  className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-teal-300 text-[11px] font-bold rounded-lg border border-slate-700 transition-colors cursor-pointer"
+                >
+                  🛡️ GDPR & Privacy Policy
+                </button>
+              </div>
             </div>
 
           </div>
@@ -1015,6 +1059,14 @@ export default function App() {
         onClose={() => setAuthModalOpen(false)}
         onLogin={handleLogin}
         initialMode={authModalInitialMode}
+        onOpenTerms={() => {
+          setActiveTab('terms');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenPrivacy={() => {
+          setActiveTab('privacy');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
       />
 
       {/* Cookie Consent Banner & Settings Modal */}
