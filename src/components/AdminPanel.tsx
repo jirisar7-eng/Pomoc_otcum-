@@ -72,6 +72,7 @@ export default function AdminPanel({
 
   // Navigation
   const [activeMenu, setActiveMenu] = useState<string>('dashboard');
+  const [isAdminDrawerOpen, setIsAdminDrawerOpen] = useState(false);
 
   // --- PARTNERS MANAGEMENT STATE & HANDLERS ---
   const [partnerSearch, setPartnerSearch] = useState('');
@@ -1700,11 +1701,146 @@ ${cases.map(c => `Název: ${c.title}\nStav: ${c.status}\nChronologie:\n` + (c.ch
         </div>
       </div>
 
-      {/* Main Admin Frame - Grid Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      {/* Main Admin Frame - Grid Layout with Responsive Tablet Drawer */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
-        {/* SIDEBAR NAVIGATION - 3 Columns */}
-        <div className="lg:col-span-3 bg-white border border-slate-100 rounded-2xl p-4 shadow-3xs space-y-4">
+        {/* TABLET & MOBILE DRAWER TOGGLE (768px - 1023px) */}
+        <div className="lg:hidden bg-white border border-slate-200 rounded-2xl p-3.5 shadow-xs flex flex-col gap-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Shield className="w-5 h-5 text-teal-600" />
+              <span className="font-extrabold text-xs text-slate-800 font-display">
+                Sekce Administrace ({activeMenu})
+              </span>
+            </div>
+            <button
+              onClick={() => setIsAdminDrawerOpen(!isAdminDrawerOpen)}
+              className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl flex items-center gap-1.5 transition-all cursor-pointer shadow-3xs"
+            >
+              <Sliders className="w-3.5 h-3.5 text-teal-300" />
+              <span>{isAdminDrawerOpen ? 'Skrýt menu' : 'Vybrat sekci'}</span>
+            </button>
+          </div>
+
+          {/* Quick horizontal category tabs on tablet when drawer is closed */}
+          {!isAdminDrawerOpen && (
+            <div className="flex items-center gap-2 overflow-x-auto whitespace-nowrap scrollbar-none pt-1">
+              {[
+                { id: 'ai_tester', label: 'AI Tester' },
+                { id: 'system_monitoring', label: 'Monitoring' },
+                { id: 'dashboard', label: 'Dashboard' },
+                { id: 'element_registry', label: 'Registr ID' },
+                { id: 'editorial', label: 'Obsah' },
+                { id: 'videoteka', label: 'Videotéka' },
+                { id: 'judikatura', label: 'Judikatura' },
+                { id: 'cases', label: 'Případy' },
+                { id: 'evidence', label: 'Důkazy' },
+                { id: 'github_manager', label: 'GitHub Sync' },
+                { id: 'tickets', label: 'Tickets' },
+                { id: 'users', label: 'Uživatelé' }
+              ].map(t => (
+                <button
+                  key={t.id}
+                  onClick={() => setActiveMenu(t.id)}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer shrink-0 border ${
+                    activeMenu === t.id
+                      ? 'bg-slate-900 text-white border-slate-900 shadow-3xs'
+                      : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
+                  }`}
+                >
+                  {t.label}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Expanded Drawer Grid on Tablet/Mobile */}
+          {isAdminDrawerOpen && (
+            <div className="pt-2 border-t border-slate-100 grid grid-cols-1 md:grid-cols-2 gap-3 animate-in fade-in duration-150">
+              {[
+                {
+                  category: 'I. Přehled & Správa',
+                  items: [
+                    { id: 'ai_tester', label: 'AI Tester & Monitoring', icon: Sparkles, badge: 'v1.0' },
+                    { id: 'system_monitoring', label: 'Systémový monitoring', icon: Activity, badge: 'HEALTH' },
+                    { id: 'dashboard', label: 'Dashboard & Statistiky', icon: LayoutDashboard },
+                    { id: 'stats', label: 'Návštěvnost & Analýza', icon: BarChart2 }
+                  ]
+                },
+                {
+                  category: 'II. Obsah & Databáze',
+                  items: [
+                    { id: 'element_registry', label: 'Registr ID prvků', icon: Database, badge: 'ID-SYSTEM' },
+                    { id: 'editorial', label: 'Obsah & Redakční fronta', icon: FileText },
+                    { id: 'videoteka', label: 'Videotéka', icon: Tv, badge: 'VIDEO' },
+                    { id: 'judikatura', label: 'Judikatura', icon: Scale },
+                    { id: 'documents', label: 'Dokumenty & Vzory', icon: FileCode },
+                    { id: 'cases', label: 'Případové centrum', icon: Briefcase },
+                    { id: 'evidence', label: 'Správce důkazů', icon: Camera },
+                    { id: 'partners', label: 'Partneři & Advokáti', icon: Share2 }
+                  ]
+                },
+                {
+                  category: 'III. AI Nástroje & Moderace',
+                  items: [
+                    { id: 'community', label: 'Komunita & AI Moderace', icon: MessageCircle, badge: 'AI' },
+                    { id: 'aicentre', label: 'AI Generátor & Nástroje', icon: Cpu },
+                    { id: 'aiauditor', label: 'AI Auditor 3.0', icon: Shield, badge: 'AUDIT' },
+                    { id: 'aimoderator', label: 'AI Internetový Sběrač', icon: Search, badge: 'CRAWLER' }
+                  ]
+                },
+                {
+                  category: 'IV. Uživatelé & Systém',
+                  items: [
+                    { id: 'github_manager', label: 'GitHub Integrace', icon: Github, badge: 'GITHUB' },
+                    { id: 'tickets', label: 'Ticket Systém', icon: TicketIcon, badge: 'PODPORA' },
+                    { id: 'users', label: 'Správa uživatelů & RBAC', icon: Users },
+                    { id: 'simulator', label: 'Nastavení simulátoru', icon: Sliders },
+                    { id: 'appearance', label: 'Vzhled & Šablony', icon: Paintbrush },
+                    { id: 'audit', label: 'Systémový audit & Zálohy', icon: Activity },
+                    { id: 'supabase', label: 'Cloud Status', icon: Database }
+                  ]
+                }
+              ].map((group) => (
+                <div key={group.category} className="space-y-1">
+                  <div className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider px-1">
+                    {group.category}
+                  </div>
+                  {group.items.map((item) => {
+                    const Icon = item.icon;
+                    return (
+                      <button
+                        key={item.id}
+                        onClick={() => {
+                          setActiveMenu(item.id);
+                          setIsAdminDrawerOpen(false);
+                        }}
+                        className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-semibold tracking-wide transition-all cursor-pointer ${
+                          activeMenu === item.id 
+                            ? 'bg-slate-900 text-white shadow-xs' 
+                            : 'text-slate-700 hover:bg-slate-100 bg-slate-50/80'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <Icon className={`w-3.5 h-3.5 ${activeMenu === item.id ? 'text-teal-400' : 'text-slate-500'}`} />
+                          <span className="truncate">{item.label}</span>
+                        </div>
+                        {item.badge && (
+                          <span className={`text-[8px] font-mono px-1 rounded font-bold ${activeMenu === item.id ? 'bg-teal-500 text-slate-950' : 'bg-slate-200 text-slate-600'}`}>
+                            {item.badge}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* DESKTOP SIDEBAR NAVIGATION (xl / lg 1024px+) */}
+        <div className="hidden lg:block lg:col-span-3 bg-white border border-slate-100 rounded-2xl p-4 shadow-3xs space-y-4">
           <div className="px-3 py-2 border-b border-slate-50">
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Sekce administrační konzole</span>
           </div>
@@ -1797,8 +1933,8 @@ ${cases.map(c => `Název: ${c.title}\nStav: ${c.status}\nChronologie:\n` + (c.ch
           </div>
         </div>
 
-        {/* CONTENT AREA - 9 Columns */}
-        <div className="lg:col-span-9 space-y-6">
+        {/* CONTENT AREA - Full Width on Tablet (col-span-12), 9 Cols on Desktop */}
+        <div className="col-span-1 lg:col-span-9 space-y-6 min-w-0 w-full">
 
           {/* TAB GITHUB MANAGER */}
           {activeMenu === 'github_manager' && (

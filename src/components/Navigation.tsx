@@ -937,7 +937,7 @@ export default function Navigation({
             )}
           </nav>
 
-          {/* Right Tools: Universal Search, Notification Center, Glossary & Profile */}
+          {/* Right Tools: Universal Search, Notification Center, Highlighted Portal, Profile & Mobile/Tablet Menu */}
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             
             {/* Universal Search Bar Component */}
@@ -950,6 +950,20 @@ export default function Navigation({
 
             {/* Notification Center */}
             <NotificationCenter onNavigate={handleTabClick} />
+
+            {/* Highlighted "Můj portál" Button on Tablet & Desktop Header */}
+            <button
+              onClick={() => handleTabClick('user-portal')}
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 shadow-3xs ${
+                activeTab === 'user-portal'
+                  ? 'bg-teal-700 text-white border border-teal-800 shadow-md ring-2 ring-teal-300/40'
+                  : 'bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white border border-teal-500/30'
+              }`}
+              title="Přejít do mého osobního portálu"
+            >
+              <UserCheck className="w-3.5 h-3.5 text-teal-100 shrink-0" />
+              <span className="hidden md:inline font-extrabold">Můj portál</span>
+            </button>
 
             {/* Glossary Button */}
             <button
@@ -1035,90 +1049,6 @@ export default function Navigation({
             </button>
           </div>
 
-        </div>
-      </div>
-
-      {/* Desktop Quick Access Bar (Pevná lišta rychlých odkazů - skryto na mobilu a tabletech md/lg) */}
-      <div className="hidden xl:block bg-slate-50/95 border-t border-slate-100 py-1.5 px-3 sm:px-4 lg:px-8">
-        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2 text-[11px] font-bold">
-          <div className="flex items-center gap-1.5 shrink-0 text-slate-500 font-mono text-[10px] uppercase tracking-wider">
-            <Compass className="w-3.5 h-3.5 text-teal-600 shrink-0" />
-            <span className="whitespace-nowrap">Rychlé odkazní centrum:</span>
-          </div>
-
-          <div className="flex items-center gap-1.5 overflow-x-auto py-0.5 max-w-full no-scrollbar">
-            <button
-              onClick={() => handleTabClick('crisis')}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg transition-all border cursor-pointer shrink-0 ${
-                activeTab === 'crisis'
-                  ? 'bg-rose-600 text-white border-rose-700 shadow-3xs'
-                  : 'bg-rose-50/80 hover:bg-rose-100 text-rose-900 border-rose-200/80'
-              }`}
-            >
-              <ShieldAlert className="w-3.5 h-3.5 text-rose-600" />
-              <span className="whitespace-nowrap">Krizová pomoc 24/7</span>
-            </button>
-
-            <button
-              onClick={() => handleTabClick('coparent-hub')}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg transition-all border cursor-pointer shrink-0 ${
-                activeTab === 'coparent-hub'
-                  ? 'bg-indigo-600 text-white border-indigo-700 shadow-3xs'
-                  : 'bg-indigo-50/80 hover:bg-indigo-100 text-indigo-900 border-indigo-200/80'
-              }`}
-            >
-              <Users className="w-3.5 h-3.5 text-indigo-600" />
-              <span className="whitespace-nowrap">Rodičovský Hub</span>
-            </button>
-
-            <button
-              onClick={() => handleTabClick('ai-guide')}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg transition-all border cursor-pointer shrink-0 ${
-                activeTab === 'ai-guide' || activeTab === 'ai-assistant'
-                  ? 'bg-teal-600 text-white border-teal-700 shadow-3xs'
-                  : 'bg-teal-50/80 hover:bg-teal-100 text-teal-900 border-teal-200/80'
-              }`}
-            >
-              <Sparkles className="w-3.5 h-3.5 text-teal-600 animate-pulse" />
-              <span className="whitespace-nowrap">AI Průvodce &amp; Asistent</span>
-            </button>
-
-            <button
-              onClick={() => handleTabClick('plan-pece')}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg transition-all border cursor-pointer shrink-0 ${
-                activeTab === 'plan-pece'
-                  ? 'bg-emerald-600 text-white border-emerald-700 shadow-3xs'
-                  : 'bg-emerald-50/80 hover:bg-emerald-100 text-emerald-900 border-emerald-200/80'
-              }`}
-            >
-              <Sliders className="w-3.5 h-3.5 text-emerald-600" />
-              <span className="whitespace-nowrap">Simulátor Péče</span>
-            </button>
-
-            <button
-              onClick={() => handleTabClick('judikatura')}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg transition-all border cursor-pointer shrink-0 ${
-                activeTab === 'judikatura'
-                  ? 'bg-amber-600 text-white border-amber-700 shadow-3xs'
-                  : 'bg-amber-50/80 hover:bg-amber-100 text-amber-900 border-amber-200/80'
-              }`}
-            >
-              <Scale className="w-3.5 h-3.5 text-amber-600" />
-              <span className="whitespace-nowrap">Judikatura ÚS</span>
-            </button>
-
-            <button
-              onClick={() => handleTabClick('ke-stazeni')}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg transition-all border cursor-pointer shrink-0 ${
-                activeTab === 'ke-stazeni'
-                  ? 'bg-slate-800 text-white border-slate-900 shadow-3xs'
-                  : 'bg-white hover:bg-slate-100 text-slate-700 border-slate-200'
-              }`}
-            >
-              <FileText className="w-3.5 h-3.5 text-slate-500" />
-              <span className="whitespace-nowrap">Vzory podání</span>
-            </button>
-          </div>
         </div>
       </div>
 

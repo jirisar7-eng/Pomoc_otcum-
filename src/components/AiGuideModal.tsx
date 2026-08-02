@@ -153,7 +153,7 @@ export default function AiGuideModal({ isOpen, onClose }: AiGuideModalProps) {
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 15 }}
               transition={{ type: 'spring', damping: 25, stiffness: 240 }}
-              className="bg-white border border-slate-200 shadow-2xl rounded-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden text-left font-sans"
+              className="bg-white border border-slate-200 shadow-2xl rounded-3xl w-[90vw] max-w-[720px] max-h-[90vh] flex flex-col overflow-hidden text-left font-sans"
               id="ai-guide-modal-container"
             >
               {/* Header */}

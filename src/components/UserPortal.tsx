@@ -819,12 +819,12 @@ Jaký krok nebo otázku dnes společně probereme?`;
           </div>
         </div>
 
-        {/* Tab switcher inside portal */}
-        <div className="flex flex-wrap gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200">
+        {/* Tab switcher inside portal - Horizontal Scroll Carousel on Tablet & Mobile */}
+        <div className="flex items-center gap-1.5 bg-slate-100 p-1.5 rounded-xl border border-slate-200/80 overflow-x-auto whitespace-nowrap scrollbar-none max-w-full">
           <button
             onClick={() => setPortalTab('case-map')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-              portalTab === 'case-map' ? 'bg-white text-slate-900 shadow-3xs' : 'text-slate-500 hover:text-slate-900'
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shrink-0 ${
+              portalTab === 'case-map' ? 'bg-white text-slate-900 shadow-3xs' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             <Clock className="w-3.5 h-3.5" />
@@ -832,8 +832,8 @@ Jaký krok nebo otázku dnes společně probereme?`;
           </button>
           <button
             onClick={() => setPortalTab('progress')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-              portalTab === 'progress' ? 'bg-white text-slate-900 shadow-3xs' : 'text-slate-500 hover:text-slate-900'
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shrink-0 ${
+              portalTab === 'progress' ? 'bg-white text-slate-900 shadow-3xs' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             <CheckSquare className="w-3.5 h-3.5 text-teal-600" />
@@ -841,8 +841,8 @@ Jaký krok nebo otázku dnes společně probereme?`;
           </button>
           <button
             onClick={() => setPortalTab('evidence')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-              portalTab === 'evidence' ? 'bg-white text-slate-900 shadow-3xs' : 'text-slate-500 hover:text-slate-900'
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shrink-0 ${
+              portalTab === 'evidence' ? 'bg-white text-slate-900 shadow-3xs' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             <UploadCloud className="w-3.5 h-3.5" />
@@ -850,17 +850,17 @@ Jaký krok nebo otázku dnes společně probereme?`;
           </button>
           <button
             onClick={() => setPortalTab('calendar')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-              portalTab === 'calendar' ? 'bg-white text-slate-900 shadow-3xs' : 'text-slate-500 hover:text-slate-900'
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shrink-0 ${
+              portalTab === 'calendar' ? 'bg-white text-slate-900 shadow-3xs' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             <CalendarDays className="w-3.5 h-3.5" />
-            Kalendář & Lhůty
+            Kalendář &amp; Lhůty
           </button>
           <button
             onClick={() => setPortalTab('ai-notes')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-              portalTab === 'ai-notes' ? 'bg-white text-slate-900 shadow-3xs' : 'text-slate-500 hover:text-slate-900'
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shrink-0 ${
+              portalTab === 'ai-notes' ? 'bg-white text-slate-900 shadow-3xs' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             <Notebook className="w-3.5 h-3.5" />
@@ -868,8 +868,8 @@ Jaký krok nebo otázku dnes společně probereme?`;
           </button>
           <button
             onClick={() => setPortalTab('saved-content')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-              portalTab === 'saved-content' ? 'bg-white text-slate-900 shadow-3xs' : 'text-slate-500 hover:text-slate-900'
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shrink-0 ${
+              portalTab === 'saved-content' ? 'bg-white text-slate-900 shadow-3xs' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             <Bookmark className="w-3.5 h-3.5" />
@@ -877,8 +877,8 @@ Jaký krok nebo otázku dnes společně probereme?`;
           </button>
           <button
             onClick={() => setPortalTab('ai-helper')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-              portalTab === 'ai-helper' ? 'bg-white text-slate-900 shadow-3xs' : 'text-slate-500 hover:text-slate-900'
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shrink-0 ${
+              portalTab === 'ai-helper' ? 'bg-white text-slate-900 shadow-3xs' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             <MessageSquare className="w-3.5 h-3.5" />
@@ -886,8 +886,8 @@ Jaký krok nebo otázku dnes společně probereme?`;
           </button>
           <button
             onClick={() => setPortalTab('inbox')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 relative ${
-              portalTab === 'inbox' ? 'bg-white text-slate-900 shadow-3xs' : 'text-slate-500 hover:text-slate-900'
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 relative shrink-0 ${
+              portalTab === 'inbox' ? 'bg-white text-slate-900 shadow-3xs' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             <Mail className="w-3.5 h-3.5" />

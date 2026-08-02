@@ -721,7 +721,7 @@ export default function AuthModal({ isOpen, onClose, onLogin, initialMode = 'log
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 15 }}
           transition={{ duration: 0.22, ease: "easeOut" }}
-          className="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-lg w-full overflow-hidden relative my-auto"
+          className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-[90vw] max-w-[720px] overflow-hidden relative my-auto"
         >
           {/* Header Banner */}
           <div className="bg-gradient-to-r from-teal-700 via-slate-800 to-slate-900 px-6 py-5 text-white relative">

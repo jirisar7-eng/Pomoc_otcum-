@@ -100,7 +100,7 @@ export default function AIAssistantModal({ isOpen, onClose, initialPrompt }: AIA
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="w-full max-w-lg h-[600px] bg-white rounded-2xl border border-slate-100 shadow-2xl flex flex-col overflow-hidden"
+            className="w-[90vw] max-w-[720px] h-[600px] bg-white rounded-3xl border border-slate-100 shadow-2xl flex flex-col overflow-hidden"
           >
             {/* Header */}
             <div className="bg-slate-850 text-white p-4 flex items-center justify-between border-b border-slate-800">
