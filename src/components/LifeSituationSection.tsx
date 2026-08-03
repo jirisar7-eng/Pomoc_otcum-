@@ -73,18 +73,25 @@ export default function LifeSituationSection({ setActiveTab, initialSubTab }: Li
         'psychika': 'psychika',
         'psychicka-podpora': 'psychika',
         'zazemi/psychika': 'psychika',
+        'zivotni-situace/psychicka-podpora': 'psychika',
         'zivotni-situace/psychika': 'psychika',
         'deti': 'deti',
         'rozhovor-dite': 'deti',
+        'jak-mluvit-s-ditetem': 'deti',
         'zazemi/deti': 'deti',
+        'zivotni-situace/jak-mluvit-s-ditetem': 'deti',
         'zivotni-situace/deti': 'deti',
         'obrana-pas': 'obrana-pas',
         'ochrana-manipulace': 'obrana-pas',
+        'pas': 'obrana-pas',
         'zazemi/obrana-pas': 'obrana-pas',
+        'zivotni-situace/pas': 'obrana-pas',
         'zivotni-situace/obrana-pas': 'obrana-pas',
         'bydleni-ospod': 'bydleni-ospod',
         'bydleni-zazemi': 'bydleni-ospod',
+        'novy-domov-ospod': 'bydleni-ospod',
         'zazemi/bydleni-ospod': 'bydleni-ospod',
+        'zivotni-situace/novy-domov-ospod': 'bydleni-ospod',
         'zivotni-situace/bydleni-ospod': 'bydleni-ospod',
         'mediace': 'mediace',
         'rodinna-mediace': 'mediace',
@@ -95,7 +102,14 @@ export default function LifeSituationSection({ setActiveTab, initialSubTab }: Li
       };
 
       const targetId = aliasMap[initialSubTab] || initialSubTab;
-      setExpandedCategories(prev => ({ ...prev, [targetId]: true }));
+      setExpandedCategories({
+        'sjm': targetId === 'sjm',
+        'psychika': targetId === 'psychika',
+        'deti': targetId === 'deti',
+        'obrana-pas': targetId === 'obrana-pas',
+        'bydleni-ospod': targetId === 'bydleni-ospod',
+        'mediace': targetId === 'mediace',
+      });
 
       setTimeout(() => {
         const el = document.getElementById(targetId) || document.getElementById(`cat-${targetId}`);
@@ -442,20 +456,25 @@ export default function LifeSituationSection({ setActiveTab, initialSubTab }: Li
         </div>
       </div>
 
-      {/* QUICK CATEGORY SELECTOR CARDS */}
+      {/* QUICK CATEGORY SELECTOR CARDS / SUBPAGE TABS */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
         {categories.map((cat) => {
           const Icon = cat.icon;
           const isExpanded = expandedCategories[cat.id];
+          const subpageUrl = `/zivotni-situace/${cat.id === 'psychika' ? 'psychicka-podpora' : cat.id === 'deti' ? 'jak-mluvit-s-ditetem' : cat.id === 'obrana-pas' ? 'pas' : cat.id === 'bydleni-ospod' ? 'novy-domov-ospod' : cat.id}`;
+
           return (
-            <button
+            <a
               key={cat.id}
-              type="button"
-              onClick={() => {
-                toggleCategory(cat.id);
-                const el = document.getElementById(cat.id) || document.getElementById(`cat-${cat.id}`);
-                if (el) {
-                  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              href={subpageUrl}
+              onClick={(e) => {
+                if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+                e.preventDefault();
+                try {
+                  window.history.pushState({}, '', subpageUrl);
+                  window.dispatchEvent(new Event('popstate'));
+                } catch {
+                  window.location.href = subpageUrl;
                 }
               }}
               className={`p-4 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between space-y-3 ${
@@ -483,11 +502,11 @@ export default function LifeSituationSection({ setActiveTab, initialSubTab }: Li
 
               <div className="flex items-center justify-between text-[11px] pt-1 border-t border-slate-100/20 font-medium">
                 <span className={isExpanded ? 'text-emerald-400' : 'text-emerald-700'}>
-                  {isExpanded ? 'Sbalit blok' : 'Otevřít sekci'}
+                  {isExpanded ? 'Zobrazena podstránka' : 'Otevřít podstránku'}
                 </span>
                 {isExpanded ? <ChevronUp className="w-4 h-4 text-emerald-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
               </div>
-            </button>
+            </a>
           );
         })}
       </div>

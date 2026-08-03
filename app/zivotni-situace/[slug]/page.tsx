@@ -30,9 +30,28 @@ interface PageProps {
 
 export default async function ZivotniSituaceDetailPage({ params }: PageProps) {
   const resolvedParams = await Promise.resolve(params);
-  const slug = resolvedParams?.slug;
+  const rawSlug = resolvedParams?.slug;
 
-  const situace = situaceData.find((s) => s.slug === slug);
+  const aliasMap: Record<string, string> = {
+    'sjm': 'sjm',
+    'majetek-sjm': 'sjm',
+    'psychika': 'psychicka-podpora',
+    'psychicka-podpora': 'psychicka-podpora',
+    'deti': 'jak-mluvit-s-ditetem',
+    'jak-mluvit-s-ditetem': 'jak-mluvit-s-ditetem',
+    'rozhovor-dite': 'jak-mluvit-s-ditetem',
+    'obrana-pas': 'pas',
+    'pas': 'pas',
+    'ochrana-manipulace': 'pas',
+    'bydleni-ospod': 'novy-domov-ospod',
+    'novy-domov-ospod': 'novy-domov-ospod',
+    'bydleni-zazemi': 'novy-domov-ospod',
+    'mediace': 'mediace',
+    'rodinna-mediace': 'mediace',
+  };
+
+  const targetSlug = aliasMap[rawSlug] || rawSlug;
+  const situace = situaceData.find((s) => s.slug === targetSlug || s.slug === rawSlug);
 
   if (!situace) {
     return notFound();
