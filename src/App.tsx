@@ -875,13 +875,14 @@ export default function App() {
               }} />
             )}
 
-            {(activeTab === 'zapoj-se' || activeTab === 'kariera' || activeTab === 'hledame-kolegy' || activeTab === 'join-team') && (
+            {(activeTab === 'zapoj-se' || activeTab === 'kariera' || activeTab === 'hledame-kolegy' || activeTab === 'join-team' || activeTab === 'kodex' || activeTab === 'dobrovolnicky-kodex') && (
               <JoinTeamSection
                 setActiveTab={(tab) => {
                   setActiveTab(tab);
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
                 currentUser={currentUser}
+                initialDocTab={activeTab === 'kodex' || activeTab === 'dobrovolnicky-kodex' ? 'kodex' : 'smlouva'}
               />
             )}
 
@@ -953,6 +954,7 @@ export default function App() {
                 <button onClick={() => { setActiveTab('ke-stazeni'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="text-left hover:text-teal-400 transition-colors cursor-pointer">{t('nav_ke_stazeni', 'Vzory podání')}</button>
                 <button onClick={() => { setActiveTab('terms'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="text-left hover:text-teal-400 font-bold text-teal-300 transition-colors cursor-pointer">📜 Podmínky užívání</button>
                 <button onClick={() => { setActiveTab('privacy'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="text-left hover:text-teal-400 font-bold text-teal-300 transition-colors cursor-pointer">🛡️ Ochrana údajů (GDPR)</button>
+                <button onClick={() => { setActiveTab('kodex'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="text-left hover:text-teal-400 font-bold text-teal-300 transition-colors cursor-pointer col-span-2">🛡️ Dobrovolnický Kodex (v1.0)</button>
                 <button onClick={() => { setActiveTab('zapoj-se'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="text-left hover:text-teal-400 font-bold text-emerald-300 transition-colors cursor-pointer col-span-2">🤝 Hledáme kolegy (Dobrovolnictví)</button>
                 <button onClick={() => { setActiveTab('user-manual'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="text-left hover:text-teal-400 font-bold text-slate-300 transition-colors cursor-pointer">📖 Nápověda & Manuál</button>
                 <button onClick={() => { setActiveTab('plan-pece'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="text-left hover:text-teal-400 transition-colors cursor-pointer">{t('nav_plan_pece', 'Plán péče')}</button>
@@ -983,6 +985,12 @@ export default function App() {
                   className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-teal-300 text-[11px] font-bold rounded-lg border border-slate-700 transition-colors cursor-pointer"
                 >
                   🛡️ GDPR & Privacy Policy
+                </button>
+                <button
+                  onClick={() => { setActiveTab('kodex'); window.scrollTo({top: 0, behavior: 'smooth'}); }}
+                  className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-teal-300 text-[11px] font-bold rounded-lg border border-slate-700 transition-colors cursor-pointer"
+                >
+                  🛡️ Dobrovolnický Kodex
                 </button>
               </div>
             </div>

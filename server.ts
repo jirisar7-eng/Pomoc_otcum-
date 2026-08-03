@@ -443,6 +443,41 @@ function getLocalFallbackData(action: string, params: any): any {
         courtWarning: "Původní zpráva vykazuje známky vyostřeného konfliktu. Pokud by ji druhá strana předložila opatrovnickému soudu nebo OSPODu, mohla by být interpretována jako neochota ke smírné dohodě a neschopnost komunikovat v zájmu nezletilých dětí."
       };
     }
+
+    case 'RECOMMEND_VIDEO': {
+      const { situation = '' } = params || {};
+      const sit = situation.toLowerCase();
+
+      let titleSource = "Právně a lidsky: Soud o děti – Já Advokátka";
+      let benefit = "Poskytuje věcný a odborný pohled na soudní opatrovnické řízení, přípravu důkazů a postup při obhajobě péče o děti u soudu.";
+      let url = "http://www.youtube.com/watch?v=38I-NswK8CY";
+
+      if (sit.includes('ospod')) {
+        titleSource = "Jak probíhá jednání na OSPOD a jak se připravit – Šance Dětem";
+        benefit = "Vysvětluje průběh šetření sociální pracovnice OSPOD a přináší konkrétní psychologická a právní doporučení, jak vystupovat věcně, klidně a v zájmu dětí.";
+        url = "http://www.youtube.com/watch?v=sance_deti_ospod";
+      } else if (sit.includes('střídav') || sit.includes('stridav')) {
+        titleSource = "Střídavá péče: Přínosy pro dítě a praxe – Šance Dětem";
+        benefit = "Detailně rozebírá klíčové principy a výhody rovnocenné střídavé péče, zachování vazeb s oběma rodiči a praktickou organizaci po rozchodu.";
+        url = "http://www.youtube.com/watch?v=sance_deti_stridavka";
+      } else if (sit.includes('konflikt') || sit.includes('emoc') || sit.includes('komunik')) {
+        titleSource = "Jak zvládat rodičovské konflikty v zájmu dítěte – Šance Dětem";
+        benefit = "Nabízí odborné psychologické návody a komunikační strategie pro zvládání vypjatých sporných situací bez sekundárního traumatizování dětí.";
+        url = "http://www.youtube.com/watch?v=sance_deti_konflikty";
+      }
+
+      return {
+        situation: situation || 'Všeobecná opatrovnická situace',
+        titleAndSource: titleSource,
+        mainBenefit: benefit,
+        videoUrl: url,
+        fullTextMarkdown: `### 📺 Doporučené video z Videotéky:
+
+1. **Název videa a zdroj:** ${titleSource}
+2. **Hlavní přínos pro otce:** ${benefit}
+3. **Přímý odkaz na video:** [Přehrát video na YouTube](${url}) \`(${url})\``
+      };
+    }
     
     default:
       return {};
@@ -2027,6 +2062,40 @@ Vygeneruj 3 položky odpovídající schématu v českém jazyce.`;
             }
           },
           required: ['results']
+        };
+        break;
+      }
+
+      case 'RECOMMEND_VIDEO': {
+        const { situation } = params || {};
+        systemInstruction = `Jsi pokročilý asistent a správce Videotéky na platformě "Táta má právo" (Synthesis OS na tatovacesta.cz). Tvým úkolem je pomáhat otcům orientovat se v ověřených videomateriálech (odborné diskuse, právní rozbory, psychologická doporučení z důvěryhodných zdrojů jako je Šance Dětem či vybrané právní kanály jako "Já Advokátka") a správně je doporučovat podle aktuální situace uživatele.
+
+Tvoje úkoly a pravidla:
+1. Kontextuální doporučování videí:
+- Pokud uživatel řeší konkrétní problém (např. "jak probíhá jednání na OSPOD", "co obnáší střídavá péče" nebo "jak zvládat rodičovské konflikty"), vyhledej v databázi Videotéky odpovídající ověřené video a nabídni ho s krátkým vysvětlením, proč je pro něj užitečné.
+- Vždy odkazuj na schválené zdroje z oficiální videotéky (např. videa z kanálu Šance Dětem nebo ověřené právní rozbory).
+
+2. Struktura doporučení videorozcestníku (vracej presně schválené atributy):
+- titleAndSource: Název videa a zdroj (např. "Právně a lidsky: Soud o děti – Já Advokátka" / "Střídavá péče: Přínosy pro dítě a praxe – Šance Dětem").
+- mainBenefit: Hlavní přínos pro otce: V jedné až dvou větách shrň, co se v něm uživatel dozví a jak mu to pomůže v jeho situaci.
+- videoUrl: Přímý odkaz na video (vložit platný URL formát, např. "http://www.youtube.com/watch?v=38I-NswK8CY").
+- fullTextMarkdown: Kompletní formátované doporučení v Markdownu.
+
+3. Tón komunikace:
+- Věcný, podporující, objektivní a srozumitelný. Nikdy nesnižuj roli matky, ale důrazně háj práva otce a nejlepší zájem dítěte na základě platné české legislativy a odborných doporučení.`;
+
+        prompt = `Uživatel (otec) řeší tuto situaci: "${situation || 'Potřebuji doporučení vhodného videa o opatrovnickém řízení'}".Vyhledej a doporuč nejvhodnější ověřené video z Videotéky.`;
+
+        responseSchema = {
+          type: 'OBJECT',
+          properties: {
+            situation: { type: 'STRING' },
+            titleAndSource: { type: 'STRING' },
+            mainBenefit: { type: 'STRING' },
+            videoUrl: { type: 'STRING' },
+            fullTextMarkdown: { type: 'STRING' }
+          },
+          required: ['situation', 'titleAndSource', 'mainBenefit', 'videoUrl', 'fullTextMarkdown']
         };
         break;
       }

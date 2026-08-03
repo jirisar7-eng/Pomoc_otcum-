@@ -42,12 +42,94 @@ export const DEFAULT_VIDEO_SOURCES = [
   'Veřejnoprávní televize',
   'Facebook stránka',
   'Podcast Táta má právo',
+  'Šance Dětem',
+  'Já Advokátka',
   'Unie otců',
   'Poradna pro rodinu',
   'Česká televize'
 ];
 
 export const INITIAL_VIDEOS: VideoItem[] = [
+  {
+    id: 'vid-soud-o-deti',
+    title: 'Právně a lidsky: Soud o děti',
+    description: 'Odborný a lidský pohled na soudní opatrovnické řízení, přípravu důkazů, práva rodičů a klíčové momenty při obhajobě péče o děti.',
+    shareUrl: 'http://www.youtube.com/watch?v=38I-NswK8CY',
+    platform: 'youtube',
+    author: 'JUDr. Lucie Martiníková (Já Advokátka)',
+    source: 'Já Advokátka / Právní rozbory',
+    tags: ['Soud', 'Opatrovnické řízení', 'Důkazy', 'Práva otců'],
+    category: 'Soudní řízení',
+    createdAt: '2026-07-25T10:00:00Z',
+    updatedAt: '2026-07-25T10:00:00Z',
+    createdBy: 'Admin',
+    status: 'Approved',
+    isFeatured: true,
+    views: 3120,
+    likes: 410,
+    language: 'CS',
+    embedUrl: 'https://www.youtube.com/embed/38I-NswK8CY'
+  },
+  {
+    id: 'vid-sance-stridavka',
+    title: 'Střídavá péče: Přínosy pro dítě a praxe',
+    description: 'Metodické video projektu Šance Dětem zaměřené na principy střídavé péče, zachování rovnováhy a výhody zapojení obou rodičů po rozchodu.',
+    shareUrl: 'http://www.youtube.com/watch?v=sance_deti_stridavka',
+    platform: 'youtube',
+    author: 'PhDr. Jaroslav Šturma',
+    source: 'Šance Dětem',
+    tags: ['Střídavá péče', 'Šance Dětem', 'Psychologie dítěte', 'Péče obou rodičů'],
+    category: 'Střídavá péče',
+    createdAt: '2026-07-20T14:00:00Z',
+    updatedAt: '2026-07-20T14:00:00Z',
+    createdBy: 'Admin',
+    status: 'Approved',
+    isFeatured: true,
+    views: 2890,
+    likes: 380,
+    language: 'CS',
+    embedUrl: 'https://www.youtube.com/embed/sance_deti_stridavka'
+  },
+  {
+    id: 'vid-sance-ospod',
+    title: 'Jak probíhá jednání na OSPOD a jak se připravit',
+    description: 'Praktická doporučení z odborného portálu Šance Dětem pro správný a věcný průběh pohovoru se sociální pracovnicí OSPOD bez zbytečných emocí.',
+    shareUrl: 'http://www.youtube.com/watch?v=sance_deti_ospod',
+    platform: 'youtube',
+    author: 'Mgr. Kateřina Radostová',
+    source: 'Šance Dětem',
+    tags: ['OSPOD', 'Šance Dětem', 'Pohovor', 'Rodičovské právo'],
+    category: 'OSPOD',
+    createdAt: '2026-07-18T09:30:00Z',
+    updatedAt: '2026-07-18T09:30:00Z',
+    createdBy: 'Admin',
+    status: 'Approved',
+    isFeatured: true,
+    views: 2150,
+    likes: 295,
+    language: 'CS',
+    embedUrl: 'https://www.youtube.com/embed/sance_deti_ospod'
+  },
+  {
+    id: 'vid-sance-konflikty',
+    title: 'Jak zvládat rodičovské konflikty v zájmu dítěte',
+    description: 'Psychologická doporučení a komunikační techniky pro zvládání vyhrocených sporů mezi rodiči tak, aby neutrpěl psychický vývoj dětí.',
+    shareUrl: 'http://www.youtube.com/watch?v=sance_deti_konflikty',
+    platform: 'youtube',
+    author: 'PhDr. Václav Mertin',
+    source: 'Šance Dětem',
+    tags: ['Rodičovská komunikace', 'Šance Dětem', 'Psychologie dítěte', 'Mediace'],
+    category: 'Rodičovská komunikace',
+    createdAt: '2026-07-12T11:15:00Z',
+    updatedAt: '2026-07-12T11:15:00Z',
+    createdBy: 'Admin',
+    status: 'Approved',
+    isFeatured: false,
+    views: 1680,
+    likes: 210,
+    language: 'CS',
+    embedUrl: 'https://www.youtube.com/embed/sance_deti_konflikty'
+  },
   {
     id: 'vid-promo',
     title: 'Oficiální propagační spot: Táta má právo – Právní vzory a AI asistence',
@@ -196,7 +278,7 @@ export const INITIAL_VIDEOS: VideoItem[] = [
   }
 ];
 
-const STORAGE_KEY = 'synthesis_videoteka_v1';
+const STORAGE_KEY = 'synthesis_videoteka_v2';
 const CATEGORIES_KEY = 'synthesis_videoteka_categories_v1';
 
 export function getStoredVideos(): VideoItem[] {
