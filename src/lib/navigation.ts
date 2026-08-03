@@ -47,6 +47,20 @@ const KNOWN_CATEGORY_SLUGS = new Set([
 
 // Map shortcut route names / paths to application tab names
 const TAB_ALIASES: Record<string, string> = {
+  'zivotni-situace': 'zivotni-situace',
+  'zazemi': 'zivotni-situace',
+  'zazemi/sjm': 'majetek-sjm',
+  'zazemi/psychika': 'psychicka-podpora',
+  'zazemi/deti': 'rozhovor-dite',
+  'zazemi/obrana-pas': 'ochrana-manipulace',
+  'zazemi/bydleni-ospod': 'bydleni-zazemi',
+  'zazemi/mediace': 'rodinna-mediace',
+  'sjm': 'majetek-sjm',
+  'psychika': 'psychicka-podpora',
+  'deti': 'rozhovor-dite',
+  'obrana-pas': 'ochrana-manipulace',
+  'bydleni-ospod': 'bydleni-zazemi',
+  'mediace': 'rodinna-mediace',
   'home': 'home',
   'domu': 'home',
   'uplatneni-prav': 'rights',

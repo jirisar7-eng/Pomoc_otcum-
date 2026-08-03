@@ -21,6 +21,9 @@
       ],
       "next/link": [
         "./src/components/Link.tsx"
+      ],
+      "next/navigation": [
+        "./src/components/next-navigation.ts"
       ]
     },
     "allowImportingTsExtensions": true,
