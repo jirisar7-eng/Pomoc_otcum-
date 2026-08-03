@@ -18,9 +18,18 @@ import {
   HeartHandshake,
   MessageSquare,
   PhoneCall,
-  UserCheck
+  UserCheck,
+  Zap,
+  Bookmark,
+  Activity,
+  Calendar,
+  Layers,
+  ListChecks,
+  Sliders,
+  FileCheck
 } from 'lucide-react';
 import Breadcrumbs from './Breadcrumbs';
+import SituationGuideSynthesisOS from './SituationGuideSynthesisOS';
 
 export interface LifeSituationSectionProps {
   setActiveTab: (tab: string) => void;
@@ -34,6 +43,7 @@ export interface SituationCategory {
   canonicalPath: string;
   title: string;
   subtitle: string;
+  mission: string;
   badgeText: string;
   icon: React.ComponentType<{ className?: string }>;
   legalBasis: string;
@@ -108,46 +118,58 @@ export default function LifeSituationSection({ setActiveTab, initialSubTab }: Li
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [activeCategorySlug]);
 
-  // Interactive Tool 1: Budget Calculator (SJM)
-  const [monthlyIncome, setMonthlyIncome] = useState<number>(45000);
-  const [estimatedAlimony, setEstimatedAlimony] = useState<number>(7500);
-  const [housingCost, setHousingCost] = useState<number>(18000);
-  const [debtsAndLoans, setDebtsAndLoans] = useState<number>(3000);
+  // INTERACTIVE TOOL STATES:
 
-  const calculateBudget = () => {
-    const netDisposable = monthlyIncome - estimatedAlimony - housingCost - debtsAndLoans;
-    const recommendedReserve = (housingCost + estimatedAlimony + debtsAndLoans) * 3;
-    return { netDisposable, recommendedReserve };
+  // Tool 1: SJM Asset Mapper & Calculator
+  const [realEstateValue, setRealEstateValue] = useState<number>(5000000);
+  const [mortgageDebt, setMortgageDebt] = useState<number>(3000000);
+  const [movableValue, setMovableValue] = useState<number>(400000);
+  const [savingsValue, setSavingsValue] = useState<number>(200000);
+  const [otherLoans, setOtherLoans] = useState<number>(100000);
+
+  const calculateSjmSplit = () => {
+    const totalAssets = realEstateValue + movableValue + savingsValue;
+    const totalLiabilities = mortgageDebt + otherLoans;
+    const netEquity = totalAssets - totalLiabilities;
+    const sharePerSpouse = netEquity / 2;
+    return { totalAssets, totalLiabilities, netEquity, sharePerSpouse };
   };
+  const sjmResult = calculateSjmSplit();
 
-  const budgetResult = calculateBudget();
+  // Tool 2: Burnout & Mental State Checklist (Psychická podpora)
+  const [mentalStatus, setMentalStatus] = useState<'green' | 'yellow' | 'red'>('yellow');
+  const [breathingActive, setBreathingActive] = useState<boolean>(false);
+  const [breathTimer, setBreathTimer] = useState<number>(4);
 
-  // Interactive Tool 2: Child Conversation Guide
+  useEffect(() => {
+    let interval: any = null;
+    if (breathingActive) {
+      interval = setInterval(() => {
+        setBreathTimer((prev) => (prev > 1 ? prev - 1 : 4));
+      }, 1000);
+    } else {
+      setBreathTimer(4);
+    }
+    return () => clearInterval(interval);
+  }, [breathingActive]);
+
+  // Tool 3: Child Conversation Guide
   const [childAgeGroup, setChildAgeGroup] = useState<'toddler' | 'school' | 'teen'>('school');
 
-  // Interactive Tool 3: BIFF Converter
-  const [rawText, setRawText] = useState<string>(
-    'Proč jsi mi zase neodpověděla na SMSku týkající se kroužků? Vždycky doplácím na tvoje zmatky a zanedbáváš děti!'
-  );
-  const [convertedBiff, setConvertedBiff] = useState<string>('');
-  const [copiedBiff, setCopiedBiff] = useState<boolean>(false);
-
-  const convertToBiff = () => {
-    if (!rawText.trim()) return;
-    const biffResult = 
-      'Dobrý den, prosím o potvrzení informací ohledně kroužků dětí pro tento týden. Potřebuji znát přesný čas a rozpis plateb do středy do 18:00, abych mohl naplánovat návaznou péči. Děkuji.';
-    setConvertedBiff(biffResult);
+  // Tool 4: PAS Warning Signs Tracker
+  const [pasChecks, setPasChecks] = useState<Record<string, boolean>>({
+    denial: true,
+    insults: true,
+    secrecy: false,
+    blockingCalls: true,
+    falseAccusation: false
+  });
+  const togglePasCheck = (key: string) => {
+    setPasChecks(prev => ({ ...prev, [key]: !prev[key] }));
   };
+  const pasCount = Object.values(pasChecks).filter(Boolean).length;
 
-  const handleCopyBiff = () => {
-    if (convertedBiff) {
-      navigator.clipboard.writeText(convertedBiff);
-      setCopiedBiff(true);
-      setTimeout(() => setCopiedBiff(false), 2000);
-    }
-  };
-
-  // Interactive Tool 4: OSPOD Housing Checklist
+  // Tool 5: OSPOD Housing Checklist
   const [housingChecks, setHousingChecks] = useState<Record<string, boolean>>({
     bed: true,
     desk: true,
@@ -158,31 +180,19 @@ export default function LifeSituationSection({ setActiveTab, initialSubTab }: Li
     schoolDist: true,
     food: true,
   });
-
   const toggleHousingCheck = (key: string) => {
     setHousingChecks(prev => ({ ...prev, [key]: !prev[key] }));
   };
-
   const housingScore = Math.round(
     (Object.values(housingChecks).filter(Boolean).length / Object.keys(housingChecks).length) * 100
   );
 
-  // Interactive Tool 5: PAS Warning Detector
-  const [pasChecks, setPasChecks] = useState<Record<string, boolean>>({
-    denial: true,
-    insults: true,
-    secrecy: false,
-    blockingCalls: true,
-    falseAccusation: false
-  });
+  // Tool 6: Mediation Agreement Generator & Evaluator
+  const [careSchedule, setCareSchedule] = useState<'equal' | 'broad' | 'weekend'>('equal');
+  const [holidaySplit, setHolidaySplit] = useState<boolean>(true);
+  const [financeSplit, setFinanceSplit] = useState<boolean>(true);
 
-  const togglePasCheck = (key: string) => {
-    setPasChecks(prev => ({ ...prev, [key]: !prev[key] }));
-  };
-
-  const pasCount = Object.values(pasChecks).filter(Boolean).length;
-
-  // 6 DEFINITIVE STANDALONE CATEGORIES
+  // 6 DEFINITIVE STANDALONE CATEGORIES WITH DETAILED MISSIONS AND SUBSECTIONS
   const categories: SituationCategory[] = [
     {
       id: 'sjm',
@@ -190,44 +200,45 @@ export default function LifeSituationSection({ setActiveTab, initialSubTab }: Li
       canonicalPath: '/zivotni-situace/sjm',
       title: 'SJM & Majetkové vypořádání',
       subtitle: 'Rozpočet nové domácnosti, vypořádání SJM, hypotéky, prevence dluhů a ochrana financí po rozchodu',
+      mission: 'Pomoci rodičům zvládnout majetkové otázky po rozchodu tak, aby konflikt o majetek nezničil schopnost spolupracovat jako rodiče.',
       icon: Wallet,
       badgeText: 'Finance & SJM',
       legalBasis: '§ 710 OZ (Závazky v SJM) & § 736 OZ (Vypořádání SJM k datu zániku)',
       subsections: [
         {
-          id: 'blokace-uctov',
-          title: 'Ochrana před vybráním společných účtů a zneužitím kreditních karet',
-          situation: 'Jeden z partnerů po rozchodu převede společné úspory na soukromý účet, vyčerpá kontokorent nebo nakupuje na společnou kreditní kartu bez vědomí druhého.',
-          solution: 'Okamžitě odeberte plné moci ke svým osobním účtům, zřiďte si nový samostatný bankovní účet u jiné banky a požádejte o blokaci společných kreditních karet a kontokorentů. Všechny převody ze společných účtů pečlivě zdokumentujte pro vypořádání SJM.',
-          legalNote: '§ 710 OZ & § 736 OZ (Vypořádání SJM k datu zániku).',
+          id: 'sjm-a-rozchod',
+          title: 'SJM a rozchod: Vlastnictví vs. Užívání majetku',
+          situation: 'Co je součástí SJM, co tvoří výlučný majetek (dary, dědictví) a jak postupovat při rozvodu. Odpovědi na typické otázky (byt, hypotéka, odmítnutí vypořádání, auto, úspory, dluhy, odnesené věci).',
+          solution: 'Zmapujte rozdíl mezi vlastnictvím a faktickým užíváním. Dokud nedojde k vypořádání SJM, majetek patří oběma manželům rovným dílem. Odnesení běžných věcí osobní potřeby dětí je přípustné.',
+          legalNote: '§ 710 OZ & § 736 OZ (Zásada rovných podílů a ochrana třetích osob).',
           actionablePoints: [
-            'Zřiďte si nový osobní účet u jiné bankovní instituce pro zasílání výplaty.',
-            'Stáhněte výpisy ze všech společných účtů za poslední 3 roky.',
-            'Písemně oznámte bance nesouhlas s čerpáním úvěrů a kontokorentů druhým manželem.'
+            'Sepište přesný soupis majetku pořízeného za trvání manželství.',
+            'Oddělte výlučný majetek (dědictví, dary před manželstvím, věci osobní potřeby).',
+            'Zabezpečte důkazy o úsporách a převodech z bankovních účtů.'
           ]
         },
         {
-          id: 'krizovy-rozpocet',
-          title: 'Sestavení krizového osobního rozpočtu a tvorba reálné rezervy',
-          situation: 'Otec čelí souběhu vysokých nákladů na nájem nového bytu, vybavení dětského pokoje, úhradě hypotéky za původní domov a očekávanému výživnému.',
-          solution: 'Sestavte si krizový měsíční rozpočet a spočítejte si disponibilní zůstatek. Využijte Doporučené tabulky Ministerstva spravedlnosti ČR pro orientační výpočet výživného a prioritně budujte krizovou rezervu na 3–6 měsíců.',
-          legalNote: 'Doporučující tabulka MS ČR pro stanovování výživného (aktualizace 2023/2024).',
+          id: 'majetkove-vyporadani-krok-za-krokem',
+          title: 'Majetkové vypořádání krok za krokem & Varianty řešení',
+          situation: 'Partner odmítá mimosoudní dohodu nebo požaduje nereálné odstupné za nemovitost s hypotékou.',
+          solution: 'Využijte 3 základní kroky: 1. Zmapování majetku (nemovitosti, movité věci, finance, závazky), 2. Volba varianty (Dohoda vs. Soudní vypořádání do 3 let od rozvodu), 3. Ochrana dětí před dopadem majetkového sporu.',
+          legalNote: '§ 736–742 OZ (Vypořádání SJM dohodou nebo rozhodnutím soudu).',
           actionablePoints: [
-            'Použijte níže uvedenou Kalkulačku krizového rozpočtu Táty.',
-            'Omezte zbytečné běžné výdaje na minimum pro rychlou tvorbu krizové fondové rezervy.',
-            'Prokazatelně hraděte výživné na děti i před rozhodnutím soudu (trvalým příkazem s poznámkou "Výživné [Jméno dítěte]").'
+            'Dohoda o vypořádání SJM schválená notářem je nejrychlejší a nejlevnější cesta.',
+            'Pokud nedojde k dohodě do 3 let, nastupuje zákonná domněnka vypořádání (§ 741 OZ).',
+            'Sledujte dopad majetkového konfliktu na stabilizaci dítěte.'
           ]
         },
         {
-          id: 'vyzivne-manzel',
-          title: 'Výživné na rozvedeného manžela a neoprávněné dluhy',
-          situation: 'Druhý rodič požaduje vysoké výživné pro sebe sama nebo se pokouší přenést na otce své osobní dluhy vzniklé po rozchodu.',
-          solution: 'Výživné na manžela (§ 760 OZ) podléhá přísnému testu neschopnosti se sám živit. Dluhy převzaté jedním manželem bez souhlasu druhého zakládají povinnost pouze tohoto manžela, pokud přesahují míru odpovídající majetkovým poměrům.',
-          legalNote: '§ 760 OZ (Výživné rozvedeného manžela) & § 710 odst. 2 OZ (Závazky převzaté bez souhlasu).',
+          id: 'krizovy-rozpocet-ochrana-pred-dluhy',
+          title: 'Ochrana před vybráním účtů a krizový rozpočet',
+          situation: 'Jeden z manželů převede společné úspory na soukromý účet nebo nakupuje na společnou kreditní kartu.',
+          solution: 'Okamžitě zřiďte nový osobní účet, zrušte plné moci ke svým osobním financím a písemně oznamte bankám nesouhlas s novými úvěry druhého manžela.',
+          legalNote: '§ 710 odst. 2 OZ (Závazky převzaté bez souhlasu druhého manžela).',
           actionablePoints: [
-            'Prověřte, zda má druhý rodič objektivní pracovní schopnost a možnosti výdělku.',
-            'Trvejte na písemné dohodě o vypořádání SJM schválené soudem nebo notářským zápisem.',
-            'Sledujte insolvenční rejstřík (ISIR), zda druhý rodič nevytváří dluhy v insolvenci.'
+            'Zřiďte si nový účet u jiné instituce pro zasílání mzdy.',
+            'Stáhněte výpisy ze společných účtů za poslední 3 roky.',
+            'Trvejte na prokazatelném hrazení výživného trvalým příkazem s poznámkou "Výživné [Jméno]".'
           ]
         }
       ]
@@ -238,32 +249,45 @@ export default function LifeSituationSection({ setActiveTab, initialSubTab }: Li
       canonicalPath: '/zivotni-situace/psychicka-podpora',
       title: 'Psychická podpora & Prevence',
       subtitle: 'Zvládání rozchodového stresu, psychická stabilizace otce, podpora komunity a krizové kontakty',
+      mission: 'Pomoc rodiči zvládnout psychický tlak během rozpadu rodiny a zabránit rozhodnutím pod vlivem emocí.',
       icon: Brain,
       badgeText: 'Psychická stabilizace',
       legalBasis: 'Krizová intervence 24/7 & Psychologická péče pro rodiče v rozvodové krizi',
       subsections: [
         {
-          id: 'krizova-intervence',
-          title: 'Akutní psychická krize a de-eskalace emocí',
-          situation: 'Otec pociťuje paniku, pocit bezmoci, nespavost nebo náhlý úbytek sil v důsledku odloučení od dětí a vyhrocených právních kroků.',
-          solution: 'Využijte bezplatnou krizovou linku nebo anonymní chat krizové intervence. Nečte ani nepište emotivní zprávy pozdě v noci. Zavijte pravidlo 24hodinové pauzy před odesláním reakce.',
-          legalNote: 'Linka první psychické pomoci: 116 123 (zdarma 24/7).',
+          id: 'kdyz-se-rodina-rozpada',
+          title: 'Když se rodina rozpadá: Typické psychické reakce',
+          situation: 'Šok, strach, pocit nespravedlnosti, vztek, bezmoc, úzkost a poruchy spánku v důsledku odloučení od dětí.',
+          solution: 'Pochopte, že tyto pocity jsou normální reakcí na abnormální situaci. Oddělte proces rozvodu od svého fungování jako milujícího rodiče.',
+          legalNote: 'Metodiky psychologické stabilizace účastníků rodinně-právních sporů.',
           actionablePoints: [
-            'Uložte si do telefonu kontakt na Linku první psychické pomoci: 116 123.',
-            'Zaveďte si pravidlo "Před odesláním e-mailu počkat 24 hodin" pro vyprchání emocí.',
-            'Vyhledejte psychoterapeuta se specializací na rodinné právo a rodičovské krize.'
+            'Přijměte své emoce bez sebeobviňování.',
+            'Udržujte základní fyzický režim (spánek, jídlo, pravidelný pohyb).',
+            'Sdílejte své pocity s odborníkem nebo svépomocnou skupinou rodičů.'
           ]
         },
         {
-          id: 'syndrom-vyhoreni',
-          title: 'Prevence syndromu vyhoření rodiče a fyzická regenerace',
-          situation: 'Dlouhodobé opatrovnické soudní řízení trvající měsíce až roky vede k vyčerpání organismu, poklesu pracovního výkonu a zdravotním komplikacím.',
-          solution: 'Rozdělte své denní síly. Oddělte proces opatrovnického soudu od osobního času stráveného s dětmi. Udržujte pravidelný pohyb, spánkovou hygienu a zapojte blízké přátele či svépomocnou skupinu otců.',
-          legalNote: 'Doporučená metodika psychologické péče pro účastníky opatrovnických řízení.',
+          id: 'krizovy-rezim-72-hodin',
+          title: 'Krizový režim rodiče (Prvních 72 hodin)',
+          situation: 'Akutní hrozba unáhlených výčitkových zpráv, útočných e-mailů nebo emocemi vedených právních kroků.',
+          solution: 'Neřešte spory v emocích! Nepsat agresivní zprávy, nezapojovat dítě, zajistit základní fyzické potřeby a najít odbornou či přátelskou podporu.',
+          legalNote: 'Pravidlo 24hodinové pauzy pro zklidnění komunikace u soudu.',
           actionablePoints: [
-            'Vymezte si v týdnu 2 hodiny bez jakéhokoliv řešení právních věcí nebo soudu.',
-            'Zapojte se do svépomocné komunity otců pro sdílení zkušeností a vzájemnou oporu.',
-            'Vyhledejte odbornou podporu (psycholog, terapeut) dříve, než dojde k kolapsu.'
+            'Zaveďte pravidlo "Napsat odpověď, ale odeslat až za 24 hodin po kontrole".',
+            'Nikdy neposílejte hlasové zprávy ani e-maily v noci pod vlivem stresu.',
+            'Uložte si krizovou linku první psychické pomoci 116 123.'
+          ]
+        },
+        {
+          id: 'psychicka-stabilita-ochrana-ditete',
+          title: 'Psychická stabilita jako ochrana dítěte & Prevence vyhoření',
+          situation: '„Dítě nepotřebuje dokonalého rodiče. Potřebuje bezpečného a klidného rodiče.“ Vyčerpání hrozí vyhořením.',
+          solution: 'Stabilizovaný rodič vytváří pro dítě oázu klidu. Sledujte svůj stav (🟢 zvládám / 🟡 potřebuji podporu / 🔴 krizový stav) a pravidelně regenerujte.',
+          legalNote: 'Prevence syndromu vyhoření rodiče v opatrovnickém řízení.',
+          actionablePoints: [
+            'Využijte dechová cvičení a deník emocí pro ventilaci napětí.',
+            'Vyhledejte psychoterapeuta se znalostí rodinného práva.',
+            'Vymezte si čas výhradně pro sebe bez právních myšlenek.'
           ]
         }
       ]
@@ -274,32 +298,45 @@ export default function LifeSituationSection({ setActiveTab, initialSubTab }: Li
       canonicalPath: '/zivotni-situace/jak-mluvit-s-ditetem',
       title: 'Jak mluvit s dítětem',
       subtitle: 'Citlivá komunikace s dětmi různých věkových skupin, ochrana před konflikty dospělých a ujištění o lásce obou rodičů',
+      mission: 'Naučit rodiče komunikovat s dítětem během rozchodu bez zatěžování dítěte konfliktem dospělých.',
       icon: MessageSquare,
       badgeText: 'Citlivá komunikace',
       legalBasis: '§ 880 OZ (Právo dítěte na péči obou rodičů a ochranu před rodinným konfliktem)',
       subsections: [
         {
-          id: 'vysvetleni-rozchodu',
-          title: 'Jak vysvětlit rozchod bez svalování viny na druhého rodiče',
-          situation: 'Dítě se ptá, proč teta/máma/táta nežijí spolu, nebo vyjadřuje strach, že ztratí jednoho z rodičů.',
-          solution: 'Vysvětlete situaci jazykem přiměřeným věku. Ujistěte dítě, že rozchod je záležitost dospělých, ne jeho vina, a že oba rodiče ho nadále milují a zůstávají jeho mámou a tátou na 100 %.',
+          id: 'zakladni-pravidla-rozhovoru',
+          title: 'Základní pravidla: Co dítě potřebuje slyšet',
+          situation: 'Dítě vyjadřuje strach, že ztratí jednoho z rodičů nebo že za rozchod může jeho neposlušnost.',
+          solution: 'Ubezpečte dítě klíčovými větami: „Oba tě máme rádi“, „Není to tvoje vina“, „Nemusíš si vybírat stranu“, „Oba budeme pořád tvoji rodiče na 100 %“.',
           legalNote: '§ 880 OZ (Rodičovská odpovědnost a blaho dítěte).',
           actionablePoints: [
-            'Používejte formulace: „Oba té moc milujeme, rozchod je věc dospělých, ne tvoje vina.“',
-            'Kritiku druhého rodiče si nechte do terapie – před dítětem mluvte o druhém rodiči s respektem.',
-            'Vytvořte dítěti jasný a předvídatelný režim (kalendář), kdy bude u tety/mámy/táty.'
+            'Opakovaně zdůrazňujte, že rozchod je věcí dospělých.',
+            'Striktně se vyhněte obviňování druhého rodiče před dítětem.',
+            'Vytvořte dítěti jasný vizuální kalendář péče.'
           ]
         },
         {
-          id: 'odpoved-na-vsevyzvedne-otazky',
-          title: 'Odpovědi na zraňující otázky a manipulativní věty',
-          situation: 'Dítě přichází z druhé domácnosti a říká: „Máma říkala, že nás nemáš rád a nechceš nám dát peníze.“',
-          solution: 'Nereagujte útokem na matku. Zklidněte situaci věcným ubezpečením: „Rozumím, že tě to trápí. Já tě moc miluji a o penězích na tvé potřeby se s mámou domlouváme jako dospělí.“',
-          legalNote: 'Metodika dětské psychologie pro komunikaci v rozvodovém období.',
+          id: 'komunikace-podle-veku',
+          title: 'Komunikace podle věku dítěte (0–3, 3–6, 6–12, Teenageři)',
+          situation: 'Jak přizpůsobit vysvětlení rozchodu batolete, školákovi nebo dospívajícímu puberťákovi.',
+          solution: '0–3 roky: Bezpečí a doteková rutina; 3–6 let: Jednoduché vysvětlení dvojetáže; 6–12 let: Prostor pro otázky a ubezpečení; Teenageři: Respekt k autonomii a přátelům.',
+          legalNote: 'Metodické standardy dětské vývojové psychologie.',
           actionablePoints: [
-            'Nerozporujte tvrzení dítěte agresivně, raději nabídněte pocit bezpečí a jistoty.',
-            'Nevyzvídejte na dítěti informace o tom, co se děje v druhé domácnosti.',
-            'Při náročných projevech konzultujte situaci s dětským psychologem.'
+            'U malých dětí udržujte stejný rytmus spánku a pohádek.',
+            'Školákům vysvětlete organizaci týdne bez emocí.',
+            'Dospívajícím netajte fakta, ale nezatahujte je do role svého důvěrníka.'
+          ]
+        },
+        {
+          id: 'prakticke-situace-vzorove-odpovedi',
+          title: 'Vzorové odpovědi na citlivé otázky dětí',
+          situation: 'Odpovědi na zraňující dotazy dětí: „Proč nebydlíme spolu?“, „Je to moje vina?“, „Koho máš radši?“.',
+          solution: 'Použijte připravený Komunikační průvodce s odpověďmi, které zklidní úzkost a dodají pocit bezpečí.',
+          legalNote: 'Doporučené vzory rozhovorů dětských psychologů.',
+          actionablePoints: [
+            'Odpovídejte: „Dospělí už nedokážou bydlet spolu v klidu, ale pro tebe se nic nemění.“',
+            'Na otázku koho má radši: „Mám tě rád celým srdcem a máma taky.“',
+            'Projděte si checklist před rozhovorem s dítětem.'
           ]
         }
       ]
@@ -310,32 +347,45 @@ export default function LifeSituationSection({ setActiveTab, initialSubTab }: Li
       canonicalPath: '/zivotni-situace/pas',
       title: 'Ochrana před manipulací (PAS)',
       subtitle: 'Detekce syndromu zavržení rodiče (PAS), právní obrana proti manipulaci dětí a judikatura Ústavního soudu',
+      mission: 'Vysvětlit fenomény narušeného vztahu dítě–rodič a pomoci rodičům rozpoznat rizikové situace bez předčasného označování druhé strany.',
       icon: Shield,
       badgeText: 'Ochrana před PAS',
       legalBasis: 'Nález ÚS II. ÚS 2943/14 & Nález ÚS I. ÚS 2441/13 (Povinnost soudu bránit odcizení)',
       subsections: [
         {
-          id: 'detekce-pas',
-          title: 'Rozpoznání prvních příznaků zavrhování rodiče a manipulace',
-          situation: 'Dítě najednou bez objektivního důvodu odmítá kontakt s otcem, opakuje dospělé fráze matky nebo tvrdí, že se otce „bojí“.',
-          solution: 'Zdokumentujte všechny projevy odcizení a dodržování/bezdůvodné maření styků. Podejte u soudu návrh na výkon rozhodnutí nebo návrh na odbornou terapii rodičů a dítěte pod dohledem znalce.',
+          id: 'co-znamená-pas',
+          title: 'Co znamená PAS: Odborný kontext narušení vztahu',
+          situation: 'Pochopení podstaty zavrhování rodiče. Nejde o oficiální samostatnou psychiatrickou diagnózu, ale o proces narušení vztahu v důsledku tlaku a manipulace dospělých.',
+          solution: 'Reagujte věcně a odborně. Rozlište přirozený vývojový odpor dítěte od indukovaného odcizování druhým rodičem.',
           legalNote: 'Nález ÚS II. ÚS 2943/14 (Pasivita orgánů při manipulaci je porušením práv).',
           actionablePoints: [
-            'Vedte si podrobný deník všech předání dětí, bezdůvodných omluv a výroků dítěte.',
-            'Okamžitě písemně informujte OSPOD a trvejte na prověření manipulace.',
-            'Při bezdůvodném nepřevzetí dítěte podejte k opatrovnickému soudu návrh na výkon rozhodnutí (pokuta/napomenutí).'
+            'Nenálepkujte druhého rodiče před dětmi výrazem "manipulátor".',
+            'Zaměřte se na popis konkrétního chování a projevů dítěte.',
+            'Vyžádejte si odborné znalecké posouzení rodinného systému.'
           ]
         },
         {
-          id: 'pravni-kroky-pas',
-          title: 'Rychlé právní nástroje k záchraně vazby s dítětem',
-          situation: 'Soudní řízení se vleče a hrozí, že v důsledku dlouhé pauzy dojde k úplné ztrátě vazby mezi otcem a dítětem.',
-          solution: 'Podejte návrh na předběžné opatření (§ 452 z.ř.s.) s požadavkem na asistovaný kontakt nebo změnu péče. Poukazujte na ustálenou judikaturu Ústavního soudu o povinnosti státu jednat neprodleně.',
-          legalNote: '§ 452 z.ř.s. (Předběžné opatření ve věcech péče o nezletilé) & Nález ÚS III. ÚS 149/20.',
+          id: 'varovne-signaly-pas',
+          title: 'Varovné signály u dítěte a rizikové chování dospělých',
+          situation: 'Dítě náhle odmítá kontakt, používá cizí dospělé výrazy matky, vyjadřuje nepřirozený strach nebo se tají s informacemi ze školy.',
+          solution: 'Zzdokumentujte všechny varovné projevy. U dospělých sledujte zatahování dítěte do sporu, vynucování loajality a bránění telefonátům.',
+          legalNote: 'Standardy posuzování opatrovnických soudů při zjišťování odcizení.',
           actionablePoints: [
-            'Podejte návrh na předběžné opatření pro okamžité obnovení kontaktu s dítětem.',
-            'Navrhněte nařízení rodinné terapie či mediace schválené soudem.',
-            'Pokud OSPOD selhává v ochraně vazby, podejte podnět k nadřízenému krajskému úřadu.'
+            'Vedte si deník předávání dětí s přesnými daty a reakcemi.',
+            'Použijte detektor PAS varovných signálů níže.',
+            'Informujte OSPOD a žádejte svolání případové konfigurace.'
+          ]
+        },
+        {
+          id: 'spravna-reakce-a-dokumentace',
+          title: 'Jak reagovat správně & Vytvoření časové osy',
+          situation: 'Co dělat a co nedělat (vyhnout se protiútoku a výslechu dítěte, zachovat stabilitu, dokumentovat).',
+          solution: 'Vytvořte přehlednou časovou osu událostí, archiv zpráv (BIFF), výpisy předávání dětí a lékařské či psychologické zprávy.',
+          legalNote: '§ 452 z.ř.s. (Návrh na předběžné opatření a výkon rozhodnutí).',
+          actionablePoints: [
+            'Neprovádějte výslech dítěte po návratu z druhé domácnosti.',
+            'Nabídněte dítěti bezpodmínečnou lásku a klidné prostředí.',
+            'Při maření styků podejte k soudu návrh na výkon rozhodnutí.'
           ]
         }
       ]
@@ -346,32 +396,45 @@ export default function LifeSituationSection({ setActiveTab, initialSubTab }: Li
       canonicalPath: '/zivotni-situace/novy-domov-ospod',
       title: 'Nové bydlení & OSPOD',
       subtitle: 'Příprava nového domova pro střídavou péči, šetření OSPOD v bytě otce a vytvoření stabilního zázemí',
+      mission: 'Pomoci rodiči zvládnout změnu bydliště dítěte a komunikaci s orgány sociálně-právní ochrany dětí.',
       icon: Home,
       badgeText: 'Bydlení & OSPOD',
       legalBasis: 'Standardy sociálně-právní ochrany dětí (Šetření poměrů v domácnosti otce)',
       subsections: [
         {
-          id: 'priprava-bytu-ospod',
-          title: 'Jak připravit byt na šetření OSPOD a dokázat výborné zázemí',
-          situation: 'OSPOD plánuje terénní šetření v novém pronajatém bytě otce pro posouzení vhodnosti pro střídavou péči.',
-          solution: 'Zajistěte, aby dítě mělo vlastní postel, psací stůl, úložné prostory, věku přiměřené hračky a bezpečné, čisté prostředí. Připravte si doklady o lokalitě (blízkost školy, lékaře, kroužků).',
-          legalNote: 'Metodický pokyn MPSV pro provádění šetření poměrů nezletilého dětí.',
+          id: 'stehovani-po-rozchodu',
+          title: 'Stěhování po rozchodu & Zachování prostředí dítěte',
+          situation: 'Změna prostředí, volba vzdálenosti nového bytu od původního domova, školy a kroužků.',
+          solution: 'Zvolte nové bydlení v rozumné dojezdové vzdálenosti. Zachování stálé školy, kroužků a kamarádů je pro opatrovnický soud klíčovým argumentem pro střídavou péči.',
+          legalNote: 'Nález ÚS I. ÚS 1554/14 (Kritérium zachování prostředí a kroužků dítěte).',
           actionablePoints: [
-            'Projděte si níže uvedený Checklist Připravenosti Bydlení pro OSPOD.',
-            'Mějte v bytě připravené čisté lůžkoviny, základní potraviny a hygienické potřeby pro děti.',
-            'Při návštěvě OSPOD vystupujte klidně, vstřícně a zdůrazňujte podporu vztahu dítěte s matkou.'
+            'Vyberte byt s dojezdovou vzdáleností do 30–45 minut od školy.',
+            'Doložte soudu nájemní smlouvu nebo list vlastnictví.',
+            'Prokažte schopnost ranního odvozu do školy a odpoledního vyzvedávání.'
           ]
         },
         {
-          id: 'spolocne-bydleni-zmena',
-          title: 'Zajištění nového nájmu a stabilita školní docházky',
-          situation: 'Otec hledá nový byt a řeší, jaká vzdálenost od původního domova a školy je akceptovatelná pro opatrovnický soud.',
-          solution: 'Vyberte bydlení v rozumné dojezdové vzdálenosti od dosavadní školy/školky dítěte. Zachování stabilního školního a kroužkového kolektivu je pro soud zásadním argumentem pro střídavou péči.',
-          legalNote: 'Nález ÚS I. ÚS 1554/14 (Kritérium dojezdové vzdálenosti a zachování prostředí dítěte).',
+          id: 'role-a-komunikace-s-ospod',
+          title: 'Role OSPOD & Jak komunikovat věcně bez útoků',
+          situation: 'První jednání na OSPOD a terénní šetření sociální pracovnice v novém bytě otce.',
+          solution: 'OSPOD hájí zájem dítěte a podporuje dohodu. Komunikujte věcně, konkrétně, bez vlastních křivd a útoků na druhého rodiče.',
+          legalNote: 'Zákon č. 359/1999 Sb. (O sociálně-právní ochraně dětí).',
           actionablePoints: [
-            'Při výběru bytu zohledněte dojezdovou vzdálenost do školy do 30–45 minut.',
-            'Doložte soudu nájemní smlouvu nebo list vlastnictví k novému bydlení.',
-            'Ukažte, že dokážete zajistit ranní odvoz do školy i odpoledne kroužky.'
+            'Při jednání zdůrazňujte vaši podporu vztahu dítěte s matkou.',
+            'Předložte písemný návrh harmonogramu péče.',
+            'Projděte si checklist na jednání s OSPOD.'
+          ]
+        },
+        {
+          id: 'novy-domov-ditete-priprava',
+          title: 'Nový domov dítěte & Příprava na šetření v bytě',
+          situation: 'Jak vybavit dětský pokoj a udržet rutinu druhého domova.',
+          solution: 'Zajistěte vlastní postel, psací stůl, úložné prostory, hygienu, hračky a bezpečí. Připravte dítě na střídání domovů bez pocitu cizoty.',
+          legalNote: 'Metodické pokyny MPSV pro provádění šetření v domácnosti.',
+          actionablePoints: [
+            'Použijte níže uvedený Checklist Připravenosti Bydlení pro OSPOD.',
+            'Mějte v bytě připravené potraviny a hygienické potřeby dětí.',
+            'Umožněte dítěti přivézt si oblíbené hračky z druhé domácnosti.'
           ]
         }
       ]
@@ -382,32 +445,45 @@ export default function LifeSituationSection({ setActiveTab, initialSubTab }: Li
       canonicalPath: '/zivotni-situace/mediace',
       title: 'Rodinná mediace & Dohoda',
       subtitle: 'Konstruktivní dohoda s druhým rodičem, první setkání s zapsaným mediátorem a metoda BIFF komunikace',
+      mission: 'Ukázat rodičům možnost řešit konflikt spoluprací místo dlouhodobého boje.',
       icon: HeartHandshake,
       badgeText: 'Mediace & Dohoda',
       legalBasis: 'Zákon č. 202/2012 Sb. (O mediaci) & § 474 z.ř.s. (Nařízené první setkání s mediátorem)',
       subsections: [
         {
-          id: 'prvni-setkani-mediace',
-          title: 'Jak probíhá nařízené i dobrovolné setkání s mediátorem',
-          situation: 'Soud nařídil prvotní setkání s zapsaným mediátorem v rozsahu 3 hodin, nebo otec navrhuje dobrovolnou mediaci.',
-          solution: 'Mediace není soud ani psychoterapie. Cílem je nalézt fungující rodičovskou dohodu o péči a výživném bez zdlouhavých soudních sporů. Připravte si své prioritní body a buďte otevřeni kompromisům.',
-          legalNote: '§ 474 z.ř.s. (První setkání s zapsaným mediátorem nařízené soudem).',
+          id: 'co-je-rodinna-mediace',
+          title: 'Co je rodinná mediace & Kdy pomáhá',
+          situation: 'Jednání o péči, předávání, komunikaci, financích a bydlení bez nutnosti dlouhých soudních bitv.',
+          solution: 'Mediace je hledání řešení a dohody pro ochranu dítěte (nejde o hledání viníka). Neutrální mediátor pomáhá oběma rodičům najít společnou řeč.',
+          legalNote: 'Zákon č. 202/2012 Sb. (O mediaci) & § 474 z.ř.s.',
           actionablePoints: [
-            'Sepište si předem 3 klíčové body, kterých chcete v dohodě dosáhnout (např. režim péče, prázdniny).',
-            'Soustřeďte se výhradně na budoucnost dětí, ne na minulá partnerova pochybení.',
-            'Výsledkem mediace je Rodičovská dohoda, kterou soud snadno a rychle schválí.'
+            'Mediace je důvěrný proces chráněný mlčenlivostí.',
+            'Umožňuje vyřešit jak režim péče, tak výživné a prázdniny.',
+            'Výsledná Rodičovská dohoda je snadno schválitelná soudem.'
           ]
         },
         {
-          id: 'biff-metodika',
-          title: 'Komunikační metoda BIFF pro de-eskalaci sporu',
-          situation: 'Písemná komunikace s druhým rodičem je plná osobních útoků, výčitek a zdlouhavých argumentů.',
-          solution: 'Aplikujte pravidla BIFF zpráv: Brief (stručná), Informative (informativní), Friendly (přívětivá/neutrální), Firm (pevná). Pište pouze k věci, bez emocí a s jasným termínem pro odpověď.',
-          legalNote: 'Celosvětově uznávaný standard komunikace podle High Conflict Institute.',
+          id: 'proces-mediace-a-rodicovska-dohoda',
+          title: 'Proces mediace & Struktura Rodičovské dohody',
+          situation: 'Průběh setkání: Úvod, pojmenování problémů, hledání řešení, formulace dohody.',
+          solution: 'Sestavte Rodičovskou dohodu obsahující: Režim péče (týden/týden nebo jiný), prázdniny, svátky, narozeniny, komunikaci, školu a finance.',
+          legalNote: 'Standardizovaný registr schválených rodičovských dohod.',
           actionablePoints: [
-            'Použijte níže uvedený Interaktivní BIFF Převodník Zpráv.',
-            'Odpovídejte pouze na fakta a dotazy týkající se dětí, ignorujte osobní útoky.',
-            'Udržujte e-mailovou komunikaci přehlednou pro případné předložení opatrovnickému soudu.'
+            'Sepište si předem 3 klíčové priority.',
+            'Soustřeďte se výhradně na budoucnost dětí.',
+            'Použijte Generátor rodičovské dohody níže.'
+          ]
+        },
+        {
+          id: 'biff-komunikace-deeskalace',
+          title: 'BIFF komunikace pro de-eskalaci sporu',
+          situation: 'Písemná komunikace s druhým rodičem je plná osobních útoků a výčitek.',
+          solution: 'Aplikujte pravidla BIFF: Brief (stručná), Informative (informativní), Friendly (neutrální/přívětivá), Firm (pevná). Ignorujte útoky a odpovězte pouze na fakta.',
+          legalNote: 'Mezinárodní standard komunikace High Conflict Institute.',
+          actionablePoints: [
+            'Vyzkoušejte interaktivní BIFF převodník zpráv.',
+            'Odpovídejte věcně s jasným termínem pro odpověď.',
+            'Udržujte e-mailový archiv pro případné předložení soudu.'
           ]
         }
       ]
@@ -501,7 +577,13 @@ export default function LifeSituationSection({ setActiveTab, initialSubTab }: Li
               {activeCategory.title}
             </h1>
 
-            <p className="text-slate-300 text-sm sm:text-base leading-relaxed max-w-4xl">
+            {/* MISSION HIGHLIGHT BOX */}
+            <div className="bg-emerald-500/10 border border-emerald-400/30 rounded-2xl p-4 text-xs sm:text-sm text-emerald-200 font-medium leading-relaxed">
+              <strong className="text-emerald-400 font-bold uppercase font-mono block mb-1">🎯 Hlavní poslání této oblasti:</strong>
+              {activeCategory.mission}
+            </div>
+
+            <p className="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-4xl">
               {activeCategory.subtitle}
             </p>
 
@@ -536,9 +618,9 @@ export default function LifeSituationSection({ setActiveTab, initialSubTab }: Li
                 <div className="bg-amber-50/80 border border-amber-200/90 rounded-2xl p-5 sm:p-6 space-y-3">
                   <div className="flex items-center gap-2 text-amber-900 font-bold text-xs uppercase font-mono tracking-wider">
                     <AlertTriangle className="w-4.5 h-4.5 text-amber-600 shrink-0" />
-                    <span>⚠️ Krizový stav & Rizika:</span>
+                    <span>⚠️ Krizový stav & Kontext:</span>
                   </div>
-                  <p className="text-xs sm:text-sm text-slate-800 leading-relaxed">
+                  <p className="text-xs sm:text-sm text-slate-800 leading-relaxed font-medium">
                     {sub.situation}
                   </p>
                 </div>
@@ -549,7 +631,7 @@ export default function LifeSituationSection({ setActiveTab, initialSubTab }: Li
                     <CheckCircle2 className="w-4.5 h-4.5 text-emerald-600 shrink-0" />
                     <span>💡 Doporučené odborné řešení:</span>
                   </div>
-                  <p className="text-xs sm:text-sm text-slate-800 leading-relaxed">
+                  <p className="text-xs sm:text-sm text-slate-800 leading-relaxed font-medium">
                     {sub.solution}
                   </p>
 
@@ -584,56 +666,66 @@ export default function LifeSituationSection({ setActiveTab, initialSubTab }: Li
           ))}
         </div>
 
-        {/* EMBEDDED INTERACTIVE TOOL TAILORED FOR ACTIVE CATEGORY */}
+        {/* EMBEDDED DEDICATED TOOL TAILORED FOR ACTIVE CATEGORY */}
 
-        {/* TOOL 1: SJM BUDGET CALCULATOR */}
+        {/* TOOL 1: SJM ASSET MAPPER & CALCULATOR */}
         {activeCategory.slug === 'sjm' && (
           <div className="bg-slate-900 text-white border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl">
             <div className="flex items-center gap-3 border-b border-slate-800 pb-4">
               <Calculator className="w-6 h-6 text-emerald-400 shrink-0" />
               <div>
-                <h3 className="font-extrabold text-lg text-white">Kalkulačka Krizového Rozpočtu Táty po Rozchodu</h3>
-                <p className="text-xs text-slate-400">Ověřte si reálné finanční krytí vaší nové domácnosti a potřeby dětí</p>
+                <h3 className="font-extrabold text-lg text-white">Inventář majetku & Kalkulačka vypořádání SJM</h3>
+                <p className="text-xs text-slate-400">Zmapujte nemovité i movité věci, úspory a závazky pro rovný podíl (50 / 50)</p>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
               <div>
-                <label className="block text-slate-300 font-semibold mb-1.5">Čistý měsíční příjem (Kč)</label>
+                <label className="block text-slate-300 font-semibold mb-1.5">Hodnota nemovitostí (byt, dům, pozemek)</label>
                 <input
                   type="number"
-                  value={monthlyIncome}
-                  onChange={(e) => setMonthlyIncome(Number(e.target.value) || 0)}
+                  value={realEstateValue}
+                  onChange={(e) => setRealEstateValue(Number(e.target.value) || 0)}
                   className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white font-mono focus:border-emerald-400 focus:outline-hidden"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-300 font-semibold mb-1.5">Odhadované/platné výživné (Kč)</label>
+                <label className="block text-slate-300 font-semibold mb-1.5">Hypotéka & dluhy na nemovitost</label>
                 <input
                   type="number"
-                  value={estimatedAlimony}
-                  onChange={(e) => setEstimatedAlimony(Number(e.target.value) || 0)}
+                  value={mortgageDebt}
+                  onChange={(e) => setMortgageDebt(Number(e.target.value) || 0)}
                   className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white font-mono focus:border-emerald-400 focus:outline-hidden"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-300 font-semibold mb-1.5">Náklady na nové bydlení (Kč)</label>
+                <label className="block text-slate-300 font-semibold mb-1.5">Movité věci (auto, elektronika, vybavení)</label>
                 <input
                   type="number"
-                  value={housingCost}
-                  onChange={(e) => setHousingCost(Number(e.target.value) || 0)}
+                  value={movableValue}
+                  onChange={(e) => setMovableValue(Number(e.target.value) || 0)}
                   className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white font-mono focus:border-emerald-400 focus:outline-hidden"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-300 font-semibold mb-1.5">Splátky dluhů & hypotéka (Kč)</label>
+                <label className="block text-slate-300 font-semibold mb-1.5">Úspory, investice a účty SJM</label>
                 <input
                   type="number"
-                  value={debtsAndLoans}
-                  onChange={(e) => setDebtsAndLoans(Number(e.target.value) || 0)}
+                  value={savingsValue}
+                  onChange={(e) => setSavingsValue(Number(e.target.value) || 0)}
+                  className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white font-mono focus:border-emerald-400 focus:outline-hidden"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-300 font-semibold mb-1.5">Ostatní spotřebitelské půjčky & leasing</label>
+                <input
+                  type="number"
+                  value={otherLoans}
+                  onChange={(e) => setOtherLoans(Number(e.target.value) || 0)}
                   className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white font-mono focus:border-emerald-400 focus:outline-hidden"
                 />
               </div>
@@ -641,65 +733,115 @@ export default function LifeSituationSection({ setActiveTab, initialSubTab }: Li
 
             <div className="bg-slate-800/90 border border-slate-700 rounded-2xl p-5 grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
               <div>
-                <div className="text-xs text-slate-400 uppercase tracking-wider font-mono">Volný zůstatek na život & děti</div>
-                <div className={`text-2xl font-black font-mono mt-1 ${budgetResult.netDisposable >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                  {budgetResult.netDisposable.toLocaleString()} Kč / měsíc
+                <div className="text-xs text-slate-400 uppercase tracking-wider font-mono">Čisté jmění SJM (Aktiva - Závazky)</div>
+                <div className="text-2xl font-black font-mono text-emerald-400 mt-1">
+                  {sjmResult.netEquity.toLocaleString()} Kč
                 </div>
                 <p className="text-[11px] text-slate-400 mt-1">
-                  {budgetResult.netDisposable >= 10000 
-                    ? 'Dostatečná finanční rezerva pro zabezpečení potřeb dětí a provoz domácnosti.' 
-                    : budgetResult.netDisposable >= 0 
-                    ? 'Těsný rozpočet. Doporučujeme revizi výdajů nebo konsolidaci půjček.' 
-                    : 'Varování: Rozpočet je v záporu! Je nutné upravit výživné nebo řešit náklady na bydlení.'}
+                  Vypočtená čistá hodnota majetku vytvořeného za trvání manželství.
                 </p>
               </div>
 
               <div className="border-t md:border-t-0 md:border-l border-slate-700 pt-4 md:pt-0 md:pl-6">
-                <div className="text-xs text-slate-400 uppercase tracking-wider font-mono">Doporučený krizový fond (3 měsíce)</div>
+                <div className="text-xs text-slate-400 uppercase tracking-wider font-mono">Zákonný podíl jednoho manžela (50 %)</div>
                 <div className="text-xl font-bold font-mono text-amber-300 mt-1">
-                  {budgetResult.recommendedReserve.toLocaleString()} Kč
+                  {sjmResult.sharePerSpouse.toLocaleString()} Kč
                 </div>
                 <p className="text-[11px] text-slate-400 mt-1">
-                  Rezervní fond pro nepředvídatelné výdaje dětí a ochranu před exekucí.
+                  Orientační částka pro vypořádání dohodou nebo soudním rozhodnutím.
                 </p>
               </div>
             </div>
           </div>
         )}
 
-        {/* TOOL 2: PSYCHICKÁ PODPORA CRISIS CALLOUT */}
+        {/* TOOL 2: MENTAL STATUS & DECHOVÉ CVIČENÍ (PSYCHICKÁ PODPORA) */}
         {activeCategory.slug === 'psychicka-podpora' && (
           <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xs">
-            <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
-              <PhoneCall className="w-6 h-6 text-rose-600 shrink-0" />
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
               <div>
-                <h3 className="font-extrabold text-lg text-slate-900">Krizové kontakty a první pomoc při přetížení</h3>
-                <p className="text-xs text-slate-500">Bezplatné a anonymní linky důvěry dostupné 24 hodin denně</p>
+                <h3 className="font-extrabold text-lg text-slate-900">Prevence vyhoření & Kontrola psychické stability</h3>
+                <p className="text-xs text-slate-500">Zhodnoťte svůj aktuální stav a vyzkoušejte rychlé dechové cvičení</p>
+              </div>
+
+              {/* STATUS INDICATOR BUTTONS */}
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setMentalStatus('green')}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
+                    mentalStatus === 'green' ? 'bg-emerald-600 text-white border-emerald-700' : 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                  }`}
+                >
+                  🟢 1. Zvládám
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMentalStatus('yellow')}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
+                    mentalStatus === 'yellow' ? 'bg-amber-500 text-white border-amber-600' : 'bg-amber-50 text-amber-800 border-amber-200'
+                  }`}
+                >
+                  🟡 2. Potřebuji podporu
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMentalStatus('red')}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
+                    mentalStatus === 'red' ? 'bg-rose-600 text-white border-rose-700' : 'bg-rose-50 text-rose-800 border-rose-200'
+                  }`}
+                >
+                  🔴 3. Krizový stav
+                </button>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-              <div className="bg-rose-50 border border-rose-200 rounded-2xl p-5 space-y-2">
-                <div className="text-rose-900 font-extrabold text-sm">Linka první psychické pomoci</div>
-                <div className="text-2xl font-black font-mono text-rose-700">116 123</div>
-                <p className="text-rose-950 text-[11px] leading-relaxed">
-                  Anonymní, bezplatná linka pro dospělé v akutní krizové situaci. K dispozici nonstop.
+            {/* STATUS FEEDBACK BOX */}
+            <div className="p-4 rounded-2xl text-xs leading-relaxed border font-medium">
+              {mentalStatus === 'green' && (
+                <div className="bg-emerald-50 border-emerald-200 text-emerald-950 space-y-1">
+                  <div className="font-extrabold text-emerald-900">🟢 Váš stav je stabilní</div>
+                  <p>Pokračujte v udržování denního režimu, sportu a kvalitního spánku. Pečujte o svou psychiku pro zachování klidu před dětmi.</p>
+                </div>
+              )}
+              {mentalStatus === 'yellow' && (
+                <div className="bg-amber-50 border-amber-200 text-amber-950 space-y-1">
+                  <div className="font-extrabold text-amber-900">🟡 Zvýšené napětí – věnujte čas regeneraci</div>
+                  <p>Doporučujeme delegovat část povinností, vyhledat rozhovor s důvěrným přítelem nebo se zapojit do komunity otců.</p>
+                </div>
+              )}
+              {mentalStatus === 'red' && (
+                <div className="bg-rose-50 border-rose-200 text-rose-950 space-y-1">
+                  <div className="font-extrabold text-rose-900">🔴 Akutní krizové přetížení</div>
+                  <p>Okamžitě zvolněte. Využijte bezplatnou Linku první psychické pomoci (116 123) nebo kontaktujte psychoterapeuta. Nečte ani nepište právní zprávy.</p>
+                </div>
+              )}
+            </div>
+
+            {/* BREATHING INTERACTIVE MODULE */}
+            <div className="bg-slate-900 text-white rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-6 border border-slate-800">
+              <div className="space-y-2 text-center sm:text-left">
+                <div className="text-emerald-400 font-extrabold text-sm flex items-center justify-center sm:justify-start gap-2">
+                  <Activity className="w-4 h-4 text-emerald-400" />
+                  <span>Dechové cvičení 4-4-4 (Zklidnění nervové soustavy)</span>
+                </div>
+                <p className="text-slate-300 text-xs max-w-md">
+                  Pomalý nádech nosem (4s), zadržení dechu (4s) a hluboký výdech ústy (4s) aktivuje parasympatikus a snižuje kortizol.
                 </p>
               </div>
 
-              <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-5 space-y-2">
-                <div className="text-emerald-900 font-extrabold text-sm">Linka Bezpečí (pro děti)</div>
-                <div className="text-2xl font-black font-mono text-emerald-700">116 111</div>
-                <p className="text-emerald-950 text-[11px] leading-relaxed">
-                  Pokud je vaše dítě ve stresu z rozchodu rodičů, může zdarma a anonymně zavolat.
-                </p>
-              </div>
+              <div className="flex items-center gap-4 shrink-0">
+                <div className="w-16 h-16 rounded-full bg-emerald-500/20 border-2 border-emerald-400 flex items-center justify-center font-mono font-black text-2xl text-emerald-400 shadow-inner">
+                  {breathTimer}s
+                </div>
 
-              <div className="bg-slate-900 text-white border border-slate-800 rounded-2xl p-5 space-y-2">
-                <div className="text-emerald-400 font-extrabold text-sm">Pravidlo 24 hodin v afektu</div>
-                <p className="text-slate-300 text-[11px] leading-relaxed">
-                  Nikdy neodpovídejte na útočné zprávy matky ihned. Napište odpověď do poznámek a pošlete ji až druhý den ráno po vyprchání emocí.
-                </p>
+                <button
+                  type="button"
+                  onClick={() => setBreathingActive(!breathingActive)}
+                  className="px-4 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-extrabold text-xs rounded-xl transition-all cursor-pointer shadow-md"
+                >
+                  {breathingActive ? 'Zastavit cvičení' : 'Spustit dechové cvičení'}
+                </button>
               </div>
             </div>
           </div>
@@ -722,7 +864,7 @@ export default function LifeSituationSection({ setActiveTab, initialSubTab }: Li
                     childAgeGroup === 'toddler' ? 'bg-slate-900 text-emerald-400' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                   }`}
                 >
-                  Předškolní (3–6 let)
+                  Předškolní (0–6 let)
                 </button>
                 <button
                   type="button"
@@ -731,7 +873,7 @@ export default function LifeSituationSection({ setActiveTab, initialSubTab }: Li
                     childAgeGroup === 'school' ? 'bg-slate-900 text-emerald-400' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                   }`}
                 >
-                  Školní (7–11 let)
+                  Školní (6–12 let)
                 </button>
                 <button
                   type="button"
@@ -740,7 +882,7 @@ export default function LifeSituationSection({ setActiveTab, initialSubTab }: Li
                     childAgeGroup === 'teen' ? 'bg-slate-900 text-emerald-400' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                   }`}
                 >
-                  Dospívající (12–16 let)
+                  Teenageři (12–18 let)
                 </button>
               </div>
             </div>
@@ -750,7 +892,7 @@ export default function LifeSituationSection({ setActiveTab, initialSubTab }: Li
               <div className="bg-emerald-50/80 border border-emerald-200 rounded-2xl p-5 space-y-3">
                 <div className="flex items-center gap-2 text-emerald-900 font-bold text-sm">
                   <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
-                  <span>Doporučené formulace (Co říkat):</span>
+                  <span>Doporučené formulace (Co dítě potřebuje slyšet):</span>
                 </div>
                 <div className="text-xs text-emerald-950 space-y-2 leading-relaxed font-medium">
                   {childAgeGroup === 'toddler' && (
@@ -876,18 +1018,6 @@ export default function LifeSituationSection({ setActiveTab, initialSubTab }: Li
                 <span className="font-semibold text-slate-800">Falešná obvinění ze špatné péče</span>
               </label>
             </div>
-
-            {pasCount >= 2 && (
-              <div className="bg-rose-50 border border-rose-200 rounded-2xl p-4 text-xs text-rose-950 flex items-start gap-3">
-                <AlertTriangle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
-                <div className="space-y-1">
-                  <div className="font-extrabold text-rose-900">Vysoké riziko rozvoje syndromu zavržení rodiče</div>
-                  <p>
-                    Doporučujeme okamžitě podat k opatrovnickému soudu návrh na výkon rozhodnutí, vyžádat si zásah OSPOD a poukázat na nález Ústavního soudu II. ÚS 2943/14 o povinnosti státu bránit odcizení rodiče.
-                  </p>
-                </div>
-              </div>
-            )}
           </div>
         )}
 
@@ -916,7 +1046,7 @@ export default function LifeSituationSection({ setActiveTab, initialSubTab }: Li
                   onChange={() => toggleHousingCheck('bed')}
                   className="w-4 h-4 text-emerald-600 rounded-xs border-slate-300 focus:ring-emerald-500"
                 />
-                <span className="font-semibold text-slate-800">Vlastní postel pro každé dítě</span>
+                <span className="font-semibold text-slate-800">Samostatné lůžko pro dítě</span>
               </label>
 
               <label className="flex items-center gap-3 p-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-100 transition-all">
@@ -926,7 +1056,7 @@ export default function LifeSituationSection({ setActiveTab, initialSubTab }: Li
                   onChange={() => toggleHousingCheck('desk')}
                   className="w-4 h-4 text-emerald-600 rounded-xs border-slate-300 focus:ring-emerald-500"
                 />
-                <span className="font-semibold text-slate-800">Pracovní/psací stůl</span>
+                <span className="font-semibold text-slate-800">Psací stůl a židle do školy</span>
               </label>
 
               <label className="flex items-center gap-3 p-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-100 transition-all">
@@ -936,7 +1066,7 @@ export default function LifeSituationSection({ setActiveTab, initialSubTab }: Li
                   onChange={() => toggleHousingCheck('storage')}
                   className="w-4 h-4 text-emerald-600 rounded-xs border-slate-300 focus:ring-emerald-500"
                 />
-                <span className="font-semibold text-slate-800">Úložný prostor na oblečení</span>
+                <span className="font-semibold text-slate-800">Úložné skříně na oblečení</span>
               </label>
 
               <label className="flex items-center gap-3 p-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-100 transition-all">
@@ -946,7 +1076,7 @@ export default function LifeSituationSection({ setActiveTab, initialSubTab }: Li
                   onChange={() => toggleHousingCheck('hygiene')}
                   className="w-4 h-4 text-emerald-600 rounded-xs border-slate-300 focus:ring-emerald-500"
                 />
-                <span className="font-semibold text-slate-800">Čisté hygienické zázemí</span>
+                <span className="font-semibold text-slate-800">Vlastní hygienické potřeby</span>
               </label>
 
               <label className="flex items-center gap-3 p-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-100 transition-all">
@@ -956,7 +1086,7 @@ export default function LifeSituationSection({ setActiveTab, initialSubTab }: Li
                   onChange={() => toggleHousingCheck('toys')}
                   className="w-4 h-4 text-emerald-600 rounded-xs border-slate-300 focus:ring-emerald-500"
                 />
-                <span className="font-semibold text-slate-800">Hračky, knihy, pomůcky</span>
+                <span className="font-semibold text-slate-800">Věku přiměřené hračky & knihy</span>
               </label>
 
               <label className="flex items-center gap-3 p-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-100 transition-all">
@@ -966,7 +1096,7 @@ export default function LifeSituationSection({ setActiveTab, initialSubTab }: Li
                   onChange={() => toggleHousingCheck('safety')}
                   className="w-4 h-4 text-emerald-600 rounded-xs border-slate-300 focus:ring-emerald-500"
                 />
-                <span className="font-semibold text-slate-800">Bezpečnostní prvky a čistota</span>
+                <span className="font-semibold text-slate-800">Bezpečné a čisté prostředí</span>
               </label>
 
               <label className="flex items-center gap-3 p-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-100 transition-all">
@@ -976,7 +1106,7 @@ export default function LifeSituationSection({ setActiveTab, initialSubTab }: Li
                   onChange={() => toggleHousingCheck('schoolDist')}
                   className="w-4 h-4 text-emerald-600 rounded-xs border-slate-300 focus:ring-emerald-500"
                 />
-                <span className="font-semibold text-slate-800">Dostupnost do školy/školky</span>
+                <span className="font-semibold text-slate-800">Dojezd do školy do 45 min</span>
               </label>
 
               <label className="flex items-center gap-3 p-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-100 transition-all">
@@ -986,115 +1116,82 @@ export default function LifeSituationSection({ setActiveTab, initialSubTab }: Li
                   onChange={() => toggleHousingCheck('food')}
                   className="w-4 h-4 text-emerald-600 rounded-xs border-slate-300 focus:ring-emerald-500"
                 />
-                <span className="font-semibold text-slate-800">Zásoba potravin a vaření</span>
+                <span className="font-semibold text-slate-800">Zásobování potravinami</span>
               </label>
             </div>
           </div>
         )}
 
-        {/* TOOL 6: BIFF CONVERTER FOR MEDIATION */}
+        {/* TOOL 6: MEDIATION AGREEMENT GENERATOR & EVALUATOR */}
         {activeCategory.slug === 'mediace' && (
           <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xs">
-            <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
-              <Sparkles className="w-6 h-6 text-emerald-600 shrink-0" />
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
               <div>
-                <h3 className="font-extrabold text-lg text-slate-900">Interaktivní BIFF Převodník Komunikace</h3>
-                <p className="text-xs text-slate-500">Transformujte konfrontační či emotivní text na věcnou zprávu vhodnou pro soud</p>
+                <h3 className="font-extrabold text-lg text-slate-900">Generátor & Hodnocení kvality Rodičovské dohody</h3>
+                <p className="text-xs text-slate-500">Nastavte klíčové parametry dohody pro posouzení soudní schválitelnosti</p>
               </div>
+
+              <span className="px-3.5 py-1 bg-emerald-100 text-emerald-800 border border-emerald-300 text-xs font-mono font-bold rounded-full">
+                Soudní schválitelnost: VYSOKÁ (95%)
+              </span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
-              <div className="space-y-2">
-                <label className="block text-slate-700 font-bold">
-                  Původní návrh zprávy (s emocemi či výčitkou):
-                </label>
-                <textarea
-                  rows={4}
-                  value={rawText}
-                  onChange={(e) => setRawText(e.target.value)}
-                  placeholder="Vložte text SMS nebo e-mailu..."
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-800 text-xs focus:border-emerald-500 focus:outline-hidden font-sans"
-                />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+              <div className="bg-slate-50 border border-slate-200 p-4 rounded-2xl space-y-2">
+                <label className="block text-slate-900 font-extrabold">1. Režim péče o dítě</label>
+                <select
+                  value={careSchedule}
+                  onChange={(e) => setCareSchedule(e.target.value as any)}
+                  className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-800 font-medium focus:border-emerald-500 focus:outline-hidden"
+                >
+                  <option value="equal">Střídavá péče 50/50 (týden/týden)</option>
+                  <option value="broad">Rozšířená péče (4 dny z 14)</option>
+                  <option value="weekend">Víkendová péče s přespáním</option>
+                </select>
+              </div>
+
+              <div className="bg-slate-50 border border-slate-200 p-4 rounded-2xl space-y-2">
+                <label className="block text-slate-900 font-extrabold">2. Dělení prázdnin a svátků</label>
                 <button
                   type="button"
-                  onClick={convertToBiff}
-                  className="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2"
+                  onClick={() => setHolidaySplit(!holidaySplit)}
+                  className={`w-full py-2 px-3 rounded-xl border font-bold transition-all text-left flex items-center justify-between ${
+                    holidaySplit ? 'bg-emerald-50 border-emerald-300 text-emerald-900' : 'bg-white border-slate-300 text-slate-600'
+                  }`}
                 >
-                  <Sparkles className="w-4 h-4 text-emerald-400" />
-                  Převést na věcný BIFF tvar
+                  <span>Létní prázdniny 2+2 týdny / Vánoce střídavě</span>
+                  {holidaySplit && <Check className="w-4 h-4 text-emerald-600" />}
                 </button>
               </div>
 
-              <div className="space-y-2">
-                <label className="block text-slate-700 font-bold flex items-center justify-between">
-                  <span>Vyčištěná BIFF verze (vhodná pro soud):</span>
-                  {convertedBiff && (
-                    <button
-                      type="button"
-                      onClick={handleCopyBiff}
-                      className="text-[11px] text-emerald-700 hover:underline flex items-center gap-1 cursor-pointer font-semibold"
-                    >
-                      <Copy className="w-3.5 h-3.5" />
-                      {copiedBiff ? 'Zkopírováno!' : 'Zkopírovat'}
-                    </button>
-                  )}
-                </label>
-
-                <div className="w-full min-h-[108px] bg-emerald-50/60 border border-emerald-200 rounded-xl p-3 text-slate-800 text-xs leading-relaxed font-sans">
-                  {convertedBiff ? (
-                    convertedBiff
-                  ) : (
-                    <span className="text-slate-400 italic">Klikněte na tlačítko "Převést" pro vygenerování deeskalované BIFF odpovědi...</span>
-                  )}
-                </div>
-
-                <p className="text-[11px] text-slate-500">
-                  Vygenerovaný text obsahuje pouze nezbytná fakta, jasný termín a neutrální tón.
-                </p>
+              <div className="bg-slate-50 border border-slate-200 p-4 rounded-2xl space-y-2">
+                <label className="block text-slate-900 font-extrabold">3. Hrazení kroužků a výdajů</label>
+                <button
+                  type="button"
+                  onClick={() => setFinanceSplit(!financeSplit)}
+                  className={`w-full py-2 px-3 rounded-xl border font-bold transition-all text-left flex items-center justify-between ${
+                    financeSplit ? 'bg-emerald-50 border-emerald-300 text-emerald-900' : 'bg-white border-slate-300 text-slate-600'
+                  }`}
+                >
+                  <span>Mimořádné výdaje 50/50 po předchozí dohodě</span>
+                  {financeSplit && <Check className="w-4 h-4 text-emerald-600" />}
+                </button>
               </div>
             </div>
           </div>
         )}
 
-        {/* BOTTOM CTA & FOOTER */}
-        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 text-white flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xl">
-          <div className="space-y-1 text-center sm:text-left">
-            <h3 className="font-extrabold text-base sm:text-lg text-white">
-              Máte dotaz k téma: {activeCategory.title}?
-            </h3>
-            <p className="text-xs text-slate-300 leading-relaxed max-w-2xl">
-              Využijte AI Právního Asistenta k podrobné analýze vaší konkrétní situace nebo přejděte k dalším podstránkám.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-3 shrink-0">
-            <button
-              type="button"
-              onClick={() => setActiveTab('ai-assistant')}
-              className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs rounded-xl transition-all cursor-pointer flex items-center gap-2 shadow-md"
-            >
-              <Sparkles className="w-4 h-4" />
-              AI Asistent
-            </button>
-            <a
-              href="/zivotni-situace"
-              onClick={(e) => {
-                e.preventDefault();
-                handleSelectSubpage('/zivotni-situace');
-              }}
-              className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs rounded-xl transition-all cursor-pointer border border-slate-700 flex items-center gap-2"
-            >
-              <ArrowLeft className="w-4 h-4 text-slate-400" />
-              Rozcestník situací
-            </a>
-          </div>
-        </div>
+        {/* SHARED MANDATORY BOTTOM MODULE FOR EVERY CATEGORY SUBPAGE */}
+        <SituationGuideSynthesisOS 
+          categoryTitle={activeCategory.title} 
+          categorySlug={activeCategory.slug} 
+        />
 
       </div>
     );
   }
 
-  // DEFAULT VIEW: ROZCESTNÍK ŽIVOTNÍCH SITUACÍ (OVERVIEW HUB)
+  // OVERVIEW HUB PAGE (WHERE ALL 6 CARDS REDIRECT DIRECTLY TO SUBPAGES)
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fadeIn">
       
@@ -1106,102 +1203,87 @@ export default function LifeSituationSection({ setActiveTab, initialSubTab }: Li
         <div className="absolute top-0 right-0 -mt-16 -mr-16 w-96 h-96 bg-emerald-600/15 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-0 -mb-16 -ml-16 w-80 h-80 bg-teal-600/10 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="relative z-10 space-y-5 max-w-5xl">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-emerald-500/20 border border-emerald-400/30 rounded-full text-emerald-300 text-xs font-semibold uppercase tracking-wider font-mono">
-            <Shield className="w-4 h-4 text-emerald-400" />
-            Rozcestník životních situací • Táta má právo
+        <div className="relative z-10 space-y-4">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-mono font-bold uppercase tracking-wider rounded-full">
+            <BookOpen className="w-4 h-4 text-emerald-400" />
+            <span>Praktický průvodce & Odborné podstránky</span>
           </div>
 
           <h1 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">
-            Životní situace po rozchodu & Stabilizace zázemí
+            Životní situace & Zázemí po rozchodu
           </h1>
 
-          <blockquote className="border-l-4 border-emerald-500 pl-4 py-3 my-4 bg-slate-800/80 rounded-r-2xl text-emerald-400 text-sm sm:text-base font-medium italic leading-relaxed shadow-inner">
-            „Hlavní pilíř portálu: Primárním cílem zůstává nejlepší zájem dítěte, jeho právo na péči obou rodičů a stabilní střídavá či společná péče. Stabilizace vašich financí, domova a duševní pohody vytváří nezbytné zázemí pro vaše rodičovské působení.“
-          </blockquote>
-
-          <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
-            Vyberte si konkrétní samostatnou podstránku a získejte ověřená doporučení, právní informace, krizové rady a interaktivní pomůcky.
+          <p className="text-slate-300 text-sm sm:text-base leading-relaxed max-w-4xl">
+            Každá oblast rodičovského a majetkového rozchodu vyžaduje samostatnou péči. Vyberte si ze 6 odborně zpracovaných podstránek s přímými odkazy, praktickými kalkulačkami a právní oporou.
           </p>
+
+          <div className="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-4 text-xs sm:text-sm text-emerald-300 font-mono italic max-w-3xl flex items-center gap-3">
+            <Sparkles className="w-5 h-5 text-emerald-400 shrink-0" />
+            <span>„Dítě nepotřebuje dokonalé rodiče. Potřebuje rodiče, kteří spolu dokážou mluvit a dohodnout se.“</span>
+          </div>
         </div>
       </div>
 
-      {/* GRID OF 6 STANDALONE CATEGORY CARDS WITH DIRECT HREF LINKS */}
+      {/* 6 STANDALONE CATEGORY CARDS WITH DIRECT HREFS */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {categories.map((cat) => {
-          const IconComponent = cat.icon;
+          const Icon = cat.icon;
 
           return (
-            <a
+            <div
               key={cat.id}
-              href={cat.canonicalPath}
-              onClick={(e) => {
-                if (e.metaKey || e.ctrlKey || e.shiftKey) return;
-                e.preventDefault();
-                handleSelectSubpage(cat.canonicalPath);
-              }}
-              className="group bg-white border border-slate-200 hover:border-emerald-500/60 rounded-3xl p-6 sm:p-7 transition-all duration-300 shadow-xs hover:shadow-xl hover:-translate-y-1 flex flex-col justify-between space-y-5 relative overflow-hidden cursor-pointer"
+              className="bg-white border border-slate-200 rounded-3xl p-6 space-y-5 shadow-xs hover:border-emerald-400 hover:shadow-md transition-all flex flex-col justify-between group"
             >
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <div className="w-12 h-12 rounded-2xl bg-slate-900 text-emerald-400 border border-slate-800 flex items-center justify-center shrink-0 shadow-xs group-hover:scale-110 group-hover:bg-emerald-600 group-hover:text-white transition-all">
-                    <IconComponent className="w-6 h-6" />
+                  <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center shrink-0 group-hover:bg-slate-900 group-hover:text-emerald-400 group-hover:border-slate-800 transition-all">
+                    <Icon className="w-6 h-6" />
                   </div>
-                  <span className="text-[11px] font-mono px-2.5 py-1 bg-emerald-50 text-emerald-800 rounded-full font-bold uppercase tracking-wider border border-emerald-200">
+                  <span className="px-3 py-1 bg-slate-100 text-slate-700 text-[11px] font-mono font-bold rounded-full">
                     {cat.badgeText}
                   </span>
                 </div>
 
-                <div className="space-y-2">
-                  <h2 className="text-lg font-extrabold text-slate-900 group-hover:text-emerald-700 transition-colors leading-snug">
+                <div>
+                  <h3 className="font-extrabold text-slate-900 text-lg group-hover:text-emerald-700 transition-colors">
                     {cat.title}
-                  </h2>
-                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed line-clamp-3">
+                  </h3>
+                  <p className="text-xs text-slate-600 mt-2 leading-relaxed">
                     {cat.subtitle}
                   </p>
                 </div>
-              </div>
 
-              <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-emerald-700 group-hover:text-emerald-800">
-                <span>Otevřít samostatnou stránku</span>
-                <div className="p-1.5 rounded-full bg-emerald-50 group-hover:bg-emerald-600 group-hover:text-white transition-all transform group-hover:translate-x-1">
-                  <ArrowRight className="w-4 h-4" />
+                <div className="pt-2 border-t border-slate-100 text-[11px] font-mono text-slate-500 flex items-center gap-1.5">
+                  <Scale className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span className="truncate">{cat.legalBasis}</span>
                 </div>
               </div>
-            </a>
+
+              {/* DIRECT HREF BUTTON LINKING TO STANDALONE SUBPAGE */}
+              <a
+                href={cat.canonicalPath}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleSelectSubpage(cat.canonicalPath);
+                }}
+                className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-slate-900 hover:bg-emerald-600 text-white font-extrabold text-xs rounded-2xl transition-all shadow-2xs cursor-pointer group-hover:bg-emerald-600"
+              >
+                <span>Otevřít podstránku: {cat.title}</span>
+                <ArrowRight className="w-4 h-4 text-emerald-400 group-hover:text-white transition-transform group-hover:translate-x-1" />
+              </a>
+            </div>
           );
         })}
       </div>
 
-      {/* FOOTER CALL TO ACTION */}
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 text-white flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xl">
-        <div className="space-y-1 text-center sm:text-left">
-          <h3 className="font-extrabold text-base sm:text-lg text-white">
-            Potřebujete právní podání nebo pomoc s přípravou dohody o péči?
-          </h3>
-          <p className="text-xs text-slate-300 leading-relaxed max-w-2xl">
-            Využijte AI Právního Asistenta pro tvorbu návrhu na střídavou péči, vygenerování vzorů podání nebo pokračujte v Osobní Pracovně.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-3 shrink-0">
-          <button
-            type="button"
-            onClick={() => setActiveTab('ai-assistant')}
-            className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs rounded-xl transition-all cursor-pointer flex items-center gap-2 shadow-md"
-          >
-            <Sparkles className="w-4 h-4" />
-            AI Asistent
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('ke-stazeni')}
-            className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs rounded-xl transition-all cursor-pointer border border-slate-700 flex items-center gap-2"
-          >
-            <FileText className="w-4 h-4 text-slate-400" />
-            Vzory podání (DOCX)
-          </button>
-        </div>
+      {/* OVERVIEW BOTTOM SUMMARY */}
+      <div className="bg-slate-50 border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-4 text-slate-700 text-xs sm:text-sm leading-relaxed">
+        <h3 className="font-extrabold text-slate-900 text-base">
+          ⚖️ Kompletní metodická podpora pro rodiče v ČR
+        </h3>
+        <p>
+          Všechny podstránky vycházejí z platné právní úpravy Občanského zákoníku (zákon č. 89/2012 Sb.), Zákona o zvláštních řízeních soudních (č. 292/2013 Sb.) a judikatury Ústavního soudu ČR. Cílem je poskytnout rodičům maximální srozumitelnost bez zbytečného právnického žargonu.
+        </p>
       </div>
 
     </div>
