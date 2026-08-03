@@ -709,6 +709,7 @@ export default function App() {
 
             {(activeTab === 'life-situation' || 
               activeTab === 'zivotni-situace' || 
+              activeTab.startsWith('zivotni-situace/') ||
               activeTab === 'zazemi-majetek' || 
               activeTab === 'biff-communicator' || 
               activeTab === 'biff-komunikace' || 
@@ -722,21 +723,7 @@ export default function App() {
               <LifeSituationSection 
                 setActiveTab={setActiveTab} 
                 onOpenAuth={() => setAuthModalOpen(true)}
-                initialSubTab={
-                  activeTab === 'biff-communicator' || activeTab === 'biff-komunikace' || activeTab === 'konstruktivni-komunikator'
-                    ? 'biff-komunikace'
-                    : activeTab === 'psychicka-podpora'
-                    ? 'psychicka-podpora'
-                    : activeTab === 'rozhovor-dite'
-                    ? 'rozhovor-dite'
-                    : activeTab === 'ochrana-manipulace'
-                    ? 'ochrana-manipulace'
-                    : activeTab === 'rodinna-mediace'
-                    ? 'rodinna-mediace'
-                    : activeTab === 'bydleni-zazemi'
-                    ? 'bydleni-zazemi'
-                    : 'majetek-sjm'
-                }
+                initialSubTab={activeTab}
               />
             )}
 
