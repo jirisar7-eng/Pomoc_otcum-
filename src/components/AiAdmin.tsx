@@ -158,26 +158,6 @@ export default function AiAdmin({ currentUser }: AiAdminProps) {
   return (
     <div className="space-y-8 animate-fadeIn" id="ai-administrator-workspace">
       
-      {/* Demo Admin Warning Banner */}
-      {currentUser?.isDemoAdmin && (
-        <div className="bg-amber-500/10 border border-amber-500/30 p-4 rounded-2xl flex items-center justify-between gap-3 text-amber-950" id="ai-admin-demo-warning">
-          <div className="flex items-center gap-3">
-            <ShieldAlert className="w-5 h-5 text-amber-600 shrink-0" />
-            <div>
-              <h4 className="font-extrabold text-xs uppercase tracking-wider font-mono text-amber-900">
-                Demo AI Administrátor (Read-Only Sandbox)
-              </h4>
-              <p className="text-xs text-amber-800 mt-0.5">
-                V ukázkovém režimu je systémový spouštěč skenů a automatické opravy v režimu pouze pro čtení.
-              </p>
-            </div>
-          </div>
-          <span className="px-2.5 py-1 bg-amber-600 text-white font-extrabold text-[10px] rounded-lg uppercase tracking-wider font-mono shrink-0">
-            READ-ONLY
-          </span>
-        </div>
-      )}
-
       {/* Title Header with Modern Gradient */}
       <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 relative overflow-hidden text-white shadow-xl">
         <div className="absolute top-0 right-0 -mt-24 -mr-24 w-80 h-80 bg-indigo-600/20 rounded-full blur-3xl animate-pulse" />

@@ -654,46 +654,7 @@ export default function AuthModal({ isOpen, onClose, onLogin, initialMode = 'log
     }
   };
 
-  // E. Safe Demo Admin Login (Read-Only Sandbox)
-  const handleDemoAdminLogin = async () => {
-    if (loading) return;
 
-    const demoUser: User = {
-      id: 'usr_demo_admin',
-      email: 'demo.admin@tatovacesta.cz',
-      name: 'Demo Administrátor (Read-Only)',
-      role: 'admin',
-      isDemoAdmin: true,
-      avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=DemoAdmin',
-      createdAt: new Date().toISOString()
-    };
-
-    setLoading(true);
-    setCurrentStep(2);
-    setStatus({
-      type: 'loading',
-      title: 'Načítám Demo Administraci...',
-      text: 'Připravuji bezpečné prostředí s omezenými právomocemi (Read-Only Sandbox)...'
-    });
-
-    setTimeout(() => {
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('synthesis_hub_local_user', JSON.stringify(demoUser));
-      }
-      setAuthenticatedUser(demoUser);
-      setCurrentStep(3);
-      setStatus({
-        type: 'success',
-        title: 'Demo administrátorský přístup schválen ✨',
-        text: 'Vítáme vás v ukázkové administrátorské konzoli (Režim pouze pro čtení).'
-      });
-
-      setTimeout(() => {
-        setMode('welcome');
-        setLoading(false);
-      }, 600);
-    }, 500);
-  };
 
   const generateRandomPassword = () => {
     const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
@@ -1274,30 +1235,7 @@ export default function AuthModal({ isOpen, onClose, onLogin, initialMode = 'log
                   )}
                 </div>
 
-                {/* Safe Demo Admin Sandbox Option */}
-                <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl space-y-2" id="demo-admin-access-panel">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1.5">
-                      <Shield className="w-3.5 h-3.5 text-amber-600" />
-                      <span className="text-[9px] uppercase font-black text-amber-800 tracking-wider font-mono">
-                        Ukázka Administrace (Sandbox)
-                      </span>
-                    </div>
-                    <span className="text-[9px] font-bold px-1.5 py-0.5 bg-amber-200 text-amber-900 rounded font-mono">
-                      READ-ONLY
-                    </span>
-                  </div>
-                  <button
-                    type="button"
-                    disabled={loading}
-                    onClick={handleDemoAdminLogin}
-                    className="w-full py-2 px-3 bg-slate-900 hover:bg-slate-800 text-amber-300 font-bold text-xs rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
-                    title="Vstoupit do administrace v bezpečném režimu pouze pro čtení"
-                  >
-                    <Shield className="w-3.5 h-3.5 text-amber-400" />
-                    <span>Vyzkoušet Demo Administraci (Pouze pro čtení)</span>
-                  </button>
-                </div>
+
 
                 <div className="relative flex py-1 items-center">
                   <div className="flex-grow border-t border-slate-200"></div>
