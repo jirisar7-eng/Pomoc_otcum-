@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Home, 
   Wallet, 
@@ -54,12 +54,57 @@ export interface SituationCategory {
 export default function LifeSituationSection({ setActiveTab, initialSubTab }: LifeSituationSectionProps) {
   // Accordion state - expanded categories
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({
-    'domacnost-bydleni': true,
-    'financni-plan': true,
-    'psychika-dite': false,
-    'biff-komunikace': false,
-    'ospod-podpora': false,
+    'sjm': true,
+    'psychika': true,
+    'deti': false,
+    'obrana-pas': false,
+    'bydleni-ospod': false,
+    'mediace': false,
   });
+
+  // Handle initialSubTab deep linking & auto-expansion
+  useEffect(() => {
+    if (initialSubTab) {
+      const aliasMap: Record<string, string> = {
+        'sjm': 'sjm',
+        'majetek-sjm': 'sjm',
+        'zazemi/sjm': 'sjm',
+        'zivotni-situace/sjm': 'sjm',
+        'psychika': 'psychika',
+        'psychicka-podpora': 'psychika',
+        'zazemi/psychika': 'psychika',
+        'zivotni-situace/psychika': 'psychika',
+        'deti': 'deti',
+        'rozhovor-dite': 'deti',
+        'zazemi/deti': 'deti',
+        'zivotni-situace/deti': 'deti',
+        'obrana-pas': 'obrana-pas',
+        'ochrana-manipulace': 'obrana-pas',
+        'zazemi/obrana-pas': 'obrana-pas',
+        'zivotni-situace/obrana-pas': 'obrana-pas',
+        'bydleni-ospod': 'bydleni-ospod',
+        'bydleni-zazemi': 'bydleni-ospod',
+        'zazemi/bydleni-ospod': 'bydleni-ospod',
+        'zivotni-situace/bydleni-ospod': 'bydleni-ospod',
+        'mediace': 'mediace',
+        'rodinna-mediace': 'mediace',
+        'zazemi/mediace': 'mediace',
+        'zivotni-situace/mediace': 'mediace',
+        'biff-komunikace': 'mediace',
+        'biff-communicator': 'mediace'
+      };
+
+      const targetId = aliasMap[initialSubTab] || initialSubTab;
+      setExpandedCategories(prev => ({ ...prev, [targetId]: true }));
+
+      setTimeout(() => {
+        const el = document.getElementById(targetId) || document.getElementById(`cat-${targetId}`);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 150);
+    }
+  }, [initialSubTab]);
 
   // Toggle individual category accordion
   const toggleCategory = (id: string) => {
@@ -69,21 +114,23 @@ export default function LifeSituationSection({ setActiveTab, initialSubTab }: Li
   // Expand / Collapse all
   const expandAll = () => {
     setExpandedCategories({
-      'domacnost-bydleni': true,
-      'financni-plan': true,
-      'psychika-dite': true,
-      'biff-komunikace': true,
-      'ospod-podpora': true,
+      'sjm': true,
+      'psychika': true,
+      'deti': true,
+      'obrana-pas': true,
+      'bydleni-ospod': true,
+      'mediace': true,
     });
   };
 
   const collapseAll = () => {
     setExpandedCategories({
-      'domacnost-bydleni': false,
-      'financni-plan': false,
-      'psychika-dite': false,
-      'biff-komunikace': false,
-      'ospod-podpora': false,
+      'sjm': false,
+      'psychika': false,
+      'deti': false,
+      'obrana-pas': false,
+      'bydleni-ospod': false,
+      'mediace': false,
     });
   };
 
@@ -146,59 +193,12 @@ export default function LifeSituationSection({ setActiveTab, initialSubTab }: Li
     (Object.values(housingChecks).filter(Boolean).length / Object.keys(housingChecks).length) * 100
   );
 
-  // 5 MAIN CATEGORIES DATA
+  // 6 MAIN CATEGORIES DATA
   const categories: SituationCategory[] = [
     {
-      id: 'domacnost-bydleni',
-      title: '1. Opouštět, či neopouštět společnou domácnost?',
-      subtitle: 'Právní status obydlí, rizika spojená s odejditím a ochrana práva na domov pro děti',
-      icon: Home,
-      badgeText: 'Právní status & Bydlení',
-      subsections: [
-        {
-          id: 'opusteni-domacnosti',
-          title: 'Opouštění společné domácnosti bez písemné dohody',
-          situation: 'Otec pod psychickým tlakem sbalí tašku a dočasně odejde ze společného bytu či domu. Druhý rodič vzápětí vymění zámky, zamezí kontaktu s dětmi a u OSPOD/soudu tvrdí, že otec o děti nemá zájem, opustil rodinu a děti si zvykly na výhradní péči matky.',
-          solution: 'Neopouštějte společnou domácnost bez předchozí písemné dohody o úpravě péče a styku s dětmi! Pokud je situace neúnosná a musíte se z bezpečnostních důvodů vzdálit, uzavřete okamžitě Dozatímní dohodu o péči, informujte OSPOD a trvejte na pravidelném kontaktu s dětmi ode dne 1.',
-          legalNote: '§ 743 Občanského zákoníku (OZ) – Právo na bydlení po rozvodu; Nález Ústavního soudu I. ÚS 1506/13 k zachování rodičovského kontaktu.',
-          actionablePoints: [
-            'Sjednejte písemnou Dozatímní dohodu o péči a styku s dětmi před fyzickým odstěhováním.',
-            'Oznámte svou novou doručovací adresu orgánu OSPOD i druhému rodiči prokazatelnou formou (e-mail, datová schránka).',
-            'Trvejte na přesných dnech a hodinách předávání dětí ihned od prvního týdne.',
-            'Udržujte podrobný deník o všech pokusech o kontakt a předávání dětí.'
-          ]
-        },
-        {
-          id: 'vymena-zamku',
-          title: 'Výměna zámků a protiprávní zamezení vstupu',
-          situation: 'Partnerka jednostranně vymění zámky od společného domu či bytu, ačkoliv má otec věcné či užívací právo a je tam přihlášen k trvalému pobytu. Otec zůstane bez osobních věcí, pracovních pomůcek i věcí pro děti.',
-          solution: 'Při výměně zámků zavolejte Policii ČR (158) k provedení oficiálního zápisu o zamezení vstupu do obydlí. Trvejte na vydání osobních věcí dětí i svých pracovních potřeb. Podejte k opatrovnickému soudu návrh na předběžné opatření na úpravu poměrů dítěte a umožnění vstupu.',
-          legalNote: '§ 208 Trestního zákoníku (Neoprávněný zásah do práva k domu, bytu nebo k nebytovému prostoru); § 1002 OZ (Ochrana držby).',
-          actionablePoints: [
-            'Vyžádejte si úřední záznam PČR potvrdzující protiprávní výměnu zámků.',
-            'Písemně vyzvěte druhého rodiče k předání osobních věcí a potřeb dětí s přesným termínem.',
-            'Podejte návrh na předběžné opatření podle § 452 o.s.ř. na okamžitou úpravu styku.',
-            'Vytvořte si náhradní bezpečné útočiště s plným vybavením pro potřeby dětí.'
-          ]
-        },
-        {
-          id: 'najem-vs-vlastnictvi',
-          title: 'Společný nájem bytu vs. Nemovitost v SJM / Výlučném vlastnictví',
-          situation: 'Spory o to, kdo má právo v bytě zůstat po dobu opatrovnického řízení, kdo hradí nájemné, energie a hypotéku.',
-          solution: 'V případě nájemního bytu podejte v případě nedohody návrh na zrušení společného nájmu manželů. U hypotéky hradí závazek ten, kdo nemovitost fakticky užívá, přičemž tyto platby se započítávají v rámci konečného vypořádání SJM.',
-          legalNote: '§ 766–770 OZ (Bydlení po zániku manželství) & § 742 OZ (Vypořádání SJM).',
-          actionablePoints: [
-            'Zmapujte majetkovoprávní status nemovitosti (výpis z KN, nájemní smlouva).',
-            'Sdělte bance změnu situace a požádejte o dočasnou úpravu podmínek nebo dohodu o hypotéce.',
-            'Hraďte poměrnou část nákladů prokazatelně bankovním převodem s jasným var. symbolech.'
-          ]
-        }
-      ]
-    },
-    {
-      id: 'financni-plan',
-      title: '2. Finanční krizový plán po rozchodu',
-      subtitle: 'Rozpočet nové domácnosti, vypořádání SJM, prevence dluhů a stanovení reálného výživného',
+      id: 'sjm',
+      title: '1. SJM & Majetkové vypořádání',
+      subtitle: 'Rozpočet nové domácnosti, vypořádání SJM, hypotéky, prevence dluhů a ochrana financí',
       icon: Wallet,
       badgeText: 'Finance & SJM',
       subsections: [
@@ -241,11 +241,11 @@ export default function LifeSituationSection({ setActiveTab, initialSubTab }: Li
       ]
     },
     {
-      id: 'psychika-dite',
-      title: '3. Psychická stabilizace, stres & Rozhovor s dítětem',
-      subtitle: 'Seberegulace v krizovém období, citlivá komunikace s dětmi a ochrana před zavrhováním rodiče (PAS)',
+      id: 'psychika',
+      title: '2. Psychická podpora & Prevence',
+      subtitle: 'Zvládání krizového stresu, seberegulace v konfliktech, pravidlo 24 hodin a psychohygiena',
       icon: Brain,
-      badgeText: 'Psychika & Dítě',
+      badgeText: 'Psychika & Podpora',
       subsections: [
         {
           id: 'seberegulace-stres',
@@ -258,7 +258,16 @@ export default function LifeSituationSection({ setActiveTab, initialSubTab }: Li
             'Využijte Anonymní Linku První psychické pomoci (116 123) nebo vyhledejte psychoterapii.',
             'Zaměřte se na fyzický pohyb, kvalitní spánek a podporu blízkých přátel.'
           ]
-        },
+        }
+      ]
+    },
+    {
+      id: 'deti',
+      title: '3. Jak mluvit s dítětem',
+      subtitle: 'Komunikace s dětmi o rozchodu citlivě, věkově přiměřeně, bez viny a bez traumatu',
+      icon: Heart,
+      badgeText: 'Děti & Komunikace',
+      subsections: [
         {
           id: 'rozhovor-dite',
           title: 'Jak mluvit s dítětem o rozchodu bez viny a manipulace',
@@ -270,9 +279,18 @@ export default function LifeSituationSection({ setActiveTab, initialSubTab }: Li
             'Ujistěte dítě: „Není to tvoje vina a oba pro tebe zůstáváme mámou a tátou.“',
             'Ochránit dítě před spory dospělých – nepředávejte mu soudní dokumenty ani výčitky.'
           ]
-        },
+        }
+      ]
+    },
+    {
+      id: 'obrana-pas',
+      title: '4. Ochrana před manipulací (PAS)',
+      subtitle: 'Rozpoznání syndromu zavrhovaného rodiče, narativů, bránění ve styku a právní obrana',
+      icon: ShieldAlert,
+      badgeText: 'Obrana & PAS',
+      subsections: [
         {
-          id: 'ochrana-pas',
+          id: 'ochrana-pas-sub',
           title: 'Ochrana před syndromem zavrhovaného rodiče (PAS) a popouzením',
           situation: 'Druhý rodič dětem systematicky namlouvá, že je táta opustil, ruší plánovaná předávání, odmítá telefonáty a vyvolává v dítěti silný konflikt loajality.',
           solution: 'Popouzení dětí a bránění ve styku je hrubým porušením rodičovské odpovědnosti. Ústavní soud ČR opakovaně judikoval, že soudy a OSPOD mají povinnost aktivně zakročit proti manipulaci a zajistit obnovení vazeb.',
@@ -286,45 +304,25 @@ export default function LifeSituationSection({ setActiveTab, initialSubTab }: Li
       ]
     },
     {
-      id: 'biff-komunikace',
-      title: '4. Konstruktivní komunikace s druhým rodičem (BIFF metoda)',
-      subtitle: 'Deeskalace konfliktů v SMS a e-mailech, tvorba věcných zpráv vhodných pro soudní dokazování',
-      icon: MessageSquare,
-      badgeText: 'BIFF Komunikace',
+      id: 'bydleni-ospod',
+      title: '5. Nové bydlení & OSPOD',
+      subtitle: 'Opouštění domácnosti, výměna zámků, standardy bydlení, OSPOD šetření a dávky MPSV',
+      icon: Home,
+      badgeText: 'Bydlení & OSPOD',
       subsections: [
         {
-          id: 'emocni-prestrelky',
-          title: 'Eliminace emočních výčitek a provokací v textové komunikaci',
-          situation: 'Druhý rodič zasílá dlouhé, osobní, útočné e-maily a SMS zprávy plné výčitek z minulosti a urážek s cílem vyprovokovat vás k hněvivé reakci.',
-          solution: 'Neodpovídejte na osobní útoky ani na lživá obvinění. Reagujte výhradně na věcné informace týkající se zdraví, školy a logistiky dětí s využitím metody BIFF (Brief, Informative, Friendly, Firm).',
-          legalNote: 'Metoda BIFF (High Conflict Institute, Bill Eddy) uznávaná rodinnými soudy v ČR.',
+          id: 'opusteni-domacnosti',
+          title: 'Opouštění společné domácnosti bez písemné dohody',
+          situation: 'Otec pod psychickým tlakem sbalí tašku a dočasně odejde ze společného bytu či domu. Druhý rodič vzápětí vymění zámky, zamezí kontaktu s dětmi a u OSPOD/soudu tvrdí, že otec o děti nemá zájem, opustil rodinu a děti si zvykly na výhradní péči matky.',
+          solution: 'Neopouštějte společnou domácnost bez předchozí písemné dohody o úpravě péče a styku s dětmi! Pokud je situace neúnosná a musíte se z bezpečnostních důvodů vzdálit, uzavřete okamžitě Dozatímní dohodu o péči, informujte OSPOD a trvejte na pravidelném kontaktu s dětmi ode dne 1.',
+          legalNote: '§ 743 Občanského zákoníku (OZ) – Právo na bydlení po rozvodu; Nález Ústavního soudu I. ÚS 1506/13 k zachování rodičovského kontaktu.',
           actionablePoints: [
-            'B – Brief (Stručná): Maximálně 2–5 vět bez omáčky.',
-            'I – Informative (Informativní): Pouze fakta, časy, místa a podstatné informace.',
-            'F – Friendly (Zdvořilá): Neutrální nebo zdvořilý tón („Dobrý den“, „Děkuji“).',
-            'F – Firm (Pevná): Jasný závěr bez otevírání nekonečné diskuze.'
+            'Sjednejte písemnou Dozatímní dohodu o péči a styku s dětmi před fyzickým odstěhováním.',
+            'Oznámte svou novou doručovací adresu orgánu OSPOD i druhému rodiči prokazatelnou formou (e-mail, datová schránka).',
+            'Trvejte na přesných dnech a hodinách předávání dětí ihned od prvního týdne.',
+            'Udržujte podrobný deník o všech pokusech o kontakt a předávání dětí.'
           ]
         },
-        {
-          id: 'biff-generator',
-          title: 'Praktické využití BIFF Šablon pro běžné rodičovské situace',
-          situation: 'Potřebujete domluvit změnu termínu předání, lékařské vyšetření nebo úhradu kroužku bez zbytečného konfliktu.',
-          solution: 'Použijte předpřipravené ověřené BIFF struktury zpráv nebo náš vestavěný interaktivní převodník textu níže.',
-          actionablePoints: [
-            'Ignorujte 90 % emotivního balastu a extrahujte pouze logistickou otázku.',
-            'Odpovídejte do 24 hodin jasným "Ano / Ne / Návrh alternativy do [Čas]".',
-            'Uchovávejte historii e-mailů jako důkaz vaší konstruktivní komunikace pro soud.'
-          ]
-        }
-      ]
-    },
-    {
-      id: 'ospod-podpora',
-      title: '5. Příprava nového domova a zázemí pro OSPOD šetření (& Státní podpora)',
-      subtitle: 'Standardy prostředí pro střídavou péči, checklist pro místní šetření OSPOD a dávky MPSV',
-      icon: Shield,
-      badgeText: 'OSPOD & Dávky MPSV',
-      subsections: [
         {
           id: 'ospod-setreni',
           title: 'Příprava domácnosti pro místní šetření OSPOD',
@@ -347,6 +345,40 @@ export default function LifeSituationSection({ setActiveTab, initialSubTab }: Li
             'Podávejte žádosti elektronicky přes portál JENDA (mpsv.cz) s Identitou občana.',
             'Příspěvek na bydlení lze nárokovat, pokud náklady na bydlení přesahují 30 % rozhodného příjmu.',
             'V případě akutní nouze požádejte Úřad práce o Mimořádnou okamžitou pomoc (MOP).'
+          ]
+        }
+      ]
+    },
+    {
+      id: 'mediace',
+      title: '6. Rodinná mediace & Dohoda',
+      subtitle: 'Mimosoudní řešení sporů, tvorba stabilní rodičovské dohody a deeskalace konfliktů BIFF metodou',
+      icon: HeartHandshake,
+      badgeText: 'Mediace & Dohoda',
+      subsections: [
+        {
+          id: 'emocni-prestrelky',
+          title: 'Eliminace emočních výčitek a provokací v textové komunikaci (BIFF)',
+          situation: 'Druhý rodič zasílá dlouhé, osobní, útočné e-maily a SMS zprávy plné výčitek z minulosti a urážek s cílem vyprovokovat vás k hněvivé reakci.',
+          solution: 'Neodpovídejte na osobní útoky ani na lživá obvinění. Reagujte výhradně na věcné informace týkající se zdraví, školy a logistiky dětí s využitím metody BIFF (Brief, Informative, Friendly, Firm).',
+          legalNote: 'Metoda BIFF (High Conflict Institute, Bill Eddy) uznávaná rodinnými soudy v ČR.',
+          actionablePoints: [
+            'B – Brief (Stručná): Maximálně 2–5 věty bez omáčky.',
+            'I – Informative (Informativní): Pouze fakta, časy, místa a podstatné informace.',
+            'F – Friendly (Zdvořilá): Neutrální nebo zdvořilý tón („Dobrý den“, „Děkuji“).',
+            'F – Firm (Pevná): Jasný závěr bez otevírání nekonečné diskuze.'
+          ]
+        },
+        {
+          id: 'rodinna-mediace-sub',
+          title: 'Rodinná mediace a příprava rodičovského plánu',
+          situation: 'Rodiče se nemohou dohodnout na rozložení péče, výživném nebo prázdninách a hrozí táhlý soudní spor.',
+          solution: 'Zapsaný rodinný mediátor pomáhá rodičům nalézt oboustranně přijatelnou dohodu v klidném a neutrálním prostředí.',
+          legalNote: 'Zákon č. 202/2012 Sb., o mediaci.',
+          actionablePoints: [
+            'Navrhněte druhému rodiči 3 nezávislé zapsané rodinné mediátory.',
+            'Připravte si konkrétní návrh harmonogramu střídavé péče a rozpisu svátků.',
+            'Výslednou dohodu nechte schválit opatrovnickým soudem pro získání vykonatelnosti.'
           ]
         }
       ]
@@ -387,7 +419,7 @@ export default function LifeSituationSection({ setActiveTab, initialSubTab }: Li
           <div className="pt-2 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-400 border-t border-slate-800">
             <div className="flex items-center gap-2">
               <span className="font-semibold text-slate-300">Struktura:</span>
-              <span className="bg-slate-800 px-2.5 py-1 rounded-md text-emerald-400 font-mono">5 Hlavních Kategorií</span>
+              <span className="bg-slate-800 px-2.5 py-1 rounded-md text-emerald-400 font-mono">6 Hlavních Kategorií</span>
             </div>
 
             <div className="flex items-center gap-2">
@@ -411,7 +443,7 @@ export default function LifeSituationSection({ setActiveTab, initialSubTab }: Li
       </div>
 
       {/* QUICK CATEGORY SELECTOR CARDS */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
         {categories.map((cat) => {
           const Icon = cat.icon;
           const isExpanded = expandedCategories[cat.id];
@@ -419,7 +451,13 @@ export default function LifeSituationSection({ setActiveTab, initialSubTab }: Li
             <button
               key={cat.id}
               type="button"
-              onClick={() => toggleCategory(cat.id)}
+              onClick={() => {
+                toggleCategory(cat.id);
+                const el = document.getElementById(cat.id) || document.getElementById(`cat-${cat.id}`);
+                if (el) {
+                  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+              }}
               className={`p-4 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between space-y-3 ${
                 isExpanded
                   ? 'bg-emerald-950/80 border-emerald-500/50 shadow-md ring-1 ring-emerald-500/30 text-white'
@@ -445,7 +483,7 @@ export default function LifeSituationSection({ setActiveTab, initialSubTab }: Li
 
               <div className="flex items-center justify-between text-[11px] pt-1 border-t border-slate-100/20 font-medium">
                 <span className={isExpanded ? 'text-emerald-400' : 'text-emerald-700'}>
-                  {isExpanded ? 'Sbalit bloku' : 'Otevřít sekci'}
+                  {isExpanded ? 'Sbalit blok' : 'Otevřít sekci'}
                 </span>
                 {isExpanded ? <ChevronUp className="w-4 h-4 text-emerald-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
               </div>
@@ -463,8 +501,8 @@ export default function LifeSituationSection({ setActiveTab, initialSubTab }: Li
           return (
             <div
               key={category.id}
-              id={`cat-${category.id}`}
-              className={`bg-white border rounded-3xl transition-all shadow-xs overflow-hidden ${
+              id={category.id}
+              className={`bg-white border rounded-3xl transition-all shadow-xs overflow-hidden scroll-mt-20 ${
                 isOpen ? 'border-emerald-300/80 ring-2 ring-emerald-500/10' : 'border-slate-200 hover:border-slate-300'
               }`}
             >
