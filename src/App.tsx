@@ -58,6 +58,7 @@ import PeceODiteSection from './components/PeceODiteSection';
 import KeStazeniSection from './components/KeStazeniSection';
 import KontaktSection from './components/KontaktSection';
 import CrisisSection from './components/CrisisSection';
+import CrisisNavigator from './components/CrisisNavigator';
 import SupportSection from './components/SupportSection';
 import CoParentHub from './components/CoParentHub';
 import GlossaryDrawer from './components/GlossaryDrawer';
@@ -667,8 +668,16 @@ export default function App() {
               />
             )}
 
-            {(activeTab === 'ai-guide' || activeTab === 'navigator' || activeTab === 'pruvodce-krizi') && (
+            {activeTab === 'ai-guide' && (
               <AiGuideSection />
+            )}
+
+            {(activeTab === 'crisis' || activeTab === 'pruvodce-krizi' || activeTab === 'crisis-navigator' || activeTab === 'navigator') && (
+              <CrisisNavigator
+                currentUser={currentUser}
+                setActiveTab={setActiveTab}
+                onOpenAuth={() => setAuthModalOpen(true)}
+              />
             )}
 
             {activeTab === 'ai-case-manager' && (
@@ -790,7 +799,7 @@ export default function App() {
               />
             )}
 
-            {activeTab === 'crisis' && (
+            {activeTab === 'crisis-sos' && (
               <CrisisSection 
                 setActiveTab={setActiveTab}
               />
