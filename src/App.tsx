@@ -64,6 +64,7 @@ import GlossaryDrawer from './components/GlossaryDrawer';
 import FounderStoryView from './components/FounderStoryView';
 import AiGuideSection from './components/AiGuideSection';
 import UserPortal from './components/UserPortal';
+import PersonalWorkspace from './components/PersonalWorkspace';
 import UserProfile from './components/UserProfile';
 import SitemapTimeline from './components/SitemapTimeline';
 import CareSimulator from './components/CareSimulator';
@@ -666,7 +667,7 @@ export default function App() {
               />
             )}
 
-            {activeTab === 'ai-guide' && (
+            {(activeTab === 'ai-guide' || activeTab === 'navigator' || activeTab === 'pruvodce-krizi') && (
               <AiGuideSection />
             )}
 
@@ -821,9 +822,13 @@ export default function App() {
               />
             )}
 
-            {activeTab === 'user-portal' && (
-              <UserPortal
+            {(activeTab === 'user-portal' || activeTab === 'workspace' || activeTab === 'pracovna' || activeTab === 'dashboard' || activeTab === 'osobni-pracovna') && (
+              <PersonalWorkspace
                 currentUser={currentUser}
+                setActiveTab={(tab) => {
+                  setActiveTab(tab);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
                 onOpenAuth={() => setAuthModalOpen(true)}
               />
             )}
