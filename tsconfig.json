@@ -18,6 +18,9 @@
     "paths": {
       "@/*": [
         "./*"
+      ],
+      "next/link": [
+        "./src/components/Link.tsx"
       ]
     },
     "allowImportingTsExtensions": true,

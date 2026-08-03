@@ -42,6 +42,7 @@ import CookieConsentBanner, { openCookieConsentModal } from './components/Cookie
 import HeroSection from './components/HeroSection';
 import RightsSection from './components/RightsSection';
 import DocumentsSection from './components/DocumentsSection';
+import Footer from './components/layout/Footer';
 import AdviceSection from './components/AdviceSection';
 import StoriesSection from './components/StoriesSection';
 import ForumSection from './components/ForumSection';
@@ -103,7 +104,7 @@ import JoinTeamSection from './components/JoinTeamSection';
 import LegalComplianceCenter from './components/LegalComplianceCenter';
 
 export default function App() {
-  const { t } = useLanguage();
+  const { t, language, setLanguage } = useLanguage();
   // Global Authentication & Navigation States
   const [currentUser, setCurrentUser] = useState<User | null>(() => {
     let user: User | null = null;
@@ -941,144 +942,14 @@ export default function App() {
         <RelatedContent activeTab={activeTab} setActiveTab={setActiveTab} />
       </main>
 
-      {/* Breathtaking and Professional Footer */}
-      <footer className="bg-slate-900 text-white border-t border-slate-800" id="synthesis-hub-footer">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            
-            {/* Branding & Mission */}
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-teal-400" />
-                <span className="font-bold text-base font-display">{t('brand_name', 'Táta má právo')}</span>
-              </div>
-              <p className="text-slate-400 text-xs leading-relaxed max-w-sm">
-                {t('brand_mission')}
-              </p>
-              
-              {/* Official Facebook Group Link */}
-              <div className="pt-1">
-                <a
-                  href="https://www.facebook.com/share/g/19HoPx33mn/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/40 text-blue-300 hover:text-blue-200 text-xs font-bold rounded-xl transition-all cursor-pointer"
-                >
-                  <Share2 className="w-3.5 h-3.5 text-blue-400" />
-                  <span>Oficiální Facebook Skupina</span>
-                  <ExternalLink className="w-3 h-3 text-blue-400" />
-                </a>
-              </div>
-            </div>
-
-            {/* Quick Links */}
-            <div className="space-y-3">
-              <h4 className="text-xs uppercase font-bold tracking-wider text-slate-300">{t('footer_useful_sections', 'Užitečné sekce & Právní info')}</h4>
-              <div className="grid grid-cols-2 gap-2 text-xs text-slate-400">
-                <button onClick={() => { setActiveTab('opatrovnicka-agenda'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="text-left hover:text-teal-400 transition-colors cursor-pointer">{t('nav_opatrovnicka_agenda', 'Opatrovnická agenda')}</button>
-                <button onClick={() => { setActiveTab('ke-stazeni'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="text-left hover:text-teal-400 transition-colors cursor-pointer">{t('nav_ke_stazeni', 'Vzory podání')}</button>
-                <button onClick={() => { setActiveTab('terms'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="text-left hover:text-teal-400 font-bold text-teal-300 transition-colors cursor-pointer">📜 Podmínky užívání</button>
-                <button onClick={() => { setActiveTab('privacy'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="text-left hover:text-teal-400 font-bold text-teal-300 transition-colors cursor-pointer">🛡️ Ochrana údajů (GDPR)</button>
-                <button onClick={() => { setActiveTab('legal-center'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="text-left hover:text-teal-400 font-bold text-teal-300 transition-colors cursor-pointer col-span-2">⚖️ Moje Právní Dokumenty (Compliance Center)</button>
-                <button onClick={() => { setActiveTab('kodex'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="text-left hover:text-teal-400 font-bold text-teal-300 transition-colors cursor-pointer col-span-2">🛡️ Dobrovolnický Kodex (v1.0)</button>
-                <button onClick={() => { setActiveTab('zapoj-se'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="text-left hover:text-teal-400 font-bold text-emerald-300 transition-colors cursor-pointer col-span-2">🤝 Hledáme kolegy (Dobrovolnictví)</button>
-                <button onClick={() => { setActiveTab('user-manual'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="text-left hover:text-teal-400 font-bold text-slate-300 transition-colors cursor-pointer">📖 Nápověda & Manuál</button>
-                <button onClick={() => { setActiveTab('plan-pece'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="text-left hover:text-teal-400 transition-colors cursor-pointer">{t('nav_plan_pece', 'Plán péče')}</button>
-                <button onClick={() => { setActiveTab('user-portal'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="text-left hover:text-teal-400 transition-colors cursor-pointer">{t('nav_user_portal', 'Můj portál')}</button>
-                <button onClick={() => { setActiveTab('contacts'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="text-left hover:text-teal-400 transition-colors cursor-pointer">Kontakt na autora</button>
-                <button onClick={() => openCookieConsentModal()} className="text-left hover:text-teal-400 transition-colors cursor-pointer col-span-2 text-slate-400 hover:text-amber-300">🍪 Nastavení Cookie preferencí</button>
-                <button onClick={() => { setActiveTab('sitemap'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="text-left hover:text-teal-400 font-bold text-teal-400 transition-colors cursor-pointer flex items-center gap-1 mt-1 col-span-2">
-                  📂 {t('btn_sitemap', 'Vývoj projektu (Tech Lab)')}
-                </button>
-              </div>
-            </div>
-
-            {/* Disclaimer & Conditions of Use */}
-            <div className="space-y-3">
-              <h4 className="text-xs uppercase font-bold tracking-wider text-slate-300">{t('footer_disclaimer_title', 'Podmínky užívání & AI Prohlášení')}</h4>
-              <p className="text-slate-400 text-[11px] leading-relaxed">
-                {t('footer_disclaimer_text')}
-              </p>
-              <div className="flex flex-wrap gap-2 pt-1">
-                <button
-                  onClick={() => { setActiveTab('terms'); window.scrollTo({top: 0, behavior: 'smooth'}); }}
-                  className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-teal-300 text-[11px] font-bold rounded-lg border border-slate-700 transition-colors cursor-pointer"
-                >
-                  📜 Podmínky užívání
-                </button>
-                <button
-                  onClick={() => { setActiveTab('privacy'); window.scrollTo({top: 0, behavior: 'smooth'}); }}
-                  className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-teal-300 text-[11px] font-bold rounded-lg border border-slate-700 transition-colors cursor-pointer"
-                >
-                  🛡️ GDPR & Privacy Policy
-                </button>
-                <button
-                  onClick={() => { setActiveTab('kodex'); window.scrollTo({top: 0, behavior: 'smooth'}); }}
-                  className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-teal-300 text-[11px] font-bold rounded-lg border border-slate-700 transition-colors cursor-pointer"
-                >
-                  🛡️ Dobrovolnický Kodex
-                </button>
-              </div>
-            </div>
-
-          </div>
-
-          {/* Link to Dedicated Partners & Sponsors Section */}
-          <div className="mt-8 bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm" id="sponsors-footer-notice">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-teal-500/10 border border-teal-500/30 flex items-center justify-center text-teal-400 font-bold shrink-0">
-                🤝
-              </div>
-              <div className="text-xs text-slate-300">
-                <span className="font-extrabold text-white">Podpora projektu & Sponzoři:</span> Podporují nás <strong>ALGOTECH a.s.</strong> (Cloud VPS), <strong>VEDOS Internet, a.s.</strong> (Webhosting) a <strong>FORPSI</strong> (Doména).
-              </div>
-            </div>
-            <button
-              onClick={() => { setActiveTab('partners'); window.scrollTo({top: 0, behavior: 'smooth'}); }}
-              className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-teal-300 hover:text-white border border-slate-700 font-bold text-xs rounded-xl transition-all shrink-0 flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
-            >
-              <span>Zobrazit sekci Sponzoři & Partneři</span>
-              <ExternalLink className="w-3.5 h-3.5" />
-            </button>
-          </div>
-
-          <div className="border-t border-slate-800 mt-8 pt-6 flex flex-col md:flex-row items-center justify-between text-[11px] text-slate-500 font-mono">
-            <div>
-              {t('footer_copyright')}
-            </div>
-            <div className="flex flex-wrap gap-4 mt-2 md:mt-0 items-center">
-              <LanguageSwitcher />
-              <button
-                onClick={() => { setShowIntro(true); window.scrollTo({top: 0, behavior: 'smooth'}); }}
-                className="text-amber-400 hover:text-amber-300 font-bold hover:underline transition-colors cursor-pointer flex items-center gap-1 mr-2"
-              >
-                📢 Beta Oznámení (Intro)
-              </button>
-              <button
-                onClick={() => { setActiveTab('sitemap'); window.scrollTo({top: 0, behavior: 'smooth'}); }}
-                className="text-teal-400 hover:text-teal-300 font-bold hover:underline transition-colors cursor-pointer flex items-center gap-1 mr-2"
-              >
-                📂 {t('btn_sitemap', 'Mapa stránek & Vývoj projektu')}
-              </button>
-              <button
-                onClick={() => openCookieConsentModal()}
-                className="text-slate-400 hover:text-teal-300 transition-colors font-medium flex items-center gap-1 cursor-pointer mr-2"
-                title="Upravit nastavení cookies"
-              >
-                🍪 Cookies
-              </button>
-              <span className="flex items-center gap-1 text-slate-400">
-                <Shield className="w-3.5 h-3.5" />
-                {t('footer_rbac', 'RBAC aktivní')}
-              </span>
-              <span className="flex items-center gap-1 text-slate-400">
-                <Scale className="w-3.5 h-3.5" />
-                {t('footer_neutrality', 'Nestrannost garantována')}
-              </span>
-            </div>
-          </div>
-        </div>
-      </footer>
+      {/* Global Footer */}
+      <Footer
+        onNavigate={setActiveTab}
+        onOpenIntro={() => setShowIntro(true)}
+        onOpenCookies={openCookieConsentModal}
+        activeLanguage={language}
+        onLanguageChange={setLanguage}
+      />
 
       {/* Glossary Drawer overlay */}
       <GlossaryDrawer

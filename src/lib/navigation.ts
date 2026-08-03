@@ -88,6 +88,7 @@ const TAB_ALIASES: Record<string, string> = {
   'diskuse': 'forum',
   'contacts': 'contacts',
   'kontakty': 'contacts',
+  'kontakt': 'contacts',
   'crisis': 'crisis',
   'krize': 'crisis',
   'support': 'support',
@@ -97,6 +98,8 @@ const TAB_ALIASES: Record<string, string> = {
   'coparent-hub': 'coparent-hub',
   'user-portal': 'user-portal',
   'portal': 'user-portal',
+  'pracovna': 'user-portal',
+  'moje-pracovna': 'user-portal',
   'profil': 'profile',
   'profile': 'profile',
   'sitemap': 'sitemap',
@@ -107,14 +110,22 @@ const TAB_ALIASES: Record<string, string> = {
   'llms': 'ai-context',
   'llms-txt': 'ai-context',
   'terms': 'terms',
+  'podminky': 'terms',
   'podminky-uzivani': 'terms',
   'privacy': 'privacy',
   'ochrana-udaju': 'privacy',
   'gdpr': 'privacy',
+  'legal-center': 'legal-center',
+  'legal-compliance': 'legal-center',
+  'kodex': 'kodex',
+  'dobrovolnicky-kodex': 'kodex',
   'zapoj-se': 'zapoj-se',
   'kariera': 'zapoj-se',
   'hledame-kolegy': 'zapoj-se',
-  'join-team': 'zapoj-se'
+  'join-team': 'zapoj-se',
+  'uzivatelsky-manual': 'user-manual',
+  'user-manual': 'user-manual',
+  'vzory-podani': 'vzory-podani'
 };
 
 export interface ParsedLink {
