@@ -964,6 +964,66 @@ app.get('/api/audit-logs', (req, res) => {
 });
 
 // ==========================================
+// LEGAL COMPLIANCE CENTER SERVER ENDPOINTS
+// ==========================================
+
+// Endpoint to fetch system audit logs for Legal Compliance Center
+app.get('/api/legal/audit-logs', (req, res) => {
+  try {
+    const logs = readAuditLogs();
+    res.json({
+      success: true,
+      total: logs.length,
+      logs
+    });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Endpoint to record electronic acceptance server-side
+app.post('/api/legal/accept', (req, res) => {
+  try {
+    const { userId, userEmail, userName, documentSlug, acceptedVersion, authProvider, passkeyId } = req.body || {};
+    if (!userId || !documentSlug) {
+      return res.status(400).json({ success: false, error: 'Chybí povinné parametry userId a documentSlug.' });
+    }
+
+    const ipAddress = (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1').toString();
+    const userAgent = req.headers['user-agent'] || 'Synthesis OS Client';
+
+    const auditEntry = {
+      id: `legal-log-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+      timestamp: new Date().toISOString(),
+      action: 'LEGAL_DOCUMENT_ACCEPTED',
+      status: 'SUCCESS',
+      details: `Uživatel ${userName || userEmail || userId} akceptoval dokument '${documentSlug}' v${acceptedVersion || '1.0'}. (IP: ${ipAddress})`,
+      metadata: {
+        userId,
+        userEmail,
+        documentSlug,
+        acceptedVersion,
+        authProvider,
+        passkeyId,
+        ipAddress,
+        userAgent
+      }
+    };
+
+    writeAuditLog(auditEntry);
+
+    res.json({
+      success: true,
+      message: 'Elektronická akceptace byla zaznamenána na serveru.',
+      auditId: auditEntry.id,
+      timestamp: auditEntry.timestamp
+    });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ==========================================
 // PAGE VIEWS & VISITOR ANALYTICS API
 // ==========================================
 

@@ -98,6 +98,7 @@ import UserManualView from './components/UserManualView';
 import TermsOfService from './components/TermsOfService';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import JoinTeamSection from './components/JoinTeamSection';
+import LegalComplianceCenter from './components/LegalComplianceCenter';
 
 export default function App() {
   const { t } = useLanguage();
@@ -875,6 +876,16 @@ export default function App() {
               }} />
             )}
 
+            {(activeTab === 'legal-center' || activeTab === 'legal' || activeTab === 'compliance' || activeTab === 'moje-smlouvy' || activeTab === 'legal-docs') && (
+              <LegalComplianceCenter
+                currentUser={currentUser}
+                setActiveTab={(tab) => {
+                  setActiveTab(tab);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+              />
+            )}
+
             {(activeTab === 'zapoj-se' || activeTab === 'kariera' || activeTab === 'hledame-kolegy' || activeTab === 'join-team' || activeTab === 'kodex' || activeTab === 'dobrovolnicky-kodex') && (
               <JoinTeamSection
                 setActiveTab={(tab) => {
@@ -954,6 +965,7 @@ export default function App() {
                 <button onClick={() => { setActiveTab('ke-stazeni'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="text-left hover:text-teal-400 transition-colors cursor-pointer">{t('nav_ke_stazeni', 'Vzory podání')}</button>
                 <button onClick={() => { setActiveTab('terms'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="text-left hover:text-teal-400 font-bold text-teal-300 transition-colors cursor-pointer">📜 Podmínky užívání</button>
                 <button onClick={() => { setActiveTab('privacy'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="text-left hover:text-teal-400 font-bold text-teal-300 transition-colors cursor-pointer">🛡️ Ochrana údajů (GDPR)</button>
+                <button onClick={() => { setActiveTab('legal-center'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="text-left hover:text-teal-400 font-bold text-teal-300 transition-colors cursor-pointer col-span-2">⚖️ Moje Právní Dokumenty (Compliance Center)</button>
                 <button onClick={() => { setActiveTab('kodex'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="text-left hover:text-teal-400 font-bold text-teal-300 transition-colors cursor-pointer col-span-2">🛡️ Dobrovolnický Kodex (v1.0)</button>
                 <button onClick={() => { setActiveTab('zapoj-se'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="text-left hover:text-teal-400 font-bold text-emerald-300 transition-colors cursor-pointer col-span-2">🤝 Hledáme kolegy (Dobrovolnictví)</button>
                 <button onClick={() => { setActiveTab('user-manual'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="text-left hover:text-teal-400 font-bold text-slate-300 transition-colors cursor-pointer">📖 Nápověda & Manuál</button>
