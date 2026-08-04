@@ -1,0 +1,79 @@
+{
+  "lastCronRun": "2026-08-04T08:22:45.223Z",
+  "nextCronRun": "2026-08-05T08:22:45.223Z",
+  "totalForms": 5,
+  "status": "synced_ok",
+  "source": "Státní API e-Sbírka (api.e-sbirka.gov.cz) + MV ČR Rest API",
+  "forms": [
+    {
+      "id": "doc-stridavka-official",
+      "title": "Návrh na střídavou péči o dítě (podle § 907 NOZ)",
+      "category": "court",
+      "categoryLabel": "Opatrovnický soud",
+      "desc": "Oficiálně ověřený vzor návrhu na střídavou péči obou rodičů se zohledněním konstantní judikatury Ústavního soudu ČR.",
+      "statutoryBasis": "§ 907 odst. 2 zákona č. 89/2012 Sb. (Občanský zákoník)",
+      "eSbírkaLawRevision": "Zákon č. 89/2012 Sb. ve znění k 2026",
+      "lastSyncedFromStateApi": "2026-08-04T08:22:45.223Z",
+      "stateStampVerified": true,
+      "fileSizeKb": 28,
+      "downloadCount": 1420,
+      "content": "Okresní soud v [Město]\n[Adresa soudu]\n\nMatka: [Jméno a Příjmení matky], narozená [Datum], bytem [Adresa matky]\nOtec: [Jméno a Příjmení otce], narozený [Datum], bytem [Adresa otce]\nNezletilý/á: [Jméno a Příjmení dítěte], narozený/á [Datum]\n\nNÁVRH OTCE NA ÚPRAVU POMĚRŮ NEZLETILÉHO PRO DOBU PŘED A PO ROZVODU\n(svěření nezletilého do střídavé péče obou rodičů podle § 907 NOZ)\n\nI.\nMatka a otec jsou rodiči nezletilého dítěte. Otec se od narození plně podílí na výchově a péči. Má vytvořeny stabilní nadstandardní bytové a materiální podmínky.\n\nII.\nDle § 907 odst. 2 OZ a nálezu Ústavního soudu I. ÚS 2482/13 je střídavá péče prioritní formou uspořádání poměrů, jsou-li oba rodiče způsobilí o dítě pečovat.\n\nPETIT / R O Z S U D E K:\n1. Nezletilý/á se svěřuje do střídavé péče matky a otce v intervalu jednoho týdne.\n2. Střídání probíhá vždy v pátek v 16:00 hodin.\n\nV [Město] dne [Datum]\n\n...........................................\n[Vlastnoruční podpis otce]"
+    },
+    {
+      "id": "doc-uprava-vyzivneho-official",
+      "title": "Návrh na úpravu výživného (podle § 913 NOZ)",
+      "category": "court",
+      "categoryLabel": "Opatrovnický soud",
+      "desc": "Podání pro stanovení či úpravu výživného reflektující odůvodněné potřeby dítěte a majetkové poměry obou rodičů.",
+      "statutoryBasis": "§ 913 a § 915 zákona č. 89/2012 Sb. (Občanský zákoník)",
+      "eSbírkaLawRevision": "Zákon č. 89/2012 Sb. ve znění k 2026",
+      "lastSyncedFromStateApi": "2026-08-04T08:22:45.223Z",
+      "stateStampVerified": true,
+      "fileSizeKb": 24,
+      "downloadCount": 980,
+      "content": "Okresní soud v [Město]\n[Adresa soudu]\n\nMatka: [Jméno a Příjmení matky], narozená [Datum], bytem [Adresa matky]\nOtec: [Jméno a Příjmení otce], narozený [Datum], bytem [Adresa otce]\n\nNÁVRH NA ÚPRAVU VÝŽIVNÉHO PRO NEZLETILÉ DÍTĚ (§ 913 NOZ)\n\nZákonné odůvodnění potřeb dítěte a majetkových možností povinného rodiče. Citace tabulek výživného Ministerstva spravedlnosti ČR.\n\nV [Město] dne [Datum]\n[Podpis]"
+    },
+    {
+      "id": "doc-predebezne-official",
+      "title": "Návrh na předběžné opatření k zamezení izolace dítěte (§ 74 OSŘ)",
+      "category": "court",
+      "categoryLabel": "Naléhavá podání",
+      "desc": "Akutní návrh pro případy, kdy matka svévolně odpírá styk s dítětem. Soud rozhoduje povinně do 7 dnů.",
+      "statutoryBasis": "§ 74 a násl. OSŘ a § 420 z.č. 292/2013 Sb. o ZŘS",
+      "eSbírkaLawRevision": "Zákon č. 99/1963 Sb. a z. č. 292/2013 Sb.",
+      "lastSyncedFromStateApi": "2026-08-04T08:22:45.223Z",
+      "stateStampVerified": true,
+      "fileSizeKb": 32,
+      "downloadCount": 2150,
+      "content": "Okresní soud v [Město]\nNÁVRH NA NAŘÍZENÍ PŘEDBĚŽNÉHO OPATŘENÍ (§ 74 OSŘ)\nUrgentní prozatímní úprava kontaktu otce s dítětem pro zamezení újmě na psychickém vývoji nezletilého."
+    },
+    {
+      "id": "doc-ospod-nahlednuti-official",
+      "title": "Žádost o nahlédnutí do spisu OSPOD (§ 15 ZOSPO)",
+      "category": "ospod",
+      "categoryLabel": "OSPOD & Orgány",
+      "desc": "Oficiální žádost o zpřístupnění celého opatrovnického spisu OmSP a pořízení fotokopií všech protokolu.",
+      "statutoryBasis": "§ 15 zákona č. 359/1999 Sb. o sociálně-právní ochraně dětí",
+      "eSbírkaLawRevision": "Zákon č. 359/1999 Sb. ve znění k 2026",
+      "lastSyncedFromStateApi": "2026-08-04T08:22:45.223Z",
+      "stateStampVerified": true,
+      "fileSizeKb": 19,
+      "downloadCount": 1730,
+      "content": "Městský úřad / OSPOD v [Město]\nŽÁDOST O NAHLÉDNUTÍ DO SPISOVÉ DOKUMENTACE OSPOD (§ 15 ZOSPO)\nJako otec a zákonný zástupce nezletilého žádám o nahlédnutí do spisu a pořízení fotokopií."
+    },
+    {
+      "id": "doc-dohoda-rodicu-official",
+      "title": "Dohoda rodičů o střídavé péči a rozdělení prázdnin",
+      "category": "agreement",
+      "categoryLabel": "Dohody rodičů",
+      "desc": "Kompletní mimosoudní dohoda o péči, výživném, vánočních a letních prázdninách schválitelná opatrovnickým soudem.",
+      "statutoryBasis": "§ 906 a § 907 zákona č. 89/2012 Sb. (Občanský zákoník)",
+      "eSbírkaLawRevision": "Zákon č. 89/2012 Sb. ve znění k 2026",
+      "lastSyncedFromStateApi": "2026-08-04T08:22:45.223Z",
+      "stateStampVerified": true,
+      "fileSizeKb": 35,
+      "downloadCount": 1100,
+      "content": "DOHODA RODIČŮ O ÚPRAVĚ POMĚRŮ NEZLETILÉHO DÍTĚTE\nMatka a otec uzavírají tuto dohody o střídavé péči a úpravě prázdninového režimu."
+    }
+  ]
+}
