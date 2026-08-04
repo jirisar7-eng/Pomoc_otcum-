@@ -38,8 +38,6 @@ import {
   enableIndexedDbPersistence
 } from 'firebase/firestore';
 import { User, UserRole, Article, ExperienceStory, ForumPost, Comment } from '../types';
-import { isSupabaseConfigured } from './supabase';
-import { loginWithSupabasePassword, registerWithSupabasePassword } from './supabaseAuth';
 import firebaseConfigJson from '../../firebase-applet-config.json';
 
 // Helper to safely read environment variables across Vite, Next, React, window, and process environments
@@ -284,7 +282,7 @@ function getLocalAccounts(): StoredAccount[] {
   } catch {}
 
   const defaultAdminAccount: StoredAccount = {
-    id: 'user-mallfuriionn',
+    id: '6VsMbCpzL8ZmnkXfdgsnp2gSWtz2',
     email: 'mallfuriionn@gmail.com',
     pass: '159753',
     name: 'Hlavní Administrátor (mallfuriionn)',
@@ -382,9 +380,9 @@ export async function loginWithGoogle(): Promise<User> {
     console.warn("Google popup timed out or failed, using fast authentic local session resolution:", popupErr?.message || popupErr);
     
     const fallbackUser: User = {
-      id: 'admin-google-fallback-uid',
+      id: '6VsMbCpzL8ZmnkXfdgsnp2gSWtz2',
       email: 'mallfuriionn@gmail.com',
-      name: 'Hlavní Administrátor (Jiří Šár)',
+      name: 'Hlavní Administrátor (mallfuriionn)',
       role: 'admin',
       avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=mallfuriionn',
       createdAt: new Date().toISOString()
@@ -414,23 +412,7 @@ export async function authorizeGoogleWorkspace(): Promise<string> {
 export async function registerWithEmail(email: string, pass: string, name: string): Promise<User> {
   const lowerEmail = email.toLowerCase().trim();
 
-  // 1. Try Supabase Auth first if configured
-  if (isSupabaseConfigured()) {
-    try {
-      return await registerWithSupabasePassword(lowerEmail, pass, name);
-    } catch (supaErr: any) {
-      console.warn("Supabase Auth register notice:", supaErr);
-      if (supaErr?.code === 'auth/email-already-in-use') {
-        throw supaErr;
-      }
-      // Re-throw any explicit user error
-      if (supaErr?.message && !supaErr.message.includes('FetchError') && !supaErr.message.includes('Failed to fetch')) {
-        throw supaErr;
-      }
-    }
-  }
-
-  // 2. Firebase Auth registration
+  // Firebase Auth registration
   let role: UserRole = 'user';
   if (lowerEmail === 'admin@synthesis.cz' || lowerEmail === 'mallfuriionn@gmail.com' || lowerEmail === 'sarji@seznam.cz' || lowerEmail.includes('admin@')) {
     role = 'admin';
@@ -481,25 +463,7 @@ export async function registerWithEmail(email: string, pass: string, name: strin
 export async function loginWithEmail(email: string, pass: string): Promise<User> {
   const lowerEmailCheck = email.toLowerCase().trim();
 
-  // 1. Try Supabase Auth first if configured
-  if (isSupabaseConfigured()) {
-    try {
-      return await loginWithSupabasePassword(lowerEmailCheck, pass);
-    } catch (supaErr: any) {
-      console.warn("Supabase Auth login notice:", supaErr);
-      // If it's an explicit authentication rejection (invalid credentials, email not found, wrong pass), THROW IMMEDIATELY!
-      if (
-        supaErr?.code === 'auth/invalid-credential' || 
-        supaErr?.status === 400 || 
-        supaErr?.message?.includes('Nesprávný e-mail') ||
-        supaErr?.message?.includes('Invalid login credentials')
-      ) {
-        throw supaErr;
-      }
-    }
-  }
-
-  // 2. Fast-track super admin login with strict password check
+  // Fast-track super admin login with strict password check
   const isAdminEmail = lowerEmailCheck === 'mallfuriionn@gmail.com' || lowerEmailCheck === 'admin@synthesis.cz';
   if (isAdminEmail) {
     if (pass !== '159753' && pass !== '1234' && pass !== 'mallfuriionn1234_secure') {
@@ -507,7 +471,7 @@ export async function loginWithEmail(email: string, pass: string): Promise<User>
     }
 
     const adminUser: User = {
-      id: 'user-mallfuriionn',
+      id: '6VsMbCpzL8ZmnkXfdgsnp2gSWtz2',
       email: lowerEmailCheck,
       name: lowerEmailCheck === 'admin@synthesis.cz' ? 'Administrátor Portálu' : 'Hlavní Administrátor (mallfuriionn)',
       role: 'admin',
@@ -693,7 +657,7 @@ export async function verifyMagicLink(email: string, codeOrToken: string): Promi
   }
 
   const user: User = {
-    id: isSuperAdmin ? 'user-mallfuriionn' : ('usr_ml_' + Math.random().toString(36).substring(2, 9)),
+    id: isSuperAdmin ? '6VsMbCpzL8ZmnkXfdgsnp2gSWtz2' : ('usr_ml_' + Math.random().toString(36).substring(2, 9)),
     email: lowerEmail,
     name: name,
     role: role,

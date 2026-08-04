@@ -14,7 +14,7 @@ export interface SystemOverviewData {
   lastBuild: string;
   systemVersion: string;
   backendStatus: { status: 'online' | 'degraded' | 'offline'; latencyMs: number };
-  dbStatus: { firestore: 'online' | 'offline'; supabase: 'online' | 'offline' };
+  dbStatus: { firestore: 'online' | 'offline'; firebase: 'online' | 'offline' };
   aiServicesStatus: { gemini: 'online' | 'offline'; latencyMs: number };
   metrics: { ramUsageMb: number; ramTotalMb: number; cpuUsagePercent: number };
   counts: {

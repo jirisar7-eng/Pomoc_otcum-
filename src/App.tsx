@@ -136,7 +136,7 @@ export default function App() {
     }
     if (user && user.email) {
       const lowerEmail = user.email.toLowerCase().trim();
-      if (lowerEmail === 'mallfuriionn@gmail.com' || lowerEmail.includes('admin')) {
+      if (lowerEmail === 'mallfuriionn@gmail.com' || lowerEmail.includes('admin') || user.id === '6VsMbCpzL8ZmnkXfdgsnp2gSWtz2') {
         user.role = 'admin';
       }
     }

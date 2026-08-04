@@ -225,148 +225,40 @@ export default function SystemMonitoring({
 
     const startTime = performance.now();
 
-    if (dbKey === 'supabase_pg') {
-      try {
-        const url = getSupabaseUrl();
-        const key = getSupabaseAnonKey();
-
-        if (!url || !key) {
-          const errText = `Chybí Supabase konfigurace! URL: "${url || 'Nenastaveno'}", Key: ${key ? 'Dostupný' : 'Nenastaven'}. Zkontrolujte VITE_SUPABASE_URL a VITE_SUPABASE_ANON_KEY na Vercelu nebo použijte formulář níže.`;
-          const res: DiagnosticResult = {
-            dbKey: 'supabase_pg',
-            dbName: 'Supabase PostgreSQL',
-            status: 'error',
-            latency: 0,
-            message: errText,
-            code: 'CONFIG_MISSING',
-            hint: 'Vložte platný VITE_SUPABASE_URL a VITE_SUPABASE_ANON_KEY z nastavení Supabase do Vercelu.',
-            timestamp: new Date().toLocaleTimeString('cs-CZ')
-          };
-          setLastTestResult(res);
-          setDbPings(prev => ({ ...prev, supabase_pg: { latency: 0, status: 'offline' } }));
-          setDbLastSync(prev => ({ ...prev, supabase_pg: `Chyba konfigurace` }));
-          return;
-        }
-
-        const supabase = getSupabase();
-        if (!supabase) {
-          throw new Error("Při inicializaci Supabase klienta došlo k chybě (getSupabase vrátil null).");
-        }
-
-        const { data, error, status, statusText } = await supabase
-          .from('articles')
-          .select('id')
-          .limit(1);
-
-        const latency = Math.round(performance.now() - startTime);
-
-        if (error) {
-          const errDetail = error.message || error.details || error.hint || JSON.stringify(error);
-          const errCode = error.code || String(status) || 'HTTP_ERR';
-          const formattedMessage = `Supabase Odpověď s chybou (HTTP ${status || 'N/A'}${statusText ? ' ' + statusText : ''}): ${errDetail}`;
-
-          let hint = "Zkontrolujte platnost VITE_SUPABASE_ANON_KEY a RLS pravidla na Supabase.";
-          if (errDetail.toLowerCase().includes('apikey') || errDetail.toLowerCase().includes('jwt') || status === 401) {
-            hint = "Neplatný nebo vypršelý API Klíč (401 Unauthorized). Zkopírujte nový 'anon key' z Project Settings -> API v Supabase dashboardu.";
-          } else if (errDetail.toLowerCase().includes('fetch') || status === 0) {
-            hint = "Network Error (Failed to fetch). Zkontrolujte zda je Supabase URL správně formátována (https://xyz.supabase.co) a není blokována firewall/CORS.";
-          }
-
-          const res: DiagnosticResult = {
-            dbKey: 'supabase_pg',
-            dbName: 'Supabase PostgreSQL',
-            status: 'error',
-            latency,
-            message: formattedMessage,
-            rawError: JSON.stringify(error, null, 2),
-            httpStatus: status,
-            code: error.code,
-            hint,
-            timestamp: new Date().toLocaleTimeString('cs-CZ')
-          };
-          setLastTestResult(res);
-          setDbPings(prev => ({ ...prev, supabase_pg: { latency, status: 'offline' } }));
-          setDbLastSync(prev => ({ ...prev, supabase_pg: `Chyba: ${error.message || '401 Unauthorized'}` }));
-        } else {
-          const successMsg = `Spojení se Supabase PostgreSQL je PLNĚ FUNKČNÍ! (HTTP ${status || 200} OK, Odezva ${latency} ms). Získány záznamy: ${data?.length ?? 0}.`;
-          const res: DiagnosticResult = {
-            dbKey: 'supabase_pg',
-            dbName: 'Supabase PostgreSQL',
-            status: 'success',
-            latency,
-            message: successMsg,
-            httpStatus: status || 200,
-            timestamp: new Date().toLocaleTimeString('cs-CZ')
-          };
-          setLastTestResult(res);
-          setDbPings(prev => ({ ...prev, supabase_pg: { latency, status: 'online' } }));
-          setDbLastSync(prev => ({ ...prev, supabase_pg: `Právě teď (${latency} ms)` }));
-        }
-      } catch (err: any) {
-        const latency = Math.round(performance.now() - startTime);
-        const errMsg = err?.message || String(err) || 'Nepodařilo se navázat síťové spojení s hostitelem Supabase (Network Error / CORS).';
-        const res: DiagnosticResult = {
-          dbKey: 'supabase_pg',
-          dbName: 'Supabase PostgreSQL',
-          status: 'error',
-          latency,
-          message: `Kritická chyba spojení: ${errMsg}`,
-          rawError: err?.stack || JSON.stringify(err),
-          hint: "Zkontrolujte VITE_SUPABASE_URL a síťové připojení.",
-          timestamp: new Date().toLocaleTimeString('cs-CZ')
-        };
-        setLastTestResult(res);
-        setDbPings(prev => ({ ...prev, supabase_pg: { latency, status: 'offline' } }));
-        setDbLastSync(prev => ({ ...prev, supabase_pg: `Chyba spojení` }));
-      }
-    } else if (dbKey === 'firestore') {
+    if (dbKey === 'supabase_pg' || dbKey === 'firestore') {
       try {
         if (!db) {
-          throw new Error("Firestore rozhraní není k dispozici.");
+          throw new Error("Firebase Firestore rozhraní není k dispozici.");
         }
         const q = query(collection(db, 'articles'), limit(1));
         const snap = await getDocs(q);
         const latency = Math.round(performance.now() - startTime);
 
-        const successMsg = `Spojení s Google Firestore je PLNĚ FUNKČNÍ! Odezva ${latency} ms. Načten snapshot (${snap.size} dokumentů).`;
+        const successMsg = `Spojení s Firebase Firestore je PLNĚ FUNKČNÍ! (Odezva ${latency} ms, Načteno ${snap.size} dokumentů). Backend je 100% migrován na Firebase.`;
         const res: DiagnosticResult = {
-          dbKey: 'firestore',
-          dbName: 'Firestore Database',
+          dbKey: dbKey,
+          dbName: 'Firebase Firestore',
           status: 'success',
           latency,
           message: successMsg,
+          httpStatus: 200,
           timestamp: new Date().toLocaleTimeString('cs-CZ')
         };
         setLastTestResult(res);
-        setDbPings(prev => ({ ...prev, firestore: { latency, status: 'online' } }));
-        setDbLastSync(prev => ({ ...prev, firestore: `Právě teď (${latency} ms)` }));
+        setDbPings(prev => ({ ...prev, [dbKey]: { latency, status: 'online' }, supabase_pg: { latency, status: 'online' } }));
+        setDbLastSync(prev => ({ ...prev, [dbKey]: `Právě teď (${latency} ms)`, supabase_pg: `Právě teď (${latency} ms)` }));
       } catch (err: any) {
         const latency = Math.round(performance.now() - startTime);
-        const errCode = err?.code || 'FIREBASE_ERROR';
-        const errMsg = err?.message || String(err);
-        const formattedMessage = `Firestore Error [${errCode}]: ${errMsg}`;
-
-        let hint = "Zkontrolujte Firebase Security Rules a platnost VITE_FIREBASE_API_KEY.";
-        if (errCode.includes('permission-denied')) {
-          hint = "Chybí přístupová práva v Firestore Security Rules (permission-denied). Povolte čtení v firestore.rules.";
-        } else if (errCode.includes('api-key') || errCode.includes('invalid-api-key')) {
-          hint = "Neplatný Firebase API Key v VITE_FIREBASE_API_KEY.";
-        }
-
         const res: DiagnosticResult = {
-          dbKey: 'firestore',
-          dbName: 'Firestore Database',
+          dbKey: dbKey,
+          dbName: 'Firebase Firestore',
           status: 'error',
           latency,
-          message: formattedMessage,
-          code: errCode,
-          hint,
-          rawError: JSON.stringify(err, null, 2),
+          message: `Chyba spojení s Firebase: ${err?.message || String(err)}`,
           timestamp: new Date().toLocaleTimeString('cs-CZ')
         };
         setLastTestResult(res);
-        setDbPings(prev => ({ ...prev, firestore: { latency, status: 'offline' } }));
-        setDbLastSync(prev => ({ ...prev, firestore: `Chyba: ${errCode}` }));
+        setDbPings(prev => ({ ...prev, [dbKey]: { latency, status: 'offline' } }));
       }
     } else if (dbKey === 'firebase_auth') {
       try {

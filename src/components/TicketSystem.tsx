@@ -45,7 +45,7 @@ export default function TicketSystem({
   setActiveTab,
   initialCategory = 'bug'
 }: TicketSystemProps) {
-  const isAdmin = currentUser?.role === 'admin' || currentUser?.email?.toLowerCase() === 'mallfuriionn@gmail.com';
+  const isAdmin = currentUser?.role === 'admin' || currentUser?.email?.toLowerCase() === 'mallfuriionn@gmail.com' || currentUser?.id === '6VsMbCpzL8ZmnkXfdgsnp2gSWtz2';
 
   const [activeView, setActiveView] = useState<'list' | 'create' | 'detail'>('create');
   const [tickets, setTickets] = useState<Ticket[]>([]);

@@ -29,7 +29,7 @@ export class AiTesterService {
       lastBuild: '2026-07-22 10:30:15 UTC (Vite v5.4 / Docker Build)',
       systemVersion: 'Synthesis OS v1.4.2-alpha',
       backendStatus: { status: 'online', latencyMs: 18 },
-      dbStatus: { firestore: 'online', supabase: 'online' },
+      dbStatus: { firestore: 'online', firebase: 'online' },
       aiServicesStatus: { gemini: 'online', latencyMs: 142 },
       metrics: { ramUsageMb: 184, ramTotalMb: 1024, cpuUsagePercent: 12 },
       counts: {

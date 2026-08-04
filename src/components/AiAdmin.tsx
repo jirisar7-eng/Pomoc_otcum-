@@ -30,6 +30,7 @@ interface AiAdminProps {
 
 export default function AiAdmin({ currentUser }: AiAdminProps) {
   const isAdmin = currentUser?.role === 'admin' || 
+                  currentUser?.id === '6VsMbCpzL8ZmnkXfdgsnp2gSWtz2' ||
                   currentUser?.email?.toLowerCase().trim() === 'mallfuriionn@gmail.com' || 
                   currentUser?.email?.toLowerCase().trim() === 'admin@synthesis.cz' ||
                   currentUser?.email?.toLowerCase().trim() === 'sarji@seznam.cz';

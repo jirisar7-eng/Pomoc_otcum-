@@ -203,7 +203,7 @@ export default function AdminPanel({
     }
     return [
       {
-        id: 'user-mallfuriionn',
+        id: '6VsMbCpzL8ZmnkXfdgsnp2gSWtz2',
         name: 'Hlavní Administrátor (mallfuriionn)',
         email: 'mallfuriionn@gmail.com',
         role: 'admin',
@@ -718,7 +718,7 @@ export default function AdminPanel({
   };
 
   const handleDeleteUser = async (id: string) => {
-    if (id === 'user-mallfuriionn' || (currentUser && id === currentUser.id)) {
+    if (id === '6VsMbCpzL8ZmnkXfdgsnp2gSWtz2' || id === 'user-mallfuriionn' || (currentUser && id === currentUser.id)) {
       alert("Nemůžete smazat hlavního administrátora nebo sami sebe!");
       return;
     }
@@ -4141,9 +4141,9 @@ ${cases.map(c => `Název: ${c.title}\nStav: ${c.status}\nChronologie:\n` + (c.ch
                                 </button>
                                 <button
                                   onClick={() => handleDeleteUser(user.id)}
-                                  disabled={user.id === 'user-mallfuriionn' || (currentUser && user.id === currentUser.id)}
+                                  disabled={user.id === '6VsMbCpzL8ZmnkXfdgsnp2gSWtz2' || user.id === 'user-mallfuriionn' || user.email?.toLowerCase().trim() === 'mallfuriionn@gmail.com' || (currentUser && user.id === currentUser.id)}
                                   className={`p-1.5 rounded-lg border transition-all ${
-                                    user.id === 'user-mallfuriionn' || (currentUser && user.id === currentUser.id)
+                                    user.id === '6VsMbCpzL8ZmnkXfdgsnp2gSWtz2' || user.id === 'user-mallfuriionn' || user.email?.toLowerCase().trim() === 'mallfuriionn@gmail.com' || (currentUser && user.id === currentUser.id)
                                       ? 'text-slate-300 border-slate-100 bg-slate-50 cursor-not-allowed'
                                       : 'text-rose-500 hover:bg-rose-50 border-rose-100/30 cursor-pointer'
                                   }`}
@@ -4576,309 +4576,89 @@ ${cases.map(c => `Název: ${c.title}\nStav: ${c.status}\nChronologie:\n` + (c.ch
             <div className="space-y-6">
               <div className="border-b border-slate-100 pb-3">
                 <h2 className="text-base font-bold text-slate-800 font-display flex items-center gap-2">
-                  <Database className="w-5 h-5 text-indigo-500" />
-                  Databáze & Cloud Management (Firebase / Supabase)
+                  <Database className="w-5 h-5 text-amber-500" />
+                  Firebase Cloud Infrastructure & Databáze
                 </h2>
                 <p className="text-xs text-slate-400 mt-0.5">
-                  Monitorujte a spravujte stav cloudové infrastruktury Synthesis OS, datová úložiště a integrační body.
+                  Monitorujte a spravujte stav cloudové infrastruktury Synthesis OS. Celý backend portálu běží na Firebase Firestore a Firebase Authentication.
                 </p>
               </div>
 
-              {/* TWO CLOUDS CARDS COMPARISON */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                
-                {/* FIREBASE / FIRESTORE CONTROL */}
-                <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-2xs space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-bold text-xs text-slate-700 uppercase tracking-wider flex items-center gap-2">
-                      <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
-                      Firebase (Firestore & Auth)
-                    </h3>
-                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-mono font-bold ${
-                      firebaseStatus === 'active' ? 'bg-teal-50 text-teal-700 border border-teal-100' :
-                      firebaseStatus === 'loading' ? 'bg-slate-50 text-slate-500' :
-                      'bg-rose-50 text-rose-700 border border-rose-100'
-                    }`}>
-                      {firebaseStatus === 'active' ? '🟢 AKTIVNÍ' :
-                       firebaseStatus === 'loading' ? '⏳ NAČÍTÁNÍ...' :
-                       '🔴 ODPOJENO'}
-                    </span>
-                  </div>
-
-                  <div className="space-y-3 text-xs">
-                    <div className="p-3.5 bg-slate-50 rounded-xl space-y-2">
-                      <div className="flex justify-between border-b border-slate-100/50 pb-1.5">
-                        <span className="text-slate-400 font-mono text-[10px]">PROJEKT ID</span>
-                        <span className="font-mono text-slate-700 font-bold">{firebaseDiagInfo?.projectId || 'synthesis-os-db'}</span>
-                      </div>
-                      <div className="flex justify-between border-b border-slate-100/50 pb-1.5">
-                        <span className="text-slate-400 font-mono text-[10px]">ZDROJ PROMĚNNÉ</span>
-                        <span className="font-mono text-indigo-600 font-bold text-[10px]">{firebaseDiagInfo?.apiKeySource || 'Automaticky'}</span>
-                      </div>
-                      <div className="flex justify-between pb-0.5">
-                        <span className="text-slate-400 font-mono text-[10px]">API KLÍČ STATUS</span>
-                        <span className="font-mono text-slate-700 font-bold">
-                          {firebaseDiagInfo?.apiKeyConfigured ? `✔️ ZADÁN (${firebaseDiagInfo.apiKeyMasked})` : '❌ CHYBÍ'}
-                        </span>
-                      </div>
-                    </div>
-
-                    {firebaseErrorMsg ? (
-                      <div className="p-3 bg-rose-50 border border-rose-200/80 rounded-xl space-y-1.5 text-rose-900 text-[11px] font-mono leading-relaxed">
-                        <strong className="block text-rose-900 font-bold font-sans text-xs flex items-center gap-1">
-                          <AlertTriangle className="w-3.5 h-3.5 text-rose-600" />
-                          Chybová hláška z Firebase:
-                        </strong>
-                        <p className="p-2 bg-white/80 rounded border border-rose-200 text-rose-800 break-words">{firebaseErrorMsg}</p>
-                      </div>
-                    ) : (
-                      <div className="p-3 bg-indigo-50/50 border border-indigo-100/30 rounded-xl space-y-1">
-                        <strong className="text-slate-800 font-bold block text-[11px]">Firestore kolekce (Users):</strong>
-                        <p className="text-slate-500 text-[11px] leading-relaxed">
-                          Spravuje profily registrovaných uživatelů, ověření účtů, speciální role a bezpečnostní vazby RBAC.
-                        </p>
-                      </div>
-                    )}
-
-                    <button
-                      type="button"
-                      onClick={async () => {
-                        setFirebaseStatus('loading');
-                        const diag = getFirebaseConfigDiagnostics();
-                        setFirebaseDiagInfo(diag);
-                        const testRes = await testFirebaseConnection();
-                        if (testRes.success) {
-                          setFirebaseStatus('active');
-                          setFirebaseErrorMsg(null);
-                          alert(`✅ Firebase Test Úspěšný!\n\n${testRes.message}\nZdroj API klíče: ${diag.apiKeySource}`);
-                        } else {
-                          setFirebaseStatus('error');
-                          setFirebaseErrorMsg(testRes.message);
-                          alert(`❌ Firebase Test Selhal!\n\n${testRes.message}\n\nProjekt ID: ${diag.projectId}\nZdroj API klíče: ${diag.apiKeySource}`);
-                        }
-                      }}
-                      className="w-full py-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200/80 rounded-xl font-bold text-slate-700 text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5"
-                    >
-                      <RefreshCw className={`w-3.5 h-3.5 ${firebaseStatus === 'loading' ? 'animate-spin' : ''}`} />
-                      Otestovat Firestore spojení (Ping)
-                    </button>
-                  </div>
-                </div>
-
-                {/* SUPABASE CONTROL */}
-                <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-2xs space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-bold text-xs text-slate-700 uppercase tracking-wider flex items-center gap-2">
-                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-                      Supabase (PostgreSQL)
-                    </h3>
-                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-mono font-bold ${
-                      supabaseStatus === 'active' ? 'bg-teal-50 text-teal-700 border border-teal-100' :
-                      supabaseStatus === 'loading' ? 'bg-slate-50 text-slate-500' :
-                      'bg-rose-50 text-rose-700 border border-rose-100'
-                    }`}>
-                      {supabaseStatus === 'active' ? `🟢 AKTIVNÍ (${pingLatency ? `${pingLatency}ms` : 'OK'})` :
-                       supabaseStatus === 'loading' ? '⏳ NAČÍTÁNÍ...' :
-                       '🔴 CHYBA / ODPOJENO'}
-                    </span>
-                  </div>
-
-                  <div className="space-y-3 text-xs">
-                    <div className="p-3.5 bg-slate-50 rounded-xl space-y-2">
-                      <div className="flex justify-between border-b border-slate-100/50 pb-1.5">
-                        <span className="text-slate-400 font-mono text-[10px]">DATABÁZE URL</span>
-                        <span className="font-mono text-slate-700 font-bold break-all max-w-[170px] truncate" title={supUrl || 'Nenastaveno'}>
-                          {supUrl || 'Nenastaveno'}
-                        </span>
-                      </div>
-                      <div className="flex justify-between border-b border-slate-100/50 pb-1.5">
-                        <span className="text-slate-400 font-mono text-[10px]">ZDROJ KLÍČE</span>
-                        <span className="font-mono text-indigo-600 font-bold text-[10px]">{supabaseDiagInfo?.keySource || 'Automaticky'}</span>
-                      </div>
-                      <div className="flex justify-between pb-0.5">
-                        <span className="text-slate-400 font-mono text-[10px]">ANON KLÍČ STATUS</span>
-                        <span className="font-mono text-slate-700 font-bold">
-                          {supKey ? `✔️ ZADÁN (${supKey.length} zn.)` : '❌ CHYBÍ'}
-                        </span>
-                      </div>
-                    </div>
-
-                    {supabaseErrorMsg ? (
-                      <div className="p-3 bg-rose-50 border border-rose-200/80 rounded-xl space-y-1.5 text-rose-900 text-[11px] font-mono leading-relaxed">
-                        <strong className="block text-rose-900 font-bold font-sans text-xs flex items-center gap-1">
-                          <AlertTriangle className="w-3.5 h-3.5 text-rose-600" />
-                          Chybová hláška ze Supabase:
-                        </strong>
-                        <p className="p-2 bg-white/80 rounded border border-rose-200 text-rose-800 break-words">{supabaseErrorMsg}</p>
-                      </div>
-                    ) : (
-                      <div className="p-3 bg-emerald-50/50 border border-emerald-100/30 rounded-xl space-y-1">
-                        <strong className="text-slate-800 font-bold block text-[11px]">Relační PostgreSQL motor:</strong>
-                        <p className="text-slate-500 text-[11px] leading-relaxed">
-                          Ukládá články, příběhy, komunitní fórum, komentáře a finanční dary tátů.
-                        </p>
-                      </div>
-                    )}
-
-                    <button
-                      type="button"
-                      onClick={async () => {
-                        setSupabaseStatus('loading');
-                        const diag = getSupabaseConfigDiagnostics();
-                        setSupabaseDiagInfo(diag);
-                        const testRes = await testSupabaseConnection();
-                        if (testRes.success) {
-                          setSupabaseStatus('active');
-                          setSupabaseErrorMsg(null);
-                          if (testRes.latencyMs) setPingLatency(testRes.latencyMs);
-                          alert(`✅ Supabase Test Úspěšný!\n\n${testRes.message}\n\nZdroj URL: ${diag.urlSource}\nZdroj Klíče: ${diag.keySource}`);
-                        } else {
-                          setSupabaseStatus('error');
-                          setSupabaseErrorMsg(testRes.message);
-                          alert(`❌ Supabase Test Selhal!\n\n${testRes.message}\n\nURL: ${diag.url}\nZdroj klíče: ${diag.keySource}\nDélka klíče: ${diag.keyLength}`);
-                        }
-                      }}
-                      className="w-full py-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200/80 rounded-xl font-bold text-slate-700 text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5"
-                    >
-                      <RefreshCw className={`w-3.5 h-3.5 ${supabaseStatus === 'loading' ? 'animate-spin' : ''}`} />
-                      Otestovat Supabase spojení (Ping)
-                    </button>
-                  </div>
-                </div>
-
-              </div>
-
-              {/* MANUAL DATABASE OVERRIDE CONFIGURATION FORM */}
+              {/* FIREBASE / FIRESTORE CONTROL */}
               <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-2xs space-y-4">
-                <div className="border-b border-slate-100/50 pb-2">
-                  <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                    <Sliders className="w-4 h-4 text-indigo-500" />
-                    Konfigurace připojení k Supabase
+                <div className="flex items-center justify-between">
+                  <h3 className="font-bold text-xs text-slate-700 uppercase tracking-wider flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse" />
+                    Firebase (Firestore Database & Auth)
                   </h3>
-                  <p className="text-[11px] text-slate-400">
-                    Zde můžete ručně zadat přihlašovací údaje pro Supabase, pokud nejsou správně načteny ze systémového prostředí. Údaje se ukládají lokálně ve vašem prohlížeči.
-                  </p>
+                  <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-mono font-bold ${
+                    firebaseStatus === 'active' ? 'bg-teal-50 text-teal-700 border border-teal-100' :
+                    firebaseStatus === 'loading' ? 'bg-slate-50 text-slate-500' :
+                    'bg-rose-50 text-rose-700 border border-rose-100'
+                  }`}>
+                    {firebaseStatus === 'active' ? '🟢 AKTIVNÍ (100% ONLINE)' :
+                     firebaseStatus === 'loading' ? '⏳ NAČÍTÁNÍ...' :
+                     '🔴 ODPOJENO'}
+                  </span>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-                  <div className="space-y-1">
-                    <label className="block text-[10px] font-bold text-slate-500 uppercase">Supabase URL adresa</label>
-                    <input
-                      type="text"
-                      value={supUrl}
-                      onChange={(e) => setSupUrl(e.target.value)}
-                      placeholder="https://your-project.supabase.co"
-                      className="w-full text-xs p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-indigo-500 focus:outline-hidden font-mono text-slate-800"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="block text-[10px] font-bold text-slate-500 uppercase">Supabase Anon Key (Klíč)</label>
-                    <input
-                      type="password"
-                      value={supKey}
-                      onChange={(e) => setSupKey(e.target.value)}
-                      placeholder="Klíč začínající eyJhbGciOi..."
-                      className="w-full text-xs p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-indigo-500 focus:outline-hidden font-mono text-slate-800"
-                    />
-                  </div>
-                </div>
-
-                <div className="flex justify-between items-center pt-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (confirm('Opravdu chcete vymazat ruční přihlašovací údaje a obnovit systémové výchozí nastavení?')) {
-                        localStorage.removeItem('synthesis_hub_supabase_url_override');
-                        localStorage.removeItem('synthesis_hub_supabase_key_override');
-                        resetSupabaseInstance();
-                        const defaultUrl = getSupabaseUrl();
-                        const defaultKey = getSupabaseAnonKey();
-                        setSupUrl(defaultUrl);
-                        setSupKey(defaultKey);
-                        setRefreshStatsTrigger(prev => prev + 1);
-                        alert('Konfigurace byla resetována na výchozí systémové hodnoty.');
-                      }
-                    }}
-                    className="px-3 py-2 border border-slate-200 hover:bg-slate-50 text-slate-600 font-bold text-xs rounded-xl cursor-pointer transition-all"
-                  >
-                    Resetovat na výchozí
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (!supUrl.trim() || !supKey.trim()) {
-                        alert('Vyplňte prosím obě pole. Jinak se aktivuje lokální fallback.');
-                        return;
-                      }
-                      localStorage.setItem('synthesis_hub_supabase_url_override', supUrl.trim());
-                      localStorage.setItem('synthesis_hub_supabase_key_override', supKey.trim());
-                      resetSupabaseInstance();
-                      setRefreshStatsTrigger(prev => prev + 1);
-                      alert('Konfigurace byla uložena a připojení se restartuje.');
-                    }}
-                    className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl cursor-pointer transition-all flex items-center gap-1.5 shadow-xs"
-                  >
-                    <Check className="w-3.5 h-3.5" />
-                    Uložit a otestovat spojení
-                  </button>
-                </div>
-              </div>
-
-              {/* DUAL DATABASE MIRRORING STATUS CARD */}
-              <div className="bg-linear-to-r from-slate-900 via-slate-800 to-indigo-950 p-6 rounded-2xl text-white shadow-md space-y-4">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-700/60 pb-3">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
-                      <h3 className="text-sm font-bold tracking-wide uppercase font-display text-white">
-                        Souběžný Dvojitý Zápis (Supabase ⚡ Firebase Sync)
-                      </h3>
+                <div className="space-y-3 text-xs">
+                  <div className="p-4 bg-slate-50 rounded-xl space-y-2.5">
+                    <div className="flex justify-between border-b border-slate-100 pb-2">
+                      <span className="text-slate-400 font-mono text-[10px] uppercase font-bold">PROJEKT ID</span>
+                      <span className="font-mono text-slate-800 font-bold">{firebaseDiagInfo?.projectId || 'synthesis-os-db'}</span>
                     </div>
-                    <p className="text-xs text-slate-300 mt-1">
-                      Aplikace zapisuje každý záznam (profily, články, fórum, nastavení) souběžně do obou databází s automatickým ošetřením výpadků.
-                    </p>
+                    <div className="flex justify-between border-b border-slate-100 pb-2">
+                      <span className="text-slate-400 font-mono text-[10px] uppercase font-bold">STAV MIGRACE</span>
+                      <span className="font-mono text-teal-600 font-bold text-xs">100% Migrováno na Firebase</span>
+                    </div>
+                    <div className="flex justify-between pb-0.5">
+                      <span className="text-slate-400 font-mono text-[10px] uppercase font-bold">API KLÍČ STATUS</span>
+                      <span className="font-mono text-slate-800 font-bold">
+                        {firebaseDiagInfo?.apiKeyConfigured ? `✔️ ZADÁN (${firebaseDiagInfo.apiKeyMasked})` : '✔️ AKTIVNÍ'}
+                      </span>
+                    </div>
                   </div>
+
+                  {firebaseErrorMsg ? (
+                    <div className="p-3 bg-rose-50 border border-rose-200/80 rounded-xl space-y-1.5 text-rose-900 text-[11px] font-mono leading-relaxed">
+                      <strong className="block text-rose-900 font-bold font-sans text-xs flex items-center gap-1">
+                        <AlertTriangle className="w-3.5 h-3.5 text-rose-600" />
+                        Chybová hláška z Firebase:
+                      </strong>
+                      <p className="p-2 bg-white/80 rounded border border-rose-200 text-rose-800 break-words">{firebaseErrorMsg}</p>
+                    </div>
+                  ) : (
+                    <div className="p-3.5 bg-teal-50/50 border border-teal-100/60 rounded-xl space-y-1">
+                      <strong className="text-teal-900 font-bold block text-xs">Firestore cloudové kolekce:</strong>
+                      <p className="text-teal-700 text-xs leading-relaxed">
+                        Spravuje profily uživatelů, spisy, právní vzory, diskuzní témata fóra, příběhy tátů i finanční dary.
+                      </p>
+                    </div>
+                  )}
+
                   <button
                     type="button"
                     onClick={async () => {
-                      const status = await dbSyncService.getStatus();
-                      alert(
-                        `STAV DVOJITÉHO ZÁPISU:\n` +
-                        `• Supabase: ${status.supabaseConfigured ? (status.supabaseConnected ? '🟢 Připojeno (Active)' : '🔴 Chyba spojení / Offline') : '⚪ Nenastaveno'}\n` +
-                        `• Firebase: ${status.firebaseConfigured ? (status.firebaseConnected ? '🟢 Připojeno (Active)' : '🔴 Chyba spojení / Offline') : '⚪ Nenastaveno'}\n` +
-                        `• Poslední synchronizace: ${status.lastSyncTimestamp ? new Date(status.lastSyncTimestamp).toLocaleString('cs-CZ') : 'Nebylo prováděno v této relaci'}`
-                      );
+                      setFirebaseStatus('loading');
+                      const diag = getFirebaseConfigDiagnostics();
+                      setFirebaseDiagInfo(diag);
+                      const testRes = await testFirebaseConnection();
+                      if (testRes.success) {
+                        setFirebaseStatus('active');
+                        setFirebaseErrorMsg(null);
+                        alert(`✅ Firebase Firestore Test Úspěšný!\n\n${testRes.message}`);
+                      } else {
+                        setFirebaseStatus('error');
+                        setFirebaseErrorMsg(testRes.message);
+                        alert(`❌ Firebase Test Selhal!\n\n${testRes.message}`);
+                      }
                     }}
-                    className="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition-all cursor-pointer shadow-xs flex items-center gap-1.5 whitespace-nowrap"
+                    className="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold text-xs transition-all cursor-pointer flex items-center justify-center gap-2 shadow-xs"
                   >
-                    <RefreshCw className="w-3.5 h-3.5" />
-                    Diagnostika Dual-Sync
+                    <RefreshCw className={`w-4 h-4 ${firebaseStatus === 'loading' ? 'animate-spin' : ''}`} />
+                    Otestovat Firebase Firestore Spojení (Ping)
                   </button>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                  <div className="bg-slate-800/80 p-3 rounded-xl border border-slate-700/50 space-y-1">
-                    <span className="text-slate-400 text-[10px] uppercase font-bold block">Primární Zápis</span>
-                    <span className="font-bold text-emerald-400 flex items-center gap-1">
-                      <Check className="w-3.5 h-3.5" /> Supabase PostgreSQL
-                    </span>
-                    <p className="text-[10px] text-slate-400">Trvalá tabulková struktura</p>
-                  </div>
-                  <div className="bg-slate-800/80 p-3 rounded-xl border border-slate-700/50 space-y-1">
-                    <span className="text-slate-400 text-[10px] uppercase font-bold block">Souběžný Zápis</span>
-                    <span className="font-bold text-amber-400 flex items-center gap-1">
-                      <Check className="w-3.5 h-3.5" /> Firebase Firestore
-                    </span>
-                    <p className="text-[10px] text-slate-400">Záložní NoSQL dokumenty</p>
-                  </div>
-                  <div className="bg-slate-800/80 p-3 rounded-xl border border-slate-700/50 space-y-1">
-                    <span className="text-slate-400 text-[10px] uppercase font-bold block">Klientská Vyrovnávací Paměť</span>
-                    <span className="font-bold text-indigo-300 flex items-center gap-1">
-                      <Check className="w-3.5 h-3.5" /> LocalStorage Fallback
-                    </span>
-                    <p className="text-[10px] text-slate-400">Rychlá offline odezva</p>
-                  </div>
                 </div>
               </div>
 

@@ -566,15 +566,6 @@ export function CoParentingProvider({ children, currentUser }: CoParentingProvid
       }
 
       try {
-        const supabase = (SupabaseService as any).getSupabase ? (SupabaseService as any).getSupabase() : null;
-        if (supabase) {
-          await supabase.from('coparent_connections').delete().eq('id', connId);
-        }
-      } catch (e) {
-        console.warn('Supabase delete connection error:', e);
-      }
-
-      try {
         await deleteDoc(doc(db, 'coparent_connections', connId));
       } catch (e) {
         console.warn('Firestore delete connection error:', e);
