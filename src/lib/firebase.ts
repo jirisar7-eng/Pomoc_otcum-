@@ -38,6 +38,8 @@ import {
   enableIndexedDbPersistence
 } from 'firebase/firestore';
 import { User, UserRole, Article, ExperienceStory, ForumPost, Comment } from '../types';
+import { isSupabaseConfigured } from './supabase';
+import { loginWithSupabasePassword, registerWithSupabasePassword } from './supabaseAuth';
 import firebaseConfigJson from '../../firebase-applet-config.json';
 
 // Helper to safely read environment variables across Vite, Next, React, window, and process environments
@@ -411,6 +413,24 @@ export async function authorizeGoogleWorkspace(): Promise<string> {
 
 export async function registerWithEmail(email: string, pass: string, name: string): Promise<User> {
   const lowerEmail = email.toLowerCase().trim();
+
+  // 1. Try Supabase Auth first if configured
+  if (isSupabaseConfigured()) {
+    try {
+      return await registerWithSupabasePassword(lowerEmail, pass, name);
+    } catch (supaErr: any) {
+      console.warn("Supabase Auth register notice:", supaErr);
+      if (supaErr?.code === 'auth/email-already-in-use') {
+        throw supaErr;
+      }
+      // Re-throw any explicit user error
+      if (supaErr?.message && !supaErr.message.includes('FetchError') && !supaErr.message.includes('Failed to fetch')) {
+        throw supaErr;
+      }
+    }
+  }
+
+  // 2. Firebase Auth registration
   let role: UserRole = 'user';
   if (lowerEmail === 'admin@synthesis.cz' || lowerEmail === 'mallfuriionn@gmail.com' || lowerEmail === 'sarji@seznam.cz' || lowerEmail.includes('admin@')) {
     role = 'admin';
@@ -421,53 +441,66 @@ export async function registerWithEmail(email: string, pass: string, name: strin
     finalPass = 'mallfuriionn1234_secure';
   }
 
-  const userId = 'usr_' + Math.random().toString(36).substring(2, 9);
-  const userData: User = {
-    id: userId,
-    email: email,
-    name: name,
-    role: role,
-    avatar: `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(name)}`,
-    createdAt: new Date().toISOString()
-  };
+  try {
+    const result = await createUserWithEmailAndPassword(auth, lowerEmail, finalPass);
+    const userId = result.user.uid;
 
-  // Save to local account DB immediately for zero latency
-  saveLocalAccount({
-    id: userId,
-    email: email,
-    pass: finalPass,
-    name: name,
-    role: role,
-    createdAt: userData.createdAt
-  });
+    const userData: User = {
+      id: userId,
+      email: lowerEmail,
+      name: name,
+      role: role,
+      avatar: `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(name)}`,
+      createdAt: new Date().toISOString()
+    };
 
-  if (typeof window !== 'undefined') {
-    localStorage.setItem('synthesis_hub_local_user', JSON.stringify(userData));
-  }
-
-  // Attempt Firebase creation with fast timeout (non-blocking for UI)
-  withTimeout(createUserWithEmailAndPassword(auth, email, finalPass), 2000)
-    .then((result) => {
-      if (result?.user) {
-        userData.id = result.user.uid;
-        saveDocNonBlocking(doc(db, 'users', result.user.uid), userData);
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('synthesis_hub_local_user', JSON.stringify(userData));
-        }
-      }
-    })
-    .catch((err) => {
-      console.warn("Background Firebase register completed or skipped:", err?.message || err);
+    saveDocNonBlocking(doc(db, 'users', userId), userData);
+    saveLocalAccount({
+      id: userId,
+      email: lowerEmail,
+      pass: finalPass,
+      name: name,
+      role: role,
+      createdAt: userData.createdAt
     });
 
-  return userData;
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('synthesis_hub_local_user', JSON.stringify(userData));
+      document.cookie = `synthesis_user_session=${encodeURIComponent(JSON.stringify(userData))}; path=/; max-age=604800; SameSite=Lax`;
+    }
+
+    return userData;
+  } catch (fbErr: any) {
+    if (fbErr?.code === 'auth/email-already-in-use') {
+      throw { code: 'auth/email-already-in-use', message: 'Tento e-mail již používá jiný účet.' };
+    }
+    throw fbErr;
+  }
 }
 
 export async function loginWithEmail(email: string, pass: string): Promise<User> {
   const lowerEmailCheck = email.toLowerCase().trim();
-  const isAdminEmail = lowerEmailCheck === 'mallfuriionn@gmail.com';
 
-  // Fast-track super admin login
+  // 1. Try Supabase Auth first if configured
+  if (isSupabaseConfigured()) {
+    try {
+      return await loginWithSupabasePassword(lowerEmailCheck, pass);
+    } catch (supaErr: any) {
+      console.warn("Supabase Auth login notice:", supaErr);
+      // If it's an explicit authentication rejection (invalid credentials, email not found, wrong pass), THROW IMMEDIATELY!
+      if (
+        supaErr?.code === 'auth/invalid-credential' || 
+        supaErr?.status === 400 || 
+        supaErr?.message?.includes('Nesprávný e-mail') ||
+        supaErr?.message?.includes('Invalid login credentials')
+      ) {
+        throw supaErr;
+      }
+    }
+  }
+
+  // 2. Fast-track super admin login with strict password check
+  const isAdminEmail = lowerEmailCheck === 'mallfuriionn@gmail.com' || lowerEmailCheck === 'admin@synthesis.cz';
   if (isAdminEmail) {
     if (pass !== '159753' && pass !== '1234' && pass !== 'mallfuriionn1234_secure') {
       throw { code: 'auth/wrong-password', message: 'Nesprávné heslo pro administrátorský účet.' };
@@ -475,8 +508,8 @@ export async function loginWithEmail(email: string, pass: string): Promise<User>
 
     const adminUser: User = {
       id: 'user-mallfuriionn',
-      email: 'mallfuriionn@gmail.com',
-      name: 'Hlavní Administrátor (mallfuriionn)',
+      email: lowerEmailCheck,
+      name: lowerEmailCheck === 'admin@synthesis.cz' ? 'Administrátor Portálu' : 'Hlavní Administrátor (mallfuriionn)',
       role: 'admin',
       avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=mallfuriionn',
       createdAt: new Date().toISOString()
@@ -484,32 +517,19 @@ export async function loginWithEmail(email: string, pass: string): Promise<User>
 
     if (typeof window !== 'undefined') {
       localStorage.setItem('synthesis_hub_local_user', JSON.stringify(adminUser));
-      saveLocalAccount({
-        id: adminUser.id,
-        email: adminUser.email,
-        pass: '159753',
-        name: adminUser.name,
-        role: 'admin',
-        createdAt: adminUser.createdAt
-      });
+      document.cookie = `synthesis_user_session=${encodeURIComponent(JSON.stringify(adminUser))}; path=/; max-age=604800; SameSite=Lax`;
     }
-
-    // Try background Firebase login
-    withTimeout(signInWithEmailAndPassword(auth, lowerEmailCheck, pass), 1500)
-      .catch(() => {
-        createUserWithEmailAndPassword(auth, lowerEmailCheck, pass).catch(() => {});
-      });
 
     return adminUser;
   }
 
-  // Check local account DB
+  // 3. Check local account DB with strict password verification
   const localAccounts = getLocalAccounts();
   const matchedAccount = localAccounts.find(a => a.email.toLowerCase() === lowerEmailCheck);
 
   if (matchedAccount) {
     if (matchedAccount.pass !== pass) {
-      throw { code: 'auth/wrong-password', message: 'Nesprávné heslo.' };
+      throw { code: 'auth/wrong-password', message: 'Nesprávné heslo pro tento e-mailový účet.' };
     }
 
     const user: User = {
@@ -523,73 +543,43 @@ export async function loginWithEmail(email: string, pass: string): Promise<User>
 
     if (typeof window !== 'undefined') {
       localStorage.setItem('synthesis_hub_local_user', JSON.stringify(user));
+      document.cookie = `synthesis_user_session=${encodeURIComponent(JSON.stringify(user))}; path=/; max-age=604800; SameSite=Lax`;
     }
-
-    // Attempt background Firebase sync
-    withTimeout(signInWithEmailAndPassword(auth, email, pass), 1500).catch(() => {});
 
     return user;
   }
 
-  // Attempt Firebase login with strict 2-second timeout
+  // 4. Attempt Firebase login
   try {
-    const result = await withTimeout(signInWithEmailAndPassword(auth, email, pass), 2000, 'AUTH_TIMEOUT');
+    const result = await signInWithEmailAndPassword(auth, lowerEmailCheck, pass);
     const fbUser = result.user;
 
     let role: UserRole = 'user';
-    if (email.includes('admin@')) role = 'admin';
+    if (lowerEmailCheck.includes('admin@')) role = 'admin';
 
     const userData: User = {
       id: fbUser.uid,
-      email: email,
-      name: fbUser.displayName || email.split('@')[0],
+      email: lowerEmailCheck,
+      name: fbUser.displayName || lowerEmailCheck.split('@')[0],
       role: role,
-      avatar: `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(email)}`,
+      avatar: `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(lowerEmailCheck)}`,
       createdAt: new Date().toISOString()
     };
 
     saveDocNonBlocking(doc(db, 'users', fbUser.uid), userData, { merge: true });
     if (typeof window !== 'undefined') {
       localStorage.setItem('synthesis_hub_local_user', JSON.stringify(userData));
+      document.cookie = `synthesis_user_session=${encodeURIComponent(JSON.stringify(userData))}; path=/; max-age=604800; SameSite=Lax`;
     }
 
     return userData;
   } catch (err: any) {
-    if (
-      err?.message === 'AUTH_TIMEOUT' || 
-      err?.code === 'auth/user-not-found' || 
-      err?.code === 'auth/invalid-credential' || 
-      err?.code === 'auth/network-request-failed' ||
-      err?.code === 'auth/internal-error' ||
-      err?.code === 'auth/configuration-not-found'
-    ) {
-      // Fallback to creating local user session
-      const userData: User = {
-        id: 'usr_' + Math.random().toString(36).substring(2, 9),
-        email: email,
-        name: email.split('@')[0],
-        role: (email.includes('admin@') || email.includes('mallfuriionn')) ? 'admin' : 'user',
-        avatar: `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(email)}`,
-        createdAt: new Date().toISOString()
-      };
-
-      saveLocalAccount({
-        id: userData.id,
-        email: email,
-        pass: pass,
-        name: userData.name,
-        role: userData.role,
-        createdAt: userData.createdAt
-      });
-
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('synthesis_hub_local_user', JSON.stringify(userData));
-      }
-
-      return userData;
-    }
-
-    throw err;
+    // DO NOT CREATE MOCK FALLBACK USERS! Throw explicit authentication error so login fails gracefully.
+    console.warn("Authentication failed for email:", lowerEmailCheck, err);
+    throw {
+      code: 'auth/user-not-found',
+      message: 'Uživatel s tímto e-mailem a heslem nebyl v databázi nalezen. Zkontrolujte přihlašovací údaje.'
+    };
   }
 }
 

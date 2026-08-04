@@ -33,6 +33,8 @@ import Breadcrumbs from './components/Breadcrumbs';
 import RelatedContent from './components/RelatedContent';
 import { updatePageSeo } from './lib/seo';
 import { parseInternalLink, scrollToAnchor } from './lib/navigation';
+import { useFeatures } from './hooks/useFeatures';
+import { FeatureDisabledFallback } from './components/FeatureDisabledFallback';
 
 // Component imports
 import Navigation from './components/Navigation';
@@ -104,6 +106,7 @@ import JoinTeamSection from './components/JoinTeamSection';
 import LegalComplianceCenter from './components/LegalComplianceCenter';
 
 export default function App() {
+  const { isEnabled } = useFeatures();
   const { t, language, setLanguage } = useLanguage();
   // Global Authentication & Navigation States
   const [currentUser, setCurrentUser] = useState<User | null>(() => {
@@ -661,28 +664,56 @@ export default function App() {
             )}
 
             {(activeTab === 'ai-assistant' || activeTab === 'ai-asistent') && (
-              <AiAssistantView
-                setActiveTab={setActiveTab}
-                setSearchQuery={setSearchQuery}
-                currentUser={currentUser}
-                onOpenAuth={() => setAuthModalOpen(true)}
-              />
+              isEnabled('ai_legal_assistant') ? (
+                <AiAssistantView
+                  setActiveTab={setActiveTab}
+                  setSearchQuery={setSearchQuery}
+                  currentUser={currentUser}
+                  onOpenAuth={() => setAuthModalOpen(true)}
+                />
+              ) : (
+                <FeatureDisabledFallback
+                  featureName="AI Právní Asistent (Gemini)"
+                  onGoHome={() => setActiveTab('home')}
+                />
+              )
             )}
 
             {activeTab === 'ai-guide' && (
-              <AiGuideSection />
+              isEnabled('ai_guide') ? (
+                <AiGuideSection />
+              ) : (
+                <FeatureDisabledFallback
+                  featureName="AI Průvodce Řízením"
+                  onGoHome={() => setActiveTab('home')}
+                />
+              )
             )}
 
             {(activeTab === 'crisis' || activeTab === 'pruvodce-krizi' || activeTab === 'crisis-navigator' || activeTab === 'navigator') && (
-              <CrisisNavigator
-                currentUser={currentUser}
-                setActiveTab={setActiveTab}
-                onOpenAuth={() => setAuthModalOpen(true)}
-              />
+              isEnabled('crisis_navigator') ? (
+                <CrisisNavigator
+                  currentUser={currentUser}
+                  setActiveTab={setActiveTab}
+                  onOpenAuth={() => setAuthModalOpen(true)}
+                />
+              ) : (
+                <FeatureDisabledFallback
+                  featureName="Krizový Navigátor"
+                  onGoHome={() => setActiveTab('home')}
+                />
+              )
             )}
 
             {activeTab === 'ai-case-manager' && (
-              <AiCaseManager currentUser={currentUser} onOpenAuth={() => setAuthModalOpen(true)} />
+              isEnabled('ai_case_manager') ? (
+                <AiCaseManager currentUser={currentUser} onOpenAuth={() => setAuthModalOpen(true)} />
+              ) : (
+                <FeatureDisabledFallback
+                  featureName="AI Analýza Spisu & Důkazů"
+                  onGoHome={() => setActiveTab('home')}
+                />
+              )
             )}
 
             {activeTab === 'legal-wiki' && (
@@ -728,7 +759,14 @@ export default function App() {
             )}
 
             {activeTab === 'plan-pece' && (
-              <PlanPeceODite currentUser={currentUser} onOpenAuth={() => setAuthModalOpen(true)} setActiveTab={setActiveTab} />
+              isEnabled('care_simulator') ? (
+                <PlanPeceODite currentUser={currentUser} onOpenAuth={() => setAuthModalOpen(true)} setActiveTab={setActiveTab} />
+              ) : (
+                <FeatureDisabledFallback
+                  featureName="Simulátor Péče o Dítě"
+                  onGoHome={() => setActiveTab('home')}
+                />
+              )
             )}
 
             {activeTab === 'partners' && (

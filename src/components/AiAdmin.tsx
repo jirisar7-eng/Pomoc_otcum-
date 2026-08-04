@@ -29,6 +29,27 @@ interface AiAdminProps {
 }
 
 export default function AiAdmin({ currentUser }: AiAdminProps) {
+  const isAdmin = currentUser?.role === 'admin' || 
+                  currentUser?.email?.toLowerCase().trim() === 'mallfuriionn@gmail.com' || 
+                  currentUser?.email?.toLowerCase().trim() === 'admin@synthesis.cz' ||
+                  currentUser?.email?.toLowerCase().trim() === 'sarji@seznam.cz';
+
+  if (!isAdmin) {
+    return (
+      <div className="bg-white border border-slate-200/90 shadow-2xl rounded-3xl overflow-hidden max-w-2xl mx-auto my-10 p-8 text-center space-y-4">
+        <div className="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto">
+          <Lock className="w-6 h-6" />
+        </div>
+        <h3 className="text-xl font-bold font-display text-slate-900">
+          Vyžadováno přihlášení administrátora
+        </h3>
+        <p className="text-slate-600 text-sm">
+          Autonomní AI Admin konzole je přístupná výhradně pro ověřené administrátory portálu Synthesis OS.
+        </p>
+      </div>
+    );
+  }
+
   const [isAuditing, setIsAuditing] = useState(false);
   const [auditMessage, setAuditMessage] = useState('');
   const [issues, setIssues] = useState<AuditIssue[]>([

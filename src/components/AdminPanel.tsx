@@ -12,7 +12,7 @@ import {
   Scale, Folder, Briefcase, Camera, Video, Mic, MessageCircle,
   UserCheck, Users, Calendar, Cpu, BarChart2, Paintbrush, Search,
   Sliders, Settings, Activity, FileCode, Share2, Download, ArrowUp, ArrowDown, Tv, Github, Ticket as TicketIcon,
-  Lock, LogIn, ArrowLeft, Home, ShieldCheck, User as UserIcon
+  Lock, LogIn, ArrowLeft, Home, ShieldCheck, User as UserIcon, ToggleLeft
 } from 'lucide-react';
 import { Article, ExperienceStory, ForumPost, Comment, User, Donation, Partner } from '../types';
 import { getSupabaseUrl, getSupabaseAnonKey, isSupabaseConfigured, getSupabase, resetSupabaseInstance, testSupabaseConnection, getSupabaseConfigDiagnostics } from '../lib/supabase';
@@ -29,22 +29,23 @@ import GitHubManager from './GitHubManager';
 import TicketSystem from './TicketSystem';
 import { ElementRegistryTable } from './ElementRegistryTable';
 import PageViewsAnalytics from './PageViewsAnalytics';
+import { FeatureFlagsAdmin } from './FeatureFlagsAdmin';
 import { logDatabaseActivity } from '../utils';
 
 interface AdminPanelProps {
   currentUser: User | null;
-  articles: Article[];
-  stories: ExperienceStory[];
-  posts: ForumPost[];
-  comments: Comment[];
-  donations: Donation[];
-  partners: Partner[];
-  setArticles: React.Dispatch<React.SetStateAction<Article[]>>;
-  setStories: React.Dispatch<React.SetStateAction<ExperienceStory[]>>;
-  setPosts: React.Dispatch<React.SetStateAction<ForumPost[]>>;
-  setComments: React.Dispatch<React.SetStateAction<Comment[]>>;
-  setDonations: React.Dispatch<React.SetStateAction<Donation[]>>;
-  setPartners: React.Dispatch<React.SetStateAction<Partner[]>>;
+  articles?: Article[];
+  stories?: ExperienceStory[];
+  posts?: ForumPost[];
+  comments?: Comment[];
+  donations?: Donation[];
+  partners?: Partner[];
+  setArticles?: React.Dispatch<React.SetStateAction<Article[]>>;
+  setStories?: React.Dispatch<React.SetStateAction<ExperienceStory[]>>;
+  setPosts?: React.Dispatch<React.SetStateAction<ForumPost[]>>;
+  setComments?: React.Dispatch<React.SetStateAction<Comment[]>>;
+  setDonations?: React.Dispatch<React.SetStateAction<Donation[]>>;
+  setPartners?: React.Dispatch<React.SetStateAction<Partner[]>>;
   onOpenAuth?: () => void;
   onQuickSuperAdmin?: (user: User) => void;
   onGoHome?: () => void;
@@ -1731,6 +1732,7 @@ ${cases.map(c => `Název: ${c.title}\nStav: ${c.status}\nChronologie:\n` + (c.ch
                 {
                   category: 'IV. Uživatelé & Systém',
                   items: [
+                    { id: 'feature_flags', label: 'Správa funkcí (Feature Flags)', icon: ToggleLeft, badge: 'FLAGS' },
                     { id: 'github_manager', label: 'GitHub Integrace', icon: Github, badge: 'GITHUB' },
                     { id: 'tickets', label: 'Ticket Systém', icon: TicketIcon, badge: 'PODPORA' },
                     { id: 'users', label: 'Správa uživatelů & RBAC', icon: Users },
@@ -1820,6 +1822,7 @@ ${cases.map(c => `Název: ${c.title}\nStav: ${c.status}\nChronologie:\n` + (c.ch
               {
                 category: 'IV. Uživatelé & Systém',
                 items: [
+                  { id: 'feature_flags', label: 'Správa funkcí (Feature Flags)', icon: ToggleLeft, badge: 'FLAGS', highlight: true },
                   { id: 'github_manager', label: 'GitHub Integrace & Sync', icon: Github, badge: 'GITHUB', highlight: true },
                   { id: 'tickets', label: 'Ticket Systém & Podpora', icon: TicketIcon, badge: 'PODPORA', highlight: true },
                   { id: 'users', label: 'Správa uživatelů & RBAC', icon: Users },
@@ -1874,6 +1877,11 @@ ${cases.map(c => `Název: ${c.title}\nStav: ${c.status}\nChronologie:\n` + (c.ch
 
         {/* CONTENT AREA - Full Width on Tablet (col-span-12), 9 Cols on Desktop */}
         <div className="col-span-1 lg:col-span-9 space-y-6 min-w-0 w-full">
+
+          {/* TAB FEATURE FLAGS CONTROL PANEL */}
+          {activeMenu === 'feature_flags' && (
+            <FeatureFlagsAdmin currentUser={currentUser} />
+          )}
 
           {/* TAB GITHUB MANAGER */}
           {activeMenu === 'github_manager' && (

@@ -5,6 +5,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import portalLogo from '../assets/images/portal_logo.png';
+import { useFeatures } from '../hooks/useFeatures';
 import { 
   Search, 
   Menu, 
@@ -249,6 +250,7 @@ export default function Navigation({
   searchQuery,
   setSearchQuery
 }: NavigationProps) {
+  const { isEnabled } = useFeatures();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [categoryFilter, setCategoryFilter] = useState('');
@@ -780,10 +782,10 @@ export default function Navigation({
                           <ModuleCapsuleCard
                             id="biff-communicator"
                             label="Konstruktivní Komunikátor"
-                            desc="Generátor věcných zpráv bez emocí (BIFF metoda) pro komunikaci s druhým rodičem"
+                            desc={isEnabled('biff_communicator') ? "Generátor věcných zpráv bez emocí (BIFF metoda) pro komunikaci s druhým rodičem" : "Tento modul je dočasně pozastaven administrátorem."}
                             icon={<MessageSquare className="w-5 h-5 text-white" />}
-                            badge="BIFF / AI"
-                            accent="teal"
+                            badge={isEnabled('biff_communicator') ? "BIFF / AI" : "ÚDRŽBA"}
+                            accent={isEnabled('biff_communicator') ? "teal" : "amber"}
                             requiresAuth
                             isLoggedIn={isLoggedIn}
                             isActive={activeTab === 'biff-communicator' || activeTab === 'biff-komunikace' || activeTab === 'konstruktivni-komunikator'}
@@ -794,10 +796,10 @@ export default function Navigation({
                           <ModuleCapsuleCard
                             id="ai-assistant"
                             label="AI Právní Asistent"
-                            desc="Interaktivní konverzační asistent s právním rozborem (Gemini AI)"
+                            desc={isEnabled('ai_legal_assistant') ? "Interaktivní konverzační asistent s právním rozborem (Gemini AI)" : "Tento modul je dočasně pozastaven administrátorem."}
                             icon={<Sparkles className="w-5 h-5 text-white" />}
-                            badge="AI GEMINI"
-                            accent="teal"
+                            badge={isEnabled('ai_legal_assistant') ? "AI GEMINI" : "ÚDRŽBA"}
+                            accent={isEnabled('ai_legal_assistant') ? "teal" : "amber"}
                             requiresAuth
                             isLoggedIn={isLoggedIn}
                             isActive={activeTab === 'ai-assistant'}
@@ -808,10 +810,10 @@ export default function Navigation({
                           <ModuleCapsuleCard
                             id="plan-pece"
                             label="Simulátor Péče"
-                            desc="Matematická 28denní mřížka péče a generování tiskového výstupu"
+                            desc={isEnabled('care_simulator') ? "Matematická 28denní mřížka péče a generování tiskového výstupu" : "Tento modul je dočasně pozastaven administrátorem."}
                             icon={<Sliders className="w-5 h-5 text-white" />}
-                            badge="SIMULÁTOR"
-                            accent="amber"
+                            badge={isEnabled('care_simulator') ? "SIMULÁTOR" : "ÚDRŽBA"}
+                            accent={isEnabled('care_simulator') ? "amber" : "amber"}
                             requiresAuth
                             isLoggedIn={isLoggedIn}
                             isActive={activeTab === 'plan-pece'}
@@ -821,7 +823,8 @@ export default function Navigation({
                           <ModuleCapsuleCard
                             id="ai-guide"
                             label="AI Průvodce Řízením"
-                            desc="Generování taktického plánu na míru podle fáze sporu"
+                            desc={isEnabled('ai_guide') ? "Generování taktického plánu na míru podle fáze sporu" : "Dočasně v údržbě"}
+                            badge={!isEnabled('ai_guide') ? "ÚDRŽBA" : undefined}
                             icon={<Compass className="w-5 h-5 text-teal-600" />}
                             requiresAuth
                             isLoggedIn={isLoggedIn}
@@ -832,7 +835,8 @@ export default function Navigation({
                           <ModuleCapsuleCard
                             id="ai-case-manager"
                             label="AI Analýza Spisu & Důkazů"
-                            desc="Skenování, sémantický výtah z listin a časová osa důkazů"
+                            desc={isEnabled('ai_case_manager') ? "Skenování, sémantický výtah z listin a časová osa důkazů" : "Dočasně v údržbě"}
+                            badge={!isEnabled('ai_case_manager') ? "ÚDRŽBA" : undefined}
                             icon={<Briefcase className="w-5 h-5 text-indigo-600" />}
                             requiresAuth
                             isLoggedIn={isLoggedIn}
@@ -843,7 +847,8 @@ export default function Navigation({
                           <ModuleCapsuleCard
                             id="ke-stazeni"
                             label="Chytrý Editor Podání"
-                            desc="Dynamický editor s automatickou kontrolou přes e-Sbírku"
+                            desc={isEnabled('ke_stazeni') ? "Dynamický editor s automatickou kontrolou přes e-Sbírku" : "Dočasně v údržbě"}
+                            badge={!isEnabled('ke_stazeni') ? "ÚDRŽBA" : undefined}
                             icon={<FileText className="w-5 h-5 text-emerald-600" />}
                             requiresAuth
                             isLoggedIn={isLoggedIn}
@@ -864,10 +869,10 @@ export default function Navigation({
                           <ModuleCapsuleCard
                             id="user-portal"
                             label="Moje Pracovna (Workspace)"
-                            desc="Soukromé řídicí centrum pro správu vlastních podání a termínů"
+                            desc={isEnabled('user_portal') ? "Soukromé řídicí centrum pro správu vlastních podání a termínů" : "Dočasně pozastaveno"}
                             icon={<UserCheck className="w-5 h-5 text-white" />}
-                            badge="PRACOVNA"
-                            accent="green"
+                            badge={isEnabled('user_portal') ? "PRACOVNA" : "ÚDRŽBA"}
+                            accent={isEnabled('user_portal') ? "green" : "amber"}
                             requiresAuth
                             isLoggedIn={isLoggedIn}
                             isActive={activeTab === 'user-portal'}
@@ -878,10 +883,10 @@ export default function Navigation({
                           <ModuleCapsuleCard
                             id="coparent-hub"
                             label="Spolurodičovský Hub (CoParent)"
-                            desc="Sdílený kalendář předávání dětí, výdajů a správa mezi rodiči"
+                            desc={isEnabled('coparent_hub') ? "Sdílený kalendář předávání dětí, výdajů a správa mezi rodiči" : "Dočasně pozastaveno"}
                             icon={<Users className="w-5 h-5 text-white" />}
-                            badge="HUB"
-                            accent="indigo"
+                            badge={isEnabled('coparent_hub') ? "HUB" : "ÚDRŽBA"}
+                            accent={isEnabled('coparent_hub') ? "indigo" : "amber"}
                             requiresAuth
                             isLoggedIn={isLoggedIn}
                             isActive={activeTab === 'coparent-hub'}
