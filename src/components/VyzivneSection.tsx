@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
   Coins, 
   HelpCircle, 
@@ -20,8 +20,15 @@ import {
   Calendar,
   Layers,
   Sparkles,
-  Heart
+  Heart,
+  Save,
+  History,
+  CheckCircle2,
+  X
 } from 'lucide-react';
+import { saveAlimonyCalculation, getUserAlimonyCalculations, auth } from '../lib/firebase';
+import { AlimonyCalculation } from '../types';
+
 
 interface AgeBracket {
   label: string;
@@ -67,6 +74,58 @@ export default function VyzivneSection() {
 
   // Parent B (Shared Custody) state
   const [incomeB, setIncomeB] = useState<number>(28000);
+
+  // Firebase Saved Calculations state
+  const [savedCalculations, setSavedCalculations] = useState<AlimonyCalculation[]>([]);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [saveSuccessMessage, setSaveSuccessMessage] = useState<string | null>(null);
+  const [showHistoryModal, setShowHistoryModal] = useState<boolean>(false);
+
+  // Load user's saved calculations from Firestore
+  useEffect(() => {
+    const userId = auth.currentUser?.uid || 'demo_father';
+    getUserAlimonyCalculations(userId).then(list => {
+      setSavedCalculations(list);
+    }).catch(err => console.warn("Failed to load saved alimony calculations:", err));
+  }, []);
+
+  const handleSaveToProfile = async () => {
+    setIsSaving(true);
+    setSaveSuccessMessage(null);
+    try {
+      const userId = auth.currentUser?.uid || 'demo_father';
+      const calcData = {
+        userId,
+        childrenCount: children.length,
+        fatherIncome: baseIncomeA,
+        motherIncome: incomeB,
+        custodyType: children.some(c => c.relationType === 'primary_shared') ? ('střídavá' as const) : ('výhradní_otec' as const),
+        calculatedAlimony: totalSummary.totalAvg,
+        calculationDetailsJson: JSON.stringify({
+          children,
+          incomeA,
+          incomeB,
+          hasExecutionA,
+          executionDeductionA,
+          totalSummary
+        }),
+        date: new Date().toISOString(),
+        notes: `Výpočet výživného pro ${children.length} dětí ze dne ${new Date().toLocaleDateString('cs-CZ')}`
+      };
+
+      const newId = await saveAlimonyCalculation(calcData);
+      setSaveSuccessMessage(`✅ Výpočet byl úspěšně uložen do vašeho profilu v databázi Firestore.`);
+      
+      // Refresh list
+      const updated = await getUserAlimonyCalculations(userId);
+      setSavedCalculations(updated);
+    } catch (err: any) {
+      alert(`Nepodařilo se uložit výpočet: ${err.message || 'Chyba databáze'}`);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
 
   // Add new child helper
   const handleAddChild = () => {
@@ -712,9 +771,9 @@ export default function VyzivneSection() {
 
             {/* Global Sum total */}
             {childSupportDetails.length > 0 && (
-              <div className="bg-white p-4 rounded-xl border border-[#EBE7E0] space-y-2">
+              <div className="bg-white p-4 rounded-xl border border-[#EBE7E0] space-y-3">
                 <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider font-mono block">Celkové výživné placené Rodičem A</span>
-                <div className="flex items-baseline justify-between">
+                <div className="flex items-baseline justify-between border-b border-slate-100 pb-3">
                   <span className="text-xs text-slate-600 font-medium">Suma alimentů měsíčně:</span>
                   <div className="text-right">
                     <span className="text-lg md:text-xl font-bold text-[#7D8F69] font-display">
@@ -725,8 +784,100 @@ export default function VyzivneSection() {
                     </span>
                   </div>
                 </div>
+
+                {/* Firestore Database Sync Actions */}
+                <div className="pt-1 flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={handleSaveToProfile}
+                    disabled={isSaving}
+                    className="flex-1 py-2.5 px-3 bg-[#7D8F69] hover:bg-[#6b7d58] text-white font-bold text-xs rounded-xl cursor-pointer transition-all flex items-center justify-center gap-1.5 shadow-xs disabled:opacity-50"
+                  >
+                    <Save className="w-3.5 h-3.5" />
+                    {isSaving ? 'Ukládám do Firebase...' : 'Uložit do mého profilu (Firestore)'}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowHistoryModal(true)}
+                    className="py-2.5 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl cursor-pointer transition-all flex items-center justify-center gap-1.5"
+                  >
+                    <History className="w-3.5 h-3.5 text-slate-500" />
+                    Historie ({savedCalculations.length})
+                  </button>
+                </div>
+
+                {saveSuccessMessage && (
+                  <div className="p-2.5 bg-teal-50 border border-teal-200 rounded-lg text-teal-800 text-[11px] font-medium flex items-center gap-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0" />
+                    <span>{saveSuccessMessage}</span>
+                  </div>
+                )}
               </div>
             )}
+
+            {/* Saved Calculations History Modal */}
+            {showHistoryModal && (
+              <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+                <div className="bg-white rounded-2xl max-w-xl w-full p-6 space-y-4 max-h-[85vh] overflow-y-auto shadow-2xl border border-slate-100">
+                  <div className="flex justify-between items-center border-b border-slate-100 pb-3">
+                    <h3 className="font-bold text-slate-800 font-display text-base flex items-center gap-2">
+                      <History className="w-5 h-5 text-[#7D8F69]" />
+                      Moje uložené výpočty v databázi (Firestore)
+                    </h3>
+                    <button 
+                      type="button"
+                      onClick={() => setShowHistoryModal(false)}
+                      className="p-1 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-all cursor-pointer"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+
+                  {savedCalculations.length === 0 ? (
+                    <p className="text-xs text-slate-500 py-6 text-center">
+                      Zatím nemáte v databázi uložené žádné výpočty alimentů. Spočtěte si výživné a klikněte na "Uložit do mého profilu".
+                    </p>
+                  ) : (
+                    <div className="space-y-3">
+                      {savedCalculations.map((item) => (
+                        <div key={item.id} className="p-3.5 bg-slate-50 rounded-xl border border-slate-200/80 space-y-2">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <span className="font-bold text-slate-800 text-xs block">{item.notes}</span>
+                              <span className="text-[10px] text-slate-400 font-mono">
+                                Datum: {new Date(item.date).toLocaleString('cs-CZ')}
+                              </span>
+                            </div>
+                            <span className="px-2 py-1 bg-teal-50 text-teal-700 text-xs font-mono font-bold rounded-lg border border-teal-100">
+                              {item.calculatedAlimony.toLocaleString()} Kč / měsíc
+                            </span>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-2 text-[10px] text-slate-600 bg-white p-2 rounded-lg border border-slate-100 font-mono">
+                            <div>Příjem Otec (Rodič A): <strong>{item.fatherIncome.toLocaleString()} Kč</strong></div>
+                            <div>Příjem Matka (Rodič B): <strong>{item.motherIncome.toLocaleString()} Kč</strong></div>
+                            <div>Počet dětí: <strong>{item.childrenCount}</strong></div>
+                            <div>Péče: <strong>{item.custodyType}</strong></div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="pt-2 border-t border-slate-100 flex justify-end">
+                    <button
+                      type="button"
+                      onClick={() => setShowHistoryModal(false)}
+                      className="px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-slate-800 transition-all cursor-pointer"
+                    >
+                      Zavřít
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
 
             {/* Execution collision analysis */}
             {hasExecutionA && executionAnalysis && (

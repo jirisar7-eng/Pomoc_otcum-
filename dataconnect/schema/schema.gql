@@ -1,0 +1,145 @@
+# Firebase Data Connect GraphQL Schema for "Táta má právo" (Synthesis OS)
+# www.tatovacesta.cz - Legal, Crisis & Community Portal for Fathers
+
+# 1. CMS & KATEGORIE (21 Hlavních opatrovnických kategorií)
+type Category @table {
+  id: String! @primaryKey
+  slug: String!
+  name: String!
+  description: String!
+  icon: String
+  parentCategory: String
+  sortOrder: Int
+  isPublic: Boolean!
+  createdAt: String!
+}
+
+# 2. ČLÁNKY A PRÁVNÍ ROZBORY
+type Article @table {
+  id: String! @primaryKey
+  title: String!
+  slug: String!
+  categorySlug: String!
+  summary: String!
+  content: String!
+  author: String!
+  tags: [String!]!
+  date: String!
+  likes: Int!
+  readTime: String!
+  imageUrl: String
+  videoUrl: String
+  isFeatured: Boolean
+}
+
+# 3. JUDIKATURA (Ústavní soud, ESLP, Nejvyšší soud)
+type Judikat @table {
+  id: String! @primaryKey
+  title: String!
+  courtType: String! # 'Ústavní soud' | 'ESLP' | 'Nejvyšší soud'
+  ecli: String # European Case Law Identifier
+  rulingDate: String!
+  summary: String!
+  pdfUrl: String
+  keyTakeaways: [String!]!
+  categorySlug: String!
+  tags: [String!]!
+  importanceLevel: Int # 1-5 rating of relevance
+  createdAt: String!
+}
+
+# 4. CENTRUM FORMULÁŘŮ & VZORY PODÁNÍ
+type DocumentTemplate @table {
+  id: String! @primaryKey
+  title: String!
+  category: String! # 'petitions' | 'appeals' | 'complaints' | 'agreements'
+  description: String!
+  downloadCount: Int!
+  fileContent: String!
+  formFieldsJson: String! # JSON string describing dynamic input fields
+  createdAt: String!
+}
+
+# 5. KALKULAČKA VÝŽIVNÉHO - ULOŽENÉ VÝPOČTY
+type AlimonyCalculation @table {
+  id: String! @primaryKey
+  userId: String!
+  childrenCount: Int!
+  fatherIncome: Float!
+  motherIncome: Float!
+  custodyType: String! # 'střídavá' | 'výhradní_otec' | 'výhradní_matka'
+  calculatedAlimony: Float!
+  calculationDetailsJson: String! # Full detailed breakdown JSON
+  date: String!
+  notes: String
+}
+
+# 6. SIMULÁTOR STŘÍDAVÉ PÉČE - KONFIGURACE & HARMONOGRAMY
+type CustodySimulation @table {
+  id: String! @primaryKey
+  userId: String!
+  name: String!
+  childrenNames: [String!]!
+  modelType: String! # '2-2-3' | '7-7' | '14-14' | 'custom'
+  handoversConfigJson: String! # Handovers and school transport config
+  calendarGridJson: String! # 14-day or 28-day schedule matrix
+  createdAt: String!
+}
+
+# 7. UŽIVATELSKÁ PRACOVNA - SOUDNÍ SPISY (COURT CASES)
+type CourtCase @table {
+  id: String! @primaryKey
+  userId: String!
+  caseNumber: String! # Spisová značka např. 12 P 150/2024
+  courtName: String!
+  judgeName: String
+  childName: String!
+  status: String! # 'Aktivní' | 'Předběžné opatření' | 'Odvolání' | 'Uzavřeno'
+  notes: String
+  createdAt: String!
+  updatedAt: String!
+}
+
+# 8. SPISOVÉ DOKUMENTY & EVIDENČNÍ SOUBORY
+type CaseDocument @table {
+  id: String! @primaryKey
+  caseId: String!
+  userId: String!
+  title: String!
+  fileType: String! # 'pdf' | 'photo' | 'audio' | 'video' | 'screenshot' | 'email'
+  fileUrl: String
+  fileSize: String
+  uploadDate: String!
+  notes: String
+  tags: [String!]!
+}
+
+# 9. AI CASE MANAGER - PROTOKOLY A DIAGNOSTIKY
+type AICaseManagerLog @table {
+  id: String! @primaryKey
+  caseId: String!
+  userId: String!
+  userQuery: String!
+  analysisSummary: String!
+  recommendedNextSteps: [String!]!
+  lawsCited: [String!]!
+  timestamp: String!
+}
+
+# 10. KRIZOVÝ SOS NAVIGÁTOR - ADRESÁŘ OSPOD A INSTITUCÍ
+type CrisisInstitution @table {
+  id: String! @primaryKey
+  name: String!
+  type: String! # 'OSPOD' | 'CrisisCenter' | 'LegalAdvice' | 'Psychologist' | 'Emergency'
+  region: String! # Pardubický, Jihomoravský, Praha atd.
+  city: String!
+  address: String!
+  phone: String!
+  emergencyPhone: String
+  email: String!
+  website: String!
+  description: String!
+  gpsLat: Float
+  gpsLng: Float
+  rating: Float
+}

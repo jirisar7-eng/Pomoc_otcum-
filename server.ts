@@ -14,11 +14,14 @@ import { checkGitHubStatus, readGitHubFile, saveGitHubFile } from './src/service
 import { esbirkaService } from './src/services/esbirkaService';
 import { stateDataSyncService } from './server/stateDataSyncService';
 import pageViewsService from './server/pageViewsService';
+import { initializeApp as initFirebaseApp, getApps as getFbApps, getApp as getFbApp } from 'firebase/app';
+import { getFirestore as getFbFirestore, collection as fbCollection, addDoc as fbAddDoc, getDocs as fbGetDocs, limit as fbLimit, query as fbQuery, deleteDoc as fbDeleteDoc, doc as fbDoc } from 'firebase/firestore';
+import firebaseConfigJson from './firebase-applet-config.json';
 
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
+const PORT = 3000;
 
 app.use(express.json());
 
@@ -2192,6 +2195,75 @@ Tvoje úkoly a pravidla:
   }
 });
 
+// Testovací endpoint pro ověření funkčnosti Firebase databáze (čtení i zápis)
+app.get('/api/test-connection', async (req, res) => {
+  const startTime = Date.now();
+
+  try {
+    const firebaseConfig = {
+      apiKey: process.env.VITE_FIREBASE_API_KEY || process.env.FIREBASE_API_KEY || firebaseConfigJson.apiKey,
+      authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN || process.env.FIREBASE_AUTH_DOMAIN || firebaseConfigJson.authDomain,
+      projectId: process.env.VITE_FIREBASE_PROJECT_ID || process.env.FIREBASE_PROJECT_ID || firebaseConfigJson.projectId,
+      storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET || process.env.FIREBASE_STORAGE_BUCKET || firebaseConfigJson.storageBucket,
+      messagingSenderId: process.env.VITE_FIREBASE_MESSAGING_SENDER_ID || firebaseConfigJson.messagingSenderId,
+      appId: process.env.VITE_FIREBASE_APP_ID || firebaseConfigJson.appId,
+    };
+
+    const fbApp = getFbApps().length === 0 ? initFirebaseApp(firebaseConfig) : getFbApp();
+    const fbDb = getFbFirestore(fbApp);
+
+    // 1. Zkouška ZÁPISU do databáze (kolekce 'test_connections')
+    const testDocRef = await fbAddDoc(fbCollection(fbDb, 'test_connections'), {
+      status: 'active',
+      testedAt: new Date().toISOString(),
+      source: 'test-connection-endpoint',
+      message: 'Testovací zápis do Firebase Firestore z aplikace Táta má právo'
+    });
+
+    // 2. Zkouška ČTENÍ z databáze
+    const q = fbQuery(fbCollection(fbDb, 'test_connections'), fbLimit(5));
+    const snapshot = await fbGetDocs(q);
+
+    const readRecords: any[] = [];
+    snapshot.forEach((docSnap) => {
+      readRecords.push({ id: docSnap.id, ...docSnap.data() });
+    });
+
+    // 3. ÚKLID TESTOVACÍHO DOKUMENTU
+    if (testDocRef?.id) {
+      await fbDeleteDoc(fbDoc(fbDb, 'test_connections', testDocRef.id));
+    }
+
+    const latencyMs = Date.now() - startTime;
+
+    res.status(200).json({
+      success: true,
+      message: 'Připojení k Firebase proběhlo úspěšně',
+      details: {
+        database: 'Firebase Firestore',
+        projectId: firebaseConfig.projectId,
+        operation: 'Zápis (WRITE), Čtení (READ) a Úklid (DELETE)',
+        writtenDocId: testDocRef.id,
+        readRecordsCount: readRecords.length,
+        latencyMs,
+        timestamp: new Date().toISOString()
+      }
+    });
+  } catch (error: any) {
+    const latencyMs = Date.now() - startTime;
+    res.status(500).json({
+      success: false,
+      message: 'Chyba připojení k Firebase databázi',
+      error: error?.message || String(error),
+      details: {
+        code: error?.code || 'UNKNOWN_FIREBASE_ERROR',
+        latencyMs,
+        projectId: firebaseConfigJson?.projectId || 'pomocotcum'
+      }
+    });
+  }
+});
+
 // Global API fallback error handler to prevent HTML response on /api/* routes
 app.use('/api', (err: any, req: any, res: any, next: any) => {
   console.error('[API Catch-all Error]:', err);
@@ -2203,7 +2275,10 @@ app.use('/api', (err: any, req: any, res: any, next: any) => {
 
 // 2. VITE MIDDLEWARE SETUP FOR DEV VS STATIC PROD
 async function setupVite() {
-  if (process.env.NODE_ENV !== 'production') {
+  const distPath = path.join(process.cwd(), 'dist');
+  const isProduction = process.env.NODE_ENV === 'production' || fs.existsSync(path.join(distPath, 'index.html'));
+
+  if (!isProduction) {
     console.log('Running in DEVELOPMENT mode. Initializing Vite middleware...');
     const vite = await createViteServer({
       server: { middlewareMode: true },
@@ -2211,8 +2286,7 @@ async function setupVite() {
     });
     app.use(vite.middlewares);
   } else {
-    console.log('Running in PRODUCTION mode. Serving static assets...');
-    const distPath = path.join(process.cwd(), 'dist');
+    console.log('Running in PRODUCTION mode. Serving static assets from dist...');
     app.use(express.static(distPath));
     app.get('*', (req, res) => {
       res.sendFile(path.join(distPath, 'index.html'));

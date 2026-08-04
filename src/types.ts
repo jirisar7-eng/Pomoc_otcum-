@@ -300,6 +300,22 @@ export interface CaseInfo {
   createdAt: string;
 }
 
+export type CourtCase = CaseInfo;
+
+export interface CaseDocument {
+  id: string;
+  caseId: string;
+  userId: string;
+  title: string;
+  fileType: string;
+  fileUrl?: string;
+  fileSize?: string;
+  uploadDate: string;
+  notes?: string;
+  tags: string[];
+}
+
+
 export interface NotificationItem {
   id: string;
   title: string;
@@ -376,6 +392,92 @@ export interface VideoSource {
   tags?: string[];
   savedAt?: string;
 }
+
+// 21 Categories CMS Interface
+export interface CategoryItem {
+  id: string;
+  slug: string;
+  name: string;
+  description: string;
+  icon?: string;
+  parentCategory?: string;
+  sortOrder?: number;
+  isPublic: boolean;
+  articlesCount?: number;
+}
+
+// Judikatura / Court Rulings Interface
+export interface Judikat {
+  id: string;
+  title: string;
+  courtType: 'Ústavní soud' | 'ESLP' | 'Nejvyšší soud' | 'Vrchní soud';
+  ecli?: string;
+  rulingDate: string;
+  summary: string;
+  pdfUrl?: string;
+  keyTakeaways: string[];
+  categorySlug: string;
+  tags: string[];
+  importanceLevel?: number;
+  createdAt?: string;
+}
+
+// Saved Alimony Calculation Interface
+export interface AlimonyCalculation {
+  id: string;
+  userId: string;
+  childrenCount: number;
+  fatherIncome: number;
+  motherIncome: number;
+  custodyType: 'střídavá' | 'výhradní_otec' | 'výhradní_matka';
+  calculatedAlimony: number;
+  calculationDetailsJson: string;
+  date: string;
+  notes?: string;
+}
+
+// Saved Shared Custody Simulation Interface
+export interface CustodySimulation {
+  id: string;
+  userId: string;
+  name: string;
+  childrenNames: string[];
+  modelType: string;
+  handoversConfigJson: string;
+  calendarGridJson: string;
+  createdAt: string;
+}
+
+// AI Case Manager Log Entry
+export interface AICaseManagerLog {
+  id: string;
+  caseId: string;
+  userId: string;
+  userQuery: string;
+  analysisSummary: string;
+  recommendedNextSteps: string[];
+  lawsCited: string[];
+  timestamp: string;
+}
+
+// Crisis Navigator / OSPOD Directory Entry
+export interface CrisisInstitution {
+  id: string;
+  name: string;
+  type: 'OSPOD' | 'CrisisCenter' | 'LegalAdvice' | 'Psychologist' | 'Emergency';
+  region: string;
+  city: string;
+  address: string;
+  phone: string;
+  emergencyPhone?: string;
+  email: string;
+  website: string;
+  description: string;
+  gpsLat?: number;
+  gpsLng?: number;
+  rating?: number;
+}
+
 
 
 

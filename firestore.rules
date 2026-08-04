@@ -1,133 +1,119 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Helper functions
-    function isSignedIn() {
+    
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
       return request.auth != null;
     }
     
+    // Helper function to check if user owns the document
     function isOwner(userId) {
-      return isSignedIn() && request.auth.uid == userId;
+      return isAuthenticated() && request.auth.uid == userId;
     }
     
-    function getUserData() {
-      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
-    }
-    
+    // Helper function for admin check
     function isAdmin() {
-      return isSignedIn() && (
-        request.auth.token.email == 'admin@synthesis.cz' ||
-        request.auth.token.email.matches('.*admin@.*') ||
-        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin')
+      return isAuthenticated() && (
+        request.auth.token.email == "mallfuriionn@gmail.com" ||
+        request.auth.token.email == "admin@synthesis.cz" ||
+        request.auth.token.role == "admin" ||
+        request.auth.token.role == "superadmin"
       );
     }
 
-    function isConnectionParent(connectionId) {
-      return isSignedIn() && (
-        get(/databases/$(database)/documents/coparent_connections/$(connectionId)).data.parent1Id == request.auth.uid ||
-        ('parent2Id' in get(/databases/$(database)/documents/coparent_connections/$(connectionId)).data &&
-         get(/databases/$(database)/documents/coparent_connections/$(connectionId)).data.parent2Id == request.auth.uid)
-      );
-    }
-
-    // Users (members) profiles
-    match /users/{userId} {
+    // 1. PUBLIC READ COLLECTIONS (CMS, Categories, Rulings, Templates, SOS Institutions, Articles)
+    match /categories/{categoryId} {
       allow read: if true;
-      allow write: if isOwner(userId) || isAdmin();
-      
-      // Users documents registry
-      match /documents/{documentId} {
-        allow read, write: if isOwner(userId) || isAdmin();
-      }
+      allow write: if isAdmin();
     }
 
-    // Articles
     match /articles/{articleId} {
       allow read: if true;
       allow write: if isAdmin();
     }
 
-    // Experience Stories
-    match /stories/{storyId} {
+    match /judikaty/{judikatId} {
       allow read: if true;
-      allow create: if true; // Any user can submit a story
+      allow write: if isAdmin();
+    }
+
+    match /document_templates/{templateId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /crisis_institutions/{institutionId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /forum_posts/{postId} {
+      allow read: if true;
+      allow create: if isAuthenticated();
+      allow update, delete: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    match /comments/{commentId} {
+      allow read: if true;
+      allow create: if isAuthenticated();
+      allow update, delete: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    match /experience_stories/{storyId} {
+      allow read: if true;
+      allow create: if true; // Allows anonymous sharing
       allow update, delete: if isAdmin();
     }
 
-    // Forum Posts
-    match /posts/{postId} {
-      allow read: if true;
-      allow create: if isSignedIn();
-      allow update, delete: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
-    }
-
-    // Comments
-    match /comments/{commentId} {
-      allow read: if true;
-      allow create: if isSignedIn();
-      allow update, delete: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
-    }
-
-    // Donations
     match /donations/{donationId} {
       allow read: if true;
       allow create: if true;
       allow update, delete: if isAdmin();
     }
 
-    // Co-parent Connections (Shared family pairs)
-    match /coparent_connections/{connectionId} {
-      allow create: if isSignedIn();
-      allow read, update, delete: if isSignedIn() && (
-        resource.data.parent1Id == request.auth.uid ||
-        ('parent2Id' in resource.data && resource.data.parent2Id == request.auth.uid) ||
-        isAdmin()
-      );
+    // 2. USER PRIVATE WORKSPACE & TOOL SAVES
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow write: if isOwner(userId) || isAdmin();
     }
 
-    // Co-parent Shared Calendar
-    match /coparent_calendar/{eventId} {
-      allow create: if isSignedIn() && 
-        request.resource.data.creatorId == request.auth.uid &&
-        isConnectionParent(request.resource.data.connectionId);
-      allow read, update, delete: if isSignedIn() && (
-        isConnectionParent(resource.data.connectionId) ||
-        isAdmin()
-      );
+    match /alimony_calculations/{calcId} {
+      allow read, write: if isAuthenticated() && (resource == null || resource.data.userId == request.auth.uid || request.resource.data.userId == request.auth.uid || isAdmin());
     }
 
-    // Co-parent Shared Child Diary
+    match /custody_simulations/{simId} {
+      allow read, write: if isAuthenticated() && (resource == null || resource.data.userId == request.auth.uid || request.resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    match /court_cases/{caseId} {
+      allow read, write: if isAuthenticated() && (resource == null || resource.data.userId == request.auth.uid || request.resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    match /case_documents/{docId} {
+      allow read, write: if isAuthenticated() && (resource == null || resource.data.userId == request.auth.uid || request.resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    match /ai_case_logs/{logId} {
+      allow read, write: if isAuthenticated() && (resource == null || resource.data.userId == request.auth.uid || request.resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    match /coparent_connections/{connId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    match /coparent_events/{eventId} {
+      allow read, write: if isAuthenticated();
+    }
+
     match /coparent_diary/{diaryId} {
-      allow create: if isSignedIn() && 
-        request.resource.data.creatorId == request.auth.uid &&
-        isConnectionParent(request.resource.data.connectionId);
-      allow read, update, delete: if isSignedIn() && (
-        isConnectionParent(resource.data.connectionId) ||
-        isAdmin()
-      );
+      allow read, write: if isAuthenticated();
     }
 
-    // Co-parent Secured Chat
-    match /coparent_chat/{messageId} {
-      allow create: if isSignedIn() && 
-        request.resource.data.senderId == request.auth.uid &&
-        isConnectionParent(request.resource.data.connectionId);
-      allow read, update, delete: if isSignedIn() && (
-        isConnectionParent(resource.data.connectionId) ||
-        isAdmin()
-      );
-    }
-
-    // State Laws (e-Sbírka)
-    match /state_laws/{lawId} {
+    match /tickets/{ticketId} {
       allow read: if true;
-      allow write: if isAdmin();
-    }
-
-    // State Statistics (ČSÚ & MPSV)
-    match /state_statistics/{statId} {
-      allow read: if true;
-      allow write: if isAdmin();
+      allow create: if true;
+      allow update, delete: if isAdmin();
     }
   }
 }

@@ -880,3 +880,186 @@ export async function linkPasswordToGoogleAccount(password: string): Promise<voi
   }
 }
 
+// ---------------------------------------------------------------------------
+// SYNTHESIS OS FIRESTORE SERVICE DATA HELPERS
+// ---------------------------------------------------------------------------
+
+import { 
+  AlimonyCalculation, 
+  CustodySimulation, 
+  CourtCase, 
+  CaseDocument, 
+  AICaseManagerLog, 
+  CrisisInstitution, 
+  Judikat 
+} from '../types';
+
+/**
+ * Save an Alimony Calculation to Firestore
+ */
+export async function saveAlimonyCalculation(calc: Omit<AlimonyCalculation, 'id'> & { id?: string }): Promise<string> {
+  const id = calc.id || `calc_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+  const calcData: AlimonyCalculation = { ...calc, id };
+  await saveDocument('alimony_calculations', id, calcData);
+  return id;
+}
+
+/**
+ * Fetch user's saved Alimony Calculations from Firestore
+ */
+export async function getUserAlimonyCalculations(userId: string): Promise<AlimonyCalculation[]> {
+  try {
+    const q = query(collection(db, 'alimony_calculations'), where('userId', '==', userId));
+    const querySnapshot = await getDocs(q);
+    const list: AlimonyCalculation[] = [];
+    querySnapshot.forEach((doc) => list.push(doc.data() as AlimonyCalculation));
+    return list.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  } catch (error) {
+    console.warn("Firestore getUserAlimonyCalculations fallback:", error);
+    return [];
+  }
+}
+
+/**
+ * Save a Shared Custody Simulation to Firestore
+ */
+export async function saveCustodySimulation(sim: Omit<CustodySimulation, 'id'> & { id?: string }): Promise<string> {
+  const id = sim.id || `sim_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+  const simData: CustodySimulation = { ...sim, id };
+  await saveDocument('custody_simulations', id, simData);
+  return id;
+}
+
+/**
+ * Fetch user's saved Shared Custody Simulations from Firestore
+ */
+export async function getUserCustodySimulations(userId: string): Promise<CustodySimulation[]> {
+  try {
+    const q = query(collection(db, 'custody_simulations'), where('userId', '==', userId));
+    const querySnapshot = await getDocs(q);
+    const list: CustodySimulation[] = [];
+    querySnapshot.forEach((doc) => list.push(doc.data() as CustodySimulation));
+    return list;
+  } catch (error) {
+    console.warn("Firestore getUserCustodySimulations fallback:", error);
+    return [];
+  }
+}
+
+/**
+ * Save Court Case to Firestore
+ */
+export async function saveCourtCase(caseItem: Omit<CourtCase, 'id'> & { id?: string }): Promise<string> {
+  const id = caseItem.id || `case_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+  const caseData: CourtCase = { ...caseItem, id };
+  await saveDocument('court_cases', id, caseData);
+  return id;
+}
+
+/**
+ * Fetch Court Cases for User
+ */
+export async function getUserCourtCases(userId: string): Promise<CourtCase[]> {
+  try {
+    const q = query(collection(db, 'court_cases'), where('userId', '==', userId));
+    const querySnapshot = await getDocs(q);
+    const list: CourtCase[] = [];
+    querySnapshot.forEach((doc) => list.push(doc.data() as CourtCase));
+    return list;
+  } catch (error) {
+    console.warn("Firestore getUserCourtCases fallback:", error);
+    return [];
+  }
+}
+
+/**
+ * Save Case Evidence Document to Firestore
+ */
+export async function saveCaseDocument(docItem: Omit<CaseDocument, 'id'> & { id?: string }): Promise<string> {
+  const id = docItem.id || `doc_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+  const docData = { ...docItem, id };
+  await saveDocument('case_documents', id, docData);
+  return id;
+}
+
+/**
+ * Fetch Documents for a Court Case
+ */
+export async function getCaseDocuments(caseId: string): Promise<CaseDocument[]> {
+  try {
+    const q = query(collection(db, 'case_documents'), where('caseId', '==', caseId));
+    const querySnapshot = await getDocs(q);
+    const list: CaseDocument[] = [];
+    querySnapshot.forEach((doc) => list.push(doc.data() as CaseDocument));
+    return list;
+  } catch (error) {
+    console.warn("Firestore getCaseDocuments fallback:", error);
+    return [];
+  }
+}
+
+/**
+ * Save AI Case Manager Log
+ */
+export async function saveAICaseLog(logItem: Omit<AICaseManagerLog, 'id'> & { id?: string }): Promise<string> {
+  const id = logItem.id || `log_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+  const logData: AICaseManagerLog = { ...logItem, id };
+  await saveDocument('ai_case_logs', id, logData);
+  return id;
+}
+
+/**
+ * Fetch AI Case Manager Logs for a Case
+ */
+export async function getCaseAILogs(caseId: string): Promise<AICaseManagerLog[]> {
+  try {
+    const q = query(collection(db, 'ai_case_logs'), where('caseId', '==', caseId));
+    const querySnapshot = await getDocs(q);
+    const list: AICaseManagerLog[] = [];
+    querySnapshot.forEach((doc) => list.push(doc.data() as AICaseManagerLog));
+    return list.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+  } catch (error) {
+    console.warn("Firestore getCaseAILogs fallback:", error);
+    return [];
+  }
+}
+
+/**
+ * Fetch Crisis Institutions & OSPOD directory
+ */
+export async function getCrisisInstitutions(): Promise<CrisisInstitution[]> {
+  try {
+    return await getCollectionData<CrisisInstitution>('crisis_institutions', []);
+  } catch (error) {
+    console.warn("Firestore getCrisisInstitutions fallback:", error);
+    return [];
+  }
+}
+
+/**
+ * Save Crisis Institution (Admin function)
+ */
+export async function saveCrisisInstitution(inst: CrisisInstitution): Promise<void> {
+  await saveDocument('crisis_institutions', inst.id, inst);
+}
+
+/**
+ * Fetch Judikatura (Court Rulings)
+ */
+export async function getJudikaty(): Promise<Judikat[]> {
+  try {
+    return await getCollectionData<Judikat>('judikaty', []);
+  } catch (error) {
+    console.warn("Firestore getJudikaty fallback:", error);
+    return [];
+  }
+}
+
+/**
+ * Save Judikát
+ */
+export async function saveJudikat(judikat: Judikat): Promise<void> {
+  await saveDocument('judikaty', judikat.id, judikat);
+}
+
+
