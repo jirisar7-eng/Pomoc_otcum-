@@ -5,6 +5,7 @@
 
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getStorage } from 'firebase/storage';
+import { getAnalytics, isSupported } from 'firebase/analytics';
 import { 
   getAuth, 
   GoogleAuthProvider, 
@@ -235,6 +236,18 @@ export const auth = getAuth(app);
 
 // Initialize Storage
 export const storage = getStorage(app);
+
+// Initialize Analytics (supported in browser environment)
+export let analytics: any = null;
+if (typeof window !== 'undefined') {
+  isSupported().then((supported) => {
+    if (supported) {
+      analytics = getAnalytics(app);
+    }
+  }).catch(() => {
+    // ignore
+  });
+}
 
 // Authentication Helpers
 export const googleProvider = new GoogleAuthProvider();

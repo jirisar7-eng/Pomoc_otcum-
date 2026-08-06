@@ -3,9 +3,11 @@
   "appId": "1:720136592456:web:d1d0ec69a672a16ed40c7d",
   "apiKey": "AIzaSyDmtka218l-LeQULH8WjEAM5huZPJqG_lc",
   "authDomain": "pomocotcum.firebaseapp.com",
+  "databaseURL": "https://pomocotcum-default-rtdb.europe-west1.firebasedatabase.app",
+  "firestoreDatabaseId": "(default)",
   "storageBucket": "pomocotcum.firebasestorage.app",
   "messagingSenderId": "720136592456",
   "measurementId": "G-STGW1FXEK0",
-  "databaseURL": "https://pomocotcum-default-rtdb.europe-west1.firebasedatabase.app",
-  "oAuthClientId": "103596706520-h4soeq1hqutkuh590gpnf8uifk7b8756.apps.googleusercontent.com"
+  "oAuthClientId": "",
+  "recaptchaSiteKey": ""
 }

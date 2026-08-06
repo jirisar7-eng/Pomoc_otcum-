@@ -37,6 +37,7 @@ import { useFeatures } from './hooks/useFeatures';
 import { FeatureDisabledFallback } from './components/FeatureDisabledFallback';
 
 // Component imports
+import MigrationBanner from './components/sections/MigrationBanner';
 import Navigation from './components/Navigation';
 import PageViewTracker from './components/PageViewTracker';
 import AuthModal from './components/AuthModal';
@@ -529,6 +530,9 @@ export default function App() {
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col justify-between selection:bg-teal-500 selection:text-white" id="synthesis-hub-app-root">
       
+      {/* Oznamovací banner o migraci na VPS a sponzoringu Algotech */}
+      <MigrationBanner />
+
       {/* Navigation Header bar */}
       <Navigation
         activeTab={activeTab}
